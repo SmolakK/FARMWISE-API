@@ -42,8 +42,14 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
-  <component name="RunManager" selected="Python.imgw_api_read">
-    <configuration name="imgw_api_read" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\GitHub\FARMWISE\API_readers\imgw" />
+      <recent name="D:\GitHub\FARMWISE\utils" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.imgw_api_stations">
+    <configuration name="imgw_api_stations" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -55,7 +61,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/imgw_api_read.py" />
+      <option name="SCRIPT_NAME" value="D:\GitHub\FARMWISE\API_readers\imgw\imgw_api_stations.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -76,7 +82,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/name_to_coordinates.py" />
+      <option name="SCRIPT_NAME" value="D:\GitHub\FARMWISE\utils\name_to_coordinates.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -87,7 +93,7 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.imgw_api_read" />
+        <item itemvalue="Python.imgw_api_stations" />
         <item itemvalue="Python.name_to_coordinates" />
       </list>
     </recent_temporary>
@@ -102,16 +108,5 @@
       <updated>1711356955598</updated>
     </task>
     <servers />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/imgw_api_read.py</url>
-          <line>14</line>
-          <option name="timeStamp" value="13" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

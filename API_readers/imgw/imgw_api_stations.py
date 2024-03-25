@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 from io import StringIO
 from tqdm import tqdm
-from name_to_coordinates import get_coordinates
+from utils.name_to_coordinates import get_coordinates
 
 url = "https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteorologiczne/wykaz_stacji.csv"
 wykaz_stacji = requests.get(url)
