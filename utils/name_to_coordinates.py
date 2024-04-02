@@ -1,5 +1,6 @@
 from geopy.geocoders import Nominatim
 
+
 def get_coordinates(city_name):
     geolocator = Nominatim(user_agent='geocoder')
     location = geolocator.geocode(city_name)
