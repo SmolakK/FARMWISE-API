@@ -1,0 +1,3 @@
+from API_readers.imgw.imgw_mappings.synop_mapping import data_aliases
+
+data_aliases

@@ -17,17 +17,10 @@ s_d_COLUMNS = [
     "Measurement status AKTN"
 ]
 s_d_SELECTION = [
-    "Station code", "Station name", "Year", "Month", "Day", "Maximum daily temperature [°C]",
-    "Minimum daily temperature [°C]", "Average daily temperature [°C]", "Minimum ground temperature [°C]",
-    "Daily precipitation total [mm]", "Type of precipitation [S/W/]", "Snow cover height [cm]",
-    "Snow water equivalent [mm/cm]", "Sunshine duration [hours]", "Duration of rainfall [hours]",
-    "Duration of snowfall [hours]", "Duration of sleet [hours]", "Duration of hail [hours]",
-    "Duration of fog [hours]", "Duration of mist [hours]", "Duration of soot [hours]",
-    "Duration of freezing rain [hours]", "Duration of low snow drift [hours]",
-    "Duration of high snow drift [hours]", "Duration of haze [hours]", "Duration of wind >=10m/s [hours]",
-    "Duration of wind >15m/s [hours]", "Duration of storm [hours]", "Duration of dew [hours]",
-    "Duration of frost [hours]", "Occurrence of snow cover [0/1]", "Occurrence of lightning [0/1]",
-    "Ground state [Z/R]", "Lower isotherm [cm]", "Upper isotherm [cm]", "Actinometry [J/cm2]"
+    "Station code", "Station name", "Year", "Month", "Day", "Average daily temperature [°C]",
+    "Daily precipitation total [mm]", "Type of precipitation [S/W/]", "Sunshine duration [hours]",
+    "Duration of rainfall [hours]","Duration of snowfall [hours]","Occurrence of snow cover [0/1]",
+    "Occurrence of lightning [0/1]"
 ]
 
 s_d_t_COLUMNS = [
@@ -55,3 +48,37 @@ s_d_t_COLUMNS = [
     "Nighttime precipitation sum [mm]",
     "Measurement status WONO"
 ]
+
+s_d_t_SELECTION = [
+    "Station code",
+    "Station name",
+    "Year",
+    "Month",
+    "Day",
+    "Daily mean total cloud cover [octants]",
+    "Daily mean wind speed [m/s]",
+    "Daily mean water vapor pressure [hPa]",
+    "Daily mean relative humidity [%]",
+    "Daily mean station-level pressure [hPa]",
+    "Daily mean sea-level pressure [hPa]",
+    "Nighttime precipitation sum [mm]"
+]
+
+DATA_ALIASES = {
+    "Average daily temperature [°C]": "temperature",
+    "Daily precipitation total [mm]": "precipitation",
+    "Type of precipitation [S/W/]": "precipitation",
+    "Snow cover height [cm]": "snow cover",
+    "Sunshine duration [hours]": "sunshine",
+    "Duration of rainfall [hours]": "precipitation",
+    "Duration of snowfall [hours]": "precipitation",
+    "Occurrence of snow cover [0/1]": "precipitation",
+    "Daily mean total cloud cover [octants]": "cloud cover",
+    "Daily mean wind speed [m/s]": "wind",
+    "Daily mean water vapor pressure [hPa]": "pressure",
+    "Daily mean relative humidity [%]": "humidity",
+    "Daily mean station-level pressure [hPa]": "pressure",
+    "Daily mean sea-level pressure [hPa]": "pressure",
+    "Daily precipitation sum [mm]": "precipitation",
+    "Nighttime precipitation sum [mm]": "precipitation"
+}
