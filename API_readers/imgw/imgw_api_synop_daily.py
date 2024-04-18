@@ -16,6 +16,13 @@ SPACE_TIME_COLUMNS = ['Station code', 'Year', 'Month', 'Day', 'Code', 'lat', 'lo
 
 
 def _limit_coordinates(spatial_range, coordinates):
+    """
+    Limit the coordinates DataFrame to those falling within the specified spatial range.
+
+    :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
+    :param coordinates: DataFrame containing latitude and longitude coordinates.
+    :return: DataFrame containing coordinates within the specified spatial range.
+    """
     n, s, e, w = spatial_range
     coordinates = coordinates[(coordinates.lat <= n) & (coordinates.lat >= s) &
                               (coordinates.lon <= e) & (coordinates.lon >= w)]
@@ -23,9 +30,16 @@ def _limit_coordinates(spatial_range, coordinates):
 
 
 def _prepare_coordinates(spatial_range, level):
+    """
+    Prepare coordinates for data retrieval, limiting them to the specified spatial range and assigning S2Cell IDs.
+
+    :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
+    :param level: S2Cell level.
+    :return: DataFrame containing coordinates within the specified spatial range and their corresponding S2Cell IDs.
+    """
     coordinates = pd.read_csv('API_readers/imgw/constants/imgw_coordinates.csv', index_col=0)
     if coordinates.lon.isna().sum() > 0 or coordinates.lat.isna().sum():
-        warnings.warn("Some stations in IMGW-API are have no coordinates. The data for them will be lost.")
+        warnings.warn("Some stations in IMGW-API have no coordinates. The data for them will be lost.")
     coordinates = coordinates[~coordinates.isna().any(axis=1)]
     coordinates.lat = coordinates.lat.astype('float32')
     coordinates.lon = coordinates.lon.astype('float32')
@@ -38,6 +52,17 @@ def _prepare_coordinates(spatial_range, level):
 
 
 def read_data(spatial_range, time_range, data_range, level):
+    """
+    Read data from the IMGW-API for the specified spatial and time range, and data types.
+
+    :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
+    :param time_range: A tuple containing the start and end timestamps defining the time range.
+    :param data_range: A list of data types requested.
+                       Allowed data types: 'precipitation', 'sunlight', 'cloud cover', 'temperature',
+                       'wind', 'pressure', 'humidity'.
+    :param level: S2Cell level.
+    :return: A DataFrame containing the requested data pivoted by Timestamp and S2CELL.
+    """
     coordinates = _prepare_coordinates(spatial_range=spatial_range, level=level)
     years = get_years_between_dates(*time_range)
     data_requested = set([k for k,v in DATA_ALIASES.items() if v in data_range])
@@ -131,6 +156,9 @@ def read_data(spatial_range, time_range, data_range, level):
 
     # Adjust time range
     s_d_merged = s_d_merged[(s_d_merged.Timestamp >= time_range[0]) & (s_d_merged.Timestamp <= time_range[1])]
+
+    # Average overlapping
+    s_d_merged = s_d_merged.groupby(['S2CELL', 'Timestamp']).mean()
 
     # Pivot the DataFrame
     s_d_pivot = s_d_merged.pivot_table(index='Timestamp', columns='S2CELL')
