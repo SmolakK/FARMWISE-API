@@ -41,6 +41,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.db_users.executor": "Run",
     "Python.main.executor": "Run",
     "Python.main_call.executor": "Debug",
     "Python.main_call_example.executor": "Run",
@@ -207,14 +208,8 @@
           <option name="timeStamp" value="168" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/test_request.py</url>
-          <line>84</line>
-          <option name="timeStamp" value="212" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/test_request.py</url>
-          <line>86</line>
-          <option name="timeStamp" value="213" />
+          <url>file://$PROJECT_DIR$/routers/auth.py</url>
+          <option name="timeStamp" value="219" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
