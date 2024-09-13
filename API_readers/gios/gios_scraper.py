@@ -4,6 +4,10 @@ import pandas as pd
 import numpy as np
 import requests
 from bs4 import BeautifulSoup
+from tqdm import tqdm
+from gios_mappings import gios_mapping
+import s2sphere
+from datetime import datetime
 
 
 # def ensure_directory_exists(directory):
@@ -72,56 +76,94 @@ def scrape_point_data(point_id, parameter_values, parameter_order):
     return pivot_table
 
 
-def main():
+def _limit_coordinates(spatial_range, coordinates):
+    """
+    Limit the coordinates DataFrame to those falling within the specified spatial range.
+
+    :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
+    :param coordinates: DataFrame containing latitude and longitude coordinates.
+    :return: DataFrame containing coordinates within the specified spatial range.
+    """
+    n, s, e, w = spatial_range
+    coordinates = coordinates[(coordinates.lat <= n) & (coordinates.lat >= s) &
+                              (coordinates.lon <= e) & (coordinates.lon >= w)]
+    return coordinates
+
+
+def _prepare_coordinates(spatial_range, level):
+    """
+    Prepare coordinates for data retrieval, limiting them to the specified spatial range and assigning S2Cell IDs.
+
+    :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
+    :param level: S2Cell level.
+    :return: DataFrame containing coordinates within the specified spatial range and their corresponding S2Cell IDs.
+    """
+    coordinates = pd.read_csv('constants/gios_coordinates.csv')
+    coordinates.lat = coordinates.lat.astype('float32')
+    coordinates.lon = coordinates.lon.astype('float32')
+    coordinates = _limit_coordinates(spatial_range=spatial_range, coordinates=coordinates)
+    coordinates['S2CELL'] = coordinates.apply(lambda x:
+                                              s2sphere.CellId.from_lat_lng(
+                                                  s2sphere.LatLng.from_degrees(x.lat, x.lon)).parent(level).id(),
+                                              axis=1)
+    return coordinates
+
+
+def read_data(spatial_range, time_range, data_range, level):
+    time_from, time_to = time_range
+    time_from = datetime.strptime(time_from, '%Y-%m-%d').year
+    time_to = datetime.strptime(time_to, '%Y-%m-%d').year
+    coordinates = _prepare_coordinates(spatial_range=spatial_range, level=level)
     point_id_url = 'https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary'
     point_ids = extract_point_ids(point_id_url)
 
     all_dataframes = []
 
-    # list of parameters in the parameter column
-    parameter_values = [
-        'BN-78/9180-11: 1.0-0.1 mm [%]', 'BN-78/9180-11: 0.1-0.02 mm [%]', 'BN-78/9180-11: < 0.02 mm [%]',
-        'PTG 2008: 2.0-0.05 mm [%]', 'PTG 2008: 0.05-0.002 mm [%]', 'PTG 2008: < 0.002 mm [%]', 'pH_H2O [pH]',
-        'pH_KCl [pH]', 'CaCo3 [%]', 'humus [%]', 'organic_carbon [%]', 'total_nitrogen [%]', 'c/n [-]',
-        'Hh [cmol(+)*kg-1]', 'Hw [cmol(+)*kg-1]', 'Al [cmol(+)*kg-1]', 'Ca2+ [cmol(+)*kg-1]', 'Mg2+ [cmol(+)*kg-1]',
-        'Na+ [cmol(+)*kg-1]', 'K+ [cmol(+)*kg-1]', 'S [cmol(+)*kg-1]', 'T [cmol(+)*kg-1]', 'V [%]',
-        'available ammonium nitrogen [NNH4 mg*kg-1]', 'available potassium [mg K2O*100g-1]',
-        'available magnesium [mg Mg*100g-1]',
-        'available sulphur [mg S-SO4*100g-1]', 'available ammonium nitrogen [NNH4 mg*kg-1]',
-        'available nitrate nitrogen [NNO3 mg*kg-1]',
-        'P [%]', 'Ca [%]', 'Mg [%]', 'K [%]', 'Na [%]', 'S [%]', 'Al [%]', 'Fe [%]', 'Mn [mg*kg-1]', 'Cd [mg*kg-1]',
-        'Cu [mg*kg-1]', 'Cr [mg*kg-1]', 'Ni [mg*kg-1]', 'Pb [mg*kg-1]', 'Zn [mg*kg-1]', 'Co [mg*kg-1]', 'V [mg*kg-1]',
-        'Li [mg*kg-1]',
-        'Be [mg*kg-1]', 'Ba [mg*kg-1]', 'Sr [mg*kg-1]', 'La [mg*kg-1]', 'Hg [mg*kg-1]', 'As [mg*kg-1]',
-        'PAH_sum_13 [µg*kg-1]',
-        'naphthalene [µg*kg-1]', 'phenanthrene [µg*kg-1]', 'anthracene [µg*kg-1]', 'fluoranthene [µg*kg-1]',
-        'chrysene [µg*kg-1]', 'benzo(a)anthracene [µg*kg-1]', 'benzo(a)pyrene [µg*kg-1]',
-        'benzo(a)fluoranthene [µg*kg-1]',
-        'benzo(ghi)perylene [µg*kg-1]', 'fluorene [µg*kg-1]', 'pyrene [µg*kg-1]', 'benzo(b)fluoranthene [µg*kg-1]',
-        'benzo(k)fluoranthene [µg*kg-1]', 'dibenzo(a.h)anthracene [µg*kg-1]', 'indeno(1.2.3-cd)pyrene [µg*kg-1]',
-        'organochlorine_pesticides_DDT/DDE/DDD [mg*kg-1]', 'organochlorine_pesticides_aldrin [mg*kg-1]',
-        'organochlorine_pesticides_dieldrin [mg*kg-1]', 'organochlorine_pesticides_endrin [mg*kg-1]',
-        'organochlorine_pesticides_alfa-HCH [mg*kg-1]', 'organochlorine_pesticides_beta-HCH [mg*kg-1]',
-        'organochlorine_pesticides_gamma-HCH [mg*kg-1]', 'pesticides_non_chlorinated_compounds_carbaryl [mg*kg-1]',
-        'pesticides_non_chlorinated_compounds_carbofuran [mg*kg-1]',
-        'pesticides_non_chlorinated_compounds_maneb [mg*kg-1]',
-        'pesticides_non_chlorinated_compounds_atrazin [mg*kg-1]', 'radioactivity [Bq*kg-1]',
-        'soil_electrical_conductivity [mS*m-1]',
-        'soil_salinity [mg KCl*100g-1]'
-    ]
-
+    data_requested = set([k for k,v in gios_mapping.DATA_ALIASES.items() if v in data_range])
+    parameter_values = gios_mapping.PARAMETER_VALUES
+    parameter_selection = gios_mapping.PARAMETER_SELECTION
+    parameter_selection = list(set(parameter_selection).intersection(data_requested))
     # Keeping the same order for the parameters
-    parameter_order = parameter_values
+    parameter_order = parameter_values.copy()
+    point_ids = point_ids.split(',')[:10]
 
-    for point_id in point_ids.split(','):
+    for point_id in tqdm(point_ids,total=len(point_ids)):
         df = scrape_point_data(point_id, parameter_values, parameter_order)
+        # Filter data layers
+        columns_to_select = list(df.columns[:2]) + list(set(df.columns).intersection(set(parameter_selection)))
+        df = df.loc[:,columns_to_select]
+        # Filter time range
+        df.year = df.year.astype(int)
+        df = df[(df.year >= time_from) & (df.year <= time_to)]
         all_dataframes.append(df)
-
     # Combine all dataframes into one
     final_dataframe = pd.concat(all_dataframes, ignore_index=True)
+    # Coordinates merge
+    final_dataframe = final_dataframe.merge(coordinates, left_on='point_id', right_on='id')
+    # Select necessary columns
+    constant_columns_numeric = list(set(final_dataframe.columns).intersection(set(parameter_selection)))
+    constant_columns = ['year','S2CELL'] + constant_columns_numeric
+    final_dataframe = final_dataframe.loc[:, constant_columns]
+    # To numeric
+    final_dataframe_numeric = final_dataframe.loc[:, constant_columns_numeric]
+    final_dataframe_numeric = final_dataframe_numeric.apply(pd.to_numeric, errors='coerce')
+    final_dataframe[:,constant_columns_numeric] = final_dataframe_numeric
+    # Average overlapping
 
-    return final_dataframe
+    # Pivot
+    dataframe_pivot = final_dataframe.pivot_table(index='year',columns='S2CELL')
+    return dataframe_pivot
 
 
 if __name__ == "__main__":
-    final_dataframe = main()
+    N = 59.0
+    S = 49.0
+    E = 24.2
+    W = 15.2
+    LEVEL = 18
+    TIME_FROM = '2015-01-01'
+    TIME_TO = '2020-04-22'
+    FACTORS = ['alias1']
+
+    read_data(spatial_range=(N,S,E,W), time_range=(TIME_FROM, TIME_TO),
+                                                 data_range=FACTORS, level=LEVEL)
