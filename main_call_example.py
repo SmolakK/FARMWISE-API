@@ -3,6 +3,7 @@ from utils.overlap_checks import spatial_ranges_overlap, time_ranges_overlap
 import importlib
 import zarr
 import pandas as pd
+from utils.cells_to_coordinates import s2cells_to_coordinates
 
 
 def read_data(bounding_box, level, time_from, time_to, factors):
@@ -39,17 +40,17 @@ def read_data(bounding_box, level, time_from, time_to, factors):
             api_response_data = module.read_data(spatial_range=bounding_box, time_range=(time_from, time_to),
                                                  data_range=factors, level=level)
             data_storage.append(api_response_data)
-    data_storage = pd.concat(data_storage,axis=1)
+    data_storage = pd.concat(data_storage,axis=1)  # TODO: how to merge data
     s_d_zarr = zarr.array(data_storage)
     return s_d_zarr
 
 N = 59.0
 S = 49.0
-E = 22.2
+E = 24.2
 W = 15.2
 LEVEL = 18
 TIME_FROM = '2017-01-01'
 TIME_TO = '2017-04-22'
 FACTORS = ['temperature', 'cloud cover']
 
-read_data((N, S, E, W), LEVEL, TIME_FROM, TIME_TO, FACTORS)
+read_data(bounding_box = (N, S, E, W), level = LEVEL, time_from = TIME_FROM, time_to = TIME_TO, factors = FACTORS)

@@ -38,7 +38,7 @@ def _prepare_coordinates(spatial_range, level):
     :return: DataFrame containing coordinates within the specified spatial range and their corresponding S2Cell IDs.
     """
     coordinates = pd.read_csv('API_readers/imgw/constants/imgw_coordinates.csv', index_col=0)
-    if coordinates.lon.isna().sum() > 0 or coordinates.lat.isna().sum():
+    if coordinates.lon.isna().sum() > 0 or coordinates.lat.isna().sum() > 0:
         warnings.warn("Some stations in IMGW-API have no coordinates. The data for them will be lost.")
     coordinates = coordinates[~coordinates.isna().any(axis=1)]
     coordinates.lat = coordinates.lat.astype('float32')
@@ -158,7 +158,10 @@ def read_data(spatial_range, time_range, data_range, level):
     s_d_merged = s_d_merged[(s_d_merged.Timestamp >= time_range[0]) & (s_d_merged.Timestamp <= time_range[1])]
 
     # Average overlapping
+    original_size = s_d_merged.shape[0]
     s_d_merged = s_d_merged.groupby(['S2CELL', 'Timestamp']).mean()
+    if original_size != s_d_merged.shape[0]:
+        warnings.warn("Some data were aggregated")
 
     # Pivot the DataFrame
     s_d_pivot = s_d_merged.pivot_table(index='Timestamp', columns='S2CELL')
