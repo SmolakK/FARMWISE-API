@@ -20,9 +20,9 @@ def create_timestamp_from_row(row):
     Returns:
         pd.Timestamp: Timestamp object representing the given date.
     """
-    day = row['Day'].astype(int)
-    month = row['Month'].astype(int)
-    year = row['Year'].astype(int)
+    day = int(row['Day'])
+    month = int(row['Month'])
+    year = int(row['Year'])
     return pd.Timestamp(year=year, month=month, day=day)
 
 
