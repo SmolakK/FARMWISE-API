@@ -38,4 +38,6 @@ PARAMETER_SELECTION = ['pesticides_non_chlorinated_compounds_carbofuran [mg*kg-1
 
 DATA_ALIASES = {'pesticides_non_chlorinated_compounds_carbofuran [mg*kg-1]': 'alias1',
                 'pesticides_non_chlorinated_compounds_maneb [mg*kg-1]': 'alias1',
+                'BN-78/9180-11: 1.0-0.1 mm [%]': 'alias1',
+                'Cu [mg*kg-1]':'alias1',
                 'soil_salinity [mg KCl*100g-1]': 'alias2'}

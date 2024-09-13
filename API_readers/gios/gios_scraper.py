@@ -1,5 +1,4 @@
 import re
-import os
 import pandas as pd
 import numpy as np
 import requests
@@ -8,12 +7,7 @@ from tqdm import tqdm
 from gios_mappings import gios_mapping
 import s2sphere
 from datetime import datetime
-
-
-# def ensure_directory_exists(directory):
-#     if not os.path.exists(directory):
-#         os.makedirs(directory)
-
+import warnings
 
 def extract_point_ids(url):
     page = requests.get(url)
@@ -123,9 +117,10 @@ def read_data(spatial_range, time_range, data_range, level):
     parameter_values = gios_mapping.PARAMETER_VALUES
     parameter_selection = gios_mapping.PARAMETER_SELECTION
     parameter_selection = list(set(parameter_selection).intersection(data_requested))
+
     # Keeping the same order for the parameters
     parameter_order = parameter_values.copy()
-    point_ids = point_ids.split(',')[:10]
+    point_ids = point_ids.split(',')
 
     for point_id in tqdm(point_ids,total=len(point_ids)):
         df = scrape_point_data(point_id, parameter_values, parameter_order)
@@ -136,19 +131,28 @@ def read_data(spatial_range, time_range, data_range, level):
         df.year = df.year.astype(int)
         df = df[(df.year >= time_from) & (df.year <= time_to)]
         all_dataframes.append(df)
+
     # Combine all dataframes into one
     final_dataframe = pd.concat(all_dataframes, ignore_index=True)
+
     # Coordinates merge
     final_dataframe = final_dataframe.merge(coordinates, left_on='point_id', right_on='id')
+
     # Select necessary columns
     constant_columns_numeric = list(set(final_dataframe.columns).intersection(set(parameter_selection)))
     constant_columns = ['year','S2CELL'] + constant_columns_numeric
     final_dataframe = final_dataframe.loc[:, constant_columns]
+
     # To numeric
     final_dataframe_numeric = final_dataframe.loc[:, constant_columns_numeric]
-    final_dataframe_numeric = final_dataframe_numeric.apply(pd.to_numeric, errors='coerce')
-    final_dataframe[:,constant_columns_numeric] = final_dataframe_numeric
+    final_dataframe_numeric = final_dataframe_numeric.apply(pd.to_numeric, errors='coerce').fillna(0)
+    final_dataframe = pd.concat((final_dataframe.drop(constant_columns_numeric,axis=1),final_dataframe_numeric),axis=1)
+
     # Average overlapping
+    original_size = final_dataframe.shape[0]
+    final_dataframe = final_dataframe.groupby(['S2CELL', 'year']).mean()
+    if original_size != final_dataframe.shape[0]:
+        warnings.warn("Some data were aggregated")
 
     # Pivot
     dataframe_pivot = final_dataframe.pivot_table(index='year',columns='S2CELL')
@@ -163,7 +167,7 @@ if __name__ == "__main__":
     LEVEL = 18
     TIME_FROM = '2015-01-01'
     TIME_TO = '2020-04-22'
-    FACTORS = ['alias1']
+    FACTORS = ['alias1','alias2']
 
     read_data(spatial_range=(N,S,E,W), time_range=(TIME_FROM, TIME_TO),
                                                  data_range=FACTORS, level=LEVEL)
