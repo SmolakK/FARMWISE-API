@@ -9,7 +9,7 @@ import io
 from API_readers.imgw.imgw_mappings.synop_mapping import s_d_COLUMNS, s_d_SELECTION, s_d_t_COLUMNS, s_d_t_SELECTION, DATA_ALIASES, GLOBAL_MAPPING
 from tqdm import tqdm
 from utils.coordinates_to_cells import prepare_coordinates
-from API_readers.imgw.imgw_utils import create_timestamp_from_row, expand_range, get_years_between_dates
+from utils.imgw_utils import create_timestamp_from_row, expand_range, get_years_between_dates
 
 URL = "https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteorologiczne/dobowe/synop"
 SPACE_TIME_COLUMNS = ['Station code', 'Year', 'Month', 'Day', 'Code', 'lat', 'lon']
@@ -52,6 +52,8 @@ def read_data(spatial_range, time_range, data_range, level):
     else:
         warnings.warn("IMGW server not responding")
 
+    s_d_files = []
+    s_d_t_files = []
     for url in tqdm(read_urls,total=len(read_urls)):
         response = requests.get(url)
         if response.status_code == 200:
@@ -64,9 +66,6 @@ def read_data(spatial_range, time_range, data_range, level):
             # Extract file names
             file_names = [link['href'] for link in links if '.' in link['href']]
 
-            # Read files from the year
-            s_d_files = []
-            s_d_t_files = []
             for x in file_names:
                 zipfile = requests.get(urljoin(url+'/',x))
                 with ZipFile(io.BytesIO(zipfile.content)) as zip_ref:
@@ -83,10 +82,11 @@ def read_data(spatial_range, time_range, data_range, level):
                             data_selection += SPACE_TIME_COLUMNS
                             s_d_file = s_d_file.loc[:, s_d_file.columns.intersection(data_selection)]
                             s_d_files.append(s_d_file)
-            s_d = pd.concat(s_d_files)
-            s_d_t = pd.concat(s_d_t_files)
         else:
             warnings.warn("IMGW server not responding")
+
+    s_d = pd.concat(s_d_files)
+    s_d_t = pd.concat(s_d_t_files)
 
     # Define the columns to be excluded
     columns_excluded = ['Timestamp', 'S2CELL']

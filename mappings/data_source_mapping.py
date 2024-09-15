@@ -19,5 +19,13 @@ API_PATH_RANGES = {
          'yearly',
          1,
          1)
+    ),
+    'API_readers.imgw_hydro.imgw_hydro_daily': (
+        ((54.8396, 49.0023, 24.1453, 14.1226),
+         ('1951-01-01', CURRENT_DAY),
+         ('water quantity'),
+         'daily',
+         1,
+         1)
     )
 }
