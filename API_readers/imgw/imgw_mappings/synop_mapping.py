@@ -18,9 +18,7 @@ s_d_COLUMNS = [
 ]
 s_d_SELECTION = [
     "Station code", "Station name", "Year", "Month", "Day", "Average daily temperature [°C]",
-    "Daily precipitation total [mm]", "Type of precipitation [S/W/]", "Sunshine duration [hours]",
-    "Duration of rainfall [hours]","Duration of snowfall [hours]","Occurrence of snow cover [0/1]",
-    "Occurrence of lightning [0/1]"
+    "Daily precipitation total [mm]", "Duration of rainfall [hours]","Duration of snowfall [hours]"
 ]
 
 s_d_t_COLUMNS = [
@@ -54,31 +52,22 @@ s_d_t_SELECTION = [
     "Station name",
     "Year",
     "Month",
-    "Day",
-    "Daily mean total cloud cover [octants]",
-    "Daily mean wind speed [m/s]",
-    "Daily mean water vapor pressure [hPa]",
-    "Daily mean relative humidity [%]",
-    "Daily mean station-level pressure [hPa]",
-    "Daily mean sea-level pressure [hPa]",
-    "Nighttime precipitation sum [mm]"
+    "Day"
 ]
+
+GLOBAL_MAPPING = {
+    "Average daily temperature [°C]": "Temperature [°C]",
+    "Daily precipitation total [mm]": "Precipitation total [mm]",
+    "Type of precipitation [S/W/]": "Type of precipitation [S/W/]",
+    "Snow cover height [cm]": "Snow cover [cm]",
+    "Duration of rainfall [hours]": "Duration of rainfall [hours]",
+    "Duration of snowfall [hours]": "Duration of snowfall [hours]"
+}
 
 DATA_ALIASES = {
     "Average daily temperature [°C]": "temperature",
     "Daily precipitation total [mm]": "precipitation",
-    "Type of precipitation [S/W/]": "precipitation",
-    "Snow cover height [cm]": "snow cover",
-    "Sunshine duration [hours]": "sunshine",
+    "Snow cover height [cm]": "snow",
     "Duration of rainfall [hours]": "precipitation",
     "Duration of snowfall [hours]": "precipitation",
-    "Occurrence of snow cover [0/1]": "precipitation",
-    "Daily mean total cloud cover [octants]": "cloud cover",
-    "Daily mean wind speed [m/s]": "wind",
-    "Daily mean water vapor pressure [hPa]": "pressure",
-    "Daily mean relative humidity [%]": "humidity",
-    "Daily mean station-level pressure [hPa]": "pressure",
-    "Daily mean sea-level pressure [hPa]": "pressure",
-    "Daily precipitation sum [mm]": "precipitation",
-    "Nighttime precipitation sum [mm]": "precipitation"
 }

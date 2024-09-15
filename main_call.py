@@ -3,7 +3,6 @@ from utils.overlap_checks import spatial_ranges_overlap, time_ranges_overlap
 import importlib
 import zarr
 import pandas as pd
-from utils.cells_to_coordinates import s2cells_to_coordinates
 
 
 def read_data(bounding_box, level, time_from, time_to, factors):

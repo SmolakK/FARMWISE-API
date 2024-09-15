@@ -6,49 +6,13 @@ from urllib.parse import urljoin
 import re
 from zipfile import ZipFile
 import io
-from API_readers.imgw.imgw_mappings.synop_mapping import s_d_COLUMNS, s_d_SELECTION, s_d_t_COLUMNS, s_d_t_SELECTION, DATA_ALIASES
+from API_readers.imgw.imgw_mappings.synop_mapping import s_d_COLUMNS, s_d_SELECTION, s_d_t_COLUMNS, s_d_t_SELECTION, DATA_ALIASES, GLOBAL_MAPPING
 from tqdm import tqdm
-import s2sphere
+from utils.coordinates_to_cells import prepare_coordinates
 from API_readers.imgw.imgw_utils import create_timestamp_from_row, expand_range, get_years_between_dates
 
 URL = "https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteorologiczne/dobowe/synop"
 SPACE_TIME_COLUMNS = ['Station code', 'Year', 'Month', 'Day', 'Code', 'lat', 'lon']
-
-
-def _limit_coordinates(spatial_range, coordinates):
-    """
-    Limit the coordinates DataFrame to those falling within the specified spatial range.
-
-    :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
-    :param coordinates: DataFrame containing latitude and longitude coordinates.
-    :return: DataFrame containing coordinates within the specified spatial range.
-    """
-    n, s, e, w = spatial_range
-    coordinates = coordinates[(coordinates.lat <= n) & (coordinates.lat >= s) &
-                              (coordinates.lon <= e) & (coordinates.lon >= w)]
-    return coordinates
-
-
-def _prepare_coordinates(spatial_range, level):
-    """
-    Prepare coordinates for data retrieval, limiting them to the specified spatial range and assigning S2Cell IDs.
-
-    :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
-    :param level: S2Cell level.
-    :return: DataFrame containing coordinates within the specified spatial range and their corresponding S2Cell IDs.
-    """
-    coordinates = pd.read_csv('API_readers/imgw/constants/imgw_coordinates.csv', index_col=0)
-    if coordinates.lon.isna().sum() > 0 or coordinates.lat.isna().sum() > 0:
-        warnings.warn("Some stations in IMGW-API have no coordinates. The data for them will be lost.")
-    coordinates = coordinates[~coordinates.isna().any(axis=1)]
-    coordinates.lat = coordinates.lat.astype('float32')
-    coordinates.lon = coordinates.lon.astype('float32')
-    coordinates = _limit_coordinates(spatial_range=spatial_range, coordinates=coordinates)
-    coordinates['S2CELL'] = coordinates.apply(lambda x:
-                                              s2sphere.CellId.from_lat_lng(
-                                                  s2sphere.LatLng.from_degrees(x.lat, x.lon)).parent(level).id(),
-                                              axis=1)
-    return coordinates
 
 
 def read_data(spatial_range, time_range, data_range, level):
@@ -63,7 +27,8 @@ def read_data(spatial_range, time_range, data_range, level):
     :param level: S2Cell level.
     :return: A DataFrame containing the requested data pivoted by Timestamp and S2CELL.
     """
-    coordinates = _prepare_coordinates(spatial_range=spatial_range, level=level)
+    coors = pd.read_csv(r'constants/imgw_coordinates.csv')
+    coordinates = prepare_coordinates(coordinates=coors, spatial_range=spatial_range, level=level)
     years = get_years_between_dates(*time_range)
     data_requested = set([k for k,v in DATA_ALIASES.items() if v in data_range])
     response = requests.get(URL)
@@ -138,6 +103,9 @@ def read_data(spatial_range, time_range, data_range, level):
 
     # Drop overlapping columns
     s_d_merged = s_d_merged.loc[:,[col for col in s_d_merged.columns if '_right' not in col]]
+
+    # Map to global names
+    s_d_merged = s_d_merged.rename(GLOBAL_MAPPING, axis=1)
 
     # Select columns excluding the excluded ones
     s_d_merged_values = s_d_merged.drop(columns=columns_excluded)

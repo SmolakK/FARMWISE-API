@@ -7,8 +7,16 @@ API_PATH_RANGES = {
     'API_readers.imgw.imgw_api_synop_daily': (
         ((54.8396, 49.0023, 24.1453, 14.1226),
          ('1960-01-01',CURRENT_DAY),
-         ('temperature','precipitation','snow cover','sunshine','cloud cover','wind','pressure','humidity'),
+         ('temperature','precipitation','snow cover'),
          'daily',
+         1,
+         1)
+    ),
+    'API_readers.gios.gios_scraper': (
+        ((54.8396, 49.0023, 24.1453, 14.1226),
+         ('1995-01-01', '2020-12-31'),
+         ('soil'),
+         'yearly',
          1,
          1)
     )

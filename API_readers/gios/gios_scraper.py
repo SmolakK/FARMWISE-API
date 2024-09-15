@@ -5,9 +5,10 @@ import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 from gios_mappings import gios_mapping
-import s2sphere
 from datetime import datetime
 import warnings
+from utils.coordinates_to_cells import prepare_coordinates
+
 
 def extract_point_ids(url):
     page = requests.get(url)
@@ -70,44 +71,12 @@ def scrape_point_data(point_id, parameter_values, parameter_order):
     return pivot_table
 
 
-def _limit_coordinates(spatial_range, coordinates):
-    """
-    Limit the coordinates DataFrame to those falling within the specified spatial range.
-
-    :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
-    :param coordinates: DataFrame containing latitude and longitude coordinates.
-    :return: DataFrame containing coordinates within the specified spatial range.
-    """
-    n, s, e, w = spatial_range
-    coordinates = coordinates[(coordinates.lat <= n) & (coordinates.lat >= s) &
-                              (coordinates.lon <= e) & (coordinates.lon >= w)]
-    return coordinates
-
-
-def _prepare_coordinates(spatial_range, level):
-    """
-    Prepare coordinates for data retrieval, limiting them to the specified spatial range and assigning S2Cell IDs.
-
-    :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
-    :param level: S2Cell level.
-    :return: DataFrame containing coordinates within the specified spatial range and their corresponding S2Cell IDs.
-    """
-    coordinates = pd.read_csv('constants/gios_coordinates.csv')
-    coordinates.lat = coordinates.lat.astype('float32')
-    coordinates.lon = coordinates.lon.astype('float32')
-    coordinates = _limit_coordinates(spatial_range=spatial_range, coordinates=coordinates)
-    coordinates['S2CELL'] = coordinates.apply(lambda x:
-                                              s2sphere.CellId.from_lat_lng(
-                                                  s2sphere.LatLng.from_degrees(x.lat, x.lon)).parent(level).id(),
-                                              axis=1)
-    return coordinates
-
-
 def read_data(spatial_range, time_range, data_range, level):
     time_from, time_to = time_range
     time_from = datetime.strptime(time_from, '%Y-%m-%d').year
     time_to = datetime.strptime(time_to, '%Y-%m-%d').year
-    coordinates = _prepare_coordinates(spatial_range=spatial_range, level=level)
+    coors = pd.read_csv(r'constants/gios_coordinates.csv')
+    coordinates = prepare_coordinates(coordinates=coors, spatial_range=spatial_range, level=level)
     point_id_url = 'https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary'
     point_ids = extract_point_ids(point_id_url)
 
@@ -120,7 +89,7 @@ def read_data(spatial_range, time_range, data_range, level):
 
     # Keeping the same order for the parameters
     parameter_order = parameter_values.copy()
-    point_ids = point_ids.split(',')
+    point_ids = point_ids.split(',')[:10]
 
     for point_id in tqdm(point_ids,total=len(point_ids)):
         df = scrape_point_data(point_id, parameter_values, parameter_order)
@@ -157,17 +126,3 @@ def read_data(spatial_range, time_range, data_range, level):
     # Pivot
     dataframe_pivot = final_dataframe.pivot_table(index='year',columns='S2CELL')
     return dataframe_pivot
-
-
-if __name__ == "__main__":
-    N = 59.0
-    S = 49.0
-    E = 24.2
-    W = 15.2
-    LEVEL = 18
-    TIME_FROM = '2015-01-01'
-    TIME_TO = '2020-04-22'
-    FACTORS = ['alias1','alias2']
-
-    read_data(spatial_range=(N,S,E,W), time_range=(TIME_FROM, TIME_TO),
-                                                 data_range=FACTORS, level=LEVEL)
