@@ -1,14 +1,14 @@
 from datetime import datetime, timedelta
 
 CURRENT_DAY = datetime.now().strftime('%Y-%m-%d')
-FIVE_BEFORE = datetime.now() - timedelta(days=5)
+FIVE_BEFORE = (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')
 # import path (key): spatial range, temporal range, parameters (value),
 # temporal type (daily, monthly, yearly), spatial type (1 - point-based, 2 - grid-based), quality (1-best)
 API_PATH_RANGES = {
     'API_readers.imgw.imgw_api_synop_daily': (
         ((54.8396, 49.0023, 24.1453, 14.1226),
          ('1960-01-01',CURRENT_DAY),
-         ('temperature','precipitation','snow cover'),
+         ('temperature','precipitation','snow'),
          'daily',
          1,
          1)
@@ -30,9 +30,9 @@ API_PATH_RANGES = {
          1)
     ),
     'API_readers.cds.cds': (
-        ((71, 34, -25, 45),
+        ((71, 34, 45, -25),
          ('1950-01-01', FIVE_BEFORE),
-         ('temperature','precipitation','snow cover'),
+         ('temperature','precipitation','snow'),
          'daily',
          1,
          1)
