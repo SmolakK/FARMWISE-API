@@ -72,6 +72,16 @@ def scrape_point_data(point_id, parameter_values, parameter_order):
 
 
 def read_data(spatial_range, time_range, data_range, level):
+    """
+    :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
+    :param time_range: A tuple containing the start and end timestamps defining the time range.
+    :param data_range: A list of data types requested.
+                       Allowed data types: 'precipitation', 'sunlight', 'cloud cover', 'temperature',
+                       'wind', 'pressure', 'humidity'.
+    :param level: S2Cell level.
+    :return:
+    """
+    print("DOWNLOADING: GIOS soil data")
     time_from, time_to = time_range
     time_from = datetime.strptime(time_from, '%Y-%m-%d').year
     time_to = datetime.strptime(time_to, '%Y-%m-%d').year

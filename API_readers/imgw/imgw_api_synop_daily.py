@@ -27,6 +27,7 @@ def read_data(spatial_range, time_range, data_range, level):
     :param level: S2Cell level.
     :return: A DataFrame containing the requested data pivoted by Timestamp and S2CELL.
     """
+    print("DOWNLOADING: IMGW synop data")
     coors = pd.read_csv(r'constants/imgw_coordinates.csv')
     coordinates = prepare_coordinates(coordinates=coors, spatial_range=spatial_range, level=level)
     years = get_years_between_dates(*time_range)
