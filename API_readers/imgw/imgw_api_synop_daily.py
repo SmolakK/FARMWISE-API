@@ -32,6 +32,8 @@ def read_data(spatial_range, time_range, data_range, level):
     coors = pd.read_csv(r'API_readers/imgw/constants/imgw_coordinates.csv')
     coors = coors[~coors.isna().any(axis=1)]
     coordinates = prepare_coordinates(coordinates=coors, spatial_range=spatial_range, level=level)
+    if coordinates is None:
+        return None
     years = get_years_between_dates(*time_range)
     data_requested = set([k for k,v in DATA_ALIASES.items() if v in data_range])
     response = requests.get(URL)

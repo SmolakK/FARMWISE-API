@@ -29,6 +29,8 @@ def read_data(spatial_range, time_range, data_range, level):
     print("DOWNLOADING: IMGW hydro data")
     coors = pd.read_csv(r'API_readers/imgw_hydro/constants/imgw_coordinates.csv')
     coordinates = prepare_coordinates(coordinates=coors, spatial_range=spatial_range, level=level)
+    if coordinates is None:
+        return None
     years = get_years_between_dates(*time_range)
     data_requested = set([k for k, v in DATA_ALIASES.items() if v in data_range])
     response = requests.get(URL)

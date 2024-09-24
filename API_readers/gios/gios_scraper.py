@@ -87,6 +87,8 @@ def read_data(spatial_range, time_range, data_range, level):
     time_to = datetime.strptime(time_to, '%Y-%m-%d').year
     coors = pd.read_csv(r'API_readers/gios/constants/gios_coordinates.csv')
     coordinates = prepare_coordinates(coordinates=coors, spatial_range=spatial_range, level=level)
+    if coordinates is None:
+        return None
     point_id_url = 'https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary'
     point_ids = extract_point_ids(point_id_url)
 
