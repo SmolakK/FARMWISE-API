@@ -11,6 +11,17 @@ auth_router = APIRouter()
 
 @auth_router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """
+    Authenticates a user and generates an access token.
+
+    This endpoint receives user credentials (username and password),
+    authenticates the user, and returns a JWT access token if the credentials are valid.
+
+    :param form_data: An instance of OAuth2PasswordRequestForm containing the username and password.
+    :param db: The database session dependency.
+    :raises HTTPException: If authentication fails, raises a 401 Unauthorized error with a message.
+    :return: A dictionary containing the access token and its type (Bearer).
+    """
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -27,4 +38,12 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 @auth_router.get("/users/me", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
+    """
+    Retrieves the current authenticated user's information.
+
+    This endpoint returns the details of the currently logged-in user.
+
+    :param current_user: The current authenticated user, retrieved through dependency injection.
+    :return: The current user's details as a User object.
+    """
     return current_user

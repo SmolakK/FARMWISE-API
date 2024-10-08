@@ -11,6 +11,16 @@ from utils.coordinates_to_cells import prepare_coordinates
 
 
 def extract_point_ids(url):
+    """
+    Extracts point IDs from the hyperlinks found on a webpage.
+
+    This function sends a GET request to the specified URL, parses the HTML content of the page,
+    and retrieves all hyperlinks. It extracts point IDs from the query parameters of the links
+    that match the pattern 'p={point_id}'.
+
+    :param url: A string representing the URL of the webpage to scrape.
+    :return: A comma-separated string of point IDs extracted from the links on the page.
+    """
     page = requests.get(url)
     soup = BeautifulSoup(page.text, "html.parser")
     links = soup.find_all('a')
@@ -20,6 +30,19 @@ def extract_point_ids(url):
 
 
 def scrape_point_data(point_id, parameter_values, parameter_order):
+    """
+    Scrapes soil measurement data for a specified point ID from a GIOS webpage.
+
+    This function retrieves data from the GIOS website, processes the HTML to extract relevant
+    soil measurement data, and organizes it into a pandas DataFrame. It formats the data and
+    ensures that parameters are arranged according to the specified order.
+
+    :param point_id: An integer representing the unique identifier for the measurement point.
+    :param parameter_values: A list of parameter names corresponding to the scraped data.
+    :param parameter_order: A list specifying the desired order of parameters in the final DataFrame.
+    :return: A pandas DataFrame containing the scraped and organized soil measurement data,
+             with columns for point ID, year, and the specified parameters.
+    """
     url = f'https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p={point_id}'
     page = requests.get(url)
     soup = BeautifulSoup(page.text, "html.parser")

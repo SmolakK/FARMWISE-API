@@ -40,17 +40,16 @@ def read_data(bounding_box, level, time_from, time_to, factors):
                                                  data_range=factors, level=level)
             if api_response_data is not None:
                 data_storage.append(api_response_data)
-    data_storage = pd.concat(data_storage,axis=1)  # TODO: how to merge data
-    s_d_zarr = zarr.array(data_storage)
-    return s_d_zarr
+    data_storage = pd.concat(data_storage,axis=1)  # TODO: separate or together
+    return data_storage
 
-N = 50.0
-S = 49.0
-E = 16.2
-W = 15.2
-LEVEL = 10
-TIME_FROM = '2017-01-01'
-TIME_TO = '2017-01-05'
-FACTORS = ['temperature', 'snow']
+N = 51.2
+S = 51.0
+E = 17.1
+W = 17.0
+LEVEL = 8
+TIME_FROM = '2023-01-01'
+TIME_TO = '2023-12-31'
+FACTORS = ['temperature','precipitation']
 
 read_data(bounding_box = (N, S, E, W), level = LEVEL, time_from = TIME_FROM, time_to = TIME_TO, factors = FACTORS)

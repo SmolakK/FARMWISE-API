@@ -2,7 +2,20 @@ import time
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderUnavailable
 
+
 def get_coordinates(city_name, retries=10, wait_time=20):
+    """
+    Fetches the geographical coordinates (latitude and longitude) for a given city name.
+
+    This function attempts to geocode the city name using the Nominatim service.
+    If the service is unavailable, it will retry up to a specified number of attempts,
+    waiting a defined amount of time between retries.
+
+    :param city_name: The name of the city for which to retrieve coordinates.
+    :param retries: The number of times to retry fetching coordinates in case of a geocoding error (default is 10).
+    :param wait_time: The time in seconds to wait between retry attempts (default is 20 seconds).
+    :return: A tuple containing the latitude and longitude of the city. Returns (None, None) if unsuccessful.
+    """
     geolocator = Nominatim(user_agent='geocoder')
     for attempt in range(retries):
         try:

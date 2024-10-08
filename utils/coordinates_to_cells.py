@@ -1,5 +1,6 @@
 import s2sphere
 
+
 def _limit_coordinates(spatial_range, coordinates):
     """
     Limit the coordinates DataFrame to those falling within the specified spatial range.
