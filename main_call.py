@@ -50,6 +50,6 @@ W = 17.0
 LEVEL = 8
 TIME_FROM = '2023-01-01'
 TIME_TO = '2023-12-31'
-FACTORS = ['temperature','precipitation']
+FACTORS = ['temperature','precipitation','vegetation_transpiration','soil_moisture']
 
 read_data(bounding_box = (N, S, E, W), level = LEVEL, time_from = TIME_FROM, time_to = TIME_TO, factors = FACTORS)

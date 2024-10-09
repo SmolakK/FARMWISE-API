@@ -205,6 +205,11 @@
           <line>40</line>
           <option name="timeStamp" value="404" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/cds/cds.py</url>
+          <line>66</line>
+          <option name="timeStamp" value="405" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
