@@ -1,7 +1,6 @@
 from mappings.data_source_mapping import API_PATH_RANGES
 from utils.overlap_checks import spatial_ranges_overlap, time_ranges_overlap
 import importlib
-import zarr
 import pandas as pd
 
 
