@@ -10,6 +10,7 @@ from API_readers.imgw.imgw_mappings.synop_mapping import s_d_COLUMNS, s_d_SELECT
 from tqdm import tqdm
 from utils.coordinates_to_cells import prepare_coordinates
 from utils.imgw_utils import create_timestamp_from_row, expand_range, get_years_between_dates
+from datetime import datetime
 
 URL = "https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteorologiczne/dobowe/synop"
 SPACE_TIME_COLUMNS = ['Station code', 'Year', 'Month', 'Day', 'Code', 'lat', 'lon']
@@ -27,8 +28,12 @@ def read_data(spatial_range, time_range, data_range, level):
     :param level: S2Cell level.
     :return: A DataFrame containing the requested data pivoted by Timestamp and S2CELL.
     """
-    coors = pd.read_csv(r'constants/imgw_coordinates.csv')
+    print("DOWNLOADING: IMGW synop data")
+    coors = pd.read_csv(r'API_readers/imgw/constants/imgw_coordinates.csv')
+    coors = coors[~coors.isna().any(axis=1)]
     coordinates = prepare_coordinates(coordinates=coors, spatial_range=spatial_range, level=level)
+    if coordinates is None:
+        return None
     years = get_years_between_dates(*time_range)
     data_requested = set([k for k,v in DATA_ALIASES.items() if v in data_range])
     response = requests.get(URL)
@@ -94,6 +99,8 @@ def read_data(spatial_range, time_range, data_range, level):
     # Apply create_timestamp_from_row function to create Timestamp column
     s_d['Timestamp'] = s_d.apply(create_timestamp_from_row, axis=1)
     s_d_t['Timestamp'] = s_d_t.apply(create_timestamp_from_row,axis=1)
+    s_d['Timestamp'] = s_d['Timestamp'].dt.date
+    s_d_t['Timestamp'] = s_d_t['Timestamp'].dt.date
 
     # Merge with COORDINATES DataFrame
     s_d_merged = s_d.merge(coordinates, left_on='Station code', right_on='Code')
@@ -103,6 +110,7 @@ def read_data(spatial_range, time_range, data_range, level):
 
     # Drop overlapping columns
     s_d_merged = s_d_merged.loc[:,[col for col in s_d_merged.columns if '_right' not in col]]
+    s_d_merged = s_d_merged.drop(['Unnamed: 0'],axis=1)
 
     # Map to global names
     s_d_merged = s_d_merged.rename(GLOBAL_MAPPING, axis=1)
@@ -123,7 +131,9 @@ def read_data(spatial_range, time_range, data_range, level):
     s_d_merged = s_d_merged.drop(SPACE_TIME_COLUMNS,axis=1)
 
     # Adjust time range
-    s_d_merged = s_d_merged[(s_d_merged.Timestamp >= time_range[0]) & (s_d_merged.Timestamp <= time_range[1])]
+    start = datetime.strptime(time_range[0], '%Y-%m-%d').date()
+    end = datetime.strptime(time_range[1], '%Y-%m-%d').date()
+    s_d_merged = s_d_merged[(s_d_merged.Timestamp >= start) & (s_d_merged.Timestamp <= end)]
 
     # Average overlapping
     original_size = s_d_merged.shape[0]

@@ -13,9 +13,24 @@ from API_readers.imgw_hydro.imgw_mappings.imgw_hydro_mappings import WATER_COLUM
 
 URL = r'https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_hydrologiczne/dobowe/'
 SPACE_TIME_COLUMNS = ['Station code', 'Hydrological year', 'Day', 'Calendar month']
+
+
 def read_data(spatial_range, time_range, data_range, level):
-    coors = pd.read_csv(r'constants/imgw_coordinates.csv')
+    """
+
+    :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
+    :param time_range: A tuple containing the start and end timestamps defining the time range.
+    :param data_range: A list of data types requested.
+                       Allowed data types: 'precipitation', 'sunlight', 'cloud cover', 'temperature',
+                       'wind', 'pressure', 'humidity'.
+    :param level: S2Cell level.
+    :return:
+    """
+    print("DOWNLOADING: IMGW hydro data")
+    coors = pd.read_csv(r'API_readers/imgw_hydro/constants/imgw_coordinates.csv')
     coordinates = prepare_coordinates(coordinates=coors, spatial_range=spatial_range, level=level)
+    if coordinates is None:
+        return None
     years = get_years_between_dates(*time_range)
     data_requested = set([k for k, v in DATA_ALIASES.items() if v in data_range])
     response = requests.get(URL)

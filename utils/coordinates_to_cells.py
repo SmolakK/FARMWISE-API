@@ -1,5 +1,6 @@
 import s2sphere
 
+
 def _limit_coordinates(spatial_range, coordinates):
     """
     Limit the coordinates DataFrame to those falling within the specified spatial range.
@@ -25,8 +26,11 @@ def prepare_coordinates(coordinates, spatial_range, level):
     coordinates.lat = coordinates.lat.astype('float32')
     coordinates.lon = coordinates.lon.astype('float32')
     coordinates = _limit_coordinates(spatial_range=spatial_range, coordinates=coordinates)
+    if coordinates.size == 0:
+        print("No data in the range")
+        return None
     coordinates['S2CELL'] = coordinates.apply(lambda x:
                                               s2sphere.CellId.from_lat_lng(
-                                                  s2sphere.LatLng.from_degrees(x.lat, x.lon)).parent(level).id(),
+                                                  s2sphere.LatLng.from_degrees(x.lat, x.lon)).parent(level),
                                               axis=1)
     return coordinates

@@ -15,6 +15,18 @@ api_router = APIRouter()
 @limiter.limit("5/minute")
 async def read_data_endpoint(request_body: ReadDataRequest, request: Request,
                              current_user: User = Depends(get_current_active_user)):
+    """
+    Endpoint to read data based on provided parameters and return a download link for the resulting CSV file.
+
+    This endpoint accepts a request containing a bounding box, level, time range, and factors,
+    processes the data, and generates a temporary CSV file, providing a link for downloading the file.
+
+    :param request_body: An instance of ReadDataRequest containing parameters for reading data.
+    :param request: The HTTP request object, used to generate the download link.
+    :param current_user: The current authenticated user, retrieved through dependency injection.
+    :raises HTTPException: Raises an error if there are issues during processing or file creation.
+    :return: An instance of ReadDataResponse containing the download link for the generated CSV file.
+    """
     try:
         # Convert the request model to the format expected by read_data function
         bounding_box = request_body.bounding_box
@@ -49,7 +61,17 @@ async def read_data_endpoint(request_body: ReadDataRequest, request: Request,
 async def download_file(file_name: str, background_tasks: BackgroundTasks, request: Request,
                         current_user: User = Depends(get_current_active_user)):
     """
-    Download a file from the server, ensuring the filename is safe and prevents directory traversal.
+    Downloads a file from the server after validating the filename to prevent directory traversal attacks.
+
+    This endpoint ensures that the requested file exists in the server's temporary directory,
+    and serves the file securely while scheduling its deletion after the response.
+
+    :param file_name: The name of the file to download, as specified in the URL.
+    :param background_tasks: BackgroundTasks to handle file deletion after the response is sent.
+    :param request: The HTTP request object, used to access the application state.
+    :param current_user: The current authenticated user, retrieved through dependency injection.
+    :raises HTTPException: Raises an error if the file is not found or there is an unexpected error.
+    :return: A FileResponse containing the requested file for download.
     """
     try:
         # Sanitize the file name to ensure it's secure

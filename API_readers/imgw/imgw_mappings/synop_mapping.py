@@ -18,7 +18,8 @@ s_d_COLUMNS = [
 ]
 s_d_SELECTION = [
     "Station code", "Station name", "Year", "Month", "Day", "Average daily temperature [°C]",
-    "Daily precipitation total [mm]", "Duration of rainfall [hours]","Duration of snowfall [hours]"
+    "Daily precipitation total [mm]", "Duration of rainfall [hours]","Duration of snowfall [hours]",
+    "Snow cover height [cm]"
 ]
 
 s_d_t_COLUMNS = [
