@@ -225,16 +225,6 @@
           <line>52</line>
           <option name="timeStamp" value="427" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/API_readers/soilgrids/soilgrids_call.py</url>
-          <line>63</line>
-          <option name="timeStamp" value="482" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/API_readers/soilgrids/soilgrids_call.py</url>
-          <line>79</line>
-          <option name="timeStamp" value="488" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
