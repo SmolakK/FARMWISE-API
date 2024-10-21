@@ -85,6 +85,13 @@ def bounding_box_area(north, south, east, west):
     return area
 
 
+def how_many(N, S, E, W, level):
+    area = bounding_box_area(N, S, E, W)
+    how_many_cells = math.ceil(area / mean_cell_size(lvl=level)) * 2
+    how_many_cells = int(math.ceil(math.sqrt(how_many_cells)))
+    return how_many_cells
+
+
 def interpolate(df_data, spatal_range, level):
     """
     Interpolates data from a DataFrame over a specified spatial range using S2 cells at a given level.
@@ -105,9 +112,7 @@ def interpolate(df_data, spatal_range, level):
     """
     print("INTERPOLATING")
     N, S, E, W = spatal_range
-    area = bounding_box_area(N, S, E, W)
-    how_many_cells = math.ceil(area / mean_cell_size(lvl=level)) * 2
-    how_many_cells = int(math.ceil(math.sqrt(how_many_cells)))
+    how_many_cells = how_many(N,S,E,W, level)
 
     s2_cells = []
     s2_cell_centers = []

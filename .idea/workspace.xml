@@ -49,8 +49,8 @@
       <recent name="D:\GitHub\FARMWISE\API_readers\gios\constants" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main_call (1)">
-    <configuration name="cds" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.soilgrids_call">
+    <configuration name="cds_land_cover" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -62,7 +62,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/cds/cds.py" />
+      <option name="SCRIPT_NAME" value="D:\GitHub\FARMWISE\API_readers\cds\cds_land_cover.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -71,7 +71,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="gios_scraper" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="cds_single_levels (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -79,11 +79,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/gios" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/cds" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/gios/gios_scraper.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/cds/cds_single_levels.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -92,7 +92,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="imgw_api_hydro_daily" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="cds_single_levels" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -100,11 +100,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/imgw_hydro" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/cds" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/imgw_hydro/imgw_api_hydro_daily.py" />
+      <option name="SCRIPT_NAME" value="D:\GitHub\FARMWISE\API_readers\cds\cds_single_levels.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -113,7 +113,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="imgw_hydro_stations_api" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="cds_vegetation" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -121,11 +121,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/imgw_hydro" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/cds" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/imgw_hydro/imgw_hydro_stations_api.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/cds/cds_vegetation.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -134,7 +134,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="main_call (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="soilgrids_call" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -142,11 +142,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/soilgrids" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main_call.py" />
+      <option name="SCRIPT_NAME" value="D:\GitHub\FARMWISE\API_readers\soilgrids\soilgrids_call.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -157,11 +157,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.main_call (1)" />
-        <item itemvalue="Python.cds" />
-        <item itemvalue="Python.imgw_api_hydro_daily" />
-        <item itemvalue="Python.imgw_hydro_stations_api" />
-        <item itemvalue="Python.gios_scraper" />
+        <item itemvalue="Python.soilgrids_call" />
+        <item itemvalue="Python.cds_vegetation" />
+        <item itemvalue="Python.cds_land_cover" />
+        <item itemvalue="Python.cds_single_levels" />
+        <item itemvalue="Python.cds_single_levels (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -197,25 +197,45 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main_call.py</url>
-          <line>42</line>
+          <line>41</line>
           <option name="timeStamp" value="403" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main_call.py</url>
-          <line>40</line>
+          <line>39</line>
           <option name="timeStamp" value="404" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/API_readers/cds/cds.py</url>
-          <line>66</line>
-          <option name="timeStamp" value="405" />
+          <url>file://$PROJECT_DIR$/API_readers/cds/cds_utils/cds_data_read.py</url>
+          <line>65</line>
+          <option name="timeStamp" value="412" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/cds/cds_land_cover.py</url>
+          <line>59</line>
+          <option name="timeStamp" value="420" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/cds/cds_single_levels.py</url>
+          <line>99</line>
+          <option name="timeStamp" value="422" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/cds/cds_land_cover.py</url>
+          <line>52</line>
+          <option name="timeStamp" value="427" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/soilgrids/soilgrids_call.py</url>
+          <line>63</line>
+          <option name="timeStamp" value="482" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/soilgrids/soilgrids_call.py</url>
+          <line>79</line>
+          <option name="timeStamp" value="488" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="PythonConfigurationType">
-        <watch expression="folders" />
-      </configuration>
-    </watches-manager>
   </component>
 </project>

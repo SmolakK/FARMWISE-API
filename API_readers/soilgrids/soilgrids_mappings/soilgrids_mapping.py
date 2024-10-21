@@ -1,0 +1,40 @@
+DATA_ALIASES = {
+    'bdod': 'soil',
+    'cec': 'soil',
+    'cfvo': 'soil',
+    'clay': 'soil',
+    'nitrogen': 'soil',
+    'phh2o': 'soil',
+    'sand': 'soil',
+    'silt': 'soil',
+    'soc': 'soil',
+    'ocs': 'soil',
+    'ocd': 'soil',
+}
+
+GLOBAL_MAPPING = {'bdod': 'Bulk Density',
+           'cec': 'Citation Exchange Capacity at ph7',
+           'cfvo': 'Coarse Fragments Volumetric',
+           'clay': 'Clay Content',
+           'nitrogen': 'Nitrogen',
+           'phh2o': 'Soil pH H2O [pH]',
+           'sand': 'Sand Content',
+           'silt': 'Silt Content',
+           'soc': 'Soil Organic Carbon [%]',
+           'ocs': 'Soil Organic Carbon stock',
+           'ocd': 'Organic Carbon Densities',
+                  }
+
+DEPTH_MAPPING = {
+            'bdod': 'bdod_0-5cm_mean',
+           'cec': 'cec_0-5cm_mean',
+           'cfvo': 'cfvo_0-5cm_mean',
+           'clay': 'clay_0-5cm_mean',
+           'nitrogen': 'nitrogen_0-5cm_mean',
+           'phh2o': 'phh2o_0-5cm_mean',
+           'sand': 'sand_0-5cm_mean',
+           'silt': 'silt_0-5cm_mean',
+           'soc': 'soc_0-5cm_mean',
+           'ocs': 'ocs_0-30cm_mean',
+           'ocd': 'ocd_0-5cm_mean',
+}

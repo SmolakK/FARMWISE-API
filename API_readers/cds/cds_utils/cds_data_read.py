@@ -3,13 +3,13 @@ import cdsapi
 import xarray as xr
 import pandas as pd
 from datetime import datetime
-from API_readers.cds.cds_mappings.cds_mapping import DATA_ALIASES, GLOBAL_MAPPING
+from API_readers.cds.cds_mappings.cds_single_levels_mapping import DATA_ALIASES, GLOBAL_MAPPING
 from utils.coordinates_to_cells import prepare_coordinates
 from utils.interpolate_data import interpolate
 import warnings
 
 
-def read_data(spatial_range, time_range, data_range, level):
+def cds_read_data(spatial_range, time_range, data_range, level, dataset):
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.
@@ -44,13 +44,12 @@ def read_data(spatial_range, time_range, data_range, level):
         days = list(range(1,32))
 
     folder_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'temp_storage')
-    file_name = "era5_temp_data.nc"
+    file_name = dataset+"_temp_data.nc"
     temp_file_path = os.path.join(folder_path, file_name)
     # Request the data and keep it in memory
     response = c.retrieve(
-        'reanalysis-era5-single-levels',  # Dataset name
+        dataset,  # Dataset name
         {
-            'product_type': 'reanalysis',
             'variable': data_requested,  # Specify variables
             'year': list(map(str,years)),  # Specify year(s)
             'month': [str(i).zfill(2) for i in months],  # Specify month(s)

@@ -28,6 +28,7 @@ logger.info(f"Temporary directory created at {temp_dir}")
 # Start the scheduler
 start_scheduler(temp_dir)
 
+
 # Shutdown event
 @app.on_event("shutdown")
 def shutdown_event():
@@ -40,4 +41,5 @@ def shutdown_event():
 # Run the application
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

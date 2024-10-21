@@ -13,10 +13,10 @@ FIVE_BEFORE = (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')
 # - Spatial type (1 for point-based, 2 for grid-based)
 # - Quality (1 for best quality)
 API_PATH_RANGES = {
-    'API_readers.cds.cds': (
+    'API_readers.cds.cds_single_levels': (
         ((71, 34, 45, -25),
          ('1950-01-01', FIVE_BEFORE),
-         ('temperature', 'precipitation', 'snow'),
+         ('temperature', 'precipitation', 'snow', 'evaporation', 'soil_moisture', 'wind', 'pressure', 'solar_radiation'),
          'daily',
          2,
          1)
@@ -44,5 +44,13 @@ API_PATH_RANGES = {
          'daily',
          1,
          1)
-    )
+    ),
+    'API_readers.soilgrids.soilgrids_call': (  # 11 datasets
+        ((71, 34, 45, -25),
+         ('1951-01-01', CURRENT_DAY),
+         ('soil'),
+         'none',
+         2,
+         1)
+    ),
 }
