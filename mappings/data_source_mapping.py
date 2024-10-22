@@ -69,4 +69,12 @@ API_PATH_RANGES = {
          2,
          1)
     ),
+    'API_readers.egdi.egdi_read': (
+        ((71, 34, 45, -25),
+         ('1950-01-01', CURRENT_DAY),
+         ('hydraulic conductivity'),
+         'none',
+         2,
+         1)
+    ),
 }
