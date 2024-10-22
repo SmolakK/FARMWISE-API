@@ -5,6 +5,9 @@ from scipy.interpolate import griddata
 import math
 from tqdm import tqdm
 
+# Constants
+EARTH_RADIUS_KM = 6371.0  # Earth's radius in kilometers
+EARTH_SURFACE_AREA_KM2 = 510.1e6
 
 def mean_cell_size(lvl):
     """
@@ -18,19 +21,25 @@ def mean_cell_size(lvl):
     :return: The average surface area of an S2 cell at the specified level in km².
              Raises a ValueError if the level is out of bounds (not between 0 and 30).
     """
-
-    # Total surface area of Earth in km²
-    earth_surface_area_km2 = 510.1e6
-
     # Dictionary to store the S2 levels and their average cell sizes in km²
     s2_level_to_area_km2 = {}
 
     # Calculate average area of S2 cells at each level
     for level in range(0, 31):  # S2 levels from 0 to 30
         num_cells = 6 * 4 ** level
-        avg_cell_area_km2 = earth_surface_area_km2 / num_cells
+        avg_cell_area_km2 = EARTH_SURFACE_AREA_KM2 / num_cells
         s2_level_to_area_km2[level] = avg_cell_area_km2
     return s2_level_to_area_km2[lvl]
+
+
+def mean_cell_edge(level):
+    """
+    Calculates the mean length of an edge of S2Cell at any given level.
+    :param level: An integer representing the S2 level (must be between 0 and 30).
+    :return: The mean length of an edge of S2Cell
+    """
+    level += 1  # to be on the precise side
+    return 9_230_208/(2**level)
 
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -86,10 +95,29 @@ def bounding_box_area(north, south, east, west):
 
 
 def how_many(N, S, E, W, level):
-    area = bounding_box_area(N, S, E, W)
-    how_many_cells = math.ceil(area / mean_cell_size(lvl=level)) * 2
-    how_many_cells = int(math.ceil(math.sqrt(how_many_cells)))
-    return how_many_cells
+    """
+    Calculates the number of S2 cells that fit within a given bounding box (specified by north, south, east, and west)
+    at a specified S2 level.
+
+    :param N: Northern latitude boundary of the bounding box.
+    :param S: Southern latitude boundary of the bounding box.
+    :param E: Eastern longitude boundary of the bounding box.
+    :param W: Western longitude boundary of the bounding box.
+    :param level: The S2 level to calculate the grid resolution.
+    :return: A tuple containing the number of S2 cells along the latitude and longitude axes.
+    """
+    cell_edge_length = mean_cell_edge(level)
+
+    lat_diff = haversine(N,E,S,E)*1_000
+    lon_diff = haversine(N,W,N,E)*1_000
+
+    num_cells_lat = lat_diff/cell_edge_length
+    num_cells_lon = lon_diff/cell_edge_length
+
+    num_cells_lat = int(math.ceil(num_cells_lat))
+    num_cells_lon = int(math.ceil(num_cells_lon))
+
+    return num_cells_lat, num_cells_lon
 
 
 def interpolate(df_data, spatal_range, level):
@@ -112,12 +140,12 @@ def interpolate(df_data, spatal_range, level):
     """
     print("INTERPOLATING")
     N, S, E, W = spatal_range
-    how_many_cells = how_many(N,S,E,W, level)
+    size_lat, size_lon = how_many(N,S,E,W, level)
 
     s2_cells = []
     s2_cell_centers = []
-    latitudes = np.linspace(S, N, how_many_cells)
-    longitudes = np.linspace(W, E, how_many_cells)
+    latitudes = np.linspace(S, N, size_lat)
+    longitudes = np.linspace(W, E, size_lon)
 
     for lat in tqdm(latitudes, total=len(latitudes)):
         for lon in longitudes:

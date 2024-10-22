@@ -54,9 +54,6 @@ s_d_t_SELECTION = [
     "Year",
     "Month",
     "Day",
-    "Daily mean wind speed [m/s]",
-    "Daily mean relative humidity [%]",
-    "Daily mean sea-level pressure [hPa]"
 ]
 
 GLOBAL_MAPPING = {
@@ -74,10 +71,6 @@ GLOBAL_MAPPING = {
 DATA_ALIASES = {
     "Average daily temperature [°C]": "temperature",
     "Daily precipitation total [mm]": "precipitation",
-    "Snow cover height [cm]": "snow",
     "Duration of rainfall [hours]": "precipitation",
-    "Duration of snowfall [hours]": "precipitation",
-    "Daily mean wind speed [m/s]": "wind",
-    "Daily mean relative humidity [%]": 'humidity',
-    "Daily mean sea-level pressure [hPa]": 'pressure'
+    "Duration of snowfall [hours]": "precipitation"
 }

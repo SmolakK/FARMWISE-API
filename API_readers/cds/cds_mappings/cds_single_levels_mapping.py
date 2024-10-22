@@ -17,14 +17,7 @@ PARAMETER_SELECTION = [
 # aliases for the data fields
 DATA_ALIASES = {
     '2m_temperature': 'temperature',
-    'total_precipitation': 'precipitation',
-    'snowfall': 'snow',
-    'evaporation': 'evaporation',
-    'volumetric_soil_water_layer_1': 'soil_moisture',
-    '10m_u_component_of_wind': 'wind',
-    '10m_v_component_of_wind': 'wind',
-    'surface_pressure': 'pressure',
-    'surface_solar_radiation_downwards': 'solar_radiation'
+    'total_precipitation': 'precipitation'
 }
 
 # global mapping of parameter codes to descriptions and units

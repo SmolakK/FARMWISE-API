@@ -47,11 +47,8 @@ def read_data(spatial_range, time_range, data_range, level):
     response = c.retrieve(
         dataset,  # Dataset name
         {
-            'product_family': [
-        "crop_productivity_indicators",
-        "evapotranspiration_indicators"
-    ],
-            "variable": data_requested,
+        'product_family': ["evapotranspiration_indicators"],
+        "variable": data_requested,
         'year': years,
         'month': months,
         'day': days,
@@ -83,7 +80,7 @@ def read_data(spatial_range, time_range, data_range, level):
     if 'time' in df.columns:
         df.rename(columns={'time': 'Timestamp'}, inplace=True)
     df.rename(columns={'lat_var':'lat','lon_var':'lon'},inplace=True)
-    df = df.drop(['crs', 'PIXEL_COUNTS', 'ALBH_QFLAG', 'FCOVER_QFLAG', 'LAI_QFLAG', 'POTENTIAL_ET'], axis=1)
+    df = df.drop(['crs', 'PIXEL_COUNTS', 'ALBH_QFLAG', 'FCOVER_QFLAG', 'LAI_QFLAG'], axis=1)
 
     df = df.rename(GLOBAL_MAPPING, axis=1)
 
