@@ -6,7 +6,7 @@ FIVE_BEFORE = (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')
 
 # Dictionary mapping API paths to their corresponding parameters
 # Each entry contains a tuple with:
-# - Spatial range (bounding box)
+# - Spatial range (bounding box) NSEW
 # - Temporal range (start and end dates)
 # - Parameters (data types requested)
 # - Temporal type (daily, monthly, yearly)
@@ -69,12 +69,36 @@ API_PATH_RANGES = {
          2,
          1)
     ),
-    'API_readers.egdi.egdi_read': (
+    'API_readers.egdi.egdi_read_hc': (
         ((71, 34, 45, -25),
          ('1950-01-01', CURRENT_DAY),
          ('hydraulic conductivity'),
          'none',
          2,
+         1)
+    ),
+    'API_readers.egdi.egdi_read_d10': (
+        ((71, 34, 30, -10),
+         ('1950-01-01', CURRENT_DAY),
+         ('depth to watertable'),
+         'none',
+         2,
+         1)
+    ),
+    'API_readers.hubeau.hubeau_wq_read': (
+        ((51.09, 41.33, 9.56, -5.14),
+         ('1969-01-01', CURRENT_DAY),
+         ('water quality'),
+         'none',
+         1,
+         1)
+    ),
+    'API_readers.hubeau.hubeau_piezo_read': (
+        ((51.09, 41.33, 9.56, -5.14),
+         ('1950-01-01', CURRENT_DAY),
+         ('groundwater quantity'),
+         'none',
+         1,
          1)
     ),
 }

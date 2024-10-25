@@ -28,7 +28,7 @@ def read_data(spatial_range, time_range, data_range, level):
     :param data_range: A list of properties requested.
                        Allowed CORINE properties: 'land cover'
     :param level: S2Cell level.
-    :return: A pandas DataFrame containing the processed soil data.
+    :return: A pandas DataFrame containing the processed data.
     """
     # Define the base URL for the CORINE Land Cover SERVICES
     avail_years = [1990,2000,2006,2012,2018,2024]

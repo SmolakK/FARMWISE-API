@@ -5,7 +5,7 @@ from utils.interpolate_data import interpolate
 import rasterio
 from rasterio.windows import from_bounds
 
-EGDI_FILE = r'data/gewp7_peu7_4326.tif'
+EGDI_FILE = r'data/gewp7_peu1_d10km_4326.tif'
 
 
 def read_data(spatial_range, time_range, data_range, level):
@@ -17,7 +17,7 @@ def read_data(spatial_range, time_range, data_range, level):
     LEVEL = 8
     TIME_FROM = '2010-01-01'
     TIME_TO = '2023-12-31'
-    FACTORS = ['land cover']
+    FACTORS = ['hydraulic conductivity']
 
     df = read_data((N, S, E, W),(TIME_FROM,TIME_TO),FACTORS,LEVEL)
 
@@ -26,7 +26,7 @@ def read_data(spatial_range, time_range, data_range, level):
     :param data_range: A list of properties requested.
                        Allowed properties: 'hydraulic conductivity'
     :param level: S2Cell level.
-    :return: A pandas DataFrame containing the processed soil data.
+    :return: A pandas DataFrame containing the processed data.
     """
     with rasterio.open(EGDI_FILE) as dataset:
         north, south, east, west = spatial_range
@@ -57,7 +57,7 @@ def read_data(spatial_range, time_range, data_range, level):
         df = pd.DataFrame({
             'lon': flat_x_coords,
             'lat': flat_y_coords,
-            'Hydraulic Conductivity DRASTIC': flat_data
+            'Depth to Watertable DRASTIC': flat_data
         })
         df = prepare_coordinates(df, spatial_range, level)
         df = df.set_index('S2CELL')
