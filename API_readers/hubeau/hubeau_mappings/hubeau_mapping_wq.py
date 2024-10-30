@@ -1,19 +1,22 @@
 CODES = {
-    # English Name: [Parameter Codes]
-    'Phosphorus': ['1350'],  # Phosphates
-    'Nitrate': ['1340'],  # Nitrates
-    'Arsenic': ['1369'],
-    'Cadmium': ['1388'],
-    'Zinc': ['1383'],
-    'Lead': ['1382'],
+    # English Name: [Parameter Code based on the 'SANDRE' ref framwork of France]
+    ## physico-chemical parameters:
+    'pH': ['1302'], # (eng "Potential of Hydrogen", unitless "pH units")
     'Salinity': ['1303'],  # Electrical Conductivity
-    'Calcium': ['1374'],
-    'Potassium': ['1367'],
-    'Sodium': ['1375'],
-    'Magnesium': ['1372'],
-    'pH': ['1302'],
-    'Chlorine': ['1337'],
-    'Pesticides': ['6276'],
+    ## major (mg/L):
+    'Phosphorus': ['1350'],  # Phosphates (fr "Phosphore total" = eng "Total Phosphorus", in mg(P)/L)
+    'Nitrate': ['1340'],  # Nitrates (in mg(NO3)/L)
+    'Calcium': ['1374'], # (in mg(Ca)/L)
+    'Potassium': ['1367'], # (in mg(K)/L)
+    'Sodium': ['1375'], # (in mg(Na)/L)
+    'Magnesium': ['1372'], # (in mg(Mg)/L)
+    'Chlorine': ['1337'], # (in mg(Cl)/L)
+    ## minor/trace/pesticides/pfas/etc. (µg/L):
+    'Arsenic': ['1369'], # (µg/L)
+    'Cadmium': ['1388'], # (µg/L)
+    'Zinc': ['1383'], # (µg/L)
+    'Lead': ['1382'], # (µg/L) (fr "Plomb", element "Pb")
+    'Pesticides': ['6276'], # (fr "Somme de l'ensemble des pesticides analysés" = eng "Total sum of pesticides", in µg/L)
     'Perfluorodecane sulfonic acid (PFDS)': ['6550'],
     'Perfluoro-n-hexanoic acid (PFHxA)': ['5978'],
     'Perfluorodecanoic acid (PFDA)': ['6509'],
