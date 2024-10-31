@@ -53,9 +53,9 @@ def read_data(spatial_range, time_range, data_range, level):
     df = df.drop_duplicates()
     df = df.rename(MAPPING, axis=1)
     # Change m to cm
-    df[['Water Level [cm]', 'Groundwater Depth [cm]']] = df[['Water Level [cm]', 'Groundwater Depth [cm]']] * 100
+    df[['Groundwater Level [cm]', 'Groundwater Depth [cm]']] = df[['Groundwater Level [cm]', 'Groundwater Depth [cm]']] * 100
     df = df.join(station_codes,rsuffix='r')
-    df = df[['Timestamp','Water Level [cm]', 'Groundwater Depth [cm]','x','y']]
+    df = df[['Timestamp','Groundwater Level [cm]', 'Groundwater Depth [cm]','x','y']]
     df = df.rename({'x':'lon','y':'lat'},axis=1)
 
     # To S2CELLs

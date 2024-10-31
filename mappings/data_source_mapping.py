@@ -88,7 +88,7 @@ API_PATH_RANGES = {
     'API_readers.hubeau.hubeau_wq_read': (
         ((51.09, 41.33, 9.56, -5.14),
          ('1969-01-01', CURRENT_DAY),
-         ('water quality'),
+         ('groundwater quality'),
          'none',
          1,
          1)
