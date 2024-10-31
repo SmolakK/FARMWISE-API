@@ -29,7 +29,12 @@ CODES = {
     'Perfluoroundecane sulfonic acid (PFUnDS)': ['8740'],
     'Perfluoro-n-butanoic acid (PFBA)': ['5980'],
     'Perfluorotridecanoic acid (PFTriDA)': ['6549'],
-    'Perfluorooctane sulfonate (PFOS)': [['6561'], ['6560']],
+
+    #REPLACED this to have 1 parameter per key:    'Perfluorooctane sulfonate (PFOS)': [['6561'], ['6560']], # 2 parameters here!
+    #SIMPLIFIED CODE is thus:
+    'Perfluorooctane sulfonate (PFOS)': ['6561'],
+    'Perfluorooctane sulfonic acid (PFOS)': ['6560'],
+
     'Perfluorohexane sulfonic acid (PFHxS)': ['6830'],
     'Perfluoro-n-pentanoic acid (PFPeA)': ['5979'],
     'Perfluoro-n-heptanoic acid (PFHpA)': ['5977'],
@@ -92,7 +97,10 @@ MAPPING = {
     'Acide perfluorotridecane sulfonique': 'GW Perfluorotridecane sulfonic acid (µg/L)',
     'Acide perfluoroundecane sulfonique': 'GW Perfluoroundecane sulfonic acid (µg/L)',
     'Acide sulfonique de perfluorobutane': 'GW Perfluorobutane sulfonic acid (µg/L)',
-    'Acide sulfonique de perfluorooctane': 'GW Perfluorooctane sulfonic acid (mµg/L)',
+
+    'Acide sulfonique de perfluorooctane': 'GW Perfluorooctane sulfonic acid (mµg/L)', # TODO maybe 'mµg/L' is wrong units? In ADES database = "µg/L"
+    'Sulfonate de perfluorooctane': 'GW Perfluorooctane sulfonate (mµg/L)',            # TODO maybe 'mµg/L' is wrong units? In ADES database = "µg/L"
+
     'Arsenic': 'GW Arsenic (µg/L)',
     'Cadmium': 'GW Cadmium (µg/L)',
     'Calcium': 'GW Calcium (mg/L)',
@@ -124,6 +132,7 @@ PARAMETERS_MAPPING = {
     'chlorine': CODES['Chlorine'],
     'pfas': [
         CODES['Perfluorooctane sulfonate (PFOS)'],
+        CODES['Perfluorooctane sulfonic acid (PFOS)'],
         CODES['Perfluoro-n-hexanoic acid (PFHxA)'],
         CODES['Perfluoro-n-nonanoic acid (PFNA)'],
         CODES['Perfluorohexane sulfonic acid (PFHxS)'],
