@@ -101,7 +101,7 @@ def read_data(spatial_range, time_range, data_range, level):
         return None
 
     #TMP DEVEL faster tests: #<<<< TMP
-    coordinates = coordinates.head(3)  #<<<< TMP
+    coordinates = coordinates.head(5)  #<<<< TMP
 
     print("  {} points are selected for this query".format(len(coordinates)))
 
@@ -230,7 +230,9 @@ def read_data(spatial_range, time_range, data_range, level):
 
     #NO MORE: df = pd.DataFrame(all_analyses)
 
-    df = df[['latitude', 'longitude', 'nom_param', 'resultat', 'symbole_unite','date_debut_prelevement']] # TODO (Marc) ADD 'code_remarque_analyse' !!
+    # TODO WIP DEVEL, I have remove 'latitude', 'longitude' from here; it is better to work with the point id at this stage.
+    df = df[['bss_id', 'latitude', 'longitude', 'nom_param', 'resultat', 'symbole_unite','date_debut_prelevement']]
+    # TODO (Marc) MAYBE: ADD 'code_remarque_analyse' ... but HOW, and what to do then in .pivot_table() !? (TO discuss 2025)
     df = df.drop_duplicates()
 
     # ##########################################################################################################################
@@ -239,31 +241,49 @@ def read_data(spatial_range, time_range, data_range, level):
     # df.to_csv(r"""API_readers\hubeau\tmp_check_df.csv""", sep=";", encoding="Windows-1252")
     # ##########################################################################################################################
 
-    df = pd.pivot_table(df,index=['latitude', 'longitude', 'date_debut_prelevement'],
+    df_ref_coords = df[['bss_id', 'latitude', 'longitude']].groupby('bss_id').first()
+    print(df_ref_coords)
+    exit()
+
+    # Here we assume (which should normally be okay) that a given point (bss_id) has always the same lat,long (unique) coordinate values!
+    df = pd.pivot_table(df,index=['bss_id', 'latitude', 'longitude', 'date_debut_prelevement'],
          columns='nom_param',
          values=['resultat','symbole_unite'],
-         aggfunc={'resultat': 'mean', 'symbole_unite': lambda x: x.mode().iloc[0]}).reset_index()
-    df = df.rename({'latitude':'lat','longitude':'lon','date_debut_prelevement':'Timestamp'},axis=1)
+         aggfunc={'resultat': 'mean', 'symbole_unite': lambda x: x.mode().head(1)}).reset_index() #(protected in case of symbole_unite all empty = None)
+    df = df.rename({'bss_id':'point_id','latitude':'lat','longitude':'lon','date_debut_prelevement':'Timestamp'},axis=1)
+
+    print(df)
 
     # TODO Marc please CHECK if this works!!? Not sure it does: 'resultat' column no more existing I think??
     phosphore_column = [x for x in df.columns if "Phosphore total" in x]
     if len(phosphore_column) > 0:  # P2O5 to P
-        df[('resultat', 'Phosphore total')][df[('symbole_unite', 'Phosphore total')] == 'mg(P2O5)/L'] = \
-        df[('resultat', 'Phosphore total')][df[('symbole_unite', 'Phosphore total')] == 'mg(P2O5)/L'] * 0.436
+        # print("\nCHECK PO4:")
+        #print(df[('resultat', 'Phosphore total')][df[('symbole_unite', 'Phosphore total')] == 'mg(P2O5)/L'])
+        # print(df.loc[df.loc[:, ('symbole_unite', 'Phosphore total')] == 'mg(P2O5)/L', ('resultat', 'Phosphore total')])
+        df.loc[df.loc[:, ('symbole_unite', 'Phosphore total')] == 'mg(P2O5)/L', ('resultat', 'Phosphore total')] *= 0.436 # (inplace multiplication)
+        # print(df.loc[df.loc[:, ('symbole_unite', 'Phosphore total')] == 'mg(P2O5)/L', ('resultat', 'Phosphore total')])
+        # print("\n")
+        # df[('resultat', 'Phosphore total')][df[('symbole_unite', 'Phosphore total')] == 'mg(P2O5)/L'] = \
+        # df[('resultat', 'Phosphore total')][df[('symbole_unite', 'Phosphore total')] == 'mg(P2O5)/L'] * 0.436
 
-    df = df[[x for x in df.columns if 'unite' not in x[0]]]  # drop units
-    df = df.droplevel(0, axis=1)  # clear columns
-    df.columns = ['lat','lon','Timestamp'] + list(df.columns[3:])
+    # Simplifying the dataframe:
+    df = df[[x for x in df.columns if 'unite' not in x[0]]]  # drop columns having a name "*unite*"
+    df = df.droplevel(0, axis=1)  # clear the "resultat" columns' grouping (multi-indexing) to get normal columns
+    df.columns = ['point_id', 'lat', 'lon', 'Timestamp'] + list(df.columns[4:])
+    df.drop('point_id', axis=1, inplace=True) # At this stage, we will not use anymore that column (and it must removed prior to the .groupby() below!)
 
     print(df)
-    return(True) # MARC working here last!
 
     df = df.rename(MAPPING, axis=1)  # Map to English names
+
+    print(df)
 
     # To S2CELLs
     df = prepare_coordinates(df, spatial_range, level)
     original_size = df.shape[0]
     df = df.groupby(['S2CELL', 'Timestamp']).mean()
+
+    # Diagnostic message:
     if original_size != df.shape[0]:
         warnings.warn("Some data were aggregated")
 
@@ -271,9 +291,17 @@ def read_data(spatial_range, time_range, data_range, level):
     df.reset_index(inplace=True)
     df.Timestamp = pd.to_datetime(df.Timestamp)
     df = df.set_index("Timestamp").groupby('S2CELL').resample('1D').first()
+    print("\nSTEP 10")
+    print(df)
     df = df.drop('S2CELL',axis=1)
+    print("\nSTEP 11")
+    print(df)
     df[['lat','lon']] = df[['lat','lon']].ffill()
     df = df.reset_index()
+    print("\nSTEP 12")
+    print(df)
+
+    return(df) # MARC working here last!
 
     # Data interpolation
     if level >= 10:
@@ -311,7 +339,7 @@ if __name__ == "__main__":
 
     time_range = (time_from, time_to)
 
-    data_range = ('nitrate') #None #('var1','var2')
+    data_range = ['phosphorus', 'nitrate'] #['phosphorus', 'pesticides','pfas'][2] #None #'pesticides'
 
     print(spatial_range)
     print(time_range)
@@ -319,4 +347,9 @@ if __name__ == "__main__":
 
     print("\nTEST calling function read_data of hubeau_wq_read...")
 
-    read_data(spatial_range,time_range,data_range,LEVEL)
+    whatweget = read_data(spatial_range,time_range,data_range,LEVEL)
+
+    print("\n\nWHAT we get with this test =")
+    print(whatweget)
+    if whatweget is not None:
+        print(len(whatweget))
