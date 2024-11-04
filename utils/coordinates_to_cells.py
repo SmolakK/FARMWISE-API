@@ -23,14 +23,15 @@ def prepare_coordinates(coordinates, spatial_range, level):
     :param level: S2Cell level.
     :return: DataFrame containing coordinates within the specified spatial range and their corresponding S2Cell IDs.
     """
-    coordinates.lat = coordinates.lat.astype('float32')
-    coordinates.lon = coordinates.lon.astype('float32')
-    coordinates = _limit_coordinates(spatial_range=spatial_range, coordinates=coordinates)
-    if coordinates.size == 0:
+    coords = coordinates.copy() # to prevent the warning: "A value is trying to be set on a copy of a slice from a DataFrame" at the .apply line below
+    coords.lat = coords.lat.astype('float32')
+    coords.lon = coords.lon.astype('float32')
+    coords = _limit_coordinates(spatial_range=spatial_range, coordinates=coords)
+    if coords.size == 0:
         print("No data in the range")
         return None
-    coordinates['S2CELL'] = coordinates.apply(lambda x:
+    coords['S2CELL'] = coords.apply(lambda x:
                                               s2sphere.CellId.from_lat_lng(
                                                   s2sphere.LatLng.from_degrees(x.lat, x.lon)).parent(level),
                                               axis=1)
-    return coordinates
+    return coords
