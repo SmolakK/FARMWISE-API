@@ -98,14 +98,3 @@ def read_data(spatial_range, time_range, data_range, level):
     df = df.pivot_table(index='Timestamp', columns='S2CELL')
 
     return df
-
-
-data = {
-    "bounding_box": [59.0, 49.0, 22.2, 15.2],
-    "level": 18,
-    "time_from": '2018-01-01',
-    "time_to": '2020-02-01',
-    "factors": ["precipitation", "temperature"]
-}
-read_data([59.0, 49.0, 22.2, 15.2], ('2018-01-01', '2018-01-01'),
-          ['precipitation', 'snow', 'evaporation', 'soil_moisture', 'wind', 'solar_radiation'], 10)

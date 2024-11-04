@@ -9,7 +9,6 @@ from utils.interpolate_data import interpolate
 import warnings
 import numpy as np
 
-
 def read_data(spatial_range, time_range, data_range, level):
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
@@ -48,4 +47,3 @@ def read_data(spatial_range, time_range, data_range, level):
         temp_file_path
     )
 
-read_data([59.0, 49.0, 22.2, 15.2],('2018-01-01','2018-02-01'),['soil'],10)
