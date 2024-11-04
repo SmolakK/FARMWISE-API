@@ -23,7 +23,7 @@ from utils.data_operators import flatten_list
 import hubeaupyutils as hub
 from datetime import datetime
 
-def read_data(spatial_range, time_range, data_range, level):
+def read_data(spatial_range, time_range, data_range, level, nmax_pts=None):
     """
     read_data((51.09, 41.33, 9.56, -5.14),('1950-01-01','1980-01-01'),['phosphorus'],8)
 
@@ -101,7 +101,8 @@ def read_data(spatial_range, time_range, data_range, level):
         return None
 
     #TMP DEVEL faster tests: #<<<< TMP
-    coordinates = coordinates.head(5)  #<<<< TMP
+    if nmax_pts is not None:
+        coordinates = coordinates.head(nmax_pts)
 
     print("  {} points are selected for this query".format(len(coordinates)))
 
@@ -241,18 +242,17 @@ def read_data(spatial_range, time_range, data_range, level):
     # df.to_csv(r"""API_readers\hubeau\tmp_check_df.csv""", sep=";", encoding="Windows-1252")
     # ##########################################################################################################################
 
-    df_ref_coords = df[['bss_id', 'latitude', 'longitude']].groupby('bss_id').first()
+    df_ref_coords = df[['bss_id', 'latitude', 'longitude']].rename({'bss_id':'point_id', 'latitude':'lat', 'longitude':'lon'},axis=1).groupby('point_id').first() # (by key = "point_id")
     print(df_ref_coords)
-    exit()
 
     # Here we assume (which should normally be okay) that a given point (bss_id) has always the same lat,long (unique) coordinate values!
-    df = pd.pivot_table(df,index=['bss_id', 'latitude', 'longitude', 'date_debut_prelevement'],
+    df = pd.pivot_table(df,index=['bss_id', 'date_debut_prelevement'],
          columns='nom_param',
          values=['resultat','symbole_unite'],
          aggfunc={'resultat': 'mean', 'symbole_unite': lambda x: x.mode().head(1)}).reset_index() #(protected in case of symbole_unite all empty = None)
-    df = df.rename({'bss_id':'point_id','latitude':'lat','longitude':'lon','date_debut_prelevement':'Timestamp'},axis=1)
+    df = df.rename({'bss_id':'point_id','date_debut_prelevement':'Timestamp'},axis=1)
 
-    print(df)
+    # print(df)
 
     # TODO Marc please CHECK if this works!!? Not sure it does: 'resultat' column no more existing I think??
     phosphore_column = [x for x in df.columns if "Phosphore total" in x]
@@ -269,19 +269,38 @@ def read_data(spatial_range, time_range, data_range, level):
     # Simplifying the dataframe:
     df = df[[x for x in df.columns if 'unite' not in x[0]]]  # drop columns having a name "*unite*"
     df = df.droplevel(0, axis=1)  # clear the "resultat" columns' grouping (multi-indexing) to get normal columns
-    df.columns = ['point_id', 'lat', 'lon', 'Timestamp'] + list(df.columns[4:])
-    df.drop('point_id', axis=1, inplace=True) # At this stage, we will not use anymore that column (and it must removed prior to the .groupby() below!)
+    df.columns = ['point_id', 'Timestamp'] + list(df.columns[2:]) #(Reminder: column index starts at [0])
+    #NO (WIP 2024-11-04 PM): df.drop('point_id', axis=1, inplace=True) # At this stage, we will not use anymore that column (and it must removed prior to the .groupby() below!)
 
-    print(df)
+    # print(df)
 
     df = df.rename(MAPPING, axis=1)  # Map to English names
 
-    print(df)
+    # print(df)
 
     # To S2CELLs
-    df = prepare_coordinates(df, spatial_range, level)
+    tmp_prep_coords_df = prepare_coordinates(df_ref_coords, spatial_range, level)
+    # print(tmp_prep_coords_df)
+    # exit()
+    #CHGggggggggggggggggggggggggg: tmp_prep_coords_df = prepare_coordinates(pd.merge(df, df_ref_coords, on='point_id', how='left'), spatial_range, level)
+
+    #Merging the data table with the coordinates(lat,lon)+S2CELL table:
+    df = pd.merge(df, tmp_prep_coords_df, on='point_id', how='left')
+    
+    # print(df)
+
     original_size = df.shape[0]
-    df = df.groupby(['S2CELL', 'Timestamp']).mean()
+    df = df.groupby(['S2CELL', 'Timestamp']).agg({
+        'point_id': lambda x: x.nunique(),
+        'lat': 'mean',
+        'lon': 'mean',
+        **{col: 'mean' for col in df.columns if col not in ['point_id', 'Timestamp', 'lat', 'lon', 'S2CELL']}
+    }).rename({'point_id':'nb_points'}, axis=1)
+
+    #xxxxxxxxxx: df_S2cell_centers_copy = df.copy() # (by multi-index ['S2CELL', 'Timestamp'])
+
+    # print("\nSTEP 9")
+    # print(df_S2cell_centers_copy)
 
     # Diagnostic message:
     if original_size != df.shape[0]:
@@ -291,24 +310,33 @@ def read_data(spatial_range, time_range, data_range, level):
     df.reset_index(inplace=True)
     df.Timestamp = pd.to_datetime(df.Timestamp)
     df = df.set_index("Timestamp").groupby('S2CELL').resample('1D').first()
-    print("\nSTEP 10")
-    print(df)
-    df = df.drop('S2CELL',axis=1)
-    print("\nSTEP 11")
-    print(df)
-    df[['lat','lon']] = df[['lat','lon']].ffill()
+    # print("\nSTEP 10")
+    # print(df)
+    df = df.drop('S2CELL',axis=1) # to remove the redundant not-index S2CELL column (now that a duplicate is included in the multi-index)
+    # print("\nSTEP 11")
+    # print(df)
+    df[['nb_points','lat','lon']] = df[['nb_points','lat','lon']].ffill()
+    
+    # Removal of the diagnostic column "nb_points", to simplify next steps, notably the call to interpolate():
+    df.drop('nb_points', axis=1, inplace=True)
+
+    # At this stage, df looks like:
+    # (columns:)   S2CELL  Timestamp  lat  lon  GW Nitrates (mg/L)  GW Total Phosphorus (mg/L) ...
     df = df.reset_index()
-    print("\nSTEP 12")
-    print(df)
+    # print("\nSTEP 12")
+    # print(df)
 
-    return(df) # MARC working here last!
-
-    # Data interpolation
-    if level >= 10:
-        df = interpolate(df, spatial_range, level)
-        df = df.reset_index().rename({'level_0': 'S2CELL', 'level_1': 'Timestamp'}, axis=1)
-    else:
-        df = df.drop(['lat', 'lon'], axis=1)
+    # COMMENT from Marc Laurencelle (brgm): I do not think it is relevant here to do Data interpolation!
+    # Actually, it is a very complex and challenging topic, involving geostatistics, dealing with censored data, etc. !!!
+    # Thus, I disabled the code below:
+    #
+    # # Data interpolation
+    # if level >= 10:
+    #     df = interpolate(df, spatial_range, level) # (Reminder: input df should contain 'lat', 'lon', and data columns)
+    #     df = df.reset_index().rename({'level_0': 'S2CELL', 'level_1': 'Timestamp'}, axis=1)
+    # else:
+    #     df = df.drop(['lat', 'lon'], axis=1)
+    df.drop(['lat', 'lon'], axis=1, inplace=True)
 
     # Pivot the DataFrame
     df = df.pivot_table(index='Timestamp', columns='S2CELL')
@@ -339,7 +367,8 @@ if __name__ == "__main__":
 
     time_range = (time_from, time_to)
 
-    data_range = ['phosphorus', 'nitrate'] #['phosphorus', 'pesticides','pfas'][2] #None #'pesticides'
+    # data_range = ['phosphorus', 'nitrate'] #['phosphorus', 'pesticides','pfas'][2] #None #'pesticides'
+    data_range = 'pesticides'
 
     print(spatial_range)
     print(time_range)
@@ -347,7 +376,7 @@ if __name__ == "__main__":
 
     print("\nTEST calling function read_data of hubeau_wq_read...")
 
-    whatweget = read_data(spatial_range,time_range,data_range,LEVEL)
+    whatweget = read_data(spatial_range,time_range,data_range,LEVEL, nmax_pts=3)
 
     print("\n\nWHAT we get with this test =")
     print(whatweget)
