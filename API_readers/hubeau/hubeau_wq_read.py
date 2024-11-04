@@ -102,7 +102,6 @@ def read_data(spatial_range, time_range, data_range, level):
 
     #TMP DEVEL faster tests: #<<<< TMP
     coordinates = coordinates.head(3)  #<<<< TMP
-    print(coordinates) #<<<< TMP
 
     print("  {} points are selected for this query".format(len(coordinates)))
 
@@ -169,7 +168,7 @@ def read_data(spatial_range, time_range, data_range, level):
     api = hub.init_api('groundwater_qual')
 
     for pt_id in pt_ids_lst:
-        print(pt_id)
+        print("\n*EXTRACTING data for " + pt_id)
         print("he_period_bounds =")
         print(he_period_bounds)
         # he_params['bss_id'] = bss_id
@@ -178,8 +177,9 @@ def read_data(spatial_range, time_range, data_range, level):
         # See this online help of HubEau for documentation on the available query parameters -> as kwargs here :
         # https://hubeau.eaufrance.fr/page/api-qualite-nappes#/qualite-nappes/analyses
         df = api.get_data(code_station=pt_id, date_debut_prelevement=he_period_bounds[0], date_fin_prelevement=he_period_bounds[1], code_param=data_requested_codes, fields=he_req_fields, only_valid_data=True) #(because the pkg uses the pseudo 'code_station' instead )
-        df = df.rename_axis('date_debut_prelevement').reset_index() # to have back the original name for that column (since hub pkg renamed it to date as put it as the index)
-        print(df.head(3))
+        if(len(df) > 0):
+            df = df.rename_axis('date_debut_prelevement').reset_index() # to have back the original name for that column (since hub pkg renamed it to date as put it as the index)
+        print(df.head(3)) # TMP
 
         #print(df.columns.names())
         # print(df)
@@ -216,6 +216,11 @@ def read_data(spatial_range, time_range, data_range, level):
     # based on: https://stackoverflow.com/questions/27929472/improve-row-append-performance-on-pandas-dataframes
     df = pd.concat(accum_dfs, sort=False)
 
+    # Nothing else to do, if no data:
+    if(len(df) == 0):
+        return None
+
+    print("\nPREVIEW of the whole data table (concatenation of all points' data frames):")
     print(df)
     print(len(df))
     print(df['bss_id'].unique())
@@ -306,7 +311,7 @@ if __name__ == "__main__":
 
     time_range = (time_from, time_to)
 
-    data_range = ('roger') #None #('var1','var2')
+    data_range = ('nitrate') #None #('var1','var2')
 
     print(spatial_range)
     print(time_range)
