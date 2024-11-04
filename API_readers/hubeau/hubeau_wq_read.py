@@ -233,11 +233,11 @@ def read_data(spatial_range, time_range, data_range, level):
     df = df[['latitude', 'longitude', 'nom_param', 'resultat', 'symbole_unite','date_debut_prelevement']] # TODO (Marc) ADD 'code_remarque_analyse' !!
     df = df.drop_duplicates()
 
-    ##########################################################################################################################
-    #TMP DEVEL for DEBUGGING pivot_table Issue with the aggfunc argument:
-    print(os.getcwd())
-    df.to_csv(r"""API_readers\hubeau\tmp_check_df.csv""", sep=";", encoding="Windows-1252")
-    ##########################################################################################################################
+    # ##########################################################################################################################
+    # #TMP DEVEL for DEBUGGING pivot_table Issue with the aggfunc argument:
+    # print(os.getcwd())
+    # df.to_csv(r"""API_readers\hubeau\tmp_check_df.csv""", sep=";", encoding="Windows-1252")
+    # ##########################################################################################################################
 
     df = pd.pivot_table(df,index=['latitude', 'longitude', 'date_debut_prelevement'],
          columns='nom_param',
