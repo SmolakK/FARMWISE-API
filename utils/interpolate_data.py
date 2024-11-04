@@ -120,7 +120,7 @@ def how_many(N, S, E, W, level):
     return num_cells_lat, num_cells_lon
 
 
-def interpolate(df_data, spatal_range, level):
+def interpolate(df_data, spatial_range, level):
     """
     Interpolates data from a DataFrame over a specified spatial range using S2 cells at a given level.
 
@@ -130,7 +130,7 @@ def interpolate(df_data, spatal_range, level):
 
     :param df_data: A pandas DataFrame containing data with 'lat' and 'lon' columns for latitude
                     and longitude, and additional columns for the data to be interpolated.
-    :param spatal_range: A tuple (N, S, E, W) defining the bounding box for interpolation:
+    :param spatial_range: A tuple (N, S, E, W) defining the bounding box for interpolation:
                          - N: Northern latitude limit
                          - S: Southern latitude limit
                          - E: Eastern longitude limit
@@ -139,7 +139,7 @@ def interpolate(df_data, spatal_range, level):
     :return: A pandas DataFrame containing the interpolated data at the finer S2 cell grid.
     """
     print("INTERPOLATING")
-    N, S, E, W = spatal_range
+    N, S, E, W = spatial_range
     size_lat, size_lon = how_many(N,S,E,W, level)
 
     s2_cells = []
