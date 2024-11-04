@@ -1,14 +1,14 @@
-# TODO DEVEL ***************** ici Temporaire, car je teste ce script qui est 2 niveaux ss-dossiers > la racine FARMWISE !
-# Ajouter le chemin du dossier parent au sys.path
-import sys
-import os
-if True:
-    print(os.path.abspath(__file__))
-    add_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) #+ r"\API_readers\hubeau"
-    print(add_path)
-    sys.path.append(add_path)
-    #sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    #print(os.getcwd())
+if __name__ == "__main__":
+    # TODO DEVEL ***************** ici Temporaire, car je teste ce script qui est 2 niveaux ss-dossiers > la racine FARMWISE !
+    # Ajouter le chemin du dossier parent au sys.path
+    import sys
+    import os
+    if True:
+        print(os.path.abspath(__file__))
+        add_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) #+ r"\API_readers\hubeau"
+        print(add_path)
+        sys.path.append(add_path)
+        #sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import requests
 import json
@@ -19,17 +19,17 @@ import warnings
 from utils.interpolate_data import interpolate
 from utils.data_operators import flatten_list
 
-#import API_readers.hubeau.hubeaupyutils as hub
+# Important reminder: "hubeaupyutils" is a library that must be installed running/using this API reader, cf. file "hubeaupyutils-main.tar.gz"
 import hubeaupyutils as hub
-
+from datetime import datetime
 
 def read_data(spatial_range, time_range, data_range, level):
     """
     read_data((51.09, 41.33, 9.56, -5.14),('1950-01-01','1980-01-01'),['phosphorus'],8)
 
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
-    :param time_range: A tuple containing the start and end timestamps defining the time range.
-    :param data_range: A list of properties requested.
+    :param time_range: A tuple containing the start and end timestamps defining the time range. 2 text dates (str) of format YYYY-mm-dd
+    :param data_range: A list of GW quality parameters requested, e.g., ('nitrate', 'phosphorus', 'potassium', 'pesticides') (not case sensitive) (see PARAMETERS_MAPPING)
     :param level: S2Cell level.
     :return: A pandas DataFrame containing the processed data.
     """
@@ -38,19 +38,59 @@ def read_data(spatial_range, time_range, data_range, level):
     #NO MORE NEEDED: north, south, east, west = spatial_range
     #NO MORE NEEDED: bbox = [west, south, east, north]  # Create bbox
 
+    # Protection in case of bad type of argument data_range:
+    # because without this conversion, next operations would fragment the string to a list of individual characters!
+    if(isinstance(data_range, str)):
+        data_range = [data_range]
+
     # Get all possible parameters, if None is specified:
     if data_range is None:
         data_range = list([k for k, v in PARAMETERS_MAPPING.items() if True])  # get all possible mapping keys
 
+    # Protection: convert to lower case:
     data_range = list(map(lambda x: x.lower(),data_range))
-    data_requested = list([v for k, v in PARAMETERS_MAPPING.items() if k in data_range])  # get all requested codes
-    data_requested = flatten_list(data_requested)
+    # Convert to set, to remove duplicates (if any):
+    data_asked_raw_set = set(data_range) #(raw but after lower case)
 
+    # Diagnostic info:
+    print("Asked parameter names (data_range set, all made lower case) =")
+    print(data_asked_raw_set)
+
+    data_requested_keys_set = data_asked_raw_set & set(PARAMETERS_MAPPING.keys())
+
+    # Diagnostic check:
+    data_asked_not_recognized = data_asked_raw_set - set(data_requested_keys_set)
+    # print(data_asked_raw_set)
+    # print(data_requested)
+
+    # Diagnostic info:
+    print("Verified (recognized) parameter names (data_requested_keys_set) =")
+    print(data_requested_keys_set)
+    if(len(data_asked_not_recognized) > 0):
+        print("NOT recognized parameter names (data_asked_not_recognized) =")
+        print(data_asked_not_recognized)
+
+    if(data_asked_raw_set.issubset(data_requested_keys_set)):
+        print(" OK, all of the {} requested parameters are recognized by the API reader.".format(len(data_asked_raw_set)))
+    else:
+        print(" OOPS! {} of the {} requested parameters are recognized by the API reader.".format(len(data_asked_not_recognized), len(data_asked_raw_set)))
+
+    # Get the parameter CODES, that will serve as parameter IDs for HubEau:
+    data_requested_codes = list([v for k, v in PARAMETERS_MAPPING.items() if k in data_requested_keys_set])  # get all requested CODES
+    data_requested_codes = flatten_list(data_requested_codes)
     # Remove duplicates by converting to a set (and back to list):
-    data_requested = list(set(data_requested))
+    data_requested_codes = list(set(data_requested_codes))
+
     # TODO TMP Marc to test fast the case of param Phosphorus ('Phosphore total') only: data_requested = 1350
     # print(data_requested)
     # print(len(data_requested))
+
+    # Diagnostic info:
+    print("Parameter CODES that will be requested in HubEau queries (data_requested_codes) =")
+    print(data_requested_codes)
+
+    if len(data_requested_codes) == 0:
+        return None
 
     print("DOWNLOADING: HubEau (France) GW Quality data")
 
@@ -109,14 +149,35 @@ def read_data(spatial_range, time_range, data_range, level):
     # TODO : Define a var he_req_fields = [] to redure the nb of columns of data to get and thus make the get ops faster!!!
     he_req_fields = ['bss_id', 'latitude', 'longitude', 'code_param', 'nom_param', 'date_debut_prelevement', 'resultat', 'symbole_unite','code_remarque_analyse']
 
+    # Date (extraction period) parameters for the HubEau query:
+    # (input argument should be text dates YYYY-mm-dd, else datetime/timestamp compatible types)
+    he_period_bounds = [None, None] # (list, not tuple)
+    # Remark (reminder): An internal function of lib hubeaupyutils, _check_parameters(**kwargs), will remove unused (empty: =None or ="") kw arguments.
+    #
+    #  Start of period:
+    if(isinstance(time_range[0], str)):
+       he_period_bounds[0] = time_range[0]
+    else:
+       he_period_bounds[0] = "{:%Y-%m-%d}".format(time_range[0])
+    #
+    #  End of period:
+    if(isinstance(time_range[1], str)):
+       he_period_bounds[1] = time_range[1]
+    else:
+       he_period_bounds[1] = "{:%Y-%m-%d}".format(time_range[1])
+
     api = hub.init_api('groundwater_qual')
 
     for pt_id in pt_ids_lst:
         print(pt_id)
+        print("he_period_bounds =")
+        print(he_period_bounds)
         # he_params['bss_id'] = bss_id
         # print(he_params)
 
-        df = api.get_data(code_station=pt_id, code_param=data_requested, fields=he_req_fields, only_valid_data=True) #(because the pkg uses the pseudo 'code_station' instead )
+        # See this online help of HubEau for documentation on the available query parameters -> as kwargs here :
+        # https://hubeau.eaufrance.fr/page/api-qualite-nappes#/qualite-nappes/analyses
+        df = api.get_data(code_station=pt_id, date_debut_prelevement=he_period_bounds[0], date_fin_prelevement=he_period_bounds[1], code_param=data_requested_codes, fields=he_req_fields, only_valid_data=True) #(because the pkg uses the pseudo 'code_station' instead )
         df = df.rename_axis('date_debut_prelevement').reset_index() # to have back the original name for that column (since hub pkg renamed it to date as put it as the index)
         print(df.head(3))
 
@@ -166,6 +227,13 @@ def read_data(spatial_range, time_range, data_range, level):
 
     df = df[['latitude', 'longitude', 'nom_param', 'resultat', 'symbole_unite','date_debut_prelevement']] # TODO (Marc) ADD 'code_remarque_analyse' !!
     df = df.drop_duplicates()
+
+    ##########################################################################################################################
+    #TMP DEVEL for DEBUGGING pivot_table Issue with the aggfunc argument:
+    print(os.getcwd())
+    df.to_csv(r"""API_readers\hubeau\tmp_check_df.csv""", sep=";", encoding="Windows-1252")
+    ##########################################################################################################################
+
     df = pd.pivot_table(df,index=['latitude', 'longitude', 'date_debut_prelevement'],
          columns='nom_param',
          values=['resultat','symbole_unite'],
@@ -221,7 +289,7 @@ if __name__ == "__main__":
     E = -2.0
     W = -5.0
     LEVEL = 8
-    TIME_FROM = '2010-01-01'
+    TIME_FROM = '2020-01-01'
     TIME_TO = '2023-12-31'
     #FACTORS = ['temperature','precipitation','vegetation_transpiration','soil_moisture']
 
@@ -238,7 +306,7 @@ if __name__ == "__main__":
 
     time_range = (time_from, time_to)
 
-    data_range = None #('var1','var2')
+    data_range = ('roger') #None #('var1','var2')
 
     print(spatial_range)
     print(time_range)
