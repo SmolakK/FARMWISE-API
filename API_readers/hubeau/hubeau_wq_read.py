@@ -349,7 +349,7 @@ if __name__ == "__main__":
     S = 47.0
     E = -2.0
     W = -5.0
-    LEVEL = 8
+    LEVEL = 2 #8
     TIME_FROM = '2020-01-01'
     TIME_TO = '2023-12-31'
     #FACTORS = ['temperature','precipitation','vegetation_transpiration','soil_moisture']
@@ -367,8 +367,8 @@ if __name__ == "__main__":
 
     time_range = (time_from, time_to)
 
-    # data_range = ['phosphorus', 'nitrate'] #['phosphorus', 'pesticides','pfas'][2] #None #'pesticides'
-    data_range = 'pesticides'
+    data_range = ['phosphorus', 'nitrate'] #['phosphorus', 'pesticides','pfas'][2] #None #'pesticides'
+    # data_range = 'pesticides'
 
     print(spatial_range)
     print(time_range)
@@ -376,7 +376,7 @@ if __name__ == "__main__":
 
     print("\nTEST calling function read_data of hubeau_wq_read...")
 
-    whatweget = read_data(spatial_range,time_range,data_range,LEVEL, nmax_pts=3)
+    whatweget = read_data(spatial_range,time_range,data_range,LEVEL, nmax_pts=10)
 
     print("\n\nWHAT we get with this test =")
     print(whatweget)
