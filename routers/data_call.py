@@ -7,14 +7,29 @@ import tempfile
 import os
 from logging_config import logger
 from security import limiter, get_current_active_user
+import asyncio
 
 api_router = APIRouter()
+
+
+# Dependency to check for client disconnection
+async def check_client_disconnected(request: Request):
+    try:
+        while True:
+            if await request.is_disconnected():
+                logger.warning("Client disconnected")
+                raise HTTPException(status_code=499, detail="Client disconnected")
+            await asyncio.sleep(1)  # Check every 1 seconds
+    except asyncio.CancelledError:
+        logger.warning("Request cancelled due to client disconnection")
 
 
 @api_router.post("/read-data", response_model=ReadDataResponse)
 @limiter.limit("5/minute")
 async def read_data_endpoint(request_body: ReadDataRequest, request: Request,
-                             current_user: User = Depends(get_current_active_user)):
+                             current_user: User = Depends(get_current_active_user),
+                             _ = Depends(check_client_disconnected)
+                             ):
     """
     Endpoint to read data based on provided parameters and return a download link for the resulting CSV file.
 
@@ -59,7 +74,9 @@ async def read_data_endpoint(request_body: ReadDataRequest, request: Request,
 
 @api_router.get("/download/{file_name}")
 async def download_file(file_name: str, background_tasks: BackgroundTasks, request: Request,
-                        current_user: User = Depends(get_current_active_user)):
+                        current_user: User = Depends(get_current_active_user),
+                        _ = Depends(check_client_disconnected)
+                        ):
     """
     Downloads a file from the server after validating the filename to prevent directory traversal attacks.
 

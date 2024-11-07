@@ -203,7 +203,7 @@ def read_data(spatial_range, time_range, data_range, level):
     df = df.reset_index()
 
     # Data interpolation
-    if level >= 10:
+    if level >= 18:
         df = interpolate(df, spatial_range, level)
         df = df.reset_index().rename({'level_0': 'S2CELL', 'level_1': 'Timestamp'}, axis=1)
     else:
