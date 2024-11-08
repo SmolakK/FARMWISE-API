@@ -6,7 +6,7 @@ from io import BytesIO
 from utils.interpolate_data import how_many
 from utils.coordinates_to_cells import prepare_coordinates
 from utils.interpolate_data import interpolate
-from corine_mappings.corine_mapping import PARAMETERS_SELECTION
+from API_readers.corine.corine_mappings.corine_mapping import PARAMETERS_SELECTION
 from datetime import datetime, date
 
 
