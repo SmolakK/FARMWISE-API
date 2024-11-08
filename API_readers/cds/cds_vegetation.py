@@ -9,9 +9,10 @@ import warnings
 import zipfile
 import glob
 from cds_mappings.cds_vegetation_mapping import GLOBAL_MAPPING, DATA_ALIASES
+import asyncio
 
 
-def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level):
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.

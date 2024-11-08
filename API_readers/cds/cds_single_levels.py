@@ -7,9 +7,10 @@ from API_readers.cds.cds_mappings.cds_single_levels_mapping import DATA_ALIASES,
 from utils.coordinates_to_cells import prepare_coordinates
 from utils.interpolate_data import interpolate
 import warnings
+import asyncio
 
 
-def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level):
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.
