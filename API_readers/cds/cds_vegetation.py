@@ -4,7 +4,6 @@ import xarray as xr
 import pandas as pd
 from datetime import datetime
 from utils.coordinates_to_cells import prepare_coordinates
-from utils.interpolate_data import interpolate
 import warnings
 import zipfile
 import glob
@@ -101,13 +100,8 @@ async def read_data(spatial_range, time_range, data_range, level):
     if original_size != df.shape[0]:
         warnings.warn("Some data were aggregated due to overlapping cells.")
 
-    # Data interpolation
-    if level >= 18:
-        df = interpolate(df, spatial_range, level)
-        df = df.reset_index().rename({'level_0': 'S2CELL', 'level_1': 'Timestamp'}, axis=1)
-    else:
-        df = df.reset_index()
-        df.drop(['lat', 'lon'], axis=1, inplace=True)
+    df = df.reset_index()
+    df.drop(['lat', 'lon'], axis=1, inplace=True)
 
     # Pivot the DataFrame
     df = df.pivot_table(index='Timestamp', columns='S2CELL')
