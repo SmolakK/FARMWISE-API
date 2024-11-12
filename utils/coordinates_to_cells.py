@@ -31,7 +31,7 @@ def prepare_coordinates(coordinates, spatial_range, level):
         print("No data in the range")
         return None
     coords['S2CELL'] = coords.apply(lambda x:
-                                              s2sphere.CellId.from_lat_lng(
-                                                  s2sphere.LatLng.from_degrees(x.lat, x.lon)).parent(level),
-                                              axis=1)
+                                    s2sphere.CellId.from_lat_lng(
+                                        s2sphere.LatLng.from_degrees(x.lat, x.lon)).parent(level),
+                                    axis=1)
     return coords
