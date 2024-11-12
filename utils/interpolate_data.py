@@ -4,6 +4,7 @@ import numpy as np
 from scipy.interpolate import griddata
 import math
 from tqdm import tqdm
+from utils.cells_to_coordinates import s2cells_to_coordinates
 
 # Constants
 EARTH_RADIUS_KM = 6371.0  # Earth's radius in kilometers
@@ -139,6 +140,9 @@ def interpolate(df_data, spatal_range, level):
     :return: A pandas DataFrame containing the interpolated data at the finer S2 cell grid.
     """
     print("INTERPOLATING")
+    df_data = df_data.stack(level=1)
+    df_data = s2cells_to_coordinates(df_data)
+
     N, S, E, W = spatal_range
     size_lat, size_lon = how_many(N,S,E,W, level)
 
@@ -162,12 +166,12 @@ def interpolate(df_data, spatal_range, level):
     fine_lat = s2_cell_centers[:, 0]
     fine_lon = s2_cell_centers[:, 1]
 
-    # Interpolate ERA5 data to the finer S2 cell grid
+    # Interpolate data to the finer S2 cell grid
     columns_to = [x for x in df_data.columns if x != 'lat' and x != 'lon']
     interpolated_data = {}
     for colname in columns_to:
         to_concat = {}
-        for day, values in df_data.groupby(level=1):
+        for day, values in df_data.groupby(level=0):
             finer_grid = griddata(
                 (values.lon, values.lat), values[colname],
                 (fine_lon, fine_lat),  # S2 cell coordinates
@@ -175,5 +179,9 @@ def interpolate(df_data, spatal_range, level):
             )
             to_concat[day] = pd.DataFrame(finer_grid, index=s2_cells)
         interpolated_data[colname] = pd.concat(to_concat)
-    interpolated_data = pd.concat(interpolated_data, axis=1).swaplevel().droplevel(1, axis=1)
+    interpolated_data = pd.concat(interpolated_data, axis=1).droplevel(1, axis=1)
+    interpolated_data = interpolated_data.reset_index()
+    interpolated_data.columns = ['Timestamp','S2CELL'] + list(interpolated_data.columns[2:])
+    interpolated_data.set_index(['Timestamp','S2CELL'],inplace=True)
+    interpolated_data = interpolated_data.pivot_table(index='Timestamp', columns='S2CELL')
     return interpolated_data
