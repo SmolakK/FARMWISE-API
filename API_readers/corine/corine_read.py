@@ -6,7 +6,6 @@ from PIL import Image
 from io import BytesIO
 from utils.interpolate_data import how_many
 from utils.coordinates_to_cells import prepare_coordinates
-from utils.interpolate_data import interpolate
 from API_readers.corine.corine_mappings.corine_mapping import PARAMETERS_SELECTION
 from datetime import datetime, date
 import asyncio
@@ -98,12 +97,7 @@ async def read_data(spatial_range, time_range, data_range, level):
                 days = pd.date_range(explode_start, explode_end, freq='D')
                 df = pd.concat([df.assign(Timestamp=dates) for dates in days])
 
-                # Data interpolation
-                if level >= 18:
-                    df = interpolate(df, spatial_range, level)
-                    df = df.reset_index().rename({'level_0': 'S2CELL', 'level_1': 'Timestamp'}, axis=1)
-                else:
-                    df = df.drop(['lat', 'lon'], axis=1)
+                df = df.drop(['lat', 'lon'], axis=1)
                 stacked_df.append(df)
 
     # Concatenate and pivot data asynchronously
