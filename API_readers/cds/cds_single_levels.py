@@ -5,7 +5,6 @@ import pandas as pd
 from datetime import datetime
 from API_readers.cds.cds_mappings.cds_single_levels_mapping import DATA_ALIASES, GLOBAL_MAPPING
 from utils.coordinates_to_cells import prepare_coordinates
-from utils.interpolate_data import interpolate
 import warnings
 import asyncio
 
@@ -88,12 +87,7 @@ async def read_data(spatial_range, time_range, data_range, level):
     if "Temperature [°C]" in df.columns:
         df["Temperature [°C]"] = df["Temperature [°C]"] - 273.15
 
-    # Data interpolation
-    if level >= 18:
-        df = interpolate(df, spatial_range, level)
-        df = df.reset_index().rename({'level_0': 'S2CELL', 'level_1': 'Timestamp'}, axis=1)
-    else:
-        df = df.drop(['lat', 'lon'], axis=1)
+    df = df.drop(['lat', 'lon'], axis=1)
 
     # Pivot the DataFrame
     df = df.pivot_table(index='Timestamp', columns='S2CELL')
