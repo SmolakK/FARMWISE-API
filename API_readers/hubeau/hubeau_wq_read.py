@@ -1,14 +1,18 @@
-if __name__ == "__main__":
-    # TODO DEVEL ***************** ici Temporaire, car je teste ce script qui est 2 niveaux ss-dossiers > la racine FARMWISE !
-    # Ajouter le chemin du dossier parent au sys.path
+dev_test_enabled = True
+
+if dev_test_enabled and __name__ == "__main__":
+    # DEVEL section, useful to test this script without having to launch the whole thing
     import sys
     import os
-    if True:
-        print(os.path.abspath(__file__))
-        add_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) #+ r"\API_readers\hubeau"
-        print(add_path)
-        sys.path.append(add_path)
-        #sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    print("\nDEVEL (if) section for testing this script is ACTIVE & RUNNING !")
+    print("* Path of the currently running Python script:")
+    print("  " + os.path.abspath(__file__))
+    add_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) #+ r"\API_readers\hubeau"
+    print("* Path that will be added to sys.path:")
+    print("  " + add_path)
+    sys.path.append(add_path)
+    #sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    print("Will now run the main part of the script, which starts with some imports...\n")
 
 import requests
 import json
@@ -344,7 +348,8 @@ def read_data(spatial_range, time_range, data_range, level, nmax_pts=None):
     return df
 
 
-if __name__ == "__main__":
+if dev_test_enabled and __name__ == "__main__":
+    print("TEST: Preparing parameters -> arguments for calling function read_data()...\n")
     N = 49.0
     S = 47.0
     E = -2.0
@@ -374,7 +379,7 @@ if __name__ == "__main__":
     print(time_range)
     print(data_range)
 
-    print("\nTEST calling function read_data of hubeau_wq_read...")
+    print("\nTEST: calling function read_data of hubeau_wq_read...")
 
     whatweget = read_data(spatial_range,time_range,data_range,LEVEL, nmax_pts=10)
 
@@ -382,3 +387,5 @@ if __name__ == "__main__":
     print(whatweget)
     if whatweget is not None:
         print(len(whatweget))
+
+    print("\nTEST: The End.")
