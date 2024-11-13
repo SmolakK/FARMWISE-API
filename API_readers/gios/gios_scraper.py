@@ -149,7 +149,7 @@ async def read_data(spatial_range, time_range, data_range, level):
 
     # Explode to days
     days = pd.date_range(time_range[0],time_range[1],freq='D')
-    final_dataframe = pd.concat([final_dataframe.assign(Timestamp=date) for date in days])
+    final_dataframe = pd.concat([final_dataframe.assign(Timestamp=date.date()) for date in days])
 
     final_dataframe = final_dataframe.droplevel(1).reset_index().set_index(["Timestamp",'S2CELL'])
 
