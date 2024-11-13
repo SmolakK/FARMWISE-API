@@ -172,11 +172,23 @@ def interpolate(df_data, spatal_range, level):
     for colname in columns_to:
         to_concat = {}
         for day, values in df_data.groupby(level=0):
+            filtered_vals = values[[colname,'lat','lon']][~values[colname].isna()]
             finer_grid = griddata(
-                (values.lon, values.lat), values[colname],
+                (filtered_vals.lon, filtered_vals.lat), filtered_vals[colname],
                 (fine_lon, fine_lat),  # S2 cell coordinates
                 method='linear'  # Interpolation method: 'linear', 'nearest', or 'cubic'
             )
+            if np.isnan(finer_grid).any():
+                # Second pass: Nearest neighbor interpolation to fill NaNs
+                finer_grid = np.where(
+                    np.isnan(finer_grid),
+                    griddata(
+                        (filtered_vals.lon, filtered_vals.lat), filtered_vals[colname],
+                        (fine_lon, fine_lat),
+                        method='nearest'
+                    ),
+                    finer_grid
+                )
             to_concat[day] = pd.DataFrame(finer_grid, index=s2_cells)
         interpolated_data[colname] = pd.concat(to_concat)
     interpolated_data = pd.concat(interpolated_data, axis=1).droplevel(1, axis=1)
