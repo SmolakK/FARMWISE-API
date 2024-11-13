@@ -35,14 +35,13 @@ async def read_data(spatial_range, time_range, data_range, level):
     file_name = dataset + "_temp_data.nc"
     temp_file_path = os.path.join(folder_path, file_name)
     # Request the data and keep it in memory
-    response = c.retrieve(
+    c.retrieve(
         dataset,  # Dataset name
         {
             'product_type': ['reanalysis'],
             'variable': data_requested,  # Specify variables
             'date': '/'.join(time_range),
             'format': 'netcdf',
-            'grid': [1.0, 1.0],  # File format
             'area': [north, west, south, east],  # Spatial extent: North, West, South, East
             'time': [f"{hour:02}:00" for hour in range(24)]
         },
@@ -83,9 +82,13 @@ async def read_data(spatial_range, time_range, data_range, level):
     if original_size != df.shape[0]:
         warnings.warn("Some data were aggregated")
 
-    # Recalculate temperature te Celsius
+    # Recalculate temperature to Celsius
     if "Temperature [°C]" in df.columns:
         df["Temperature [°C]"] = df["Temperature [°C]"] - 273.15
+
+    # Recalculate precipitation to a daily sum
+    if 'Precipitation total [mm]' in df.columns:
+        df['Precipitation total [mm]'] = df['Precipitation total [mm]']*(24*60*60)
 
     df = df.drop(['lat', 'lon'], axis=1)
 
