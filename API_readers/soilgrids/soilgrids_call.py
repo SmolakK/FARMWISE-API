@@ -3,8 +3,7 @@ from utils.interpolate_data import how_many
 import pandas as pd
 import numpy as np
 from utils.coordinates_to_cells import prepare_coordinates
-from utils.interpolate_data import interpolate
-from soilgrids_mappings.soilgrids_mapping import GLOBAL_MAPPING, DATA_ALIASES, DEPTH_MAPPING
+from API_readers.soilgrids.soilgrids_mappings.soilgrids_mapping import GLOBAL_MAPPING, DATA_ALIASES, DEPTH_MAPPING
 
 
 def read_data(spatial_range, time_range, data_range, level):
@@ -76,12 +75,7 @@ def read_data(spatial_range, time_range, data_range, level):
     days = pd.date_range(time_range[0],time_range[1],freq='D')
     df = pd.concat([df.assign(Timestamp=date) for date in days])
 
-    # Data interpolation
-    if level >= 10:
-        df = interpolate(df, spatial_range, level)
-        df = df.reset_index().rename({'level_0': 'S2CELL', 'level_1': 'Timestamp'}, axis=1)
-    else:
-        df = df.drop(['lat', 'lon'], axis=1)
+    df = df.drop(['lat', 'lon'], axis=1)
 
     # Pivot the DataFrame
     df = df.pivot_table(index='Timestamp', columns='S2CELL')
