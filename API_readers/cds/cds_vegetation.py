@@ -7,7 +7,7 @@ from utils.coordinates_to_cells import prepare_coordinates
 import warnings
 import zipfile
 import glob
-from cds_mappings.cds_vegetation_mapping import GLOBAL_MAPPING, DATA_ALIASES
+from API_readers.cds.cds_mappings.cds_vegetation_mapping import GLOBAL_MAPPING, DATA_ALIASES
 import asyncio
 
 
@@ -86,7 +86,7 @@ async def read_data(spatial_range, time_range, data_range, level):
 
     # Convert 'Timestamp' to datetime if it's not already
     if not pd.api.types.is_datetime64_any_dtype(df['Timestamp']):
-        df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+        df['Timestamp'] = pd.to_datetime(df['Timestamp']).date()
 
     # Filter data within the specified time range
     df = df[(df['Timestamp'] >= pd.to_datetime(start)) & (df['Timestamp'] <= pd.to_datetime(end))]
