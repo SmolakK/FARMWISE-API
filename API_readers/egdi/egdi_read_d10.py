@@ -74,7 +74,7 @@ async def read_data(spatial_range, time_range, data_range, level):
 
         # Explode to days
         days = pd.date_range(time_range[0], time_range[1], freq='D')
-        df = pd.concat([df.assign(Timestamp=date) for date in days])
+        df = pd.concat([df.assign(Timestamp=date.date()) for date in days])
 
         # Drop unnecessary columns
         df = df.drop(['lat', 'lon'], axis=1)
