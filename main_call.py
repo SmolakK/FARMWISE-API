@@ -23,11 +23,9 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
     :param time_from: The starting time from when data should be collected. Format: Unix timestamp.
     :param time_to: The ending time to when data should be collected. Format: Unix timestamp.
     :param factors: A list of factors specifying the type of data requested.
-                    Allowed factors: 'precipitation', 'sunlight', 'cloud cover', 'temperature',
-                    'wind', 'pressure', 'humidity'.
+                    Examples of allowed factors: 'precipitation', 'temperature'
 
-    :return: Requested DataCube in Zarr format. The DataCube contains data for the requested factors within the specified time range
-             and geographical area.
+    :return: Requested data in DataFrame of pandas.
 
     :raises: Specific exceptions raised by individual API modules if data retrieval fails.
 
@@ -75,4 +73,4 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
         logger.warning("No data retrieved from available APIs")
         return pd.DataFrame()
 
-asyncio.run(read_data((50, 49, 20, 18), 10, '2023-10-10', '2023-10-12', ['hydraulic conductivity'], separate_api=False, interpolation=True))
+asyncio.run(read_data((50, 49, 20, 18), 10, '2017-01-10', '2017-12-12', ['soil'], separate_api=False, interpolation=True))
