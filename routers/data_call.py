@@ -50,8 +50,14 @@ async def read_data_endpoint(request_body: ReadDataRequest, request: Request,
         time_to = request_body.time_to
         factors = request_body.factors
 
+        # New parameters from request_body, with default values if not specified
+        separate_api = request_body.separate_api if hasattr(request_body, 'separate_api') else False
+        interpolation = request_body.interpolation if hasattr(request_body, 'interpolation') else False
+
         # Call the read_data function
-        df = read_data(bounding_box, level, time_from, time_to, factors)
+        df = await read_data(bounding_box, level, time_from, time_to, factors,
+                             separate_api=separate_api, interpolation=interpolation
+                             )
 
         # Use the temporary directory from the application state
         temp_dir = request.app.state.temp_dir
