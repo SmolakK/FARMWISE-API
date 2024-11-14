@@ -11,6 +11,7 @@ from utils.coordinates_to_cells import prepare_coordinates
 import asyncio
 
 
+# TODO: time wrapping bug
 async def extract_point_ids(url):
     """
     Extracts point IDs from the hyperlinks found on a webpage.
@@ -94,9 +95,16 @@ async def read_data(spatial_range, time_range, data_range, level):
     :return:
     """
     print("DOWNLOADING: GIOS soil data")
+    avail_years = [1995, 2000, 2005, 2010, 2015, 2020, 2025]
+    avail_years = [(avail_years[x], avail_years[x + 1]) for x in range(len(avail_years) - 1)]
+
     time_from, time_to = time_range
     time_from = datetime.strptime(time_from, '%Y-%m-%d').year
     time_to = datetime.strptime(time_to, '%Y-%m-%d').year
+
+    between_years = [(s, e) for s, e in avail_years if e >= time_from and s <= time_from]
+    lowest_range = min([x[0] for x in between_years])
+    highest_range = max([x[1] for x in between_years])
 
     coors = await asyncio.to_thread(pd.read_csv, r'API_readers/gios/constants/gios_coordinates.csv')
 
@@ -115,15 +123,17 @@ async def read_data(spatial_range, time_range, data_range, level):
     # Keeping the same order for the parameters
     parameter_order = parameter_values.copy()
     point_ids = point_ids.split(',')
+    point_ids = list(map(int, point_ids))
+    point_ids = list(set(point_ids).intersection(set(coordinates.id)))
 
     for point_id in tqdm(point_ids, total=len(point_ids)):
         df = await scrape_point_data(point_id, parameter_values, parameter_order)
         # Filter data layers
         columns_to_select = list(df.columns[:2]) + list(set(df.columns).intersection(set(parameter_selection)))
-        df = df.loc[:,columns_to_select]
+        df = df.loc[:, columns_to_select]
         # Filter time range
         df.year = df.year.astype(int)
-        df = df[(df.year >= time_from) & (df.year <= time_to)]
+        df = df[(df.year >= lowest_range) & (df.year < highest_range)]
         all_dataframes.append(df)
 
     # Combine all dataframes into one
@@ -146,12 +156,13 @@ async def read_data(spatial_range, time_range, data_range, level):
     final_dataframe = final_dataframe.groupby(['S2CELL', 'year']).mean()
     if original_size != final_dataframe.shape[0]:
         warnings.warn("Some data were aggregated")
+    final_dataframe = final_dataframe.groupby(level=0, axis=1).mean()  # some wierd stuff out here
 
     # Explode to days
-    days = pd.date_range(time_range[0],time_range[1],freq='D')
+    days = pd.date_range(time_range[0], time_range[1], freq='D')
     final_dataframe = pd.concat([final_dataframe.assign(Timestamp=date.date()) for date in days])
 
-    final_dataframe = final_dataframe.droplevel(1).reset_index().set_index(["Timestamp",'S2CELL'])
+    final_dataframe = final_dataframe.droplevel(1).reset_index().set_index(["Timestamp", 'S2CELL'])
 
     dataframe_pivot = final_dataframe.pivot_table(index='Timestamp', columns='S2CELL')
     return dataframe_pivot
