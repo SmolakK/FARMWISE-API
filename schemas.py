@@ -1,6 +1,12 @@
 from pydantic import BaseModel, Field, field_validator, EmailStr
 from typing import List, Tuple, Optional
 from datetime import datetime
+from mappings.data_source_mapping import API_PATH_RANGES
+
+# Dynamically extract all unique factors from API_PATH_RANGES
+valid_factors = set(
+    factor for api_params in API_PATH_RANGES.values() for factor in api_params[2]
+)
 
 
 class ReadDataRequest(BaseModel):
@@ -30,6 +36,14 @@ class ReadDataRequest(BaseModel):
         example=["temperature", "humidity"],
         description="List of factors to retrieve data for."
     )
+    separate_api: Optional[bool] = Field(
+        False,
+        description="If True, store APIs in separate columns instead of averaging."
+    )
+    interpolation: Optional[bool] = Field(
+        False,
+        description="If True, apply interpolation to the resulting data."
+    )
 
     @field_validator("time_from", "time_to")
     def validate_date(cls, value):
@@ -49,7 +63,6 @@ class ReadDataRequest(BaseModel):
 
     @field_validator("factors")
     def check_factors(cls, value):
-        valid_factors = {"precipitation", "sunlight", "cloud cover", "temperature", "wind", "pressure", "humidity"}
         if any(factor not in valid_factors for factor in value):
             raise ValueError(f"Factors must be within {valid_factors}")
         return value
