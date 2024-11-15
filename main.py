@@ -16,6 +16,7 @@ Base.metadata.create_all(bind=engine)
 temp_dir = tempfile.mkdtemp()
 logger.info(f"Temporary directory created at {temp_dir}")
 
+
 # Define the lifespan context manager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,6 +32,7 @@ async def lifespan(app: FastAPI):
         logger.info(f"Temporary directory {app.state.temp_dir} removed")
         logger.info("Application shutdown completed.")
 
+
 # Create the FastAPI app with lifespan
 app = FastAPI(lifespan=lifespan)
 
@@ -44,4 +46,5 @@ setup_security(app)
 # Run the application
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
