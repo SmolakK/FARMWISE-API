@@ -13,12 +13,14 @@ api_router = APIRouter()
 
 
 # Dependency to check for client disconnection
-async def monitor_client_disconnection(request: Request):
+async def monitor_client_disconnection(request: Request, stop_event: asyncio.Event):
     """
     Continuously monitors client disconnection in a separate task.
     """
     try:
         while not await request.is_disconnected():
+            if stop_event.is_set():
+                return
             await asyncio.sleep(1)  # Check every second
     except asyncio.CancelledError:
         logger.warning("Client disconnected - request cancelled")
@@ -47,8 +49,10 @@ async def read_data_endpoint(
     :raises HTTPException: Raises an error if there are issues during processing or file creation.
     :return: An instance of ReadDataResponse containing the download link for the generated CSV file.
     """
+    stop_event = asyncio.Event()
+
     # Add client disconnection monitor as a background task
-    background_tasks.add_task(monitor_client_disconnection, request)
+    background_tasks.add_task(monitor_client_disconnection, request, stop_event)
 
     async def stream_progress():
         try:
@@ -90,6 +94,9 @@ async def read_data_endpoint(
         except Exception as e:
             logger.error(f"Error processing request: {e}")
             raise HTTPException(status_code=500, detail="Internal Server Error")
+        finally:
+            # Signal that the main task is completed
+            stop_event.set()
 
     return StreamingResponse(stream_progress(), media_type="text/plain")
 
