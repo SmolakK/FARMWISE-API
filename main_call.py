@@ -73,4 +73,4 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
         logger.warning("No data retrieved from available APIs")
         return pd.DataFrame()
 
-asyncio.run(read_data((50, 49, 20, 18), 10, '2017-01-10', '2017-12-12', ['soil'], separate_api=False, interpolation=True))
+# asyncio.run(read_data((50, 49, 20, 18), 10, '2017-01-10', '2017-12-12', ['soil'], separate_api=False, interpolation=True))
