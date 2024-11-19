@@ -4,14 +4,14 @@ import xarray as xr
 import pandas as pd
 from datetime import datetime
 from utils.coordinates_to_cells import prepare_coordinates
-from utils.interpolate_data import interpolate
 import warnings
 import zipfile
 import glob
-from cds_mappings.cds_vegetation_mapping import GLOBAL_MAPPING, DATA_ALIASES
+from API_readers.cds.cds_mappings.cds_vegetation_mapping import GLOBAL_MAPPING, DATA_ALIASES
+import asyncio
 
 
-def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level):
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.
@@ -86,7 +86,7 @@ def read_data(spatial_range, time_range, data_range, level):
 
     # Convert 'Timestamp' to datetime if it's not already
     if not pd.api.types.is_datetime64_any_dtype(df['Timestamp']):
-        df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+        df['Timestamp'] = pd.to_datetime(df['Timestamp']).date()
 
     # Filter data within the specified time range
     df = df[(df['Timestamp'] >= pd.to_datetime(start)) & (df['Timestamp'] <= pd.to_datetime(end))]
@@ -100,13 +100,8 @@ def read_data(spatial_range, time_range, data_range, level):
     if original_size != df.shape[0]:
         warnings.warn("Some data were aggregated due to overlapping cells.")
 
-    # Data interpolation
-    if level >= 20:
-        df = interpolate(df, spatial_range, level)
-        df = df.reset_index().rename({'level_0': 'S2CELL', 'level_1': 'Timestamp'}, axis=1)
-    else:
-        df = df.reset_index()
-        df.drop(['lat', 'lon'], axis=1, inplace=True)
+    df = df.reset_index()
+    df.drop(['lat', 'lon'], axis=1, inplace=True)
 
     # Pivot the DataFrame
     df = df.pivot_table(index='Timestamp', columns='S2CELL')

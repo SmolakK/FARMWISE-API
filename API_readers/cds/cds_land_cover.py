@@ -8,8 +8,10 @@ from utils.coordinates_to_cells import prepare_coordinates
 from utils.interpolate_data import interpolate
 import warnings
 import numpy as np
+import asyncio
 
-def read_data(spatial_range, time_range, data_range, level):
+
+async def read_data(spatial_range, time_range, data_range, level):
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.
@@ -28,7 +30,7 @@ def read_data(spatial_range, time_range, data_range, level):
     start, end = time_range
     start = datetime.strptime(start, '%Y-%m-%d').date()
     end = datetime.strptime(end, '%Y-%m-%d').date()
-    years = list(map(str,range(start.year,end.year+1)))
+    years = list(map(str, range(start.year, end.year + 1)))
     # data_requested = list([k for k, v in DATA_ALIASES.items() if v in data_range])
 
     folder_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'temp_storage')
@@ -41,9 +43,8 @@ def read_data(spatial_range, time_range, data_range, level):
         {
             'variable': 'all',  # Specify variables (land cover classes)
             'year': years,
-            "version": ["v2_0_7cds","v2_1_1"],
+            "version": ["v2_0_7cds", "v2_1_1"],
             'area': [north, west, south, east],  # Spatial extent: North, West, South, East
         },
         temp_file_path
     )
-

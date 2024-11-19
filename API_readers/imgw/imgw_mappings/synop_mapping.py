@@ -18,8 +18,7 @@ s_d_COLUMNS = [
 ]
 s_d_SELECTION = [
     "Station code", "Station name", "Year", "Month", "Day", "Average daily temperature [°C]",
-    "Daily precipitation total [mm]", "Duration of rainfall [hours]","Duration of snowfall [hours]",
-    "Snow cover height [cm]"
+    "Daily precipitation total [mm]"
 ]
 
 s_d_t_COLUMNS = [
@@ -71,6 +70,4 @@ GLOBAL_MAPPING = {
 DATA_ALIASES = {
     "Average daily temperature [°C]": "temperature",
     "Daily precipitation total [mm]": "precipitation",
-    "Duration of rainfall [hours]": "precipitation",
-    "Duration of snowfall [hours]": "precipitation"
 }

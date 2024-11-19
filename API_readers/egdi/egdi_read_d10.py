@@ -1,14 +1,14 @@
 import numpy as np
 import pandas as pd
 from utils.coordinates_to_cells import prepare_coordinates
-from utils.interpolate_data import interpolate
 import rasterio
 from rasterio.windows import from_bounds
+import asyncio
 
-EGDI_FILE = r'data/gewp7_peu1_d10km_4326.tif'
+EGDI_FILE = r'API_readers/egdi/data/gewp7_peu1_d10km_4326.tif'
 
 
-def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level):
     """
     N = 51.2
     S = 49.0
@@ -28,53 +28,63 @@ def read_data(spatial_range, time_range, data_range, level):
     :param level: S2Cell level.
     :return: A pandas DataFrame containing the processed data.
     """
-    with rasterio.open(EGDI_FILE) as dataset:
-        north, south, east, west = spatial_range
-        window = rasterio.windows.from_bounds(
-            left=west, bottom=south, right=east, top=north, transform=dataset.transform
-        )
+    north, south, east, west = spatial_range
 
-        # Read the data within the window
-        data = dataset.read(1, window=window)
+    # Load and process the raster file asynchronously using a synchronous context manager in a thread
+    def load_raster_data():
+        with rasterio.open(EGDI_FILE) as dataset:
+            window = from_bounds(left=west, bottom=south, right=east, top=north, transform=dataset.transform)
 
-        # Generate meshgrid of row and column indices
-        rows, cols = data.shape
-        row_indices, col_indices = np.meshgrid(
-            np.arange(window.row_off, window.row_off + rows),
-            np.arange(window.col_off, window.col_off + cols),
-            indexing='ij'
-        )
+            # Read the data within the window
+            data = dataset.read(1, window=window)
 
-        # Use the meshgrid to get corresponding x, y coordinates
-        x_coords, y_coords = rasterio.transform.xy(dataset.transform, row_indices, col_indices, offset='center')
+            # Generate meshgrid of row and column indices
+            rows, cols = data.shape
+            row_indices, col_indices = np.meshgrid(
+                np.arange(window.row_off, window.row_off + rows),
+                np.arange(window.col_off, window.col_off + cols),
+                indexing='ij'
+            )
 
-        # Flatten the data and coordinates
-        flat_data = data.flatten()
-        flat_x_coords = np.array(x_coords).flatten()
-        flat_y_coords = np.array(y_coords).flatten()
+            # Get corresponding x, y coordinates using the transform
+            x_coords, y_coords = rasterio.transform.xy(dataset.transform, row_indices, col_indices, offset='center')
 
-        # Create a DataFrame
+            return data, x_coords, y_coords
+
+    # Offload raster loading to a separate thread to avoid blocking the event loop
+    data, x_coords, y_coords = await asyncio.to_thread(load_raster_data)
+
+    # Flatten data and coordinates asynchronously
+    flat_data = data.flatten()
+    flat_x_coords = np.array(x_coords).flatten()
+    flat_y_coords = np.array(y_coords).flatten()
+
+    # Define an async function to create and process the DataFrame
+    def process_dataframe():
         df = pd.DataFrame({
             'lon': flat_x_coords,
             'lat': flat_y_coords,
             'Depth to Watertable DRASTIC': flat_data
         })
+
+        # Prepare coordinates and perform grouping
         df = prepare_coordinates(df, spatial_range, level)
         df = df.set_index('S2CELL')
         df = df.groupby(level=0).mean().reset_index()
 
         # Explode to days
         days = pd.date_range(time_range[0], time_range[1], freq='D')
-        df = pd.concat([df.assign(Timestamp=date) for date in days])
+        df = pd.concat([df.assign(Timestamp=date.date()) for date in days])
 
-        # Data interpolation
-        if level >= 10:
-            df = interpolate(df, spatial_range, level)
-            df = df.reset_index().rename({'level_0': 'S2CELL', 'level_1': 'Timestamp'}, axis=1)
-        else:
-            df = df.drop(['lat', 'lon'], axis=1)
+        # Drop unnecessary columns
+        df = df.drop(['lat', 'lon'], axis=1)
 
         # Pivot the DataFrame
         df = df.pivot_table(index='Timestamp', columns='S2CELL')
 
         return df
+
+    # Ensure that the result from process_dataframe is awaited
+    final_df = await asyncio.to_thread(process_dataframe)
+
+    return final_df

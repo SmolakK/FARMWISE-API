@@ -12,17 +12,17 @@ DATA_ALIASES = {
     'ocd': 'soil',
 }
 
-GLOBAL_MAPPING = {'bdod': 'Bulk Density',
-           'cec': 'Citation Exchange Capacity at ph7',
-           'cfvo': 'Coarse Fragments Volumetric',
-           'clay': 'Clay Content',
-           'nitrogen': 'Nitrogen',
-           'phh2o': 'Soil pH H2O [pH]',
-           'sand': 'Sand Content',
-           'silt': 'Silt Content',
-           'soc': 'Soil Organic Carbon [%]',
-           'ocs': 'Soil Organic Carbon stock',
-           'ocd': 'Organic Carbon Densities',
+GLOBAL_MAPPING = {'bdod': 'Bulk Density CLASS',
+           'cec': 'Citation Exchange Capacity at ph7 CLASS',
+           'cfvo': 'Coarse Fragments Volumetric CLASS',
+           'clay': 'Clay Content CLASS',
+           'nitrogen': 'Nitrogen CLASS',
+           'phh2o': 'Soil pH H2O [pH] CLASS',
+           'sand': 'Sand Content CLASS',
+           'silt': 'Silt Content CLASS',
+           'soc': 'Soil Organic Carbon [%] CLASS',
+           'ocs': 'Soil Organic Carbon stock CLASS',
+           'ocd': 'Organic Carbon Densities CLASS',
                   }
 
 DEPTH_MAPPING = {
