@@ -5,7 +5,6 @@ import pandas as pd
 from datetime import datetime
 from API_readers.cds.cds_mappings.cds_single_levels_mapping import DATA_ALIASES, GLOBAL_MAPPING
 from utils.coordinates_to_cells import prepare_coordinates
-from utils.interpolate_data import interpolate
 import warnings
 import asyncio
 
@@ -36,14 +35,13 @@ async def read_data(spatial_range, time_range, data_range, level):
     file_name = dataset + "_temp_data.nc"
     temp_file_path = os.path.join(folder_path, file_name)
     # Request the data and keep it in memory
-    response = c.retrieve(
+    c.retrieve(
         dataset,  # Dataset name
         {
             'product_type': ['reanalysis'],
             'variable': data_requested,  # Specify variables
             'date': '/'.join(time_range),
             'format': 'netcdf',
-            'grid': [1.0, 1.0],  # File format
             'area': [north, west, south, east],  # Spatial extent: North, West, South, East
             'time': [f"{hour:02}:00" for hour in range(24)]
         },
@@ -84,16 +82,15 @@ async def read_data(spatial_range, time_range, data_range, level):
     if original_size != df.shape[0]:
         warnings.warn("Some data were aggregated")
 
-    # Recalculate temperature te Celsius
+    # Recalculate temperature to Celsius
     if "Temperature [°C]" in df.columns:
         df["Temperature [°C]"] = df["Temperature [°C]"] - 273.15
 
-    # Data interpolation
-    if level >= 18:
-        df = interpolate(df, spatial_range, level)
-        df = df.reset_index().rename({'level_0': 'S2CELL', 'level_1': 'Timestamp'}, axis=1)
-    else:
-        df = df.drop(['lat', 'lon'], axis=1)
+    # Recalculate precipitation to a daily sum
+    if 'Precipitation total [mm]' in df.columns:
+        df['Precipitation total [mm]'] = df['Precipitation total [mm]']*(24*60*60)
+
+    df = df.drop(['lat', 'lon'], axis=1)
 
     # Pivot the DataFrame
     df = df.pivot_table(index='Timestamp', columns='S2CELL')
