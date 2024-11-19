@@ -1,6 +1,7 @@
 import pandas as pd
 import s2sphere
 import numpy as np
+import scipy.spatial
 from scipy.interpolate import griddata
 import math
 from tqdm import tqdm
@@ -140,8 +141,8 @@ def interpolate(df_data, spatial_range, level):
     :return: A pandas DataFrame containing the interpolated data at the finer S2 cell grid.
     """
     print("INTERPOLATING")
-
     df_data = df_data.stack(level=1)
+    df_data = df_data.ffill().bfill()
     df_data = s2cells_to_coordinates(df_data)
 
     N, S, E, W = spatial_range
@@ -175,11 +176,18 @@ def interpolate(df_data, spatial_range, level):
         to_concat = {}
         for day, values in df_data.groupby(level=0):
             filtered_vals = values[[colname,'lat','lon']][~values[colname].isna()]
-            finer_grid = griddata(
-                (filtered_vals.lon, filtered_vals.lat), filtered_vals[colname],
-                (fine_lon, fine_lat),  # S2 cell coordinates
-                method='linear'  # Interpolation method: 'linear', 'nearest', or 'cubic'
-            )
+            try:
+                finer_grid = griddata(
+                    (filtered_vals.lon, filtered_vals.lat), filtered_vals[colname],
+                    (fine_lon, fine_lat),  # S2 cell coordinates
+                    method='linear'  # Interpolation method: 'linear', 'nearest', or 'cubic'
+                )
+            except scipy.spatial.QhullError:
+                finer_grid = griddata(
+                    (filtered_vals.lon, filtered_vals.lat), filtered_vals[colname],
+                    (fine_lon, fine_lat),  # S2 cell coordinates
+                    method='nearest'  # Interpolation method: 'linear', 'nearest', or 'cubic'
+                )
             if np.isnan(finer_grid).any():
                 # Second pass: Nearest neighbor interpolation to fill NaNs
                 finer_grid = np.where(
