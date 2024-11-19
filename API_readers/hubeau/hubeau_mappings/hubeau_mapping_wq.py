@@ -80,6 +80,7 @@ COLUMNS = ['lat', 'lon', 'Timestamp',
            'Sulfonate de perfluorooctane',
            'Zinc']
 
+# To translate original French (ADES, Sandre reference) to English FARMWISE names
 MAPPING = {
     'Acide pentacosafluorotridecanoique': 'GW Pentacosafluorotridecanoic acid (µg/L)',
     'Acide perfluoro-dodecanoïque': 'GW Perfluorododecanoic acid (µg/L)',

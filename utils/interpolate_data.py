@@ -140,10 +140,12 @@ def interpolate(df_data, spatial_range, level):
     :return: A pandas DataFrame containing the interpolated data at the finer S2 cell grid.
     """
     print("INTERPOLATING")
+
     df_data = df_data.stack(level=1)
     df_data = s2cells_to_coordinates(df_data)
 
     N, S, E, W = spatial_range
+
     size_lat, size_lon = how_many(N,S,E,W, level)
 
     s2_cells = []
