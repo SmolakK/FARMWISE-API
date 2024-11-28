@@ -46,7 +46,7 @@ async def fetch_station_data(resource_id, station_ids, time_range, parameters):
     return data
 
 
-async def fetch_klima_v2_1d_by_bbox(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level):
     """
     Fetch `klima-v2-1d` data by bounding box.
     :param spatial_range: Tuple containing the bounding box (south, west, north, east) in EPSG:4326.
