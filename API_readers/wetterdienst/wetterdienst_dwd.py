@@ -60,6 +60,7 @@ async def read_data(spatial_range, time_range, data_range, level):
     df = df.merge(df_stations, left_on='station_id', right_on='station_id')
     df = df[data_requested + ['latitude','longitude','date']]
 
+
     df = df.rename(
         columns={
             'date': 'Timestamp',
@@ -92,6 +93,11 @@ async def read_data(spatial_range, time_range, data_range, level):
     df = df[(df['Timestamp'] >= start_date.date()) & (df['Timestamp'] <= end_date.date())]
 
     df = df.drop(['lat', 'lon'], axis=1)
+    df = df.rename(GLOBAL_MAPPING, axis=1)
+
+    # Recalculate temperature to Celsius
+    if "Temperature [°C]" in df.columns:
+        df["Temperature [°C]"] = df["Temperature [°C]"] - 273.15
 
     # Pivot the DataFrame
     df_pivot = df.pivot_table(
