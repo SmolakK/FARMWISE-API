@@ -37,7 +37,7 @@ async def read_data(spatial_range, time_range, data_range, level):
     start, end = time_range
     start = datetime.strptime(start, '%Y-%m-%d').date()
     end = datetime.strptime(end, '%Y-%m-%d').date()
-    between_years = [(s,e) for s,e in avail_years if e >= start.year and s <= start.year]
+    between_years = [(s,e) for s,e in avail_years if e >= start.year and s < start.year]
 
     stacked_df = []
     async with httpx.AsyncClient() as client:
@@ -80,8 +80,8 @@ async def read_data(spatial_range, time_range, data_range, level):
                         data_rows.append(coors)
 
                 # Convert data to DataFrame asynchronously
-                df = await asyncio.to_thread(pd.DataFrame.from_dict, data_rows)
-                df = await asyncio.to_thread(prepare_coordinates, df, spatial_range, level)
+                df = pd.DataFrame.from_dict(data_rows)
+                df = prepare_coordinates(df, spatial_range, level)
                 df = df.set_index('S2CELL')
                 df = df.groupby(level=0).mean().reset_index()
 
@@ -101,7 +101,18 @@ async def read_data(spatial_range, time_range, data_range, level):
                 stacked_df.append(df)
 
     # Concatenate and pivot data asynchronously
-    final_df = await asyncio.to_thread(pd.concat, stacked_df)
-    final_df = await asyncio.to_thread(final_df.pivot_table, index='Timestamp', columns='S2CELL')
+    final_df = pd.concat(stacked_df)
+    final_df = final_df.pivot_table(index='Timestamp', columns='S2CELL')
 
     return final_df
+
+# Define the input parameters
+N, S, E, W = 51.2, 49.0, 17.1, 15.0
+TIME_FROM, TIME_TO = '2018-01-01', '2018-12-31'
+FACTORS = ['land cover']
+LEVEL = 8
+
+# Run the async function
+if __name__ == "__main__":
+    result = asyncio.run(read_data((N, S, E, W), (TIME_FROM, TIME_TO), FACTORS, LEVEL))
+    print(result)
