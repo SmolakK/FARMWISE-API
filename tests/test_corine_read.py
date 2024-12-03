@@ -2,9 +2,6 @@ import pytest
 from unittest.mock import patch, AsyncMock, MagicMock
 import numpy as np
 import pandas as pd
-from PIL import Image
-from io import BytesIO
-from datetime import datetime, date
 from API_readers.corine.corine_read import read_data
 
 
@@ -64,6 +61,4 @@ async def test_read_data(
     assert "S2CELL" in result.columns.names
     assert "Timestamp" == result.index.name
     assert all(param in result.columns.levels[0] for param in ['CORINE R', 'CORINE G', 'CORINE B', 'CORINE ALPHA'])
-
-    # Validate structure
-    assert not result.empty
+    assert result.shape == (365,36)
