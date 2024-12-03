@@ -37,7 +37,7 @@ async def read_data(spatial_range, time_range, data_range, level):
     start, end = time_range
     start = datetime.strptime(start, '%Y-%m-%d').date()
     end = datetime.strptime(end, '%Y-%m-%d').date()
-    between_years = [(s,e) for s,e in avail_years if e >= start.year and s < start.year]
+    between_years = [(s,e) for s,e in avail_years if e >= start.year > s]
 
     stacked_df = []
     async with httpx.AsyncClient() as client:
