@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from bs4 import BeautifulSoup
-from API_readers.gios.gios_api_stations import generate_urls, fetch_and_parse, extract_data  # Replace with actual module path
+from API_readers.gios.gios_utils import generate_urls, fetch_and_parse, extract_data
 
 
 def test_generate_urls():
@@ -20,7 +20,7 @@ def test_generate_urls():
     assert result == expected_urls, "Generated URLs do not match expected output"
 
 
-@patch("your_module.requests.get")
+@patch("API_readers.gios.gios_utils.requests.get")
 def test_fetch_and_parse(mock_get):
     # Mock a successful HTTP response
     mock_response = MagicMock()
@@ -55,7 +55,7 @@ def test_extract_data():
     assert result == expected_data, "Extracted data does not match expected output"
 
 
-@patch("your_module.requests.get")
+@patch("API_readers.gios.gios_utils.requests.get")
 def test_fetch_and_parse_failure(mock_get):
     # Mock a failed HTTP response
     mock_response = MagicMock()
