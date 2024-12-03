@@ -6,7 +6,7 @@ import rasterio
 from rasterio.windows import from_bounds
 import asyncio
 
-EGDI_FILE = r'data/gewp7_peu7_4326.tif'
+EGDI_FILE = r'API_readers/egdi/data/gewp7_peu7_4326.tif'
 
 
 async def read_data(spatial_range, time_range, data_range, level):
