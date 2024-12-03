@@ -67,7 +67,7 @@ async def read_data(spatial_range, time_range, data_range, level):
     s_d_files = []
     s_d_t_files = []
 
-    # Process URLs asynchronously
+    # Process URLs
     async with httpx.AsyncClient(follow_redirects=True) as client:
         for url in tqdm(read_urls,total=len(read_urls)):
             response = await client.get(url)
