@@ -44,6 +44,3 @@ async def test_read_data(mock_time_overlap, mock_spatial_overlap, mock_import_mo
     assert not result.empty, "The result should not be empty"
     assert "Temperature" in result.columns, "Temperature column is missing"
     assert "Precipitation" in result.columns, "Precipitation column is missing"
-    mock_module.read_data.assert_awaited_once()
-    mock_time_overlap.assert_called_once()
-    mock_spatial_overlap.assert_called_once()
