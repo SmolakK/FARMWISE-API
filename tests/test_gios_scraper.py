@@ -48,8 +48,8 @@ async def test_read_data(mock_read_csv, mock_prepare_coordinates, mock_scrape_po
     mock_scrape_point_data.return_value = pd.DataFrame({
         "point_id": [123, 456],
         "year": [2020, 2020],
-        "Parameter1": [1.0, 2.0],
-        "Parameter2": [3.0, 4.0]
+        "Humus [%]": [1.0, 2.0],
+        "Soil CaCo3 [%]": [3.0, 4.0]
     })
 
     # Mock CSV read
@@ -58,7 +58,7 @@ async def test_read_data(mock_read_csv, mock_prepare_coordinates, mock_scrape_po
     # Test parameters
     spatial_range = (50, 40, 10, 20)
     time_range = ("2020-01-01", "2020-12-31")
-    data_range = ["Parameter1", "Parameter2"]
+    data_range = ["soil"]
     level = 8
 
     result = await read_data(spatial_range, time_range, data_range, level)
