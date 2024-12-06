@@ -9,7 +9,6 @@ from utils.interpolate_data import (
     how_many,
     interpolate
 )
-from s2sphere import CellId, LatLng
 from unittest.mock import patch
 
 def test_mean_cell_size():
