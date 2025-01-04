@@ -33,7 +33,7 @@ class ReadDataRequest(BaseModel):
     )
     factors: List[str] = Field(
         ...,
-        example=["temperature", "humidity"],
+        example=["temperature", "precipitation"],
         description="List of factors to retrieve data for."
     )
     separate_api: Optional[bool] = Field(

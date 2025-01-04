@@ -63,7 +63,7 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
         try:
             combined_data = pd.concat(data_storage)
             combined_data = combined_data.groupby(level=0).mean()  # average data from separate APIs
-            if interpolation:
+            if interpolation:  # be aware this inserts values to NaNs
                 combined_data = interpolate(combined_data, bounding_box, level)
             return combined_data
         except Exception as e:
