@@ -2,11 +2,13 @@ import os.path
 import cdsapi
 import xarray as xr
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from API_readers.cds.cds_mappings.cds_single_levels_mapping import DATA_ALIASES, GLOBAL_MAPPING
 from utils.coordinates_to_cells import prepare_coordinates
 import warnings
 import asyncio
+import zipfile
+import shutil
 
 
 async def read_data(spatial_range, time_range, data_range, level):
@@ -31,25 +33,46 @@ async def read_data(spatial_range, time_range, data_range, level):
     end = datetime.strptime(end, '%Y-%m-%d').date()
     data_requested = list([k for k, v in DATA_ALIASES.items() if v in data_range])
 
+    # Generate the unique lists
+    years = set()
+    months = set()
+    days = set()
+
+    current_date = start
+    while current_date <= end:
+        years.add(str(current_date.year))  # Convert to string
+        months.add(f"{current_date.month:02}")  # Zero-padded as text
+        days.add(f"{current_date.day:02}")  # Zero-padded as text
+        current_date += timedelta(days=1)
+
+    # Convert sets to sorted lists
+    years = sorted(list(years))
+    months = sorted(list(months))
+    days = sorted(list(days))
+
     folder_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'temp_storage')
-    file_name = dataset + "_temp_data.nc"
+    file_name = dataset + "_temp_data.zip"
     temp_file_path = os.path.join(folder_path, file_name)
     # Request the data and keep it in memory
-    c.retrieve(
-        dataset,  # Dataset name
-        {
-            'product_type': ['reanalysis'],
+    request = {
+            'product_type': ["reanalysis"],
             'variable': data_requested,  # Specify variables
-            'date': '/'.join(time_range),
-            'format': 'netcdf',
+            "year": list(years),
+            "month": list(months),
+            "day": list(days),
+            "time": [f"{hour:02}:00" for hour in range(24)],
+            'data_format': "netcdf",
+            "download_format": "zip",
             'area': [north, west, south, east],  # Spatial extent: North, West, South, East
-            'time': [f"{hour:02}:00" for hour in range(24)]
-        },
-        temp_file_path
-    )
+        }
+    c.retrieve(dataset,request).download(temp_file_path)
 
-    # Open tempfile
-    ds = xr.open_dataset(temp_file_path)
+    # Unzip files
+    with zipfile.ZipFile(temp_file_path, 'r') as zip_ref:
+        zip_ref.extractall(folder_path)
+    extracted_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.nc')]
+    datasets = [xr.open_dataset(f) for f in extracted_files]
+    ds = xr.merge(datasets)
 
     # Convert xarray Dataset to pandas DataFrame
     df = ds.to_dataframe().reset_index()
@@ -94,5 +117,9 @@ async def read_data(spatial_range, time_range, data_range, level):
 
     # Pivot the DataFrame
     df = df.pivot_table(index='Timestamp', columns='S2CELL')
+
+    # Cleanup
+    os.remove(temp_file_path)
+    shutil.rmtree(folder_path)
 
     return df
