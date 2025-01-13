@@ -71,7 +71,10 @@ async def read_data(spatial_range, time_range, data_range, level):
     with zipfile.ZipFile(temp_file_path, 'r') as zip_ref:
         zip_ref.extractall(folder_path)
     extracted_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.nc')]
-    datasets = [xr.open_dataset(f) for f in extracted_files]
+    datasets = []
+    for f in extracted_files:
+        with xr.open_dataset(f) as dataset:
+            datasets.append(dataset.load())
     ds = xr.merge(datasets)
 
     # Convert xarray Dataset to pandas DataFrame
@@ -120,6 +123,6 @@ async def read_data(spatial_range, time_range, data_range, level):
 
     # Cleanup
     os.remove(temp_file_path)
-    shutil.rmtree(folder_path)
+    [os.remove(x) for x in extracted_files]
 
     return df
