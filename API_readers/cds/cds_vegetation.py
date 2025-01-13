@@ -98,6 +98,7 @@ async def read_data(spatial_range, time_range, data_range, level):
 
     # Filter data within the specified time range
     df = df[(df['Timestamp'] >= pd.to_datetime(start)) & (df['Timestamp'] <= pd.to_datetime(end))]
+    df['Timestamp'] = df.Timestamp.dt.date
 
     # S2Cell Mapping
     df = prepare_coordinates(df, spatial_range, level)
