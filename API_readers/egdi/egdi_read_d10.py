@@ -59,32 +59,25 @@ async def read_data(spatial_range, time_range, data_range, level):
     flat_x_coords = np.array(x_coords).flatten()
     flat_y_coords = np.array(y_coords).flatten()
 
-    # Define an async function to create and process the DataFrame
-    def process_dataframe():
-        df = pd.DataFrame({
-            'lon': flat_x_coords,
-            'lat': flat_y_coords,
-            'Depth to Watertable DRASTIC': flat_data
-        })
+    df = pd.DataFrame({
+        'lon': flat_x_coords,
+        'lat': flat_y_coords,
+        'Depth to Watertable DRASTIC': flat_data
+    })
 
-        # Prepare coordinates and perform grouping
-        df = prepare_coordinates(df, spatial_range, level)
-        df = df.set_index('S2CELL')
-        df = df.groupby(level=0).mean().reset_index()
+    # Prepare coordinates and perform grouping
+    df = prepare_coordinates(df, spatial_range, level)
+    df = df.set_index('S2CELL')
+    df = df.groupby(level=0).mean().reset_index()
 
-        # Explode to days
-        days = pd.date_range(time_range[0], time_range[1], freq='D')
-        df = pd.concat([df.assign(Timestamp=date.date()) for date in days])
+    # Explode to days
+    days = pd.date_range(time_range[0], time_range[1], freq='D')
+    df = pd.concat([df.assign(Timestamp=date.date()) for date in days])
 
-        # Drop unnecessary columns
-        df = df.drop(['lat', 'lon'], axis=1)
+    # Drop unnecessary columns
+    df = df.drop(['lat', 'lon'], axis=1)
 
-        # Pivot the DataFrame
-        df = df.pivot_table(index='Timestamp', columns='S2CELL')
-
-        return df
-
-    # Ensure that the result from process_dataframe is awaited
-    final_df = await asyncio.to_thread(process_dataframe)
+    # Pivot the DataFrame
+    final_df = df.pivot_table(index='Timestamp', columns='S2CELL')
 
     return final_df

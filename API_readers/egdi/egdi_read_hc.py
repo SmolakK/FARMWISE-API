@@ -60,29 +60,23 @@ async def read_data(spatial_range, time_range, data_range, level):
     flat_x_coords = np.array(x_coords).flatten()
     flat_y_coords = np.array(y_coords).flatten()
 
-    def process_dataframe():
-        # Create a DataFrame
-        df = pd.DataFrame({
-            'lon': flat_x_coords,
-            'lat': flat_y_coords,
-            'Hydraulic Conductivity DRASTIC': flat_data
-        })
-        df = prepare_coordinates(df, spatial_range, level)
-        df = df.set_index('S2CELL')
-        df = df.groupby(level=0).mean().reset_index()
+    # Create a DataFrame
+    df = pd.DataFrame({
+        'lon': flat_x_coords,
+        'lat': flat_y_coords,
+        'Hydraulic Conductivity DRASTIC': flat_data
+    })
+    df = prepare_coordinates(df, spatial_range, level)
+    df = df.set_index('S2CELL')
+    df = df.groupby(level=0).mean().reset_index()
 
-        # Explode to days
-        days = pd.date_range(time_range[0], time_range[1], freq='D')
-        df = pd.concat([df.assign(Timestamp=date.date()) for date in days])
+    # Explode to days
+    days = pd.date_range(time_range[0], time_range[1], freq='D')
+    df = pd.concat([df.assign(Timestamp=date.date()) for date in days])
 
-        df = df.drop(['lat', 'lon'], axis=1)
+    df = df.drop(['lat', 'lon'], axis=1)
 
-        # Pivot the DataFrame
-        df = df.pivot_table(index='Timestamp', columns='S2CELL')
-
-        return df
-
-    # Offload DataFrame processing to a separate thread
-    final_df = await asyncio.to_thread(process_dataframe)
+    # Pivot the DataFrame
+    final_df = df.pivot_table(index='Timestamp', columns='S2CELL')
 
     return final_df

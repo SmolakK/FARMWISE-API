@@ -14,6 +14,22 @@ FIVE_BEFORE = (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')
 # - Quality (1 for best quality)
 # - NName
 API_PATH_RANGES = {
+    'API_readers.geosphere.geosphere': (
+        ((49.0, 46.0, 17.2, 9.5),
+         ('1950-01-01', CURRENT_DAY),
+         ['temperature', 'precipitation'],
+         'none',
+         1,
+         1)
+    ),
+    'API_readers.wetterdienst.wetterdienst_dwd': (
+        ((54.98, 47.30, 15.02, 5.99),
+         ('1950-01-01', CURRENT_DAY),
+         ['temperature', 'precipitation'],
+         'none',
+         1,
+         1)
+    ),
     'API_readers.soilgrids.soilgrids_call': (  # 11 datasets
         ((71, 34, 45, -25),
          ('1951-01-01', CURRENT_DAY),

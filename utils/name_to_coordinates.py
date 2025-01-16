@@ -23,7 +23,7 @@ def get_coordinates(city_name, retries=10, wait_time=20):
             if location:
                 return location.latitude, location.longitude
             else:
-                return None
+                return None, None
         except GeocoderUnavailable as e:
             print(f"Geocoder unavailable for {city_name}, retrying... (Attempt {attempt + 1}/{retries})")
             time.sleep(wait_time)  # Wait before retrying

@@ -9,7 +9,8 @@ import asyncio
 logger = logging.getLogger(__name__)
 
 
-async def read_data(bounding_box, level, time_from, time_to, factors, separate_api=False, timeout=600, interpolation=False):
+async def read_data(bounding_box, level, time_from, time_to, factors, separate_api=False, timeout=600,
+                    interpolation=False):
     """
     Main data reading call - combines different APIs which overlap with the requested area and time range.
 
@@ -32,6 +33,7 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
     Note: `API_PATH_RANGES` is a dictionary mapping API names to their spatial, temporal, and data range constraints.
     """
     data_storage = []  # This will store data called from different APIs
+    api_metadata = []
     for api_name, ranges in API_PATH_RANGES.items():  # Iterate over API ranges
         api_spatial_range = ranges[0]  # Spatial range
         api_time_range = ranges[1]  # Temporal range
@@ -43,16 +45,27 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
             try:
                 module = importlib.import_module(api_name)  # Import the proper module
                 # Read data from the module (parameters are the same for all read_data() functions)
-                api_response_data = await asyncio.wait_for(module.read_data(spatial_range=bounding_box, time_range=(time_from, time_to),
-                                                     data_range=factors, level=level),
-                                                           timeout=timeout)
+                api_response_data = await asyncio.wait_for(
+                    module.read_data(spatial_range=bounding_box, time_range=(time_from, time_to),
+                                     data_range=factors, level=level),
+                    timeout=timeout)
                 if isinstance(api_response_data, pd.DataFrame):
                     api_name_suffix = api_name.split('.')[-1]
+                    api_columns = list(api_response_data.columns.get_level_values(0).unique())
+                    api_dates = list(api_response_data.index.astype(str).unique())
+                    api_cells = list(api_response_data.columns.get_level_values(1).unique().astype(str))
+                    api_metadata.append({
+                        "api_name": api_name_suffix,
+                        "columns": api_columns,
+                        "dates": api_dates,
+                        "cells": api_cells,
+                        "status": "success" if isinstance(api_response_data, pd.DataFrame) else "failure",
+                        "error": str(e) if "e" in locals() else None  # Add error details if any
+                    })
                     if separate_api:
                         api_response_data = api_response_data.add_suffix(f' ({api_name_suffix})')
                     data_storage.append(api_response_data)
                     logger.info(f'Data retrieved from {api_name_suffix}')
-
             except asyncio.TimeoutError:
                 logger.error(f'Request to {api_name_suffix} timed out')
             except Exception as e:
@@ -63,9 +76,12 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
         try:
             combined_data = pd.concat(data_storage)
             combined_data = combined_data.groupby(level=0).mean()  # average data from separate APIs
-            if interpolation:
+            if interpolation:  # be aware this inserts values to NaNs
                 combined_data = interpolate(combined_data, bounding_box, level)
-            return combined_data
+            return {"data": combined_data,  # The DataFrame containing the concatenated data
+                    "metadata": {"apis": api_metadata  # List of metadata dictionaries for each API
+                                 }
+                    }
         except Exception as e:
             logger.error(f'Error concatenating data: {e}')
             return pd.DataFrame()  # Return an empty DataFrame if concatenation fails
@@ -73,4 +89,6 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
         logger.warning("No data retrieved from available APIs")
         return pd.DataFrame()
 
-# asyncio.run(read_data((50, 49, 20, 18), 10, '2017-01-10', '2017-12-12', ['soil'], separate_api=False, interpolation=True))
+
+asyncio.run(read_data((51.09, 50.00, 14.56, 14.14), 10, '2017-01-10', '2017-01-12', ['temperature', 'precipitation'],
+                      separate_api=False, interpolation=True))

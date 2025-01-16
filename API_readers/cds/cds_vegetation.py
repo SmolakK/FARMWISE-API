@@ -33,10 +33,13 @@ async def read_data(spatial_range, time_range, data_range, level):
     end = datetime.strptime(end, '%Y-%m-%d').date()
 
     # Generate a list of years, months, and days between start and end dates
-    date_range = pd.date_range(start=start, end=end, freq='10D')
+    date_range = pd.date_range(start=start, end=end, freq='1D')
     years = sorted(set(date_range.strftime('%Y')))
     months = sorted(set(date_range.strftime('%m')))
-    days = sorted(set(date_range.strftime('%d')))
+    days = date_range.day
+    days = days[days.isin([1,11,21])]
+    days = sorted(set(map(str,days)))
+
     data_requested = list([k for k, v in DATA_ALIASES.items() if v in data_range])
 
     folder_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'temp_storage')
@@ -76,6 +79,11 @@ async def read_data(spatial_range, time_range, data_range, level):
     # Convert xarray Dataset to pandas DataFrame
     df = pd.concat(ds)
 
+    # Clean up temporary files
+    os.remove(temp_file_path)
+    for f in nc_files:
+        os.remove(f)
+
     # Rename columns if necessary
     if 'time' in df.columns:
         df.rename(columns={'time': 'Timestamp'}, inplace=True)
@@ -90,6 +98,7 @@ async def read_data(spatial_range, time_range, data_range, level):
 
     # Filter data within the specified time range
     df = df[(df['Timestamp'] >= pd.to_datetime(start)) & (df['Timestamp'] <= pd.to_datetime(end))]
+    df['Timestamp'] = df.Timestamp.dt.date
 
     # S2Cell Mapping
     df = prepare_coordinates(df, spatial_range, level)
@@ -106,9 +115,6 @@ async def read_data(spatial_range, time_range, data_range, level):
     # Pivot the DataFrame
     df = df.pivot_table(index='Timestamp', columns='S2CELL')
 
-    # Clean up temporary files
-    os.remove(temp_file_path)
-    for f in nc_files:
-        os.remove(f)
+
 
     return df

@@ -1,13 +1,13 @@
 import pandas as pd
 import s2sphere
 import numpy as np
+import scipy.spatial
 from scipy.interpolate import griddata
 import math
 from tqdm import tqdm
 from utils.cells_to_coordinates import s2cells_to_coordinates
 
 # Constants
-EARTH_RADIUS_KM = 6371.0  # Earth's radius in kilometers
 EARTH_SURFACE_AREA_KM2 = 510.1e6
 
 def mean_cell_size(lvl):
@@ -56,7 +56,7 @@ def haversine(lat1, lon1, lat2, lon2):
     :param lon2: Longitude of the second point in degrees.
     :return: The distance between the two points in kilometers.
     """
-    R = 6371.0  # Earth radius in kilometers
+    R = 6371.0 * 1000 # Earth radius in meters
 
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
@@ -109,8 +109,8 @@ def how_many(N, S, E, W, level):
     """
     cell_edge_length = mean_cell_edge(level)
 
-    lat_diff = haversine(N,E,S,E)*1_000
-    lon_diff = haversine(N,W,N,E)*1_000
+    lat_diff = haversine(N,E,S,E)
+    lon_diff = haversine(N,W,N,E)
 
     num_cells_lat = lat_diff/cell_edge_length
     num_cells_lon = lon_diff/cell_edge_length
@@ -121,7 +121,7 @@ def how_many(N, S, E, W, level):
     return num_cells_lat, num_cells_lon
 
 
-def interpolate(df_data, spatal_range, level):
+def interpolate(df_data, spatial_range, level):
     """
     Interpolates data from a DataFrame over a specified spatial range using S2 cells at a given level.
 
@@ -131,7 +131,7 @@ def interpolate(df_data, spatal_range, level):
 
     :param df_data: A pandas DataFrame containing data with 'lat' and 'lon' columns for latitude
                     and longitude, and additional columns for the data to be interpolated.
-    :param spatal_range: A tuple (N, S, E, W) defining the bounding box for interpolation:
+    :param spatial_range: A tuple (N, S, E, W) defining the bounding box for interpolation:
                          - N: Northern latitude limit
                          - S: Southern latitude limit
                          - E: Eastern longitude limit
@@ -141,9 +141,11 @@ def interpolate(df_data, spatal_range, level):
     """
     print("INTERPOLATING")
     df_data = df_data.stack(level=1)
+    df_data = df_data.ffill().bfill()
     df_data = s2cells_to_coordinates(df_data)
 
-    N, S, E, W = spatal_range
+    N, S, E, W = spatial_range
+
     size_lat, size_lon = how_many(N,S,E,W, level)
 
     s2_cells = []
@@ -173,11 +175,18 @@ def interpolate(df_data, spatal_range, level):
         to_concat = {}
         for day, values in df_data.groupby(level=0):
             filtered_vals = values[[colname,'lat','lon']][~values[colname].isna()]
-            finer_grid = griddata(
-                (filtered_vals.lon, filtered_vals.lat), filtered_vals[colname],
-                (fine_lon, fine_lat),  # S2 cell coordinates
-                method='linear'  # Interpolation method: 'linear', 'nearest', or 'cubic'
-            )
+            try:
+                finer_grid = griddata(
+                    (filtered_vals.lon, filtered_vals.lat), filtered_vals[colname],
+                    (fine_lon, fine_lat),  # S2 cell coordinates
+                    method='linear'  # Interpolation method: 'linear', 'nearest', or 'cubic'
+                )
+            except scipy.spatial.QhullError:
+                finer_grid = griddata(
+                    (filtered_vals.lon, filtered_vals.lat), filtered_vals[colname],
+                    (fine_lon, fine_lat),  # S2 cell coordinates
+                    method='nearest'  # Interpolation method: 'linear', 'nearest', or 'cubic'
+                )
             if np.isnan(finer_grid).any():
                 # Second pass: Nearest neighbor interpolation to fill NaNs
                 finer_grid = np.where(

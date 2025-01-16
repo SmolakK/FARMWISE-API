@@ -32,7 +32,7 @@ async def read_data(spatial_range, time_range, data_range, level):
     print("DOWNLOADING: IMGW synop data")
 
     # Load and process the coordinates CSV asynchronously
-    coors = await asyncio.to_thread(pd.read_csv, r'API_readers/imgw/constants/imgw_coordinates.csv')
+    coors = pd.read_csv(r'API_readers/imgw/constants/imgw_coordinates.csv')
     coors = coors[~coors.isna().any(axis=1)]
     coordinates = prepare_coordinates(coordinates=coors, spatial_range=spatial_range, level=level)
     if coordinates is None:
@@ -67,7 +67,7 @@ async def read_data(spatial_range, time_range, data_range, level):
     s_d_files = []
     s_d_t_files = []
 
-    # Process URLs asynchronously
+    # Process URLs
     async with httpx.AsyncClient(follow_redirects=True) as client:
         for url in tqdm(read_urls,total=len(read_urls)):
             response = await client.get(url)
@@ -85,18 +85,13 @@ async def read_data(spatial_range, time_range, data_range, level):
                     with ZipFile(io.BytesIO(zip_response.content)) as zip_ref:
                         for name in zip_ref.namelist():
                             if '_t' in name:
-                                s_d_t_file = await asyncio.to_thread(
-                                    lambda: pd.read_csv(zip_ref.open(name), encoding='windows-1250',
-                                                        names=s_d_t_COLUMNS)
-                                )
+                                s_d_t_file = pd.read_csv(zip_ref.open(name), encoding='windows-1250', names=s_d_t_COLUMNS)
                                 data_selection = list(data_requested.intersection(set(s_d_t_SELECTION)))
                                 data_selection += SPACE_TIME_COLUMNS
                                 s_d_t_file = s_d_t_file.loc[:, s_d_t_file.columns.intersection(data_selection)]
                                 s_d_t_files.append(s_d_t_file)
                             else:
-                                s_d_file = await asyncio.to_thread(
-                                    lambda: pd.read_csv(zip_ref.open(name), encoding='windows-1250', names=s_d_COLUMNS)
-                                )
+                                s_d_file = pd.read_csv(zip_ref.open(name), encoding='windows-1250', names=s_d_COLUMNS)
                                 data_selection = list(data_requested.intersection(set(s_d_SELECTION)))
                                 data_selection += SPACE_TIME_COLUMNS
                                 s_d_file = s_d_file.loc[:, s_d_file.columns.intersection(data_selection)]
@@ -104,13 +99,13 @@ async def read_data(spatial_range, time_range, data_range, level):
             else:
                 warnings.warn("IMGW server not responding")
 
-    # Concatenate dataframes asynchronously
-    s_d = await asyncio.to_thread(pd.concat, s_d_files)
-    s_d_t = await asyncio.to_thread(pd.concat, s_d_t_files)
+    # Concatenate dataframes
+    s_d = pd.concat(s_d_files)
+    s_d_t = pd.concat(s_d_t_files)
 
     # Process timestamps and merge data asynchronously
-    s_d['Timestamp'] = await asyncio.to_thread(lambda: s_d.apply(create_timestamp_from_row, axis=1))
-    s_d_t['Timestamp'] = await asyncio.to_thread(lambda: s_d_t.apply(create_timestamp_from_row, axis=1))
+    s_d['Timestamp'] = s_d.apply(create_timestamp_from_row, axis=1)
+    s_d_t['Timestamp'] = s_d_t.apply(create_timestamp_from_row, axis=1)
     s_d['Timestamp'] = s_d['Timestamp'].dt.date
     s_d_t['Timestamp'] = s_d_t['Timestamp'].dt.date
 
@@ -143,6 +138,6 @@ async def read_data(spatial_range, time_range, data_range, level):
         warnings.warn("Some data were aggregated")
 
     # Pivot the DataFrame asynchronously
-    s_d_pivot = await asyncio.to_thread(lambda: s_d_merged.pivot_table(index='Timestamp', columns='S2CELL'))
+    s_d_pivot = s_d_merged.pivot_table(index='Timestamp', columns='S2CELL')
 
     return s_d_pivot

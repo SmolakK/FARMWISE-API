@@ -8,6 +8,7 @@ import os
 from logging_config import logger
 from security import limiter, get_current_active_user
 import asyncio
+import json
 
 api_router = APIRouter()
 
@@ -70,26 +71,38 @@ async def read_data_endpoint(
             yield "Starting data processing...\n\n"
 
             # Call the read_data function
-            df = await read_data(bounding_box, level, time_from, time_to, factors,
+            result = await read_data(bounding_box, level, time_from, time_to, factors,
                                  separate_api=separate_api, interpolation=interpolation
                                  )
+            df = result['data']
+            metadata = result['metadata']
 
             # Finalize the processing
             yield "Data processing completed. Generating CSV file...\n\n"
 
             # Use the temporary directory from the application state
             temp_dir = request.app.state.temp_dir
-            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".csv", mode='w+', dir=temp_dir)
 
-            df.to_csv(temp_file.name, index=True)
+            # Data CSV
+            data_file = tempfile.NamedTemporaryFile(delete=False, suffix=".csv", mode='w+', dir=temp_dir)
+            df.to_csv(data_file.name, index=True)
+            data_file.close()
 
-            # Generate download link
-            download_link = f"{str(request.base_url).rstrip('/')}/download/{os.path.basename(temp_file.name)}"
+            # Metadata JSON
+            metadata_file = tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode='w+', dir=temp_dir)
+            with open(metadata_file.name, 'w') as mf:
+                json.dump(metadata, mf, indent=4)
+            metadata_file.close()
 
-            # Make sure to close the file
-            temp_file.close()
+            # Generate download links
+            base_url = str(request.base_url).rstrip('/')
+            data_download_link = f"{base_url}/download/{os.path.basename(data_file.name)}"
+            metadata_download_link = f"{base_url}/download/{os.path.basename(metadata_file.name)}"
 
-            yield f"Download link: {download_link}\n\n"
+            download_link = f"{str(request.base_url).rstrip('/')}/download/{os.path.basename(data_file.name)}"
+
+            yield f"Data file available for download: {data_download_link}\n"
+            yield f"Metadata file available for download: {metadata_download_link}\n\n"
 
         except Exception as e:
             logger.error(f"Error processing request: {e}")
