@@ -1,9 +1,10 @@
+import math
+
+import numpy as np
 import pandas as pd
 import s2sphere
-import numpy as np
 import scipy.spatial
 from scipy.interpolate import griddata
-import math
 from tqdm import tqdm
 from utils.cells_to_coordinates import s2cells_to_coordinates
 

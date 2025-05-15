@@ -84,11 +84,11 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
                     }
         except Exception as e:
             logger.error(f'Error concatenating data: {e}')
-            return False  # Return False if concatenation fails
+            return pd.DataFrame()  # Return an empty DataFrame if concatenation fails
     else:
         logger.warning("No data retrieved from available APIs")
-        return False
+        return pd.DataFrame()
 
 
-# asyncio.run(read_data((51.09, 50.00, 14.56, 14.14), 10, '2017-01-10', '2017-01-12', ['temperature', 'precipitation'],
-#                       separate_api=False, interpolation=True))
+asyncio.run(read_data((54.8396, 49.0023, 24.1453, 14.1226), 10, '2000-01-01', '2020-12-31', ['soil'],
+                      separate_api=False, interpolation=True))

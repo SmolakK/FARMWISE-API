@@ -1,6 +1,3 @@
-import s2sphere
-
-
 def _s2cell_id_to_coordinate(s2cell_id):
     """
     Convert an S2Cell ID to the coordinates of its center.

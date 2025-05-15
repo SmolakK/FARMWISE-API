@@ -1,6 +1,7 @@
 selected_columns = {
-    "PUWG 1992 X": "lat",
-    "PUWG 1992 Y": "lon",
+    "PUWG 1992 X": "PUWG 1992 X",
+    "PUWG 1992 Y": "PUWG 1992 Y",
+    "Data poboru próbki": "date",
     "Rok badań": "year",
     "Numer punktu pomiarowego wg MONBADA": "id",
     "Rodzaj punktu pomiarowego": "Type of Measurement Point",
@@ -27,56 +28,3 @@ selected_columns = {
     "Fosforany[mgPO4 / l]": "Phosphates [mgPO4/l]"
 }
 
-PARAMETER_SELECTION = [
-    # "PUWG 1992 X",
-    # "PUWG 1992 Y",
-    "Type of Measurement Point",
-    "Depth to Top of Aquifer Layer [m b.g.l.]",
-    "Range of Captured Aquifer Layer [m b.g.l.]",
-    "Bifenthrin [mg/l]",
-    "Flonicamid (IKI-220) [mg/l]",
-    "Flufenacet [mg/l]",
-    "Fluopyram [mg/l]",
-    "Trifloxystrobin [mg/l]",
-    "PFOS [mg/l]",
-    "Novaluron [mg/l]",
-    "EC [µS/cm]",
-    "pH",
-    "Arsenic [mgAs/l]",
-    "Chlorides [mgCl/l]",
-    "Zinc [mgZn/l]",
-    "Cadmium [mgCd/l]",
-    "Magnesium [mgMg/l]",
-    "Lead [mgPb/l]",
-    "Potassium [mgK/l]",
-    "Sodium [mgNa/l]",
-    "Calcium [mgCa/l]",
-    "Phosphates [mgPO4/l]"
-]
-
-DATA_ALIASES = {
-    "Year of Study": "groundwater quality",
-    "id": "groundwater quality",
-    "Type of Measurement Point": "groundwater quality",
-    "Depth to Top of Aquifer Layer [m b.g.l.]": "groundwater quality",
-    "Range of Captured Aquifer Layer [m b.g.l.]": "groundwater quality",
-    "Bifenthrin [mg/l]": "groundwater quality",
-    "Flonicamid (IKI-220) [mg/l]": "groundwater quality",
-    "Flufenacet [mg/l]": "groundwater quality",
-    "Fluopyram [mg/l]": "groundwater quality",
-    "Trifloxystrobin [mg/l]": "groundwater quality",
-    "PFOS [mg/l]": "groundwater quality",
-    "Novaluron [mg/l]": "groundwater quality",
-    "EC [µS/cm]": "groundwater quality",
-    "pH": "groundwater quality",
-    "Arsenic [mgAs/l]": "groundwater quality",
-    "Chlorides [mgCl/l]": "groundwater quality",
-    "Zinc [mgZn/l]": "groundwater quality",
-    "Cadmium [mgCd/l]": "groundwater quality",
-    "Magnesium [mgMg/l]": "groundwater quality",
-    "Lead [mgPb/l]": "groundwater quality",
-    "Potassium [mgK/l]": "groundwater quality",
-    "Sodium [mgNa/l]": "groundwater quality",
-    "Calcium [mgCa/l]": "groundwater quality",
-    "Phosphates [mgPO4/l]": "groundwater quality"
-}

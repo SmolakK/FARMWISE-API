@@ -4,7 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e861ba43-0096-452f-bd7e-8db19b445a06" name="Changes" comment="" />
+    <list default="true" id="e861ba43-0096-452f-bd7e-8db19b445a06" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/API_readers/CHMI_Meteo/CHMI_meteo.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API_readers/CHMI_Meteo/json_files_list.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API_readers/EPA Ireland/EPA_coordinates.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API_readers/EPA Ireland/epa_gw.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API_readers/The Irish Meteorological Service/EPA_ireland_stations.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API_readers/The Irish Meteorological Service/Irish MS_daily.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API_readers/The Irish Meteorological Service/Irish MS_monthly.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API_readers/UA_sw_quality/ukrainian_surface_water.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/FARMWISE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/FARMWISE.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/gios_gw/gios_gw.py" beforeDir="false" afterPath="$PROJECT_DIR$/API_readers/gios_gw/gios_gw.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/gios_gw/gios_gw_mappings/gios_gw_mapping.py" beforeDir="false" afterPath="$PROJECT_DIR$/API_readers/gios_gw/gios_gw_mappings/gios_gw_mapping.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/wetterdienst/wetterdienst_dwd.py" beforeDir="false" afterPath="$PROJECT_DIR$/API_readers/wetterdienst/wetterdienst_dwd.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_call.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_call.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/cells_to_coordinates.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/cells_to_coordinates.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/generate_cells.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/generate_cells.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/imgw_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/imgw_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/interpolate_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/interpolate_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/name_to_coordinates.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/name_to_coordinates.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/reproject_raster.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/reproject_raster.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -40,17 +64,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.db_users.executor&quot;: &quot;Run&quot;,
-    &quot;Python.hubeau_piezo_read.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/GIT/FARMWISE&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.coordinates_to_cells.executor": "Run",
+    "Python.db_users.executor": "Run",
+    "Python.egdi_read_d10.executor": "Run",
+    "Python.epa_gw.executor": "Debug",
+    "Python.gios_gw.executor": "Debug",
+    "Python.gios_scraper.executor": "Debug",
+    "Python.hubeau_piezo_read.executor": "Debug",
+    "Python.main.executor": "Run",
+    "Python.main_call.executor": "Debug",
+    "Python.wetterdienst_dwd.executor": "Debug",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/JakubM/Documents/GitHub/FARMWISE/API_readers/UA_sw_quality",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers\UA_sw_quality" />
+      <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers\CHMI_Meteo" />
+      <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers\EPA Ireland" />
+      <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers" />
+      <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers\gios_gw\gios_gw_mappings" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\GitHub\FARMWISE\API_readers\cds" />
       <recent name="D:\GitHub\FARMWISE\API_readers\imgw_hydro\imgw_mappings" />
@@ -59,7 +97,7 @@
       <recent name="D:\GitHub\FARMWISE\API_readers\gios\constants" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.hubeau_piezo_read">
+  <component name="RunManager">
     <configuration name="egdi_read_d10" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="ENV_FILES" value="" />
@@ -126,28 +164,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="hubeau_read" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="FARMWISE" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/Hub'Eau" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/Hub'Eau/hubeau_read.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="hubeau_wq_read" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="ENV_FILES" value="" />
@@ -170,22 +186,36 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="wetterdienst_dwd" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="FARMWISE" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/wetterdienst" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/wetterdienst/wetterdienst_dwd.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.egdi_read_d10" />
         <item itemvalue="Python.hubeau_piezo_read" />
         <item itemvalue="Python.get_piezo_stations" />
         <item itemvalue="Python.hubeau_wq_read" />
-        <item itemvalue="Python.hubeau_read" />
-        <item itemvalue="Python.egdi_read_d10" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-python-sdk-5b207ade9991-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.17890.14" />
-      </set>
-    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -197,6 +227,17 @@
       <updated>1711356955598</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -214,6 +255,46 @@
           <url>file://$PROJECT_DIR$/API_readers/cds/cds_utils/cds_data_read.py</url>
           <line>65</line>
           <option name="timeStamp" value="412" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/wetterdienst/wetterdienst_dwd.py</url>
+          <line>105</line>
+          <option name="timeStamp" value="413" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/gios/gios_scraper.py</url>
+          <line>167</line>
+          <option name="timeStamp" value="414" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/gios/gios_scraper.py</url>
+          <line>83</line>
+          <option name="timeStamp" value="418" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/gios/gios_scraper.py</url>
+          <line>31</line>
+          <option name="timeStamp" value="419" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/imgw/imgw_api_synop_daily.py</url>
+          <line>142</line>
+          <option name="timeStamp" value="420" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main_call.py</url>
+          <line>89</line>
+          <option name="timeStamp" value="422" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main_call.py</url>
+          <line>80</line>
+          <option name="timeStamp" value="423" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/EPA Ireland/epa_gw.py</url>
+          <line>79</line>
+          <option name="timeStamp" value="424" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

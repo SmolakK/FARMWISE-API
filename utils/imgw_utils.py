@@ -1,5 +1,6 @@
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
 
 
 def expand_range(range_str):

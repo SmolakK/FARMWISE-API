@@ -1,7 +1,6 @@
-import s2sphere
 import geopandas as gpd
+import s2sphere
 from shapely.geometry import Polygon
-import matplotlib.pyplot as plt
 
 
 def generate_s2cell_polygons(bounding_box, cell_level, save_path=None):
