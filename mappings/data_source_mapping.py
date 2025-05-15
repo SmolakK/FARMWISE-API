@@ -118,4 +118,45 @@ API_PATH_RANGES = {
          1,
          1)
     ),
+    'API_readers.CHMI_Meteo.CHMI_meteo': (
+        ((51.0557, 48.5518, 18.8592, 12.0907),
+         ('1961-01-01', CURRENT_DAY),
+         ['precipitation'],
+         'daily',
+         1,
+         1)
+    ),
+    'API_readers.UA_sw_quality.ukrainian surface water': (
+        ((52.3791, 44.3824, 40.2276, 22.1371),
+         ('1950-01-01', CURRENT_DAY),
+         ['water quality'],
+         'monthly',
+         1,
+         1)
+    ),
+    'API_readers.EPA Ireland.epa_gw': (
+        ((55.3822, 51.4476, -6.0024, -10.4781),
+         ('1970-01-01', CURRENT_DAY),
+         ['groundwater quantity'],
+         'daily',
+         1,
+         1)
+    ),
+    'API_readers.gios_gw.gios_gw': (
+        ((54.8396, 49.0023, 24.1453, 14.1226),
+         ('1995-01-01', '2020-12-31'),
+         ['groundwater quantity', 'groundwater quality'],
+         'daily',
+         1,
+         1)
+    ),
+    'API_readers.The Irish Meteorological Service.Irish MS_daily': (
+        ((55.3822, 51.4476, -6.0024, -10.4781),
+         ('1985-01-01', CURRENT_DAY),
+         ['precipitation'],
+         'daily',
+         1,
+         1)
+    )
 }
+

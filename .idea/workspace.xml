@@ -4,30 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e861ba43-0096-452f-bd7e-8db19b445a06" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/API_readers/CHMI_Meteo/CHMI_meteo.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/API_readers/CHMI_Meteo/json_files_list.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/API_readers/EPA Ireland/EPA_coordinates.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/API_readers/EPA Ireland/epa_gw.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/API_readers/The Irish Meteorological Service/EPA_ireland_stations.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/API_readers/The Irish Meteorological Service/Irish MS_daily.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/API_readers/The Irish Meteorological Service/Irish MS_monthly.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/API_readers/UA_sw_quality/ukrainian_surface_water.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/FARMWISE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/FARMWISE.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="e861ba43-0096-452f-bd7e-8db19b445a06" name="Changes" comment="new sources added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API_readers/gios_gw/gios_gw.py" beforeDir="false" afterPath="$PROJECT_DIR$/API_readers/gios_gw/gios_gw.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API_readers/gios_gw/gios_gw_mappings/gios_gw_mapping.py" beforeDir="false" afterPath="$PROJECT_DIR$/API_readers/gios_gw/gios_gw_mappings/gios_gw_mapping.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API_readers/wetterdienst/wetterdienst_dwd.py" beforeDir="false" afterPath="$PROJECT_DIR$/API_readers/wetterdienst/wetterdienst_dwd.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_call.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_call.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/cells_to_coordinates.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/cells_to_coordinates.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/generate_cells.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/generate_cells.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/imgw_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/imgw_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/interpolate_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/interpolate_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/name_to_coordinates.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/name_to_coordinates.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/reproject_raster.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/reproject_raster.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mappings/data_source_mapping.py" beforeDir="false" afterPath="$PROJECT_DIR$/mappings/data_source_mapping.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -226,6 +205,15 @@
       <option name="presentableId" value="Default" />
       <updated>1711356955598</updated>
     </task>
+    <task id="LOCAL-00001" summary="new sources added">
+      <option name="closed" value="true" />
+      <created>1747298700162</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1747298700162</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -233,11 +221,27 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/Jakub_farmwise" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="new sources added" />
+    <option name="LAST_COMMIT_MESSAGE" value="new sources added" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
