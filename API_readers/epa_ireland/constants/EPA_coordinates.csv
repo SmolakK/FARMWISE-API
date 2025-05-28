@@ -1,4 +1,4 @@
-station_id,station_name,lat,lon,station_link,download_link,measuring_point_height
+id,station_name,lat,lon,station_link,download_link,measuring_point_height
 IE_EA_G_0002_1400_0007,DUFFYS CROSSROADS,53.36382195,-6.61164432,https://epawebapp.epa.ie/Hydronet/#IE_EA_G_0002_1400_0007,https://epawebapp.epa.ie/Hydronet/output/internet/stations/ATH/IE_EA_G_0002_1400_0007/GWL/complete_daymean.zip,88.05
 IE_EA_G_0002_2300_0003,DUNSHAUGHLIN PW6,53.51289123,-6.53384912,https://epawebapp.epa.ie/Hydronet/#IE_EA_G_0002_2300_0003,https://epawebapp.epa.ie/Hydronet/output/internet/stations/ATH/IE_EA_G_0002_2300_0003/GWL/complete_daymean.zip,106.24
 IE_EA_G_0008_1400_0003,Allen,53.20901876,-6.39824987,https://epawebapp.epa.ie/Hydronet/#IE_EA_G_0008_1400_0003,https://epawebapp.epa.ie/Hydronet/output/internet/stations/DUB/IE_EA_G_0008_1400_0003/GWL/complete_daymean.zip,86.15
