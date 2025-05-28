@@ -126,15 +126,15 @@ API_PATH_RANGES = {
          1,
          1)
     ),
-    'API_readers.UA_sw_quality.ukrainian surface water': (
+    'API_readers.UA_sw_quality.ukrainian_surface_water': (
         ((52.3791, 44.3824, 40.2276, 22.1371),
          ('1950-01-01', CURRENT_DAY),
-         ['water quality'],
+         ['sw quality'],
          'monthly',
          1,
          1)
     ),
-    'API_readers.EPA Ireland.epa_gw': (
+    'API_readers.epa_ireland.epa_gw': (
         ((55.3822, 51.4476, -6.0024, -10.4781),
          ('1970-01-01', CURRENT_DAY),
          ['groundwater quantity'],
@@ -144,7 +144,7 @@ API_PATH_RANGES = {
     ),
     'API_readers.gios_gw.gios_gw': (
         ((54.8396, 49.0023, 24.1453, 14.1226),
-         ('1995-01-01', '2020-12-31'),
+         ('1990-01-01', CURRENT_DAY),
          ['groundwater quantity', 'groundwater quality'],
          'daily',
          1,

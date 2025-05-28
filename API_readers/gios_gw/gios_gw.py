@@ -1,7 +1,6 @@
 import asyncio
 import httpx
 import pandas as pd
-import numpy as np
 import logging
 import nest_asyncio
 from bs4 import BeautifulSoup
@@ -9,20 +8,22 @@ from urllib.parse import urljoin
 from io import BytesIO
 from tqdm.asyncio import tqdm
 from pyproj import Transformer
-from gios_gw_mappings.gios_gw_mapping import selected_columns
+from API_readers.gios_gw.gios_gw_mappings.gios_gw_mapping import selected_columns, DATA_ALIASES, schema
+from utils.coordinates_to_cells import prepare_coordinates
 
-# Apply nest_asyncio for interactive environments.
+# Apply nest_asyncio for interactive environments
 nest_asyncio.apply()
 
+# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Initialize transformer for coordinate conversion.
+# Initialize transformer for coordinate conversion
 transformer = Transformer.from_crs("EPSG:2180", "EPSG:4326", always_xy=True)
 URL = 'https://mjwp.gios.gov.pl/wyniki-badan/wyniki-badan-2023.html'
 
 
 async def find_subpage_links(url: str, client: httpx.AsyncClient) -> list:
-    """Fetch the main page and extract subpage links that contain 'wyniki-badan'."""
+    """Fetch the main page and extract subpage links containing 'wyniki-badan'."""
     try:
         response = await client.get(url)
         response.raise_for_status()
@@ -37,7 +38,7 @@ async def find_subpage_links(url: str, client: httpx.AsyncClient) -> list:
 
 
 async def find_xlsx_links(url: str, client: httpx.AsyncClient) -> list:
-    """Fetch a subpage and extract all .xlsx file links along with a cleaned file name."""
+    """Fetch a subpage and extract all .xlsx file links with cleaned file names."""
     try:
         response = await client.get(url)
         response.raise_for_status()
@@ -52,7 +53,7 @@ async def find_xlsx_links(url: str, client: httpx.AsyncClient) -> list:
 
 
 async def process_xlsx(url: str, client: httpx.AsyncClient) -> pd.DataFrame:
-    """Download and read an Excel file into a DataFrame using a thread pool."""
+    """Download and read an Excel file into a DataFrame."""
     try:
         response = await client.get(url)
         response.raise_for_status()
@@ -68,104 +69,122 @@ async def process_xlsx(url: str, client: httpx.AsyncClient) -> pd.DataFrame:
 
 
 def convert_coords(df: pd.DataFrame) -> pd.DataFrame:
-    """Convert coordinates using the pyproj transformer, vectorized for performance."""
+    """Convert coordinates from EPSG:2180 to EPSG:4326."""
     try:
         if 'PUWG 1992 X' in df.columns and 'PUWG 1992 Y' in df.columns:
             coords = transformer.transform(df['PUWG 1992 X'].values, df['PUWG 1992 Y'].values)
-            df['lat'], df['lon'] = coords
+            df['lon'], df['lat'] = coords
             df = df.drop(columns=["PUWG 1992 X", "PUWG 1992 Y"])
     except Exception as e:
         logging.error(f"Error converting coordinates: {e}")
     return df
 
 
-def convert_to_float(df: pd.DataFrame) -> pd.DataFrame:
-    """Standardize string representations of numbers directly on DataFrame."""
-    for col in df.select_dtypes(include=['object']).columns:
-        if col not in ['Range of Captured Aquifer Layer', 'date']:
-            df[col] = df[col].str.replace(',', '.').str.replace('<', '').astype(float, errors='ignore')
+def standardize_dataframe(df, schema):
+    """
+    Standardize a DataFrame to a predefined schema by reindexing and converting data types.
+
+    :param df: Input DataFrame with renamed columns.
+    :param schema: Dictionary mapping column names to their expected data types.
+    :return: Standardized DataFrame.
+    """
+    # Convert coordinates
+    df = convert_coords(df)
+
+    # Reindex to schema columns
+    standard_columns = list(schema.keys())
+    df = df.reindex(columns=standard_columns)
+
+    # Clean and convert data types
+    for col, dtype in schema.items():
+        if col in df.columns:
+            if dtype in ['float', 'int']:
+                df[col] = df[col].astype(str).str.replace(',', '.').str.replace('<', '')
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+                if dtype == 'int':
+                    df[col] = df[col].astype('Int64')
+            elif dtype == 'Timestamp':
+                df[col] = pd.to_datetime(df[col], format='%d.%m.%Y', errors='coerce')
+            elif dtype == 'category':
+                df[col] = df[col].astype('category')
+
     return df
 
 
-async def read_data(url: str) -> pd.DataFrame:
-    all_data = []
+async def read_data(spatial_range, time_range, data_range, level):
+    """
+    Read and process groundwater data, filtering by spatial and time ranges, and return a MultiIndex DataFrame.
+
+    :param spatial_range: Tuple (N, S, E, W) defining the bounding box.
+    :param time_range: Tuple (start, end) of timestamps for filtering.
+    :param data_range: List of requested data categories.
+    :param level: S2Cell level for spatial aggregation.
+    :return: DataFrame with MultiIndex ['date', 'S2CELL'] and numeric measurement columns.
+    """
+    print("DOWNLOADING: GIOS groundwater q&q data")
     async with httpx.AsyncClient(timeout=30) as client:
-        subpage_links = await find_subpage_links(url, client)
+        subpage_links = await find_subpage_links(URL, client)
         if not subpage_links:
-            logging.warning("No subpage links found. Exiting.")
+            logging.warning("No subpage links found.")
             return pd.DataFrame()
 
         xlsx_links = [item for sublist in
-                      await asyncio.gather(*[find_xlsx_links(subpage, client) for subpage in subpage_links]) for item in
-                      sublist]
-        logging.info(f"Total xlsx files found: {len(xlsx_links)}")
+                      await asyncio.gather(*[find_xlsx_links(subpage, client) for subpage in subpage_links])
+                      for item in sublist]
         if not xlsx_links:
-            logging.warning("No xlsx links found. Exiting.")
+            logging.warning("No xlsx links found.")
             return pd.DataFrame()
 
+        all_data = []
         for xlsx_url, _ in tqdm(xlsx_links, desc="Processing files"):
             df = await process_xlsx(xlsx_url, client)
             if not df.empty:
                 valid_columns = [col for col in selected_columns.keys() if col in df.columns]
                 if valid_columns:
                     df = df[valid_columns].rename(columns=selected_columns)
-                    df = convert_coords(df)
-                    df = convert_to_float(df)
-
-                    if 'id' in df.columns:
-                        df['id'] = pd.to_numeric(df['id'], errors='coerce').fillna(0).astype(int)
-
-                    if 'year' in df.columns:
-                        df['year'] = pd.to_datetime(df['year'], format='%Y', errors='coerce')
-
-                    # Clean "Type of Measurement Point".
-                    df.replace({
-                        "n.o.": np.nan, "b.d.": np.nan, "brak danych": np.nan,
-                        "st. wiercona": "well", "st. kopana": "well",
-                        "piezometr": "piezometer", "źródło": "spring",
-                        "łata wodowskazowa": "water level gauge",
-                        "szyb kopalniany": "mineshaft", "otw badawczy": "test hole"
-                    }, inplace=True)
-
-                    # Date parsing and fallback logic
-                    if 'year' in df.columns:
-                        year_dates = pd.to_datetime(df['year'], format='%Y', errors='coerce')
-                    else:
-                        year_dates = None
-
-                    if 'date' in df.columns:
-                        sample_dates = pd.to_datetime(df['date'], errors='coerce', dayfirst=True)
-                        df['date'] = sample_dates.where(sample_dates.notna(), other=year_dates)
-                    elif year_dates is not None:
-                        df['date'] = year_dates
-
-                    df.drop(columns=["year"], inplace=True, errors='ignore')
-
-                    if not df.isna().all().all():
+                    df = standardize_dataframe(df, schema)
+                    # Only append if DataFrame has non-NA data for measurement columns
+                    measurement_cols = [col for col in df.columns if col not in ['id', 'date', 'lat', 'lon']]
+                    if measurement_cols and not df[measurement_cols].isna().all().all():
                         all_data.append(df)
+                    else:
+                        logging.info(f"Skipped empty or all-NA DataFrame from {xlsx_url}")
 
-    if all_data:
+        if not all_data:
+            logging.warning("No valid data collected from any file.")
+            return pd.DataFrame()
+
         final_df = pd.concat(all_data, ignore_index=True)
         final_df.dropna(how='all', inplace=True)
-        if 'id' in final_df.columns:
-            final_df = final_df.sort_values(by="id").reset_index(drop=True)
-        if 'id' in final_df.columns:
-            final_df = final_df[['id'] + [col for col in final_df.columns if col != 'id']]
-        logging.info(f"Final DataFrame shape: {final_df.shape}")
-        return final_df
-    else:
-        logging.warning("No data was collected from any file.")
-        return pd.DataFrame()
 
+        unique_points = final_df[['id', 'lat', 'lon']].drop_duplicates()
+        coordinates = prepare_coordinates(coordinates=unique_points, spatial_range=spatial_range, level=level)
+        if coordinates is None or coordinates.empty:
+            logging.info("No coordinates within spatial range.")
+            return pd.DataFrame()
 
-async def main():
-    final_data = await read_data(URL)
-    if final_data.empty:
-        logging.info("The final DataFrame is empty.")
-    else:
-        logging.info(f"Final DataFrame has {final_data.shape[0]} rows and {final_data.shape[1]} columns.")
-        print(final_data.head())
+        valid_ids = coordinates['id'].unique()
+        final_df = final_df[final_df['id'].isin(valid_ids)]
 
+        time_from, time_to = pd.to_datetime(time_range[0]), pd.to_datetime(time_range[1])
+        final_df = final_df[(final_df['date'] >= time_from) & (final_df['date'] <= time_to)]
 
-if __name__ == "__main__":
-    asyncio.run(main())
+        # Select numeric columns based on data_range
+        category_columns = {col for col, cat in DATA_ALIASES.items() if cat in data_range}
+        available_columns = [col for col in category_columns if col in final_df.columns]
+        if not available_columns:
+            logging.warning("No data columns found for the requested categories.")
+            return pd.DataFrame()
+
+        # Ensure numeric columns
+        final_df[available_columns] = final_df[available_columns].apply(pd.to_numeric, errors='coerce')
+
+        final_df = final_df[['id', 'date'] + available_columns]
+        final_df = final_df.merge(coordinates[['id', 'S2CELL']], on='id')
+
+        # Set MultiIndex
+        final_df = final_df.set_index(['date', 'S2CELL'])
+
+        # Pivot the DataFrame asynchronously
+        final_df_pivot = final_df.pivot_table(index='date', columns='S2CELL')
+        return final_df_pivot
