@@ -1,0 +1,322 @@
+scc -w -v -u -p -z --exclude-ext md,txt,xml,csv --sloccount-format --dryness --avg-wage 60000
+
+ff31159 | 2024-11-27 | added dwd temp and per
+ 2 files changed, 111 insertions(+)
+
+78d790d | 2024-11-27 | Update data_source_mapping.py
+ 1 file changed, 16 insertions(+)
+
+21891fa | 2024-11-27 | added geosphere wrapper
+ 2 files changed, 134 insertions(+)
+
+0b8c0ee | 2024-11-19 | Update hubeau_wq_read.py
+ 1 file changed, 125 insertions(+), 112 deletions(-)
+
+0c4903a | 2024-11-19 | Update hubeau_piezo_read.py
+ 1 file changed, 45 insertions(+), 37 deletions(-)
+
+625b219 | 2024-11-19 | Update get_piezo_stations.py
+ 1 file changed, 19 insertions(+), 14 deletions(-)
+
+58674e2 | 2024-11-19 | Update interpolate_data.py
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+5d87987 | 2024-11-19 | Update coordinates_to_cells.py
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+0ae294d | 2024-11-19 | Update main_call.py
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+16f48b0 | 2024-11-19 | Merge branch 'main' of https://github.com/SmolakK/FARMWISE
+080c959 | 2024-11-19 | Update interpolate_data.py
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+9cd9e14 | 2024-11-19 | Merge pull request #2 from SmolakK/marc-working-hubeau
+ca8ebb0 | 2024-11-19 | Merge branch 'main' into marc-working-hubeau
+ebd3be7 | 2024-11-15 | Update data_call.py
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+81179d8 | 2024-11-15 | Update main.py
+ 1 file changed, 3 insertions(+)
+
+2393b41 | 2024-11-15 | Update main.py
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+364c979 | 2024-11-15 | Update schemas.py
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+e497aa1 | 2024-11-15 | Update data_call.py
+ 1 file changed, 54 insertions(+), 39 deletions(-)
+
+b0c225a | 2024-11-15 | Update main_call.py
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+c1f02c5 | 2024-11-15 | Stream handling
+ 1 file changed, 23 insertions(+), 21 deletions(-)
+
+2145d6c | 2024-11-14 | Update schemas.py
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+009c474 | 2024-11-14 | Update data_call.py
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+b171be7 | 2024-11-14 | Update main_call.py
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+3bc982f | 2024-11-14 | Update data_source_mapping.py
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+335cf19 | 2024-11-14 | Update .gitignore
+ 1 file changed, 15 insertions(+)
+
+acdf6e8 | 2024-11-14 | Soilgrids async + naming
+ 2 files changed, 69 insertions(+), 54 deletions(-)
+
+7d0b947 | 2024-11-14 | Update imgw_api_hydro_daily.py
+ 1 file changed, 68 insertions(+), 53 deletions(-)
+
+faeeedf | 2024-11-14 | Gios scraper update + bug fix
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
+0cf7273 | 2024-11-13 | Update interpolate_data.py
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+49940ac | 2024-11-13 | Update main_call.py
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+d5a8a6a | 2024-11-13 | Update soilgrids_call.py
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+06ff3ec | 2024-11-13 | Update cds_single_levels.py
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+e1fb68e | 2024-11-13 | Update synop_mapping.py
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+28089be | 2024-11-13 | imgw async
+ 1 file changed, 84 insertions(+), 83 deletions(-)
+
+8b54827 | 2024-11-13 | date fix
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+d1b6b04 | 2024-11-13 | date fixes
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+813c9da | 2024-11-13 | date fix and minor bug on year selection
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+9928527 | 2024-11-13 | date fix
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+3742c1c | 2024-11-12 | back to LF EOL
+ 1 file changed, 37 insertions(+), 37 deletions(-)
+
+8788872 | 2024-11-12 | minor change of indentation in coordinates_to_cells.py
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+fad8f87 | 2024-11-12 | test renamed to testing_hubeau_wq.py
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+31fb923 | 2024-11-12 | Added a working example of Test for the API hubeau GW quality... but not yet a real relevant test.
+ 1 file changed, 64 insertions(+)
+
+7e28f60 | 2024-11-12 | API hubeau on GW quality Full review and cleanup of the code Added lots of comments; many TODOs yet to DISCUSS soon or later; etc.
+ 1 file changed, 169 insertions(+), 175 deletions(-)
+
+5b17681 | 2024-11-12 | Update gios_scraper.py
+ 1 file changed, 38 insertions(+), 44 deletions(-)
+
+f6fbac5 | 2024-11-12 | Update main_call.py
+ 1 file changed, 20 insertions(+), 5 deletions(-)
+
+eadd1d8 | 2024-11-12 | Update interpolate_data.py
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+7ddfea2 | 2024-11-12 | Update cells_to_coordinates.py
+ 1 file changed, 4 insertions(+), 13 deletions(-)
+
+3bbcf89 | 2024-11-12 | Update egdi_read_hc.py
+ 1 file changed, 40 insertions(+), 32 deletions(-)
+
+b4ebc35 | 2024-11-12 | Update egdi_read_d10.py
+ 1 file changed, 45 insertions(+), 35 deletions(-)
+
+4c1485a | 2024-11-12 | Update corine_read.py
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+3df6dce | 2024-11-12 | Update cds_vegetation.py
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+1fb706a | 2024-11-12 | Update cds_single_levels.py
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+b377f52 | 2024-11-12 | hubeau More verbose in the DEVEL if main section for testing that API
+ 1 file changed, 18 insertions(+), 11 deletions(-)
+
+5177509 | 2024-11-08 | Corine to async call
+ 1 file changed, 73 insertions(+), 72 deletions(-)
+
+4d0afdc | 2024-11-08 | Update corine_read.py
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+ec68489 | 2024-11-08 | Bug fix in mappings
+ 1 file changed, 13 insertions(+), 12 deletions(-)
+
+f5e58f0 | 2024-11-08 | Main call as async call + changes
+ 1 file changed, 25 insertions(+), 10 deletions(-)
+
+5ba3f2c | 2024-11-08 | CDS to async calls
+ 3 files changed, 9 insertions(+), 6 deletions(-)
+
+8e4780b | 2024-11-07 | Update inter rise + async
+ 22 files changed, 58 insertions(+), 62 deletions(-)
+
+a1128db | 2024-11-07 | API hubeau testing w other input params
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+e47800f | 2024-11-04 | API hubeau advancing...
+ 1 file changed, 60 insertions(+), 31 deletions(-)
+
+ca87e80 | 2024-11-04 | Correction of a typo error in utils interpolate_data.py spatal_range replaced by spatial_range in interpolate func args
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+d9134c3 | 2024-11-04 | working on API hubeau...
+ 2 files changed, 48 insertions(+), 14 deletions(-)
+
+46b3dac | 2024-11-04 | modified prepare_coordinates() func code to prevent a warning
+ 1 file changed, 37 insertions(+), 36 deletions(-)
+
+a07af70 | 2024-11-04 | API hubeau minor chg comment (new branch...)
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+26a89e8 | 2024-11-04 | API hubeau adding protections in case of empty results (interm)
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+f2e4a37 | 2024-11-04 | Merge branch 'main' of https://github.com/SmolakK/FARMWISE
+019e82d | 2024-11-04 | API hubeau WIP clarifying data_range processing prior to URL queries...
+ 1 file changed, 89 insertions(+), 21 deletions(-)
+
+d97da7d | 2024-11-04 | Remove call from wrappers
+ 2 files changed, 13 deletions(-)
+
+55d915c | 2024-10-31 | Marc working on big update of the hubeau API reader for GW quality data... Sorry this commit is WIP so not fully working yet. PLUS: Now it depends on a custom package which I added as a .tar.gz file.
+ 3 files changed, 2058 insertions(+), 27 deletions(-)
+
+8c32977 | 2024-10-31 | Added hubeau API constants file listing attributes of GW quality parameters from French database definitions
+ 1 file changed, 37 insertions(+)
+
+7368957 | 2024-10-31 | Minor changes in hubeau mapping wq for PFOS params but TODO remains to check consistency of column names MAPPING Goal was to avoid (PFOS) having several codes in a dict item (1 key)
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+ee3dcb3 | 2024-10-31 | Merge branch 'main' of https://github.com/SmolakK/FARMWISE
+db399ae | 2024-10-31 | GW/SW naming adjustment
+ 4 files changed, 38 insertions(+), 38 deletions(-)
+
+ac470c0 | 2024-10-30 | Changed the format (order and comments) of hubeau_mapping_wq mainly to highlight the different parameter units (mg/L, ...)
+ 1 file changed, 17 insertions(+), 14 deletions(-)
+
+84fdb01 | 2024-10-30 | Added __pycache__ to the .gitignore file (Towards Data Science on the web says:) In most of the cases, you should ignore specific files such as those including sensitive data, system-specific files or auto-generated files that were created by say an IDE or a specific workspace. REMAINING TODO: Delete the already existing __pycache__ in the repo img
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+c525a63 | 2024-10-25 | hubeau_france wrapper
+ 15 files changed, 515 insertions(+), 29 deletions(-)
+
+ddbdb25 | 2024-10-22 | EGID - hydraulic conductivity
+ 7 files changed, 140 insertions(+), 38 deletions(-)
+
+a098a7c | 2024-10-22 | Correcting for requiremnets + CORINE
+ 10 files changed, 237 insertions(+), 60 deletions(-)
+
+cac15e4 | 2024-10-21 | remove testcall
+ 2 files changed, 101 deletions(-)
+
+5c07579 | 2024-10-21 | SoilGrids added + CDS API
+ 23 files changed, 666 insertions(+), 90 deletions(-)
+
+1cc3c46 | 2024-10-10 | Update .gitignore
+ 1 file changed, 1 insertion(+)
+
+a2df609 | 2024-10-10 | Update .gitignore
+ 1 file changed, 1 insertion(+)
+
+8268cdb | 2024-10-10 | Merge branch 'main' of https://github.com/SmolakK/FARMWISE
+f63cad2 | 2024-10-10 | Update main_call.py
+ 1 file changed, 1 deletion(-)
+
+66dbdbe | 2024-10-09 | CDS add transpiratio and soil moisture
+ 4 files changed, 17 insertions(+), 5 deletions(-)
+
+b50c1e4 | 2024-10-08 | Documentation updated
+ 15 files changed, 285 insertions(+), 107 deletions(-)
+
+a1ae29d | 2024-09-24 | Added interpolation
+ 8 files changed, 126 insertions(+), 17 deletions(-)
+
+9255a12 | 2024-09-23 | CDS DONE
+ 9 files changed, 73 insertions(+), 30 deletions(-)
+
+b75de71 | 2024-09-23 | Preparation for CDS-beta
+ 6 files changed, 115 insertions(+), 1 deletion(-)
+
+9ae4694 | 2024-09-15 | IMGW hydro added
+ 11 files changed, 1468 insertions(+), 16 deletions(-)
+
+a18c76d | 2024-09-15 | GIOS Mapping added
+ 7 files changed, 319 insertions(+), 152 deletions(-)
+
+31e654a | 2024-09-13 | GIOS Finalised
+ 3 files changed, 32 insertions(+), 13 deletions(-)
+
+3229174 | 2024-09-13 | GIOS_Example
+ 6 files changed, 174 insertions(+), 77 deletions(-)
+
+eed0e18 | 2024-09-13 | Merge branch 'main' of https://github.com/SmolakK/FARMWISE
+31e2093 | 2024-09-13 | Gios_API_cleaning
+ 14 files changed, 73 insertions(+), 641 deletions(-)
+
+84fce1f | 2024-07-19 | API start
+ 31 files changed, 492 insertions(+), 33 deletions(-)
+
+2874b56 | 2024-07-19 | Merge branch 'main' of https://github.com/SmolakK/FARMWISE
+2477e4b | 2024-07-19 | Adjusting_to_server
+ 11 files changed, 86 insertions(+), 84 deletions(-)
+
+51a1c83 | 2024-07-01 | GIOS- scraper
+ 1 file changed, 82 insertions(+), 28 deletions(-)
+
+131b163 | 2024-05-27 | GIOS- scraper
+ 1 file changed, 217 insertions(+)
+
+f26616f | 2024-05-27 | GIOS- scraper
+ 12 files changed, 753 insertions(+)
+
+ed56d83 | 2024-04-18 | Delete python-package-conda.yml
+ 1 file changed, 34 deletions(-)
+
+b9f1f79 | 2024-04-18 | Demo1_docs
+ 5 files changed, 182 insertions(+), 53 deletions(-)
+
+bd21dc3 | 2024-04-17 | First_demo
+ 12 files changed, 2528 insertions(+), 2302 deletions(-)
+
+ff58118 | 2024-04-02 | Merge branch 'main' of https://github.com/SmolakK/FARMWISE
+15c9c55 | 2024-04-02 | S2 celling
+ 6 files changed, 238 insertions(+), 2 deletions(-)
+
+fd905f1 | 2024-03-28 | Uzupełnione współrzędne.
+ 1 file changed, 17 insertions(+), 16 deletions(-)
+
+b1fa5dc | 2024-03-28 | Update imgw_coordinates.csv
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+a6a823c | 2024-03-27 | Create python-package-conda.yml
+ 1 file changed, 34 insertions(+)
+
+126a4e5 | 2024-03-25 | Reorganise structure
+ 3 files changed, 13 insertions(+), 18 deletions(-)
+
+8d9be8c | 2024-03-25 | Station Geocoder
+ 10 files changed, 4474 insertions(+)
+
+94fc945 | 2024-03-22 | first commit
+ 1 file changed, 1 insertion(+)
