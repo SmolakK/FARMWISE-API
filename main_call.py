@@ -1,6 +1,7 @@
 from mappings.data_source_mapping import API_PATH_RANGES
 from utils.overlap_checks import spatial_ranges_overlap, time_ranges_overlap
 from utils.interpolate_data import interpolate
+from utils.cells_to_coordinates import extract_bbox
 import importlib
 import pandas as pd
 import logging
@@ -53,12 +54,14 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
                     api_name_suffix = api_name.split('.')[-1]
                     api_columns = list(api_response_data.columns.get_level_values(0).unique())
                     api_dates = list(api_response_data.index.astype(str).unique())
-                    api_cells = list(api_response_data.columns.get_level_values(1).unique().astype(str))
+                    api_dates = [api_dates[0],api_dates[-1]]
+                    api_cells = list(api_response_data.columns.get_level_values(1).unique())
+                    bbox = extract_bbox(api_cells)
                     api_metadata.append({
                         "api_name": api_name_suffix,
                         "columns": api_columns,
-                        "dates": api_dates,
-                        "cells": api_cells,
+                        "dates_range": api_dates,
+                        "bounding_box (NSEW)": bbox,
                         "status": "success" if isinstance(api_response_data, pd.DataFrame) else "failure",
                         "error": str(e) if "e" in locals() else None  # Add error details if any
                     })
@@ -90,5 +93,5 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
         return pd.DataFrame()
 
 
-asyncio.run(read_data((51.09, 50.00, 14.56, 14.14), 10, '2017-01-10', '2017-01-12', ['temperature', 'precipitation'],
+asyncio.run(read_data((51.09, 40.00, 15.56, 1.14), 10, '2017-01-01', '2017-01-02', ['temperature'],
                       separate_api=False, interpolation=True))
