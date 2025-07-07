@@ -74,6 +74,10 @@ async def read_data_endpoint(
             result = await read_data(bounding_box, level, time_from, time_to, factors,
                                  separate_api=separate_api, interpolation=interpolation
                                  )
+            if not result:
+                yield "No data in requested boundaries...\n\n"
+                return
+
             df = result['data']
             metadata = result['metadata']
 
