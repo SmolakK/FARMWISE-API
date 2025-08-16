@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from routers.data_call import api_router
 from routers.auth import auth_router
+from routers.frontpage import frontpage_router
 from security import setup_security
 from scheduler import start_scheduler, shutdown_scheduler
 from logging_config import logger
@@ -8,7 +9,7 @@ from user_database import engine, Base
 import tempfile
 import shutil
 from contextlib import asynccontextmanager
-import os
+from fastapi.staticfiles import StaticFiles
 
 # Create the database tables
 Base.metadata.create_all(bind=engine)
@@ -20,7 +21,6 @@ logger.info(f"Using fixed temporary directory: {FIXED_TEMP_DIR}")
 
 # temp_dir = tempfile.mkdtemp()
 # logger.info(f"Temporary directory created at {temp_dir}")
-
 
 # Define the lifespan context manager
 @asynccontextmanager
@@ -44,6 +44,9 @@ app = FastAPI(lifespan=lifespan)
 # Include API routers
 app.include_router(api_router)
 app.include_router(auth_router)
+app.include_router(frontpage_router)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Setup security configurations
 setup_security(app)

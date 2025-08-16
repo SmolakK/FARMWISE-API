@@ -28,3 +28,4 @@ API_readers/soilgrids/temp_storage/out_bdod.tif
 API_readers/soilgrids/temp_storage/out.tif
 API_readers/cds/temp_storage/reanalysis-era5-single-levels_temp_data.nc
 API_readers/soilgrids/temp_storage/out.tif
+*.env

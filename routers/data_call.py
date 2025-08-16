@@ -9,6 +9,7 @@ from logging_config import logger
 from security import limiter, get_current_active_user
 import asyncio
 import json
+from utils.email_utils import send_email
 
 api_router = APIRouter()
 
@@ -30,12 +31,69 @@ async def monitor_client_disconnection(request: Request, stop_event: asyncio.Eve
     raise HTTPException(status_code=499, detail="Client disconnected")
 
 
-@api_router.post("/read-data", response_model=ReadDataResponse)
+# BACKGROUND PROCESS BACKUP
+async def process_and_send_email(request_body, request, user_email):
+    logger.info('Started processing background email task')
+    try:
+        boundingbox = getattr(request_body, 'bounding_box', None)
+        countries = getattr(request_body, 'country', None)
+        level = request_body.level
+        time_from = request_body.time_from
+        time_to = request_body.time_to
+        factors = request_body.factors
+        separate_api = getattr(request_body, 'separate_api', False)
+        interpolation = getattr(request_body, 'interpolation', False)
+
+        result = await read_data(
+            bounding_box=boundingbox,
+            country=countries,
+            level=level,
+            time_from=time_from,
+            time_to=time_to,
+            factors=factors,
+            separate_api=separate_api,
+            interpolation=interpolation
+        )
+
+        if not result:
+            send_email(user_email, "Data Processing Failed", "No data available for the selected parameters.")
+            return
+
+        df = result['data']
+        metadata = result['metadata']
+
+        temp_dir = request.app.state.temp_dir
+
+        # Save CSV
+        data_file = tempfile.NamedTemporaryFile(delete=False, suffix=".csv", mode='w+', dir=temp_dir)
+        df.to_csv(data_file.name, index=True)
+        data_file.close()
+
+        # Save metadata
+        metadata_file = tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode='w+', dir=temp_dir)
+        with open(metadata_file.name, 'w') as mf:
+            json.dump(metadata, mf, indent=4)
+        metadata_file.close()
+
+        # Generate download links
+        base_url = str(request.base_url).rstrip('/')
+        data_download_link = f"{base_url}/download/{os.path.basename(data_file.name)}"
+        metadata_download_link = f"{base_url}/download/{os.path.basename(metadata_file.name)}"
+
+        # Send the email
+        email_content = f"Your data file is ready for download:\n\nData File: {data_download_link}\nMetadata File: {metadata_download_link}"
+        send_email(user_email, "Your Data is Ready", email_content)
+
+    except Exception as e:
+        logger.error(f"Error in background processing: {e}")
+        send_email(user_email, "Data Processing Failed", "An internal error occurred during data processing.")
+
+
+@api_router.post("/read-data")
 @limiter.limit("5/minute")
 async def read_data_endpoint(
         request_body: ReadDataRequest,
         request: Request,
-        background_tasks: BackgroundTasks,
         current_user: User = Depends(get_current_active_user)
                              ):
     """
@@ -50,78 +108,69 @@ async def read_data_endpoint(
     :raises HTTPException: Raises an error if there are issues during processing or file creation.
     :return: An instance of ReadDataResponse containing the download link for the generated CSV file.
     """
-    stop_event = asyncio.Event()
+    try:
+        logger.info('Started processing data')
 
-    # Add client disconnection monitor as a background task
-    background_tasks.add_task(monitor_client_disconnection, request, stop_event)
+        result = await read_data(
+            bounding_box=getattr(request_body, 'bounding_box', None),
+            country=getattr(request_body, 'country', None),
+            level=request_body.level,
+            time_from=request_body.time_from,
+            time_to=request_body.time_to,
+            factors=request_body.factors,
+            separate_api=request_body.separate_api,
+            interpolation=request_body.interpolation
+        )
 
-    async def stream_progress():
-        try:
-            # Convert the request model to the format expected by read_data function
-            bounding_box = request_body.bounding_box
-            level = request_body.level
-            time_from = request_body.time_from
-            time_to = request_body.time_to
-            factors = request_body.factors
+        if not result:
+            logger.error("No data found for the selected parameters.")
+            return {"status": "failure", "message": "No data available for the selected parameters."}
 
-            # New parameters from request_body, with default values if not specified
-            separate_api = request_body.separate_api if hasattr(request_body, 'separate_api') else False
-            interpolation = request_body.interpolation if hasattr(request_body, 'interpolation') else False
+        df = result['data']
+        metadata = result['metadata']
 
-            yield "Starting data processing...\n\n"
+        temp_dir = request.app.state.temp_dir
 
-            # Call the read_data function
-            result = await read_data(bounding_box, level, time_from, time_to, factors,
-                                 separate_api=separate_api, interpolation=interpolation
-                                 )
-            if not result:
-                yield "No data in requested boundaries...\n\n"
-                return
+        # Save CSV
+        data_file = tempfile.NamedTemporaryFile(delete=False, suffix=".csv", mode='w+', dir=temp_dir)
+        df.to_csv(data_file.name, index=True)
+        data_file.close()
 
-            df = result['data']
-            metadata = result['metadata']
+        # Save metadata
+        metadata_file = tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode='w+', dir=temp_dir)
+        with open(metadata_file.name, 'w') as mf:
+            json.dump(metadata, mf, indent=4)
+        metadata_file.close()
 
-            # Finalize the processing
-            yield "Data processing completed. Generating CSV file...\n\n"
+        # Generate download links
+        base_url = str(request.base_url).rstrip('/')
+        data_download_link = f"{base_url}/download/{os.path.basename(data_file.name)}"
+        metadata_download_link = f"{base_url}/download/{os.path.basename(metadata_file.name)}"
 
-            # Use the temporary directory from the application state
-            temp_dir = request.app.state.temp_dir
+        # Send the email
+        email_content = (
+            f"Your data file is ready for download:\n\n"
+            f"Data File: {data_download_link}\n"
+            f"Metadata File: {metadata_download_link}\n\n"
+            f"Your request details:\n"
+            f"- Time Range: {request_body.time_from} to {request_body.time_to}\n"
+            f"- Level: {request_body.level}\n"
+            f"- Factors: {', '.join(request_body.factors)}\n"
+            f"- Location Mode: {'Country: ' + ', '.join(request_body.country) if hasattr(request_body, 'country') and request_body.country else 'Bounding Box: ' + str(request_body.bounding_box)}\n\n"
+            f"DO NOT RESPOND TO THIS EMAIL\n"
+        )
+        send_email(current_user.email, "Your Data is Ready", email_content)
 
-            # Data CSV
-            data_file = tempfile.NamedTemporaryFile(delete=False, suffix=".csv", mode='w+', dir=temp_dir)
-            df.to_csv(data_file.name, index=True)
-            data_file.close()
+        # Return success response
+        return "Data processing completed successfully. A download link has been sent to your email."
 
-            # Metadata JSON
-            metadata_file = tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode='w+', dir=temp_dir)
-            with open(metadata_file.name, 'w') as mf:
-                json.dump(metadata, mf, indent=4)
-            metadata_file.close()
-
-            # Generate download links
-            base_url = str(request.base_url).rstrip('/')
-            data_download_link = f"{base_url}/download/{os.path.basename(data_file.name)}"
-            metadata_download_link = f"{base_url}/download/{os.path.basename(metadata_file.name)}"
-
-            download_link = f"{str(request.base_url).rstrip('/')}/download/{os.path.basename(data_file.name)}"
-
-            yield f"Data file available for download: {data_download_link}\n"
-            yield f"Metadata file available for download: {metadata_download_link}\n\n"
-
-        except Exception as e:
-            logger.error(f"Error processing request: {e}")
-            raise HTTPException(status_code=500, detail="Internal Server Error")
-        finally:
-            # Signal that the main task is completed
-            stop_event.set()
-
-    return StreamingResponse(stream_progress(), media_type="text/plain")
+    except Exception as e:
+        logger.error(f"Error in processing: {e}")
+        return "ERROR: there was an error when processing your request. Try different parameters."
 
 
 @api_router.get("/download/{file_name}")
-async def download_file(file_name: str, background_tasks: BackgroundTasks, request: Request,
-                        current_user: User = Depends(get_current_active_user),
-                        ):
+async def download_file(file_name: str, background_tasks: BackgroundTasks, request: Request):
     """
     Downloads a file from the server after validating the filename to prevent directory traversal attacks.
 

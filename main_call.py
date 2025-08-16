@@ -1,16 +1,20 @@
 from mappings.data_source_mapping import API_PATH_RANGES
 from utils.overlap_checks import spatial_ranges_overlap, time_ranges_overlap
 from utils.interpolate_data import interpolate
+from utils.cells_to_coordinates import extract_bbox
+from utils.country_bboxes import return_country_bboxes
+from utils.merge_bboxes import merge_bounding_boxes
 import importlib
 import pandas as pd
 import logging
 import asyncio
 
 logger = logging.getLogger(__name__)
+COUNTRY_BBOXES = return_country_bboxes()
 
 
-async def read_data(bounding_box, level, time_from, time_to, factors, separate_api=False, timeout=600,
-                    interpolation=False):
+async def read_data(bounding_box=None, country=None, level=None, time_from=None, time_to=None,
+                    factors=None, separate_api=False, timeout=600, interpolation=False):
     """
     Main data reading call - combines different APIs which overlap with the requested area and time range.
 
@@ -34,6 +38,22 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
     """
     data_storage = []  # This will store data called from different APIs
     api_metadata = []
+
+    if country is not None:
+        if isinstance(country, str):
+            country = [country]  # Support single country input
+
+        selected_bboxes = []
+        for c in country:
+            if c not in COUNTRY_BBOXES:
+                raise ValueError(f"Country '{c}' not found in country bounding boxes.")
+            selected_bboxes.append(COUNTRY_BBOXES[c])
+        bounding_box = merge_bounding_boxes(selected_bboxes)
+        logger.info(f"Using merged bounding box {bounding_box} for countries: {country}")
+
+    elif bounding_box is None:
+        raise ValueError("You must provide either a 'bounding_box' or a 'country' parameter.")
+
     for api_name, ranges in API_PATH_RANGES.items():  # Iterate over API ranges
         api_spatial_range = ranges[0]  # Spatial range
         api_time_range = ranges[1]  # Temporal range
@@ -53,12 +73,14 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
                     api_name_suffix = api_name.split('.')[-1]
                     api_columns = list(api_response_data.columns.get_level_values(0).unique())
                     api_dates = list(api_response_data.index.astype(str).unique())
-                    api_cells = list(api_response_data.columns.get_level_values(1).unique().astype(str))
+                    api_dates = [api_dates[0],api_dates[-1]]
+                    api_cells = list(api_response_data.columns.get_level_values(1).unique())
+                    bbox = extract_bbox(api_cells)
                     api_metadata.append({
                         "api_name": api_name_suffix,
                         "columns": api_columns,
-                        "dates": api_dates,
-                        "cells": api_cells,
+                        "dates_range": api_dates,
+                        "bounding_box (NSEW)": bbox,
                         "status": "success" if isinstance(api_response_data, pd.DataFrame) else "failure",
                         "error": str(e) if "e" in locals() else None  # Add error details if any
                     })
@@ -90,5 +112,8 @@ async def read_data(bounding_box, level, time_from, time_to, factors, separate_a
         return False
 
 
-# asyncio.run(read_data((51.09, 50.00, 14.56, 14.14), 10, '2017-01-10', '2017-01-12', ['temperature', 'precipitation'],
-#                       separate_api=False, interpolation=True))
+# Example using bounding box
+# asyncio.run(read_data(bounding_box=(51.09, 50.00, 14.56, 14.14), level=10, time_from='2017-01-10', time_to='2017-01-12', factors=['temperature', 'precipitation']))
+
+# Example using country
+# asyncio.run(read_data(country='Poland', level=10, time_from='2017-01-10', time_to='2017-01-12', factors=['temperature', 'precipitation']))
