@@ -10,10 +10,14 @@ valid_factors = set(
 
 
 class ReadDataRequest(BaseModel):
-    bounding_box: Tuple[float, float, float, float] = Field(
-        ...,
+    bounding_box: Optional[Tuple[float, float, float, float]] = Field(
+        None,
         example=(34.0, -118.0, 35.0, -117.0),
         description="Tuple of (North, South, East, West) coordinates in decimal degrees."
+    )
+    country: Optional[List[str]] = Field(
+        None,
+        description="List of country names. Used as an alternative to bounding box."
     )
     level: int = Field(
         ...,
@@ -55,6 +59,8 @@ class ReadDataRequest(BaseModel):
 
     @field_validator("bounding_box")
     def validate_bounding_box(cls, value):
+        if value is None:
+            return value  # Allow None if user selects country
         if not (len(value) == 4 and all(isinstance(num, (int, float)) for num in value)):
             raise ValueError("Bounding box must be a tuple of four float or int values.")
         if not (value[0] > value[1] and value[2] > value[3]):
