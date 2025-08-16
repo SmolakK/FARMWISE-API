@@ -15,14 +15,6 @@ import os
 # Create the database tables
 Base.metadata.create_all(bind=engine)
 
-# Create a temporary directory for the application
-FIXED_TEMP_DIR = r'C:\Users\farmwise\AppData\Local\Temp\3'
-os.makedirs(FIXED_TEMP_DIR, exist_ok=True)
-logger.info(f"Using fixed temporary directory: {FIXED_TEMP_DIR}")
-
-# temp_dir = tempfile.mkdtemp()
-# logger.info(f"Temporary directory created at {temp_dir}")
-
 # Define the lifespan context manager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,7 +23,7 @@ async def lifespan(app: FastAPI):
         static_temp_dir = os.path.abspath("temp_files")
         os.makedirs(static_temp_dir, exist_ok=True)
         app.state.temp_dir = static_temp_dir
-        start_scheduler(temp_dir)
+        start_scheduler(static_temp_dir)
         yield
     finally:
         # Shutdown logic
