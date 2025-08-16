@@ -16,9 +16,12 @@ import os
 Base.metadata.create_all(bind=engine)
 
 # Create a temporary directory for the application
-temp_dir = tempfile.mkdtemp()
-logger.info(f"Temporary directory created at {temp_dir}")
+FIXED_TEMP_DIR = r'C:\Users\farmwise\AppData\Local\Temp\3'
+os.makedirs(FIXED_TEMP_DIR, exist_ok=True)
+logger.info(f"Using fixed temporary directory: {FIXED_TEMP_DIR}")
 
+# temp_dir = tempfile.mkdtemp()
+# logger.info(f"Temporary directory created at {temp_dir}")
 
 # Define the lifespan context manager
 @asynccontextmanager
