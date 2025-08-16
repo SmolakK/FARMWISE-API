@@ -145,7 +145,7 @@ async def download_file(file_name: str, background_tasks: BackgroundTasks, reque
             raise HTTPException(status_code=404, detail="File not found")
 
         # Serve the file securely
-        background_tasks.add_task(os.unlink, file_path)
+        # background_tasks.add_task(os.unlink, file_path)
         return FileResponse(path=file_path, media_type='application/octet-stream', filename=safe_file_name)
 
     except ValueError as e:

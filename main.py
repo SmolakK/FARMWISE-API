@@ -8,13 +8,18 @@ from user_database import engine, Base
 import tempfile
 import shutil
 from contextlib import asynccontextmanager
+import os
 
 # Create the database tables
 Base.metadata.create_all(bind=engine)
 
 # Create a temporary directory for the application
-temp_dir = tempfile.mkdtemp()
-logger.info(f"Temporary directory created at {temp_dir}")
+FIXED_TEMP_DIR = r'C:\Users\farmwise\AppData\Local\Temp\3'
+os.makedirs(FIXED_TEMP_DIR, exist_ok=True)
+logger.info(f"Using fixed temporary directory: {FIXED_TEMP_DIR}")
+
+# temp_dir = tempfile.mkdtemp()
+# logger.info(f"Temporary directory created at {temp_dir}")
 
 
 # Define the lifespan context manager
@@ -22,8 +27,8 @@ logger.info(f"Temporary directory created at {temp_dir}")
 async def lifespan(app: FastAPI):
     try:
         # Startup logic
-        app.state.temp_dir = temp_dir
-        start_scheduler(temp_dir)
+        app.state.temp_dir = FIXED_TEMP_DIR
+        start_scheduler(FIXED_TEMP_DIR)
         yield
     finally:
         # Shutdown logic
