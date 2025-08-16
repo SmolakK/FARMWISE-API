@@ -54,5 +54,6 @@ if __name__ == "__main__":
         "main:app",  # Specify the module and app
         host="0.0.0.0",
         port=8000,
-        workers=4  # Number of worker processes
+        workers=4,  # Number of worker processes
+        proxy_headers=True
     )
