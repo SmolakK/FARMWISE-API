@@ -161,6 +161,8 @@ async def secured_frontend_page():
 
             async function submitForm(event) {
                 event.preventDefault();
+                
+                document.getElementById('result').innerText = 'Submitted';
 
                 console.log('submitForm triggered');
 
@@ -292,7 +294,7 @@ async def api_call_page(current_user: User = Depends(get_current_active_user)):
         <input type="button" value="Logout" onclick="logout()" style="margin-top: 10px;">
     </form>
 
-    <pre id="result">Message prompt</pre>
+    <pre id="result">Here you will find submit confirmation or error message in case of failure.</pre>
     """
 
     return HTMLResponse(content=html_content)

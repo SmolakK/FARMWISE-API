@@ -10,7 +10,7 @@ import tempfile
 import shutil
 from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
-
+import os
 
 # Create the database tables
 Base.metadata.create_all(bind=engine)
@@ -25,7 +25,9 @@ logger.info(f"Temporary directory created at {temp_dir}")
 async def lifespan(app: FastAPI):
     try:
         # Startup logic
-        app.state.temp_dir = temp_dir
+        static_temp_dir = os.path.abspath("temp_files")
+        os.makedirs(static_temp_dir, exist_ok=True)
+        app.state.temp_dir = static_temp_dir
         start_scheduler(temp_dir)
         yield
     finally:
