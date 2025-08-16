@@ -10,6 +10,7 @@ from security import limiter, get_current_active_user
 import asyncio
 import json
 from utils.email_utils import send_email
+from dotenv import load_dotenv
 
 api_router = APIRouter()
 
@@ -76,7 +77,8 @@ async def process_and_send_email(request_body, request, user_email):
         metadata_file.close()
 
         # Generate download links
-        base_url = str(request.base_url).rstrip('/')
+        load_dotenv('public_host.env')
+        base_url = os.getenv("PUBLIC_BASE_URL")
         data_download_link = f"{base_url}/download/{os.path.basename(data_file.name)}"
         metadata_download_link = f"{base_url}/download/{os.path.basename(metadata_file.name)}"
 
@@ -143,7 +145,8 @@ async def read_data_endpoint(
         metadata_file.close()
 
         # Generate download links
-        base_url = str(request.base_url).rstrip('/')
+
+        base_url = str(request.base_url).replace("http://", "https://").rstrip('/')
         data_download_link = f"{base_url}/download/{os.path.basename(data_file.name)}"
         metadata_download_link = f"{base_url}/download/{os.path.basename(metadata_file.name)}"
 
