@@ -178,7 +178,7 @@ async def secured_frontend_page():
                 var factors = Array.from(document.getElementById("factors").selectedOptions).map(option => option.value);
 
                 var payload = {
-                    level: 10,
+                    level: parseInt(document.getElementById("s2_level").value),
                     time_from: document.getElementById("from").value,
                     time_to: document.getElementById("to").value,
                     factors: factors,
@@ -245,56 +245,155 @@ async def api_call_page(current_user: User = Depends(get_current_active_user)):
     factor_options = "".join([f'<option value="{f}">{f}</option>' for f in available_factors])
 
     html_content = f"""
+    <html>
+    <head>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                background-color: #f5f5f5;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                min-height: 100vh;
+            }}
+            form {{
+                background: #fff;
+                padding: 20px;
+                margin: 20px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                max-width: 600px;
+                width: 100%;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }}
+            h2 {{
+                grid-column: span 2;
+                text-align: center;
+            }}
+            label {{
+                font-weight: bold;
+                display: block;
+                margin-bottom: 4px;
+            }}
+            select, input[type="text"], input[type="number"], input[type="submit"], input[type="button"] {{
+                width: 100%;
+                padding: 6px;
+                margin-top: 2px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }}
+            .bbox-container {{
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }}
+            .bbox-container label {{
+                flex: 1 1 45%;
+            }}
+            .time-container {{
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }}
+            .buttons {{
+                grid-column: span 2;
+                display: flex;
+                gap: 12px;
+                justify-content: center;
+            }}
+            pre {{
+                grid-column: span 2;
+                background: #f0f0f0;
+                padding: 10px;
+                border-radius: 6px;
+                overflow-x: auto;
+            }}
+            /* Make it stack on small screens */
+            @media (max-width: 700px) {{
+                form {{
+                    grid-template-columns: 1fr;
+                }}
+                .buttons {{
+                    flex-direction: column;
+                }}
+            }}
+        </style>
+    </head>
+    <body>
     <form id="apiForm" action="javascript:void(0);">
-        <h2 style="text-align:center;">FARMWISE API</h2>
+        <h2>FARMWISE API</h2>
 
-        <!-- Toggle between Country and Bounding Box -->
-        <input type="radio" id="use_country" name="location_mode" value="country" checked>
-        <label for="use_country">Select by Country</label><br>
+        <!-- Location mode -->
+        <div style="grid-column: span 2;">
+            <input type="radio" id="use_country" name="location_mode" value="country" checked>
+            <label for="use_country">Select by Country</label>
 
-        <input type="radio" id="use_bbox" name="location_mode" value="bbox">
-        <label for="use_bbox">Select by Bounding Box</label><br><br>
+            <input type="radio" id="use_bbox" name="location_mode" value="bbox">
+            <label for="use_bbox">Select by Bounding Box</label>
+        </div>
 
         <!-- Country selection -->
-        <label for="country">Select countries:</label><br>
-        <select id="country_select" name="country" multiple size="10">
-            {country_options}
-        </select><br><br>
-
-        <!-- Bounding box input -->
-        <label>Bounding Box (N, S, E, W):</label><br>
-        <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px;">
-            <label>N: <input type="text" id="bbox_n" name="bbox_n" disabled style="width: 50px;"></label>
-            <label>S: <input type="text" id="bbox_s" name="bbox_s" disabled style="width: 50px;"></label>
-            <label>E: <input type="text" id="bbox_e" name="bbox_e" disabled style="width: 50px;"></label>
-            <label>W: <input type="text" id="bbox_w" name="bbox_w" disabled style="width: 50px;"></label>
-        </div><br>
-
+        <div>
+            <label for="country_select">Select countries:</label>
+            <select id="country_select" name="country" multiple size="6">
+                {country_options}
+            </select>
+        </div>
 
         <!-- Factors selection -->
-        <label for="factors">Select Factors:</label><br>
-        <select id="factors" name="factors" multiple size="10">
-            {factor_options}
-        </select><br><br>
+        <div>
+            <label for="factors">Select Factors:</label>
+            <select id="factors" name="factors" multiple size="6">
+                {factor_options}
+            </select>
+        </div>
+
+        <!-- Bounding box input -->
+        <div style="grid-column: span 2;">
+            <label>Bounding Box (N, S, E, W):</label>
+            <div class="bbox-container">
+                <label>N: <input type="text" id="bbox_n" name="bbox_n" disabled></label>
+                <label>S: <input type="text" id="bbox_s" name="bbox_s" disabled></label>
+                <label>E: <input type="text" id="bbox_e" name="bbox_e" disabled></label>
+                <label>W: <input type="text" id="bbox_w" name="bbox_w" disabled></label>
+            </div>
+        </div>
 
         <!-- Time selection -->
-        <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;">
-            <div style="flex: 1;">
-                <label for="from">From (YYYY-MM-DD):</label><br>
-                <input type="text" id="from" name="time_from" value="2017-01-10" style="width: 100%;">
-            </div>
-            <div style="flex: 1;">
-                <label for="to">To (YYYY-MM-DD):</label><br>
-                <input type="text" id="to" name="time_to" value="2017-01-12" style="width: 100%;">
-            </div>
-        </div><br>
+        <div class="time-container">
+            <label for="from">From (YYYY-MM-DD):</label>
+            <input type="text" id="from" name="time_from" value="2017-01-10">
+        </div>
+        <div class="time-container">
+            <label for="to">To (YYYY-MM-DD):</label>
+            <input type="text" id="to" name="time_to" value="2017-01-12">
+        </div>
 
+        <!-- S2 Level selection -->
+        <div style="grid-column: span 2;">
+            <label for="s2_level">
+                S2 Level (geographic resolution)
+                <a href="http://s2geometry.io/resources/s2cell_statistics.html" target="_blank">[?]</a>
+            </label>
+            <input type="number" id="s2_level" name="s2_level" min="2" max="14" value="10">
+        </div>
 
-        <input type="submit" value="Submit to FARMWISE API">
-        <input type="button" value="Logout" onclick="logout()" style="margin-top: 10px;">
+        <!-- Buttons -->
+        <div class="buttons">
+            <input type="submit" value="Submit to FARMWISE API">
+            <input type="button" value="Logout" onclick="logout()">
+        </div>
+
+        <pre id="result">Here you will find submit confirmation or error message in case of failure.</pre>
     </form>
-
-    <pre id="result">Here you will find submit confirmation or error message in case of failure.</pre>
+    </body>
+    </html>
     """
 
     return HTMLResponse(content=html_content)
+
