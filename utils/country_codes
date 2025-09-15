@@ -1,0 +1,7051 @@
+{
+  "aw": {
+    "name": "Aruba",
+    "alpha-2": "AW",
+    "alpha-3": "ABW",
+    "country-code": "533",
+    "iso_3166-2": "ISO 3166-2:AW",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+297",
+    "geonameid": "3577279",
+    "capital": "Oranjestad",
+    "currency": "Guilder",
+    "language-codes": "nl-AW,es,en",
+    "area-km2": "193",
+    "gdp": "2516000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 12.1702998,
+        "lon": -70.2809842
+      },
+      "ne": {
+        "lat": 12.8102998,
+        "lon": -69.6409842
+      }
+    }
+  },
+  "af": {
+    "name": "Afghanistan",
+    "alpha-2": "AF",
+    "alpha-3": "AFG",
+    "country-code": "004",
+    "iso_3166-2": "ISO 3166-2:AF",
+    "region": "Asia",
+    "sub-region": "Southern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "034",
+    "intermediate-region-code": "",
+    "dial_code": "+93",
+    "geonameid": "1149361",
+    "capital": "Kabul",
+    "currency": "Afghani",
+    "language-codes": "fa-AF,ps,uz-AF,tk",
+    "area-km2": "647500",
+    "gdp": "20650000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 29.3772,
+        "lon": 60.5176034
+      },
+      "ne": {
+        "lat": 38.4910682,
+        "lon": 74.889862
+      }
+    }
+  },
+  "ao": {
+    "name": "Angola",
+    "alpha-2": "AO",
+    "alpha-3": "AGO",
+    "country-code": "024",
+    "iso_3166-2": "ISO 3166-2:AO",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Middle Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "017",
+    "dial_code": "+244",
+    "geonameid": "3351879",
+    "capital": "Luanda",
+    "currency": "Kwanza",
+    "language-codes": "pt-AO",
+    "area-km2": "1246700",
+    "gdp": "124000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -18.038945,
+        "lon": 11.4609793
+      },
+      "ne": {
+        "lat": -4.3880634,
+        "lon": 24.0878856
+      }
+    }
+  },
+  "ai": {
+    "name": "Anguilla",
+    "alpha-2": "AI",
+    "alpha-3": "AIA",
+    "country-code": "660",
+    "iso_3166-2": "ISO 3166-2:AI",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1264",
+    "geonameid": "3573511",
+    "capital": "The Valley",
+    "currency": "Dollar",
+    "language-codes": "en-AI",
+    "area-km2": "102",
+    "gdp": "175400000",
+    "boundingBox": {
+      "sw": {
+        "lat": 18.0615454,
+        "lon": -63.6391992
+      },
+      "ne": {
+        "lat": 18.7951194,
+        "lon": -62.7125449
+      }
+    }
+  },
+  "al": {
+    "name": "Albania",
+    "alpha-2": "AL",
+    "alpha-3": "ALB",
+    "country-code": "008",
+    "iso_3166-2": "ISO 3166-2:AL",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+355",
+    "geonameid": "783754",
+    "capital": "Tirana",
+    "currency": "Lek",
+    "language-codes": "sq,el",
+    "area-km2": "28748",
+    "gdp": "12800000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 39.6448625,
+        "lon": 19.1246095
+      },
+      "ne": {
+        "lat": 42.6610848,
+        "lon": 21.0574335
+      }
+    }
+  },
+  "ad": {
+    "name": "Andorra",
+    "alpha-2": "AD",
+    "alpha-3": "AND",
+    "country-code": "020",
+    "iso_3166-2": "ISO 3166-2:AD",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+376",
+    "geonameid": "3041565",
+    "capital": "Andorra la Vella",
+    "currency": "Euro",
+    "language-codes": "ca",
+    "area-km2": "468",
+    "gdp": "4800000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 42.4288238,
+        "lon": 1.4135781
+      },
+      "ne": {
+        "lat": 42.6559357,
+        "lon": 1.7863837
+      }
+    }
+  },
+  "ae": {
+    "name": "United Arab Emirates",
+    "alpha-2": "AE",
+    "alpha-3": "ARE",
+    "country-code": "784",
+    "iso_3166-2": "ISO 3166-2:AE",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+971",
+    "geonameid": "290557",
+    "capital": "Abu Dhabi",
+    "currency": "Dirham",
+    "language-codes": "ar-AE,fa,en,hi,ur",
+    "area-km2": "82880",
+    "gdp": "390000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 22.6444,
+        "lon": 51.498
+      },
+      "ne": {
+        "lat": 26.2822,
+        "lon": 56.3834
+      }
+    }
+  },
+  "ar": {
+    "name": "Argentina",
+    "alpha-2": "AR",
+    "alpha-3": "ARG",
+    "country-code": "032",
+    "iso_3166-2": "ISO 3166-2:AR",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+54",
+    "geonameid": "3865483",
+    "capital": "Buenos Aires",
+    "currency": "Peso",
+    "language-codes": "es-AR,en,it,de,fr,gn",
+    "area-km2": "2766890",
+    "gdp": "484600000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -55.1850761,
+        "lon": -73.5600329
+      },
+      "ne": {
+        "lat": -21.781168,
+        "lon": -53.6374515
+      }
+    }
+  },
+  "am": {
+    "name": "Armenia",
+    "alpha-2": "AM",
+    "alpha-3": "ARM",
+    "country-code": "051",
+    "iso_3166-2": "ISO 3166-2:AM",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+374",
+    "geonameid": "174982",
+    "capital": "Yerevan",
+    "currency": "Dram",
+    "language-codes": "hy",
+    "area-km2": "29800",
+    "gdp": "10440000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 38.8404775,
+        "lon": 43.4471395
+      },
+      "ne": {
+        "lat": 41.300712,
+        "lon": 46.6333087
+      }
+    }
+  },
+  "as": {
+    "name": "American Samoa",
+    "alpha-2": "AS",
+    "alpha-3": "ASM",
+    "country-code": "016",
+    "iso_3166-2": "ISO 3166-2:AS",
+    "region": "Oceania",
+    "sub-region": "Polynesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "061",
+    "intermediate-region-code": "",
+    "dial_code": "+1684",
+    "geonameid": "5880801",
+    "capital": "Pago Pago",
+    "currency": "Dollar",
+    "language-codes": "en-AS,sm,to",
+    "area-km2": "199",
+    "gdp": "462200000",
+    "boundingBox": {
+      "sw": {
+        "lat": -14.7608358,
+        "lon": -171.2951296
+      },
+      "ne": {
+        "lat": -10.8449746,
+        "lon": -167.9322899
+      }
+    }
+  },
+  "aq": {
+    "name": "Antarctica",
+    "alpha-2": "AQ",
+    "alpha-3": "ATA",
+    "country-code": "010",
+    "iso_3166-2": "ISO 3166-2:AQ",
+    "region": "",
+    "sub-region": "",
+    "intermediate-region": "",
+    "region-code": "",
+    "sub-region-code": "",
+    "intermediate-region-code": "",
+    "dial_code": "+672",
+    "geonameid": "6697173",
+    "capital": "",
+    "currency": "",
+    "language-codes": "",
+    "area-km2": "14000000",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": -85.0511287,
+        "lon": -180.0
+      },
+      "ne": {
+        "lat": -60.0,
+        "lon": 180.0
+      }
+    }
+  },
+  "ag": {
+    "name": "Antigua and Barbuda",
+    "alpha-2": "AG",
+    "alpha-3": "ATG",
+    "country-code": "028",
+    "iso_3166-2": "ISO 3166-2:AG",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1268",
+    "geonameid": "3576396",
+    "capital": "St. John's",
+    "currency": "Dollar",
+    "language-codes": "en-AG",
+    "area-km2": "443",
+    "gdp": "1220000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 16.7573901,
+        "lon": -62.5536517
+      },
+      "ne": {
+        "lat": 17.929,
+        "lon": -61.447857
+      }
+    }
+  },
+  "au": {
+    "name": "Australia",
+    "alpha-2": "AU",
+    "alpha-3": "AUS",
+    "country-code": "036",
+    "iso_3166-2": "ISO 3166-2:AU",
+    "region": "Oceania",
+    "sub-region": "Australia and New Zealand",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "053",
+    "intermediate-region-code": "",
+    "dial_code": "+61",
+    "geonameid": "2077456",
+    "capital": "Canberra",
+    "currency": "Dollar",
+    "language-codes": "en-AU",
+    "area-km2": "7686850",
+    "gdp": "1488000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -55.3228175,
+        "lon": 72.2460938
+      },
+      "ne": {
+        "lat": -9.0882278,
+        "lon": 168.2249543
+      }
+    }
+  },
+  "at": {
+    "name": "Austria",
+    "alpha-2": "AT",
+    "alpha-3": "AUT",
+    "country-code": "040",
+    "iso_3166-2": "ISO 3166-2:AT",
+    "region": "Europe",
+    "sub-region": "Western Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "155",
+    "intermediate-region-code": "",
+    "dial_code": "+43",
+    "geonameid": "2782113",
+    "capital": "Vienna",
+    "currency": "Euro",
+    "language-codes": "de-AT,hr,hu,sl",
+    "area-km2": "83858",
+    "gdp": "417900000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 46.3722761,
+        "lon": 9.5307487
+      },
+      "ne": {
+        "lat": 49.0205305,
+        "lon": 17.160776
+      }
+    }
+  },
+  "az": {
+    "name": "Azerbaijan",
+    "alpha-2": "AZ",
+    "alpha-3": "AZE",
+    "country-code": "031",
+    "iso_3166-2": "ISO 3166-2:AZ",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+994",
+    "geonameid": "587116",
+    "capital": "Baku",
+    "currency": "Manat",
+    "language-codes": "az,ru,hy",
+    "area-km2": "86600",
+    "gdp": "76010000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 38.3929551,
+        "lon": 44.7633701
+      },
+      "ne": {
+        "lat": 41.9502947,
+        "lon": 51.0090302
+      }
+    }
+  },
+  "bi": {
+    "name": "Burundi",
+    "alpha-2": "BI",
+    "alpha-3": "BDI",
+    "country-code": "108",
+    "iso_3166-2": "ISO 3166-2:BI",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+257",
+    "geonameid": "433561",
+    "capital": "Bujumbura",
+    "currency": "Franc",
+    "language-codes": "fr-BI,rn",
+    "area-km2": "27830",
+    "gdp": "2676000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -4.4693155,
+        "lon": 29.0007401
+      },
+      "ne": {
+        "lat": -2.3096796,
+        "lon": 30.8498462
+      }
+    }
+  },
+  "be": {
+    "name": "Belgium",
+    "alpha-2": "BE",
+    "alpha-3": "BEL",
+    "country-code": "056",
+    "iso_3166-2": "ISO 3166-2:BE",
+    "region": "Europe",
+    "sub-region": "Western Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "155",
+    "intermediate-region-code": "",
+    "dial_code": "+32",
+    "geonameid": "2802361",
+    "capital": "Brussels",
+    "currency": "Euro",
+    "language-codes": "nl-BE,fr-BE,de-BE",
+    "area-km2": "30510",
+    "gdp": "507400000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 49.4969821,
+        "lon": 2.3889137
+      },
+      "ne": {
+        "lat": 51.5516667,
+        "lon": 6.408097
+      }
+    }
+  },
+  "bj": {
+    "name": "Benin",
+    "alpha-2": "BJ",
+    "alpha-3": "BEN",
+    "country-code": "204",
+    "iso_3166-2": "ISO 3166-2:BJ",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+229",
+    "geonameid": "2395170",
+    "capital": "Porto-Novo",
+    "currency": "Franc",
+    "language-codes": "fr-BJ",
+    "area-km2": "112620",
+    "gdp": "8359000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 6.0398696,
+        "lon": 0.776667
+      },
+      "ne": {
+        "lat": 12.4092447,
+        "lon": 3.843343
+      }
+    }
+  },
+  "bf": {
+    "name": "Burkina Faso",
+    "alpha-2": "BF",
+    "alpha-3": "BFA",
+    "country-code": "854",
+    "iso_3166-2": "ISO 3166-2:BF",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+226",
+    "geonameid": "2361809",
+    "capital": "Ouagadougou",
+    "currency": "Franc",
+    "language-codes": "fr-BF",
+    "area-km2": "274200",
+    "gdp": "12130000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 9.4104718,
+        "lon": -5.5132416
+      },
+      "ne": {
+        "lat": 15.084,
+        "lon": 2.4089717
+      }
+    }
+  },
+  "bd": {
+    "name": "Bangladesh",
+    "alpha-2": "BD",
+    "alpha-3": "BGD",
+    "country-code": "050",
+    "iso_3166-2": "ISO 3166-2:BD",
+    "region": "Asia",
+    "sub-region": "Southern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "034",
+    "intermediate-region-code": "",
+    "dial_code": "+880",
+    "geonameid": "1210997",
+    "capital": "Dhaka",
+    "currency": "Taka",
+    "language-codes": "bn-BD,en",
+    "area-km2": "144000",
+    "gdp": "140200000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 20.3756582,
+        "lon": 88.0075306
+      },
+      "ne": {
+        "lat": 26.6382534,
+        "lon": 92.6804979
+      }
+    }
+  },
+  "bg": {
+    "name": "Bulgaria",
+    "alpha-2": "BG",
+    "alpha-3": "BGR",
+    "country-code": "100",
+    "iso_3166-2": "ISO 3166-2:BG",
+    "region": "Europe",
+    "sub-region": "Eastern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "151",
+    "intermediate-region-code": "",
+    "dial_code": "+359",
+    "geonameid": "732800",
+    "capital": "Sofia",
+    "currency": "Lev",
+    "language-codes": "bg,tr-BG",
+    "area-km2": "110910",
+    "gdp": "53700000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 41.2353929,
+        "lon": 22.3571459
+      },
+      "ne": {
+        "lat": 44.2167064,
+        "lon": 28.8875409
+      }
+    }
+  },
+  "bh": {
+    "name": "Bahrain",
+    "alpha-2": "BH",
+    "alpha-3": "BHR",
+    "country-code": "048",
+    "iso_3166-2": "ISO 3166-2:BH",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+973",
+    "geonameid": "290291",
+    "capital": "Manama",
+    "currency": "Dinar",
+    "language-codes": "ar-BH,en,fa,ur",
+    "area-km2": "665",
+    "gdp": "28360000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 25.535,
+        "lon": 50.2697989
+      },
+      "ne": {
+        "lat": 26.6872444,
+        "lon": 50.9233693
+      }
+    }
+  },
+  "bs": {
+    "name": "Bahamas",
+    "alpha-2": "BS",
+    "alpha-3": "BHS",
+    "country-code": "044",
+    "iso_3166-2": "ISO 3166-2:BS",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1242",
+    "geonameid": "3572887",
+    "capital": "Nassau",
+    "currency": "Dollar",
+    "language-codes": "en-BS",
+    "area-km2": "13940",
+    "gdp": "8373000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 20.7059846,
+        "lon": -80.7001941
+      },
+      "ne": {
+        "lat": 27.4734551,
+        "lon": -72.4477521
+      }
+    }
+  },
+  "ba": {
+    "name": "Bosnia and Herzegovina",
+    "alpha-2": "BA",
+    "alpha-3": "BIH",
+    "country-code": "070",
+    "iso_3166-2": "ISO 3166-2:BA",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+387",
+    "geonameid": "3277605",
+    "capital": "Sarajevo",
+    "currency": "Marka",
+    "language-codes": "bs,hr-BA,sr-BA",
+    "area-km2": "51129",
+    "gdp": "18870000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 42.5553114,
+        "lon": 15.7287433
+      },
+      "ne": {
+        "lat": 45.2764135,
+        "lon": 19.6237311
+      }
+    }
+  },
+  "bl": {
+    "name": "Saint Barth\u00e9lemy",
+    "alpha-2": "BL",
+    "alpha-3": "BLM",
+    "country-code": "652",
+    "iso_3166-2": "ISO 3166-2:BL",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+590",
+    "geonameid": "3578476",
+    "capital": "Gustavia",
+    "currency": "Euro",
+    "language-codes": "fr",
+    "area-km2": "21",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": 17.670931,
+        "lon": -63.06639
+      },
+      "ne": {
+        "lat": 18.1375569,
+        "lon": -62.5844019
+      }
+    }
+  },
+  "by": {
+    "name": "Belarus",
+    "alpha-2": "BY",
+    "alpha-3": "BLR",
+    "country-code": "112",
+    "iso_3166-2": "ISO 3166-2:BY",
+    "region": "Europe",
+    "sub-region": "Eastern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "151",
+    "intermediate-region-code": "",
+    "dial_code": "+375",
+    "geonameid": "630336",
+    "capital": "Minsk",
+    "currency": "Ruble",
+    "language-codes": "be,ru",
+    "area-km2": "207600",
+    "gdp": "69240000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 51.2575982,
+        "lon": 23.1783344
+      },
+      "ne": {
+        "lat": 56.17218,
+        "lon": 32.7627809
+      }
+    }
+  },
+  "bz": {
+    "name": "Belize",
+    "alpha-2": "BZ",
+    "alpha-3": "BLZ",
+    "country-code": "084",
+    "iso_3166-2": "ISO 3166-2:BZ",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Central America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "013",
+    "dial_code": "+501",
+    "geonameid": "3582678",
+    "capital": "Belmopan",
+    "currency": "Dollar",
+    "language-codes": "en-BZ,es",
+    "area-km2": "22966",
+    "gdp": "1637000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 15.8857286,
+        "lon": -89.2262083
+      },
+      "ne": {
+        "lat": 18.496001,
+        "lon": -87.3098494
+      }
+    }
+  },
+  "bm": {
+    "name": "Bermuda",
+    "alpha-2": "BM",
+    "alpha-3": "BMU",
+    "country-code": "060",
+    "iso_3166-2": "ISO 3166-2:BM",
+    "region": "Americas",
+    "sub-region": "Northern America",
+    "intermediate-region": "",
+    "region-code": "019",
+    "sub-region-code": "021",
+    "intermediate-region-code": "",
+    "dial_code": "+1441",
+    "geonameid": "3573345",
+    "capital": "Hamilton",
+    "currency": "Dollar",
+    "language-codes": "en-BM,pt",
+    "area-km2": "53",
+    "gdp": "5600000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 32.0469651,
+        "lon": -65.1232222
+      },
+      "ne": {
+        "lat": 32.5913693,
+        "lon": -64.4109842
+      }
+    }
+  },
+  "bo": {
+    "name": "Bolivia (Plurinational State of)",
+    "alpha-2": "BO",
+    "alpha-3": "BOL",
+    "country-code": "068",
+    "iso_3166-2": "ISO 3166-2:BO",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+591",
+    "geonameid": "3923057",
+    "capital": "Sucre",
+    "currency": "Boliviano",
+    "language-codes": "es-BO,qu,ay",
+    "area-km2": "1098580",
+    "gdp": "30790000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -22.8982742,
+        "lon": -69.6450073
+      },
+      "ne": {
+        "lat": -9.6689438,
+        "lon": -57.453
+      }
+    }
+  },
+  "br": {
+    "name": "Brazil",
+    "alpha-2": "BR",
+    "alpha-3": "BRA",
+    "country-code": "076",
+    "iso_3166-2": "ISO 3166-2:BR",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+55",
+    "geonameid": "3469034",
+    "capital": "Brasilia",
+    "currency": "Real",
+    "language-codes": "pt-BR,es,en,fr",
+    "area-km2": "8511965",
+    "gdp": "2190000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -33.8689056,
+        "lon": -73.9830625
+      },
+      "ne": {
+        "lat": 5.2842873,
+        "lon": -28.6341164
+      }
+    }
+  },
+  "bb": {
+    "name": "Barbados",
+    "alpha-2": "BB",
+    "alpha-3": "BRB",
+    "country-code": "052",
+    "iso_3166-2": "ISO 3166-2:BB",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1246",
+    "geonameid": "3374084",
+    "capital": "Bridgetown",
+    "currency": "Dollar",
+    "language-codes": "en-BB",
+    "area-km2": "431",
+    "gdp": "4262000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 12.845,
+        "lon": -59.8562115
+      },
+      "ne": {
+        "lat": 13.535,
+        "lon": -59.2147175
+      }
+    }
+  },
+  "bn": {
+    "name": "Brunei Darussalam",
+    "alpha-2": "BN",
+    "alpha-3": "BRN",
+    "country-code": "096",
+    "iso_3166-2": "ISO 3166-2:BN",
+    "region": "Asia",
+    "sub-region": "South-eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "035",
+    "intermediate-region-code": "",
+    "dial_code": "+673",
+    "geonameid": "1820814",
+    "capital": "Bandar Seri Begawan",
+    "currency": "Dollar",
+    "language-codes": "ms-BN,en-BN",
+    "area-km2": "5770",
+    "gdp": "16560000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 4.002508,
+        "lon": 114.0758734
+      },
+      "ne": {
+        "lat": 5.1011857,
+        "lon": 115.3635623
+      }
+    }
+  },
+  "bt": {
+    "name": "Bhutan",
+    "alpha-2": "BT",
+    "alpha-3": "BTN",
+    "country-code": "064",
+    "iso_3166-2": "ISO 3166-2:BT",
+    "region": "Asia",
+    "sub-region": "Southern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "034",
+    "intermediate-region-code": "",
+    "dial_code": "+975",
+    "geonameid": "1252634",
+    "capital": "Thimphu",
+    "currency": "Ngultrum",
+    "language-codes": "dz",
+    "area-km2": "47000",
+    "gdp": "2133000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 26.702016,
+        "lon": 88.7464724
+      },
+      "ne": {
+        "lat": 28.246987,
+        "lon": 92.1252321
+      }
+    }
+  },
+  "bw": {
+    "name": "Botswana",
+    "alpha-2": "BW",
+    "alpha-3": "BWA",
+    "country-code": "072",
+    "iso_3166-2": "ISO 3166-2:BW",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Southern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "018",
+    "dial_code": "+267",
+    "geonameid": "933860",
+    "capital": "Gaborone",
+    "currency": "Pula",
+    "language-codes": "en-BW,tn-BW",
+    "area-km2": "600370",
+    "gdp": "15530000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -26.9059669,
+        "lon": 19.9986474
+      },
+      "ne": {
+        "lat": -17.778137,
+        "lon": 29.375304
+      }
+    }
+  },
+  "cf": {
+    "name": "Central African Republic",
+    "alpha-2": "CF",
+    "alpha-3": "CAF",
+    "country-code": "140",
+    "iso_3166-2": "ISO 3166-2:CF",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Middle Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "017",
+    "dial_code": "+236",
+    "geonameid": "239880",
+    "capital": "Bangui",
+    "currency": "Franc",
+    "language-codes": "fr-CF,sg,ln,kg",
+    "area-km2": "622984",
+    "gdp": "2050000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 2.2156553,
+        "lon": 14.4155426
+      },
+      "ne": {
+        "lat": 11.001389,
+        "lon": 27.4540764
+      }
+    }
+  },
+  "ca": {
+    "name": "Canada",
+    "alpha-2": "CA",
+    "alpha-3": "CAN",
+    "country-code": "124",
+    "iso_3166-2": "ISO 3166-2:CA",
+    "region": "Americas",
+    "sub-region": "Northern America",
+    "intermediate-region": "",
+    "region-code": "019",
+    "sub-region-code": "021",
+    "intermediate-region-code": "",
+    "dial_code": "+1",
+    "geonameid": "6251999",
+    "capital": "Ottawa",
+    "currency": "Dollar",
+    "language-codes": "en-CA,fr-CA,iu",
+    "area-km2": "9984670",
+    "gdp": "1825000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 41.6765556,
+        "lon": -141.00275
+      },
+      "ne": {
+        "lat": 83.3362128,
+        "lon": -52.3231981
+      }
+    }
+  },
+  "cc": {
+    "name": "Cocos (Keeling) Islands",
+    "alpha-2": "CC",
+    "alpha-3": "CCK",
+    "country-code": "166",
+    "iso_3166-2": "ISO 3166-2:CC",
+    "region": "Oceania",
+    "sub-region": "Australia and New Zealand",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "053",
+    "intermediate-region-code": "",
+    "dial_code": "+61",
+    "geonameid": "1547376",
+    "capital": "West Island",
+    "currency": "Dollar",
+    "language-codes": "ms-CC,en",
+    "area-km2": "14",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": -12.4055983,
+        "lon": 96.612524
+      },
+      "ne": {
+        "lat": -11.6213132,
+        "lon": 97.1357343
+      }
+    }
+  },
+  "ch": {
+    "name": "Switzerland",
+    "alpha-2": "CH",
+    "alpha-3": "CHE",
+    "country-code": "756",
+    "iso_3166-2": "ISO 3166-2:CH",
+    "region": "Europe",
+    "sub-region": "Western Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "155",
+    "intermediate-region-code": "",
+    "dial_code": "+41",
+    "geonameid": "2658434",
+    "capital": "Berne",
+    "currency": "Franc",
+    "language-codes": "de-CH,fr-CH,it-CH,rm",
+    "area-km2": "41290",
+    "gdp": "646200000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 45.817995,
+        "lon": 5.9559113
+      },
+      "ne": {
+        "lat": 47.8084648,
+        "lon": 10.4922941
+      }
+    }
+  },
+  "cl": {
+    "name": "Chile",
+    "alpha-2": "CL",
+    "alpha-3": "CHL",
+    "country-code": "152",
+    "iso_3166-2": "ISO 3166-2:CL",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+56",
+    "geonameid": "3895114",
+    "capital": "Santiago",
+    "currency": "Peso",
+    "language-codes": "es-CL",
+    "area-km2": "756950",
+    "gdp": "281700000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -56.725,
+        "lon": -109.6795789
+      },
+      "ne": {
+        "lat": -17.4983998,
+        "lon": -66.0753474
+      }
+    }
+  },
+  "cn": {
+    "name": "China",
+    "alpha-2": "CN",
+    "alpha-3": "CHN",
+    "country-code": "156",
+    "iso_3166-2": "ISO 3166-2:CN",
+    "region": "Asia",
+    "sub-region": "Eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "030",
+    "intermediate-region-code": "",
+    "dial_code": "+86",
+    "geonameid": "1814991",
+    "capital": "Beijing",
+    "currency": "Yuan Renminbi",
+    "language-codes": "zh-CN,yue,wuu,dta,ug,za",
+    "area-km2": "9596960",
+    "gdp": "9330000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 8.8383436,
+        "lon": 73.4997347
+      },
+      "ne": {
+        "lat": 53.5608154,
+        "lon": 134.7754563
+      }
+    }
+  },
+  "ci": {
+    "name": "C\u00f4te d'Ivoire",
+    "alpha-2": "CI",
+    "alpha-3": "CIV",
+    "country-code": "384",
+    "iso_3166-2": "ISO 3166-2:CI",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+225",
+    "geonameid": "2287781",
+    "capital": "Yamoussoukro",
+    "currency": "Franc",
+    "language-codes": "fr-CI",
+    "area-km2": "322460",
+    "gdp": "28280000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 4.1621205,
+        "lon": -8.601725
+      },
+      "ne": {
+        "lat": 10.740197,
+        "lon": -2.493031
+      }
+    }
+  },
+  "cm": {
+    "name": "Cameroon",
+    "alpha-2": "CM",
+    "alpha-3": "CMR",
+    "country-code": "120",
+    "iso_3166-2": "ISO 3166-2:CM",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Middle Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "017",
+    "dial_code": "+237",
+    "geonameid": "2233387",
+    "capital": "Yaounde",
+    "currency": "Franc",
+    "language-codes": "en-CM,fr-CM",
+    "area-km2": "475440",
+    "gdp": "27880000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 1.6546659,
+        "lon": 8.3822176
+      },
+      "ne": {
+        "lat": 13.083333,
+        "lon": 16.1921476
+      }
+    }
+  },
+  "cd": {
+    "name": "Congo, Democratic Republic of the",
+    "alpha-2": "CD",
+    "alpha-3": "COD",
+    "country-code": "180",
+    "iso_3166-2": "ISO 3166-2:CD",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Middle Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "017",
+    "dial_code": "+243",
+    "geonameid": "203312",
+    "capital": "Kinshasa",
+    "currency": "Franc",
+    "language-codes": "fr-CD,ln,kg",
+    "area-km2": "2345410",
+    "gdp": "18560000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -13.459035,
+        "lon": 12.039074
+      },
+      "ne": {
+        "lat": 5.3920026,
+        "lon": 31.3056758
+      }
+    }
+  },
+  "cg": {
+    "name": "Congo",
+    "alpha-2": "CG",
+    "alpha-3": "COG",
+    "country-code": "178",
+    "iso_3166-2": "ISO 3166-2:CG",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Middle Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "017",
+    "dial_code": "+242",
+    "geonameid": "2260494",
+    "capital": "Brazzaville",
+    "currency": "Franc",
+    "language-codes": "fr-CG,kg,ln-CG",
+    "area-km2": "342000",
+    "gdp": "14250000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -5.149089,
+        "lon": 11.0048205
+      },
+      "ne": {
+        "lat": 3.713056,
+        "lon": 18.643611
+      }
+    }
+  },
+  "ck": {
+    "name": "Cook Islands",
+    "alpha-2": "CK",
+    "alpha-3": "COK",
+    "country-code": "184",
+    "iso_3166-2": "ISO 3166-2:CK",
+    "region": "Oceania",
+    "sub-region": "Polynesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "061",
+    "intermediate-region-code": "",
+    "dial_code": "+682",
+    "geonameid": "1899402",
+    "capital": "Avarua",
+    "currency": "Dollar",
+    "language-codes": "en-CK,mi",
+    "area-km2": "240",
+    "gdp": "183200000",
+    "boundingBox": {
+      "sw": {
+        "lat": -22.15807,
+        "lon": -166.0856468
+      },
+      "ne": {
+        "lat": -8.7168792,
+        "lon": -157.1089329
+      }
+    }
+  },
+  "co": {
+    "name": "Colombia",
+    "alpha-2": "CO",
+    "alpha-3": "COL",
+    "country-code": "170",
+    "iso_3166-2": "ISO 3166-2:CO",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+57",
+    "geonameid": "3686110",
+    "capital": "Bogota",
+    "currency": "Peso",
+    "language-codes": "es-CO",
+    "area-km2": "1138910",
+    "gdp": "369200000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -4.2316872,
+        "lon": -82.1243666
+      },
+      "ne": {
+        "lat": 16.0571269,
+        "lon": -66.8511907
+      }
+    }
+  },
+  "km": {
+    "name": "Comoros",
+    "alpha-2": "KM",
+    "alpha-3": "COM",
+    "country-code": "174",
+    "iso_3166-2": "ISO 3166-2:KM",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+269",
+    "geonameid": "921929",
+    "capital": "Moroni",
+    "currency": "Franc",
+    "language-codes": "ar,fr-KM",
+    "area-km2": "2170",
+    "gdp": "658000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -12.621,
+        "lon": 43.025305
+      },
+      "ne": {
+        "lat": -11.165,
+        "lon": 44.7451922
+      }
+    }
+  },
+  "cv": {
+    "name": "Cabo Verde",
+    "alpha-2": "CV",
+    "alpha-3": "CPV",
+    "country-code": "132",
+    "iso_3166-2": "ISO 3166-2:CV",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+238",
+    "geonameid": "3374766",
+    "capital": "Praia",
+    "currency": "Escudo",
+    "language-codes": "pt-CV",
+    "area-km2": "4033",
+    "gdp": "1955000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 14.8031546,
+        "lon": -25.3609478
+      },
+      "ne": {
+        "lat": 17.2053108,
+        "lon": -22.6673416
+      }
+    }
+  },
+  "cr": {
+    "name": "Costa Rica",
+    "alpha-2": "CR",
+    "alpha-3": "CRI",
+    "country-code": "188",
+    "iso_3166-2": "ISO 3166-2:CR",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Central America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "013",
+    "dial_code": "+506",
+    "geonameid": "3624060",
+    "capital": "San Jose",
+    "currency": "Colon",
+    "language-codes": "es-CR,en",
+    "area-km2": "51100",
+    "gdp": "48510000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 5.3329698,
+        "lon": -87.2722647
+      },
+      "ne": {
+        "lat": 11.2195684,
+        "lon": -82.5060208
+      }
+    }
+  },
+  "cu": {
+    "name": "Cuba",
+    "alpha-2": "CU",
+    "alpha-3": "CUB",
+    "country-code": "192",
+    "iso_3166-2": "ISO 3166-2:CU",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+53",
+    "geonameid": "3562981",
+    "capital": "Havana",
+    "currency": "Peso",
+    "language-codes": "es-CU",
+    "area-km2": "110860",
+    "gdp": "72300000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 19.6275294,
+        "lon": -85.1679702
+      },
+      "ne": {
+        "lat": 23.4816972,
+        "lon": -73.9190004
+      }
+    }
+  },
+  "cx": {
+    "name": "Christmas Island",
+    "alpha-2": "CX",
+    "alpha-3": "CXR",
+    "country-code": "162",
+    "iso_3166-2": "ISO 3166-2:CX",
+    "region": "Oceania",
+    "sub-region": "Australia and New Zealand",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "053",
+    "intermediate-region-code": "",
+    "dial_code": "+61",
+    "geonameid": "2078138",
+    "capital": "Flying Fish Cove",
+    "currency": "Dollar",
+    "language-codes": "en,zh,ms-CC",
+    "area-km2": "135",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": -10.5698515,
+        "lon": 105.5336422
+      },
+      "ne": {
+        "lat": -10.4123553,
+        "lon": 105.7130159
+      }
+    }
+  },
+  "ky": {
+    "name": "Cayman Islands",
+    "alpha-2": "KY",
+    "alpha-3": "CYM",
+    "country-code": "136",
+    "iso_3166-2": "ISO 3166-2:KY",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+ 345",
+    "geonameid": "3580718",
+    "capital": "George Town",
+    "currency": "Dollar",
+    "language-codes": "en-KY",
+    "area-km2": "262",
+    "gdp": "2250000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 19.0620619,
+        "lon": -81.6313748
+      },
+      "ne": {
+        "lat": 19.9573759,
+        "lon": -79.5110954
+      }
+    }
+  },
+  "cy": {
+    "name": "Cyprus",
+    "alpha-2": "CY",
+    "alpha-3": "CYP",
+    "country-code": "196",
+    "iso_3166-2": "ISO 3166-2:CY",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+357",
+    "geonameid": "146669",
+    "capital": "Nicosia",
+    "currency": "Euro",
+    "language-codes": "el-CY,tr-CY,en",
+    "area-km2": "9250",
+    "gdp": "21780000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 34.4383706,
+        "lon": 32.0227581
+      },
+      "ne": {
+        "lat": 35.913252,
+        "lon": 34.8553182
+      }
+    }
+  },
+  "cz": {
+    "name": "Czechia",
+    "alpha-2": "CZ",
+    "alpha-3": "CZE",
+    "country-code": "203",
+    "iso_3166-2": "ISO 3166-2:CZ",
+    "region": "Europe",
+    "sub-region": "Eastern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "151",
+    "intermediate-region-code": "",
+    "dial_code": "+420",
+    "geonameid": "3077311",
+    "capital": "Prague",
+    "currency": "Koruna",
+    "language-codes": "cs,sk",
+    "area-km2": "78866",
+    "gdp": "194800000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 48.5518083,
+        "lon": 12.0905901
+      },
+      "ne": {
+        "lat": 51.0557036,
+        "lon": 18.859216
+      }
+    }
+  },
+  "de": {
+    "name": "Germany",
+    "alpha-2": "DE",
+    "alpha-3": "DEU",
+    "country-code": "276",
+    "iso_3166-2": "ISO 3166-2:DE",
+    "region": "Europe",
+    "sub-region": "Western Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "155",
+    "intermediate-region-code": "",
+    "dial_code": "+49",
+    "geonameid": "2921044",
+    "capital": "Berlin",
+    "currency": "Euro",
+    "language-codes": "de",
+    "area-km2": "357021",
+    "gdp": "3593000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 47.2701114,
+        "lon": 5.8663153
+      },
+      "ne": {
+        "lat": 55.099161,
+        "lon": 15.0419319
+      }
+    }
+  },
+  "dj": {
+    "name": "Djibouti",
+    "alpha-2": "DJ",
+    "alpha-3": "DJI",
+    "country-code": "262",
+    "iso_3166-2": "ISO 3166-2:DJ",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+253",
+    "geonameid": "223816",
+    "capital": "Djibouti",
+    "currency": "Franc",
+    "language-codes": "fr-DJ,ar,so-DJ,aa",
+    "area-km2": "23000",
+    "gdp": "1459000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 10.9149547,
+        "lon": 41.7713139
+      },
+      "ne": {
+        "lat": 12.7923081,
+        "lon": 43.6579046
+      }
+    }
+  },
+  "dm": {
+    "name": "Dominica",
+    "alpha-2": "DM",
+    "alpha-3": "DMA",
+    "country-code": "212",
+    "iso_3166-2": "ISO 3166-2:DM",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1767",
+    "geonameid": "3575830",
+    "capital": "Roseau",
+    "currency": "Dollar",
+    "language-codes": "en-DM",
+    "area-km2": "754",
+    "gdp": "495000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 15.0074207,
+        "lon": -61.6869184
+      },
+      "ne": {
+        "lat": 15.7872222,
+        "lon": -61.0329895
+      }
+    }
+  },
+  "dk": {
+    "name": "Denmark",
+    "alpha-2": "DK",
+    "alpha-3": "DNK",
+    "country-code": "208",
+    "iso_3166-2": "ISO 3166-2:DK",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+45",
+    "geonameid": "2623032",
+    "capital": "Copenhagen",
+    "currency": "Krone",
+    "language-codes": "da-DK,en,fo,de-DK",
+    "area-km2": "43094",
+    "gdp": "324300000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 54.4516667,
+        "lon": 7.7153255
+      },
+      "ne": {
+        "lat": 57.9524297,
+        "lon": 15.5530641
+      }
+    }
+  },
+  "do": {
+    "name": "Dominican Republic",
+    "alpha-2": "DO",
+    "alpha-3": "DOM",
+    "country-code": "214",
+    "iso_3166-2": "ISO 3166-2:DO",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1849",
+    "geonameid": "3508796",
+    "capital": "Santo Domingo",
+    "currency": "Peso",
+    "language-codes": "es-DO",
+    "area-km2": "48730",
+    "gdp": "59270000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 17.2701708,
+        "lon": -72.0574706
+      },
+      "ne": {
+        "lat": 21.303433,
+        "lon": -68.1101463
+      }
+    }
+  },
+  "dz": {
+    "name": "Algeria",
+    "alpha-2": "DZ",
+    "alpha-3": "DZA",
+    "country-code": "012",
+    "iso_3166-2": "ISO 3166-2:DZ",
+    "region": "Africa",
+    "sub-region": "Northern Africa",
+    "intermediate-region": "",
+    "region-code": "002",
+    "sub-region-code": "015",
+    "intermediate-region-code": "",
+    "dial_code": "+213",
+    "geonameid": "2589581",
+    "capital": "Algiers",
+    "currency": "Dinar",
+    "language-codes": "ar-DZ",
+    "area-km2": "2381740",
+    "gdp": "215700000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 18.968147,
+        "lon": -8.668908
+      },
+      "ne": {
+        "lat": 37.2962055,
+        "lon": 11.997337
+      }
+    }
+  },
+  "ec": {
+    "name": "Ecuador",
+    "alpha-2": "EC",
+    "alpha-3": "ECU",
+    "country-code": "218",
+    "iso_3166-2": "ISO 3166-2:EC",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+593",
+    "geonameid": "3658394",
+    "capital": "Quito",
+    "currency": "Dollar",
+    "language-codes": "es-EC",
+    "area-km2": "283560",
+    "gdp": "91410000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -5.0159314,
+        "lon": -92.2072392
+      },
+      "ne": {
+        "lat": 1.8835964,
+        "lon": -75.192504
+      }
+    }
+  },
+  "eg": {
+    "name": "Egypt",
+    "alpha-2": "EG",
+    "alpha-3": "EGY",
+    "country-code": "818",
+    "iso_3166-2": "ISO 3166-2:EG",
+    "region": "Africa",
+    "sub-region": "Northern Africa",
+    "intermediate-region": "",
+    "region-code": "002",
+    "sub-region-code": "015",
+    "intermediate-region-code": "",
+    "dial_code": "+20",
+    "geonameid": "357994",
+    "capital": "Cairo",
+    "currency": "Pound",
+    "language-codes": "ar-EG,en,fr",
+    "area-km2": "1001450",
+    "gdp": "262000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 22.0,
+        "lon": 24.6499112
+      },
+      "ne": {
+        "lat": 31.8330854,
+        "lon": 37.1153517
+      }
+    }
+  },
+  "er": {
+    "name": "Eritrea",
+    "alpha-2": "ER",
+    "alpha-3": "ERI",
+    "country-code": "232",
+    "iso_3166-2": "ISO 3166-2:ER",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+291",
+    "geonameid": "338010",
+    "capital": "Asmara",
+    "currency": "Nakfa",
+    "language-codes": "aa-ER,ar,tig,kun,ti-ER",
+    "area-km2": "121320",
+    "gdp": "3438000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 12.3548219,
+        "lon": 36.4333653
+      },
+      "ne": {
+        "lat": 18.0709917,
+        "lon": 43.3001714
+      }
+    }
+  },
+  "eh": {
+    "name": "Western Sahara",
+    "alpha-2": "EH",
+    "alpha-3": "ESH",
+    "country-code": "732",
+    "iso_3166-2": "ISO 3166-2:EH",
+    "region": "Africa",
+    "sub-region": "Northern Africa",
+    "intermediate-region": "",
+    "region-code": "002",
+    "sub-region-code": "015",
+    "intermediate-region-code": "",
+    "geonameid": "2461445",
+    "capital": "El-Aaiun",
+    "currency": "Dirham",
+    "language-codes": "ar,mey",
+    "area-km2": "266000",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": 20.556883,
+        "lon": -17.3494721
+      },
+      "ne": {
+        "lat": 27.6666834,
+        "lon": -8.666389
+      }
+    }
+  },
+  "es": {
+    "name": "Spain",
+    "alpha-2": "ES",
+    "alpha-3": "ESP",
+    "country-code": "724",
+    "iso_3166-2": "ISO 3166-2:ES",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+34",
+    "geonameid": "2510769",
+    "capital": "Madrid",
+    "currency": "Euro",
+    "language-codes": "es-ES,ca,gl,eu,oc",
+    "area-km2": "504782",
+    "gdp": "1356000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 27.4335426,
+        "lon": -18.3936845
+      },
+      "ne": {
+        "lat": 43.9933088,
+        "lon": 4.5918885
+      }
+    }
+  },
+  "ee": {
+    "name": "Estonia",
+    "alpha-2": "EE",
+    "alpha-3": "EST",
+    "country-code": "233",
+    "iso_3166-2": "ISO 3166-2:EE",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+372",
+    "geonameid": "453733",
+    "capital": "Tallinn",
+    "currency": "Euro",
+    "language-codes": "et,ru",
+    "area-km2": "45226",
+    "gdp": "24280000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 57.5092997,
+        "lon": 21.3826069
+      },
+      "ne": {
+        "lat": 59.9383754,
+        "lon": 28.2100175
+      }
+    }
+  },
+  "et": {
+    "name": "Ethiopia",
+    "alpha-2": "ET",
+    "alpha-3": "ETH",
+    "country-code": "231",
+    "iso_3166-2": "ISO 3166-2:ET",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+251",
+    "geonameid": "337996",
+    "capital": "Addis Ababa",
+    "currency": "Birr",
+    "language-codes": "am,en-ET,om-ET,ti-ET,so-ET,sid",
+    "area-km2": "1127127",
+    "gdp": "47340000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 3.397448,
+        "lon": 32.9975838
+      },
+      "ne": {
+        "lat": 14.8940537,
+        "lon": 47.9823797
+      }
+    }
+  },
+  "fi": {
+    "name": "Finland",
+    "alpha-2": "FI",
+    "alpha-3": "FIN",
+    "country-code": "246",
+    "iso_3166-2": "ISO 3166-2:FI",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+358",
+    "geonameid": "660013",
+    "capital": "Helsinki",
+    "currency": "Euro",
+    "language-codes": "fi-FI,sv-FI,smn",
+    "area-km2": "337030",
+    "gdp": "259600000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 59.4541578,
+        "lon": 19.0832098
+      },
+      "ne": {
+        "lat": 70.0922939,
+        "lon": 31.5867071
+      }
+    }
+  },
+  "fj": {
+    "name": "Fiji",
+    "alpha-2": "FJ",
+    "alpha-3": "FJI",
+    "country-code": "242",
+    "iso_3166-2": "ISO 3166-2:FJ",
+    "region": "Oceania",
+    "sub-region": "Melanesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "054",
+    "intermediate-region-code": "",
+    "dial_code": "+679",
+    "geonameid": "2205218",
+    "capital": "Suva",
+    "currency": "Dollar",
+    "language-codes": "en-FJ,fj",
+    "area-km2": "18270",
+    "gdp": "4218000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -21.9434274,
+        "lon": 172.0
+      },
+      "ne": {
+        "lat": -12.2613866,
+        "lon": -178.5
+      }
+    }
+  },
+  "fk": {
+    "name": "Falkland Islands (Malvinas)",
+    "alpha-2": "FK",
+    "alpha-3": "FLK",
+    "country-code": "238",
+    "iso_3166-2": "ISO 3166-2:FK",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+500",
+    "geonameid": "3474414",
+    "capital": "Stanley",
+    "currency": "Pound",
+    "language-codes": "en-FK",
+    "area-km2": "12173",
+    "gdp": "164500000",
+    "boundingBox": {
+      "sw": {
+        "lat": -53.1186766,
+        "lon": -61.7726772
+      },
+      "ne": {
+        "lat": -50.7973007,
+        "lon": -57.3662367
+      }
+    }
+  },
+  "fr": {
+    "name": "France",
+    "alpha-2": "FR",
+    "alpha-3": "FRA",
+    "country-code": "250",
+    "iso_3166-2": "ISO 3166-2:FR",
+    "region": "Europe",
+    "sub-region": "Western Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "155",
+    "intermediate-region-code": "",
+    "dial_code": "+33",
+    "geonameid": "3017382",
+    "capital": "Paris",
+    "currency": "Euro",
+    "language-codes": "fr-FR,frp,br,co,ca,eu,oc",
+    "area-km2": "547030",
+    "gdp": "2739000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 41.2632185,
+        "lon": -5.4534286
+      },
+      "ne": {
+        "lat": 51.268318,
+        "lon": 9.8678344
+      }
+    }
+  },
+  "fo": {
+    "name": "Faroe Islands",
+    "alpha-2": "FO",
+    "alpha-3": "FRO",
+    "country-code": "234",
+    "iso_3166-2": "ISO 3166-2:FO",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+298",
+    "geonameid": "2622320",
+    "capital": "Torshavn",
+    "currency": "Krone",
+    "language-codes": "fo,da-FO",
+    "area-km2": "1399",
+    "gdp": "2320000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 61.3915553,
+        "lon": -7.6882939
+      },
+      "ne": {
+        "lat": 62.3942991,
+        "lon": -6.2565525
+      }
+    }
+  },
+  "fm": {
+    "name": "Micronesia (Federated States of)",
+    "alpha-2": "FM",
+    "alpha-3": "FSM",
+    "country-code": "583",
+    "iso_3166-2": "ISO 3166-2:FM",
+    "region": "Oceania",
+    "sub-region": "Micronesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "057",
+    "intermediate-region-code": "",
+    "dial_code": "+691",
+    "geonameid": "2081918",
+    "capital": "Palikir",
+    "currency": "Dollar",
+    "language-codes": "en-FM,chk,pon,yap,kos,uli,woe,nkr,kpg",
+    "area-km2": "702",
+    "gdp": "339000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 0.827,
+        "lon": 137.2234512
+      },
+      "ne": {
+        "lat": 10.291,
+        "lon": 163.2364054
+      }
+    }
+  },
+  "ga": {
+    "name": "Gabon",
+    "alpha-2": "GA",
+    "alpha-3": "GAB",
+    "country-code": "266",
+    "iso_3166-2": "ISO 3166-2:GA",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Middle Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "017",
+    "dial_code": "+241",
+    "geonameid": "2400553",
+    "capital": "Libreville",
+    "currency": "Franc",
+    "language-codes": "fr-GA",
+    "area-km2": "267667",
+    "gdp": "19970000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -4.1012261,
+        "lon": 8.5002246
+      },
+      "ne": {
+        "lat": 2.3182171,
+        "lon": 14.539444
+      }
+    }
+  },
+  "gb": {
+    "name": "United Kingdom of Great Britain and Northern Ireland",
+    "alpha-2": "GB",
+    "alpha-3": "GBR",
+    "country-code": "826",
+    "iso_3166-2": "ISO 3166-2:GB",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+44",
+    "geonameid": "2635167",
+    "capital": "London",
+    "currency": "Pound",
+    "language-codes": "en-GB,cy-GB,gd",
+    "area-km2": "244820",
+    "gdp": "2490000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 49.674,
+        "lon": -14.015517
+      },
+      "ne": {
+        "lat": 61.061,
+        "lon": 2.0919117
+      }
+    }
+  },
+  "ge": {
+    "name": "Georgia",
+    "alpha-2": "GE",
+    "alpha-3": "GEO",
+    "country-code": "268",
+    "iso_3166-2": "ISO 3166-2:GE",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+995",
+    "geonameid": "614540",
+    "capital": "Tbilisi",
+    "currency": "Lari",
+    "language-codes": "ka,ru,hy,az",
+    "area-km2": "69700",
+    "gdp": "15950000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 41.0552922,
+        "lon": 39.8844803
+      },
+      "ne": {
+        "lat": 43.5864294,
+        "lon": 46.7365373
+      }
+    }
+  },
+  "gg": {
+    "name": "Guernsey",
+    "alpha-2": "GG",
+    "alpha-3": "GGY",
+    "country-code": "831",
+    "iso_3166-2": "ISO 3166-2:GG",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "Channel Islands",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "830",
+    "dial_code": "+44",
+    "geonameid": "3042362",
+    "capital": "St Peter Port",
+    "currency": "Pound",
+    "language-codes": "en,fr",
+    "area-km2": "78",
+    "gdp": "2742000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 49.4155331,
+        "lon": -2.6751703
+      },
+      "ne": {
+        "lat": 49.5090776,
+        "lon": -2.501814
+      }
+    }
+  },
+  "gh": {
+    "name": "Ghana",
+    "alpha-2": "GH",
+    "alpha-3": "GHA",
+    "country-code": "288",
+    "iso_3166-2": "ISO 3166-2:GH",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+233",
+    "geonameid": "2300660",
+    "capital": "Accra",
+    "currency": "Cedi",
+    "language-codes": "en-GH,ak,ee,tw",
+    "area-km2": "239460",
+    "gdp": "45550000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 4.5392525,
+        "lon": -3.260786
+      },
+      "ne": {
+        "lat": 11.1748562,
+        "lon": 1.2732942
+      }
+    }
+  },
+  "gi": {
+    "name": "Gibraltar",
+    "alpha-2": "GI",
+    "alpha-3": "GIB",
+    "country-code": "292",
+    "iso_3166-2": "ISO 3166-2:GI",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+350",
+    "geonameid": "2411586",
+    "capital": "Gibraltar",
+    "currency": "Pound",
+    "language-codes": "en-GI,es,it,pt",
+    "area-km2": "7",
+    "gdp": "1106000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 36.100807,
+        "lon": -5.3941295
+      },
+      "ne": {
+        "lat": 36.180807,
+        "lon": -5.3141295
+      }
+    }
+  },
+  "gn": {
+    "name": "Guinea",
+    "alpha-2": "GN",
+    "alpha-3": "GIN",
+    "country-code": "324",
+    "iso_3166-2": "ISO 3166-2:GN",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+224",
+    "geonameid": "2420477",
+    "capital": "Conakry",
+    "currency": "Franc",
+    "language-codes": "fr-GN",
+    "area-km2": "245857",
+    "gdp": "6544000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 7.1906045,
+        "lon": -15.5680508
+      },
+      "ne": {
+        "lat": 12.67563,
+        "lon": -7.6381993
+      }
+    }
+  },
+  "gm": {
+    "name": "Gambia",
+    "alpha-2": "GM",
+    "alpha-3": "GMB",
+    "country-code": "270",
+    "iso_3166-2": "ISO 3166-2:GM",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+220",
+    "geonameid": "2413451",
+    "capital": "Banjul",
+    "currency": "Dalasi",
+    "language-codes": "en-GM,mnk,wof,wo,ff",
+    "area-km2": "11300",
+    "gdp": "896000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 13.061,
+        "lon": -17.0288254
+      },
+      "ne": {
+        "lat": 13.8253137,
+        "lon": -13.797778
+      }
+    }
+  },
+  "gw": {
+    "name": "Guinea-Bissau",
+    "alpha-2": "GW",
+    "alpha-3": "GNB",
+    "country-code": "624",
+    "iso_3166-2": "ISO 3166-2:GW",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+245",
+    "geonameid": "2372248",
+    "capital": "Bissau",
+    "currency": "Franc",
+    "language-codes": "pt-GW,pov",
+    "area-km2": "36120",
+    "gdp": "880000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 10.6514215,
+        "lon": -16.894523
+      },
+      "ne": {
+        "lat": 12.6862384,
+        "lon": -13.6348777
+      }
+    }
+  },
+  "gq": {
+    "name": "Equatorial Guinea",
+    "alpha-2": "GQ",
+    "alpha-3": "GNQ",
+    "country-code": "226",
+    "iso_3166-2": "ISO 3166-2:GQ",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Middle Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "017",
+    "dial_code": "+240",
+    "geonameid": "2309096",
+    "capital": "Malabo",
+    "currency": "Franc",
+    "language-codes": "es-GQ,fr",
+    "area-km2": "28051",
+    "gdp": "17080000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -1.6732196,
+        "lon": 5.4172943
+      },
+      "ne": {
+        "lat": 3.989,
+        "lon": 11.3598628
+      }
+    }
+  },
+  "gr": {
+    "name": "Greece",
+    "alpha-2": "GR",
+    "alpha-3": "GRC",
+    "country-code": "300",
+    "iso_3166-2": "ISO 3166-2:GR",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+30",
+    "geonameid": "390903",
+    "capital": "Athens",
+    "currency": "Euro",
+    "language-codes": "el-GR,en,fr",
+    "area-km2": "131940",
+    "gdp": "243300000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 34.7006096,
+        "lon": 19.2477876
+      },
+      "ne": {
+        "lat": 41.7488862,
+        "lon": 29.7296986
+      }
+    }
+  },
+  "gd": {
+    "name": "Grenada",
+    "alpha-2": "GD",
+    "alpha-3": "GRD",
+    "country-code": "308",
+    "iso_3166-2": "ISO 3166-2:GD",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1473",
+    "geonameid": "3580239",
+    "capital": "St. George's",
+    "currency": "Dollar",
+    "language-codes": "en-GD",
+    "area-km2": "344",
+    "gdp": "811000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 11.786,
+        "lon": -62.0065868
+      },
+      "ne": {
+        "lat": 12.5966532,
+        "lon": -61.1732143
+      }
+    }
+  },
+  "gl": {
+    "name": "Greenland",
+    "alpha-2": "GL",
+    "alpha-3": "GRL",
+    "country-code": "304",
+    "iso_3166-2": "ISO 3166-2:GL",
+    "region": "Americas",
+    "sub-region": "Northern America",
+    "intermediate-region": "",
+    "region-code": "019",
+    "sub-region-code": "021",
+    "intermediate-region-code": "",
+    "dial_code": "+299",
+    "geonameid": "3425505",
+    "capital": "Nuuk",
+    "currency": "Krone",
+    "language-codes": "kl,da-GL,en",
+    "area-km2": "2166086",
+    "gdp": "2160000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 59.515387,
+        "lon": -74.1250416
+      },
+      "ne": {
+        "lat": 83.875172,
+        "lon": -10.0288759
+      }
+    }
+  },
+  "gt": {
+    "name": "Guatemala",
+    "alpha-2": "GT",
+    "alpha-3": "GTM",
+    "country-code": "320",
+    "iso_3166-2": "ISO 3166-2:GT",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Central America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "013",
+    "dial_code": "+502",
+    "geonameid": "3595528",
+    "capital": "Guatemala City",
+    "currency": "Quetzal",
+    "language-codes": "es-GT",
+    "area-km2": "108890",
+    "gdp": "53900000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 13.6345804,
+        "lon": -92.3105242
+      },
+      "ne": {
+        "lat": 17.8165947,
+        "lon": -88.1755849
+      }
+    }
+  },
+  "gu": {
+    "name": "Guam",
+    "alpha-2": "GU",
+    "alpha-3": "GUM",
+    "country-code": "316",
+    "iso_3166-2": "ISO 3166-2:GU",
+    "region": "Oceania",
+    "sub-region": "Micronesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "057",
+    "intermediate-region-code": "",
+    "dial_code": "+1671",
+    "geonameid": "4043988",
+    "capital": "Hagatna",
+    "currency": "Dollar",
+    "language-codes": "en-GU,ch-GU",
+    "area-km2": "549",
+    "gdp": "4600000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 13.182335,
+        "lon": 144.563426
+      },
+      "ne": {
+        "lat": 13.706179,
+        "lon": 145.009167
+      }
+    }
+  },
+  "gy": {
+    "name": "Guyana",
+    "alpha-2": "GY",
+    "alpha-3": "GUY",
+    "country-code": "328",
+    "iso_3166-2": "ISO 3166-2:GY",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+595",
+    "geonameid": "3378535",
+    "capital": "Georgetown",
+    "currency": "Dollar",
+    "language-codes": "en-GY",
+    "area-km2": "214970",
+    "gdp": "3020000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 1.1710017,
+        "lon": -61.414905
+      },
+      "ne": {
+        "lat": 8.6038842,
+        "lon": -56.4689543
+      }
+    }
+  },
+  "hk": {
+    "name": "Hong Kong",
+    "alpha-2": "HK",
+    "alpha-3": "HKG",
+    "country-code": "344",
+    "iso_3166-2": "ISO 3166-2:HK",
+    "region": "Asia",
+    "sub-region": "Eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "030",
+    "intermediate-region-code": "",
+    "dial_code": "+852",
+    "geonameid": "1819730",
+    "capital": "Hong Kong",
+    "currency": "Dollar",
+    "language-codes": "zh-HK,yue,zh,en",
+    "area-km2": "1092",
+    "gdp": "272100000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 22.1193278,
+        "lon": 114.0028131
+      },
+      "ne": {
+        "lat": 22.4393278,
+        "lon": 114.3228131
+      }
+    }
+  },
+  "hn": {
+    "name": "Honduras",
+    "alpha-2": "HN",
+    "alpha-3": "HND",
+    "country-code": "340",
+    "iso_3166-2": "ISO 3166-2:HN",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Central America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "013",
+    "dial_code": "+504",
+    "geonameid": "3608932",
+    "capital": "Tegucigalpa",
+    "currency": "Lempira",
+    "language-codes": "es-HN",
+    "area-km2": "112090",
+    "gdp": "18880000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 12.9808485,
+        "lon": -89.3568207
+      },
+      "ne": {
+        "lat": 17.619526,
+        "lon": -82.1729621
+      }
+    }
+  },
+  "hr": {
+    "name": "Croatia",
+    "alpha-2": "HR",
+    "alpha-3": "HRV",
+    "country-code": "191",
+    "iso_3166-2": "ISO 3166-2:HR",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+385",
+    "geonameid": "3202326",
+    "capital": "Zagreb",
+    "currency": "Kuna",
+    "language-codes": "hr-HR,sr",
+    "area-km2": "56542",
+    "gdp": "59140000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 42.1765993,
+        "lon": 13.2104814
+      },
+      "ne": {
+        "lat": 46.555029,
+        "lon": 19.4470842
+      }
+    }
+  },
+  "ht": {
+    "name": "Haiti",
+    "alpha-2": "HT",
+    "alpha-3": "HTI",
+    "country-code": "332",
+    "iso_3166-2": "ISO 3166-2:HT",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+509",
+    "geonameid": "3723988",
+    "capital": "Port-au-Prince",
+    "currency": "Gourde",
+    "language-codes": "ht,fr-HT",
+    "area-km2": "27750",
+    "gdp": "8287000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 17.9099291,
+        "lon": -75.2384618
+      },
+      "ne": {
+        "lat": 20.2181368,
+        "lon": -71.6217461
+      }
+    }
+  },
+  "hu": {
+    "name": "Hungary",
+    "alpha-2": "HU",
+    "alpha-3": "HUN",
+    "country-code": "348",
+    "iso_3166-2": "ISO 3166-2:HU",
+    "region": "Europe",
+    "sub-region": "Eastern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "151",
+    "intermediate-region-code": "",
+    "dial_code": "+36",
+    "geonameid": "719819",
+    "capital": "Budapest",
+    "currency": "Forint",
+    "language-codes": "hu-HU",
+    "area-km2": "93030",
+    "gdp": "130600000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 45.737128,
+        "lon": 16.1138867
+      },
+      "ne": {
+        "lat": 48.585257,
+        "lon": 22.8977094
+      }
+    }
+  },
+  "id": {
+    "name": "Indonesia",
+    "alpha-2": "ID",
+    "alpha-3": "IDN",
+    "country-code": "360",
+    "iso_3166-2": "ISO 3166-2:ID",
+    "region": "Asia",
+    "sub-region": "South-eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "035",
+    "intermediate-region-code": "",
+    "dial_code": "+62",
+    "geonameid": "1643084",
+    "capital": "Jakarta",
+    "currency": "Rupiah",
+    "language-codes": "id,en,nl,jv",
+    "area-km2": "1919440",
+    "gdp": "867500000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -11.2085669,
+        "lon": 94.7717124
+      },
+      "ne": {
+        "lat": 6.2744496,
+        "lon": 141.0194444
+      }
+    }
+  },
+  "im": {
+    "name": "Isle of Man",
+    "alpha-2": "IM",
+    "alpha-3": "IMN",
+    "country-code": "833",
+    "iso_3166-2": "ISO 3166-2:IM",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+44",
+    "geonameid": "3042225",
+    "capital": "Douglas, Isle of Man",
+    "currency": "Pound",
+    "language-codes": "en,gv",
+    "area-km2": "572",
+    "gdp": "4076000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 54.0539576,
+        "lon": -4.7946845
+      },
+      "ne": {
+        "lat": 54.4178705,
+        "lon": -4.3076853
+      }
+    }
+  },
+  "in": {
+    "name": "India",
+    "alpha-2": "IN",
+    "alpha-3": "IND",
+    "country-code": "356",
+    "iso_3166-2": "ISO 3166-2:IN",
+    "region": "Asia",
+    "sub-region": "Southern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "034",
+    "intermediate-region-code": "",
+    "dial_code": "+91",
+    "geonameid": "1269750",
+    "capital": "New Delhi",
+    "currency": "Rupee",
+    "language-codes": "en-IN,hi,bn,te,mr,ta,ur,gu,kn,ml,or,pa,as,bh,sat,ks,ne,sd,kok,doi,mni,sit,sa,fr,lus,inc",
+    "area-km2": "3287590",
+    "gdp": "1670000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 6.5546079,
+        "lon": 68.1113787
+      },
+      "ne": {
+        "lat": 35.6745457,
+        "lon": 97.395561
+      }
+    }
+  },
+  "io": {
+    "name": "British Indian Ocean Territory",
+    "alpha-2": "IO",
+    "alpha-3": "IOT",
+    "country-code": "086",
+    "iso_3166-2": "ISO 3166-2:IO",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+246",
+    "geonameid": "1282588",
+    "capital": "Diego Garcia",
+    "currency": "Dollar",
+    "language-codes": "en-IO",
+    "area-km2": "60",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": -7.6454079,
+        "lon": 71.036504
+      },
+      "ne": {
+        "lat": -5.037066,
+        "lon": 72.7020157
+      }
+    }
+  },
+  "ie": {
+    "name": "Ireland",
+    "alpha-2": "IE",
+    "alpha-3": "IRL",
+    "country-code": "372",
+    "iso_3166-2": "ISO 3166-2:IE",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+353",
+    "geonameid": "2963597",
+    "capital": "Dublin",
+    "currency": "Euro",
+    "language-codes": "en-IE,ga-IE",
+    "area-km2": "70280",
+    "gdp": "220900000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 51.222,
+        "lon": -11.0133788
+      },
+      "ne": {
+        "lat": 55.636,
+        "lon": -5.6582363
+      }
+    }
+  },
+  "ir": {
+    "name": "Iran (Islamic Republic of)",
+    "alpha-2": "IR",
+    "alpha-3": "IRN",
+    "country-code": "364",
+    "iso_3166-2": "ISO 3166-2:IR",
+    "region": "Asia",
+    "sub-region": "Southern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "034",
+    "intermediate-region-code": "",
+    "dial_code": "+98",
+    "geonameid": "130758",
+    "capital": "Tehran",
+    "currency": "Rial",
+    "language-codes": "fa-IR,ku",
+    "area-km2": "1648000",
+    "gdp": "411900000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 24.8465103,
+        "lon": 44.0318908
+      },
+      "ne": {
+        "lat": 39.7816502,
+        "lon": 63.3332704
+      }
+    }
+  },
+  "iq": {
+    "name": "Iraq",
+    "alpha-2": "IQ",
+    "alpha-3": "IRQ",
+    "country-code": "368",
+    "iso_3166-2": "ISO 3166-2:IQ",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+964",
+    "geonameid": "99237",
+    "capital": "Baghdad",
+    "currency": "Dinar",
+    "language-codes": "ar-IQ,ku,hy",
+    "area-km2": "437072",
+    "gdp": "221800000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 29.0585661,
+        "lon": 38.7936719
+      },
+      "ne": {
+        "lat": 37.380932,
+        "lon": 48.8412702
+      }
+    }
+  },
+  "is": {
+    "name": "Iceland",
+    "alpha-2": "IS",
+    "alpha-3": "ISL",
+    "country-code": "352",
+    "iso_3166-2": "ISO 3166-2:IS",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+354",
+    "geonameid": "2629691",
+    "capital": "Reykjavik",
+    "currency": "Krona",
+    "language-codes": "is,en,de,da,sv,no",
+    "area-km2": "103000",
+    "gdp": "14590000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 63.0859177,
+        "lon": -25.0135069
+      },
+      "ne": {
+        "lat": 67.353,
+        "lon": -12.8046162
+      }
+    }
+  },
+  "il": {
+    "name": "Israel",
+    "alpha-2": "IL",
+    "alpha-3": "ISR",
+    "country-code": "376",
+    "iso_3166-2": "ISO 3166-2:IL",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+972",
+    "geonameid": "294640",
+    "capital": "Jerusalem",
+    "currency": "Shekel",
+    "language-codes": "he,ar-IL,en-IL,",
+    "area-km2": "20770",
+    "gdp": "272700000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 29.4533796,
+        "lon": 34.2674994
+      },
+      "ne": {
+        "lat": 33.3356317,
+        "lon": 35.8950234
+      }
+    }
+  },
+  "it": {
+    "name": "Italy",
+    "alpha-2": "IT",
+    "alpha-3": "ITA",
+    "country-code": "380",
+    "iso_3166-2": "ISO 3166-2:IT",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+39",
+    "geonameid": "3175395",
+    "capital": "Rome",
+    "currency": "Euro",
+    "language-codes": "it-IT,de-IT,fr-IT,sc,ca,co,sl",
+    "area-km2": "301230",
+    "gdp": "2068000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 35.2889616,
+        "lon": 6.6272658
+      },
+      "ne": {
+        "lat": 47.0921462,
+        "lon": 18.7844746
+      }
+    }
+  },
+  "jm": {
+    "name": "Jamaica",
+    "alpha-2": "JM",
+    "alpha-3": "JAM",
+    "country-code": "388",
+    "iso_3166-2": "ISO 3166-2:JM",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1876",
+    "geonameid": "3489940",
+    "capital": "Kingston",
+    "currency": "Dollar",
+    "language-codes": "en-JM",
+    "area-km2": "10991",
+    "gdp": "14390000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 16.5899443,
+        "lon": -78.5782366
+      },
+      "ne": {
+        "lat": 18.7256394,
+        "lon": -75.7541143
+      }
+    }
+  },
+  "je": {
+    "name": "Jersey",
+    "alpha-2": "JE",
+    "alpha-3": "JEY",
+    "country-code": "832",
+    "iso_3166-2": "ISO 3166-2:JE",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "Channel Islands",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "830",
+    "dial_code": "+44",
+    "geonameid": "3042142",
+    "capital": "Saint Helier",
+    "currency": "Pound",
+    "language-codes": "en,pt",
+    "area-km2": "116",
+    "gdp": "5100000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 49.1625179,
+        "lon": -2.254512
+      },
+      "ne": {
+        "lat": 49.2621288,
+        "lon": -2.0104193
+      }
+    }
+  },
+  "jo": {
+    "name": "Jordan",
+    "alpha-2": "JO",
+    "alpha-3": "JOR",
+    "country-code": "400",
+    "iso_3166-2": "ISO 3166-2:JO",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+962",
+    "geonameid": "248816",
+    "capital": "Amman",
+    "currency": "Dinar",
+    "language-codes": "ar-JO,en",
+    "area-km2": "92300",
+    "gdp": "34080000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 29.183401,
+        "lon": 34.8844372
+      },
+      "ne": {
+        "lat": 33.3750617,
+        "lon": 39.3012981
+      }
+    }
+  },
+  "jp": {
+    "name": "Japan",
+    "alpha-2": "JP",
+    "alpha-3": "JPN",
+    "country-code": "392",
+    "iso_3166-2": "ISO 3166-2:JP",
+    "region": "Asia",
+    "sub-region": "Eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "030",
+    "intermediate-region-code": "",
+    "dial_code": "+81",
+    "geonameid": "1861060",
+    "capital": "Tokyo",
+    "currency": "Yen",
+    "language-codes": "ja",
+    "area-km2": "377835",
+    "gdp": "5007000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 20.2145811,
+        "lon": 122.7141754
+      },
+      "ne": {
+        "lat": 45.7112046,
+        "lon": 154.205541
+      }
+    }
+  },
+  "kz": {
+    "name": "Kazakhstan",
+    "alpha-2": "KZ",
+    "alpha-3": "KAZ",
+    "country-code": "398",
+    "iso_3166-2": "ISO 3166-2:KZ",
+    "region": "Asia",
+    "sub-region": "Central Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "143",
+    "intermediate-region-code": "",
+    "dial_code": "+77",
+    "geonameid": "1522867",
+    "capital": "Astana",
+    "currency": "Tenge",
+    "language-codes": "kk,ru",
+    "area-km2": "2717300",
+    "gdp": "224900000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 40.5686476,
+        "lon": 46.4932179
+      },
+      "ne": {
+        "lat": 55.4421701,
+        "lon": 87.3156316
+      }
+    }
+  },
+  "ke": {
+    "name": "Kenya",
+    "alpha-2": "KE",
+    "alpha-3": "KEN",
+    "country-code": "404",
+    "iso_3166-2": "ISO 3166-2:KE",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+254",
+    "geonameid": "192950",
+    "capital": "Nairobi",
+    "currency": "Shilling",
+    "language-codes": "en-KE,sw-KE",
+    "area-km2": "582650",
+    "gdp": "45310000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -4.8995204,
+        "lon": 33.9098987
+      },
+      "ne": {
+        "lat": 4.62,
+        "lon": 41.899578
+      }
+    }
+  },
+  "kg": {
+    "name": "Kyrgyzstan",
+    "alpha-2": "KG",
+    "alpha-3": "KGZ",
+    "country-code": "417",
+    "iso_3166-2": "ISO 3166-2:KG",
+    "region": "Asia",
+    "sub-region": "Central Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "143",
+    "intermediate-region-code": "",
+    "dial_code": "+996",
+    "geonameid": "1527747",
+    "capital": "Bishkek",
+    "currency": "Som",
+    "language-codes": "ky,uz,ru",
+    "area-km2": "198500",
+    "gdp": "7234000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 39.1728437,
+        "lon": 69.2649523
+      },
+      "ne": {
+        "lat": 43.2667971,
+        "lon": 80.2295793
+      }
+    }
+  },
+  "kh": {
+    "name": "Cambodia",
+    "alpha-2": "KH",
+    "alpha-3": "KHM",
+    "country-code": "116",
+    "iso_3166-2": "ISO 3166-2:KH",
+    "region": "Asia",
+    "sub-region": "South-eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "035",
+    "intermediate-region-code": "",
+    "dial_code": "+855",
+    "geonameid": "1831722",
+    "capital": "Phnom Penh",
+    "currency": "Riels",
+    "language-codes": "km,fr,en",
+    "area-km2": "181040",
+    "gdp": "15640000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 9.4752639,
+        "lon": 102.3338282
+      },
+      "ne": {
+        "lat": 14.6904224,
+        "lon": 107.6276788
+      }
+    }
+  },
+  "ki": {
+    "name": "Kiribati",
+    "alpha-2": "KI",
+    "alpha-3": "KIR",
+    "country-code": "296",
+    "iso_3166-2": "ISO 3166-2:KI",
+    "region": "Oceania",
+    "sub-region": "Micronesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "057",
+    "intermediate-region-code": "",
+    "dial_code": "+686",
+    "geonameid": "4030945",
+    "capital": "Tarawa",
+    "currency": "Dollar",
+    "language-codes": "en-KI,gil",
+    "area-km2": "811",
+    "gdp": "173000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -7.0516717,
+        "lon": -179.1645388
+      },
+      "ne": {
+        "lat": 7.9483283,
+        "lon": -164.1645388
+      }
+    }
+  },
+  "kn": {
+    "name": "Saint Kitts and Nevis",
+    "alpha-2": "KN",
+    "alpha-3": "KNA",
+    "country-code": "659",
+    "iso_3166-2": "ISO 3166-2:KN",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1869",
+    "geonameid": "3575174",
+    "capital": "Basseterre",
+    "currency": "Dollar",
+    "language-codes": "en-KN",
+    "area-km2": "261",
+    "gdp": "767000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 16.895,
+        "lon": -63.051129
+      },
+      "ne": {
+        "lat": 17.6158146,
+        "lon": -62.3303519
+      }
+    }
+  },
+  "kr": {
+    "name": "Korea, Republic of",
+    "alpha-2": "KR",
+    "alpha-3": "KOR",
+    "country-code": "410",
+    "iso_3166-2": "ISO 3166-2:KR",
+    "region": "Asia",
+    "sub-region": "Eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "030",
+    "intermediate-region-code": "",
+    "dial_code": "+82",
+    "geonameid": "1835841",
+    "capital": "Seoul",
+    "currency": "Won",
+    "language-codes": "ko-KR,en",
+    "area-km2": "98480",
+    "gdp": "1198000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 32.9104556,
+        "lon": 124.354847
+      },
+      "ne": {
+        "lat": 38.623477,
+        "lon": 132.1467806
+      }
+    }
+  },
+  "kw": {
+    "name": "Kuwait",
+    "alpha-2": "KW",
+    "alpha-3": "KWT",
+    "country-code": "414",
+    "iso_3166-2": "ISO 3166-2:KW",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+965",
+    "geonameid": "285570",
+    "capital": "Kuwait City",
+    "currency": "Dinar",
+    "language-codes": "ar-KW,en",
+    "area-km2": "17820",
+    "gdp": "179500000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 28.5243622,
+        "lon": 46.5526837
+      },
+      "ne": {
+        "lat": 30.1038082,
+        "lon": 49.0046809
+      }
+    }
+  },
+  "la": {
+    "name": "Lao People's Democratic Republic",
+    "alpha-2": "LA",
+    "alpha-3": "LAO",
+    "country-code": "418",
+    "iso_3166-2": "ISO 3166-2:LA",
+    "region": "Asia",
+    "sub-region": "South-eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "035",
+    "intermediate-region-code": "",
+    "dial_code": "+856",
+    "geonameid": "1655842",
+    "capital": "Vientiane",
+    "currency": "Kip",
+    "language-codes": "lo,fr,en",
+    "area-km2": "236800",
+    "gdp": "10100000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 13.9096752,
+        "lon": 100.0843247
+      },
+      "ne": {
+        "lat": 22.5086717,
+        "lon": 107.6349989
+      }
+    }
+  },
+  "lb": {
+    "name": "Lebanon",
+    "alpha-2": "LB",
+    "alpha-3": "LBN",
+    "country-code": "422",
+    "iso_3166-2": "ISO 3166-2:LB",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+961",
+    "geonameid": "272103",
+    "capital": "Beirut",
+    "currency": "Pound",
+    "language-codes": "ar-LB,fr-LB,en,hy",
+    "area-km2": "10400",
+    "gdp": "43490000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 33.0479858,
+        "lon": 34.8825667
+      },
+      "ne": {
+        "lat": 34.6923543,
+        "lon": 36.625
+      }
+    }
+  },
+  "lr": {
+    "name": "Liberia",
+    "alpha-2": "LR",
+    "alpha-3": "LBR",
+    "country-code": "430",
+    "iso_3166-2": "ISO 3166-2:LR",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+231",
+    "geonameid": "2275384",
+    "capital": "Monrovia",
+    "currency": "Dollar",
+    "language-codes": "en-LR",
+    "area-km2": "111370",
+    "gdp": "1977000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 4.1555907,
+        "lon": -11.6080764
+      },
+      "ne": {
+        "lat": 8.5519861,
+        "lon": -7.367323
+      }
+    }
+  },
+  "ly": {
+    "name": "Libya",
+    "alpha-2": "LY",
+    "alpha-3": "LBY",
+    "country-code": "434",
+    "iso_3166-2": "ISO 3166-2:LY",
+    "region": "Africa",
+    "sub-region": "Northern Africa",
+    "intermediate-region": "",
+    "region-code": "002",
+    "sub-region-code": "015",
+    "intermediate-region-code": "",
+    "dial_code": "+218",
+    "geonameid": "2215636",
+    "capital": "Tripolis",
+    "currency": "Dinar",
+    "language-codes": "ar-LY,it,en",
+    "area-km2": "1759540",
+    "gdp": "70920000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 19.5008138,
+        "lon": 9.391081
+      },
+      "ne": {
+        "lat": 33.3545898,
+        "lon": 25.3770629
+      }
+    }
+  },
+  "lc": {
+    "name": "Saint Lucia",
+    "alpha-2": "LC",
+    "alpha-3": "LCA",
+    "country-code": "662",
+    "iso_3166-2": "ISO 3166-2:LC",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1758",
+    "geonameid": "3576468",
+    "capital": "Castries",
+    "currency": "Dollar",
+    "language-codes": "en-LC",
+    "area-km2": "616",
+    "gdp": "1377000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 13.508,
+        "lon": -61.2853867
+      },
+      "ne": {
+        "lat": 14.2725,
+        "lon": -60.6669363
+      }
+    }
+  },
+  "li": {
+    "name": "Liechtenstein",
+    "alpha-2": "LI",
+    "alpha-3": "LIE",
+    "country-code": "438",
+    "iso_3166-2": "ISO 3166-2:LI",
+    "region": "Europe",
+    "sub-region": "Western Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "155",
+    "intermediate-region-code": "",
+    "dial_code": "+423",
+    "geonameid": "3042058",
+    "capital": "Vaduz",
+    "currency": "Franc",
+    "language-codes": "de-LI",
+    "area-km2": "160",
+    "gdp": "5113000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 47.0484291,
+        "lon": 9.4716736
+      },
+      "ne": {
+        "lat": 47.270581,
+        "lon": 9.6357143
+      }
+    }
+  },
+  "lk": {
+    "name": "Sri Lanka",
+    "alpha-2": "LK",
+    "alpha-3": "LKA",
+    "country-code": "144",
+    "iso_3166-2": "ISO 3166-2:LK",
+    "region": "Asia",
+    "sub-region": "Southern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "034",
+    "intermediate-region-code": "",
+    "dial_code": "+94",
+    "geonameid": "1227603",
+    "capital": "Colombo",
+    "currency": "Rupee",
+    "language-codes": "si,ta,en",
+    "area-km2": "65610",
+    "gdp": "65120000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 5.719,
+        "lon": 79.3959205
+      },
+      "ne": {
+        "lat": 10.035,
+        "lon": 82.0810141
+      }
+    }
+  },
+  "ls": {
+    "name": "Lesotho",
+    "alpha-2": "LS",
+    "alpha-3": "LSO",
+    "country-code": "426",
+    "iso_3166-2": "ISO 3166-2:LS",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Southern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "018",
+    "dial_code": "+266",
+    "geonameid": "932692",
+    "capital": "Maseru",
+    "currency": "Loti",
+    "language-codes": "en-LS,st,zu,xh",
+    "area-km2": "30355",
+    "gdp": "2457000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -30.6772773,
+        "lon": 27.0114632
+      },
+      "ne": {
+        "lat": -28.570615,
+        "lon": 29.4557099
+      }
+    }
+  },
+  "lt": {
+    "name": "Lithuania",
+    "alpha-2": "LT",
+    "alpha-3": "LTU",
+    "country-code": "440",
+    "iso_3166-2": "ISO 3166-2:LT",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+370",
+    "geonameid": "597427",
+    "capital": "Vilnius",
+    "currency": "Euro",
+    "language-codes": "lt,ru,pl",
+    "area-km2": "65200",
+    "gdp": "46710000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 53.8967893,
+        "lon": 20.653783
+      },
+      "ne": {
+        "lat": 56.4504213,
+        "lon": 26.8355198
+      }
+    }
+  },
+  "lu": {
+    "name": "Luxembourg",
+    "alpha-2": "LU",
+    "alpha-3": "LUX",
+    "country-code": "442",
+    "iso_3166-2": "ISO 3166-2:LU",
+    "region": "Europe",
+    "sub-region": "Western Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "155",
+    "intermediate-region-code": "",
+    "dial_code": "+352",
+    "geonameid": "2960313",
+    "capital": "Luxembourg",
+    "currency": "Euro",
+    "language-codes": "lb,de-LU,fr-LU",
+    "area-km2": "2586",
+    "gdp": "60540000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 49.4969821,
+        "lon": 4.9684415
+      },
+      "ne": {
+        "lat": 50.430377,
+        "lon": 6.0344254
+      }
+    }
+  },
+  "lv": {
+    "name": "Latvia",
+    "alpha-2": "LV",
+    "alpha-3": "LVA",
+    "country-code": "428",
+    "iso_3166-2": "ISO 3166-2:LV",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+371",
+    "geonameid": "458258",
+    "capital": "Riga",
+    "currency": "Euro",
+    "language-codes": "lv,ru,lt",
+    "area-km2": "64589",
+    "gdp": "30380000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 55.6746505,
+        "lon": 20.6715407
+      },
+      "ne": {
+        "lat": 58.0855688,
+        "lon": 28.2414904
+      }
+    }
+  },
+  "mo": {
+    "name": "Macao",
+    "alpha-2": "MO",
+    "alpha-3": "MAC",
+    "country-code": "446",
+    "iso_3166-2": "ISO 3166-2:MO",
+    "region": "Asia",
+    "sub-region": "Eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "030",
+    "intermediate-region-code": "",
+    "dial_code": "+853",
+    "geonameid": "1821275",
+    "capital": "Macao",
+    "currency": "Pataca",
+    "language-codes": "zh,zh-MO,pt",
+    "area-km2": "254",
+    "gdp": "51680000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 22.0766667,
+        "lon": 113.5281666
+      },
+      "ne": {
+        "lat": 22.2170361,
+        "lon": 113.6301389
+      }
+    }
+  },
+  "mf": {
+    "name": "Saint Martin (French part)",
+    "alpha-2": "MF",
+    "alpha-3": "MAF",
+    "country-code": "663",
+    "iso_3166-2": "ISO 3166-2:MF",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+590",
+    "geonameid": "3578421",
+    "capital": "Marigot",
+    "currency": "Euro",
+    "language-codes": "fr",
+    "area-km2": "53",
+    "gdp": "561500000",
+    "boundingBox": {
+      "sw": {
+        "lat": 17.8963535,
+        "lon": -63.3605643
+      },
+      "ne": {
+        "lat": 18.1902778,
+        "lon": -62.7644063
+      }
+    }
+  },
+  "ma": {
+    "name": "Morocco",
+    "alpha-2": "MA",
+    "alpha-3": "MAR",
+    "country-code": "504",
+    "iso_3166-2": "ISO 3166-2:MA",
+    "region": "Africa",
+    "sub-region": "Northern Africa",
+    "intermediate-region": "",
+    "region-code": "002",
+    "sub-region-code": "015",
+    "intermediate-region-code": "",
+    "dial_code": "+212",
+    "geonameid": "2542007",
+    "capital": "Rabat",
+    "currency": "Dirham",
+    "language-codes": "ar-MA,fr",
+    "area-km2": "446550",
+    "gdp": "104800000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 21.3365321,
+        "lon": -17.2551456
+      },
+      "ne": {
+        "lat": 36.0505269,
+        "lon": -0.998429
+      }
+    }
+  },
+  "mc": {
+    "name": "Monaco",
+    "alpha-2": "MC",
+    "alpha-3": "MCO",
+    "country-code": "492",
+    "iso_3166-2": "ISO 3166-2:MC",
+    "region": "Europe",
+    "sub-region": "Western Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "155",
+    "intermediate-region-code": "",
+    "dial_code": "+377",
+    "geonameid": "2993457",
+    "capital": "Monaco",
+    "currency": "Euro",
+    "language-codes": "fr-MC,en,it",
+    "area-km2": "2",
+    "gdp": "5748000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 43.7247599,
+        "lon": 7.4090279
+      },
+      "ne": {
+        "lat": 43.7519311,
+        "lon": 7.4398704
+      }
+    }
+  },
+  "md": {
+    "name": "Moldova, Republic of",
+    "alpha-2": "MD",
+    "alpha-3": "MDA",
+    "country-code": "498",
+    "iso_3166-2": "ISO 3166-2:MD",
+    "region": "Europe",
+    "sub-region": "Eastern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "151",
+    "intermediate-region-code": "",
+    "dial_code": "+373",
+    "geonameid": "617790",
+    "capital": "Chisinau",
+    "currency": "Leu",
+    "language-codes": "ro,ru,gag,tr",
+    "area-km2": "33843",
+    "gdp": "7932000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 45.4674139,
+        "lon": 26.6162189
+      },
+      "ne": {
+        "lat": 48.4918695,
+        "lon": 30.1636756
+      }
+    }
+  },
+  "mg": {
+    "name": "Madagascar",
+    "alpha-2": "MG",
+    "alpha-3": "MDG",
+    "country-code": "450",
+    "iso_3166-2": "ISO 3166-2:MG",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+261",
+    "geonameid": "1062947",
+    "capital": "Antananarivo",
+    "currency": "Ariary",
+    "language-codes": "fr-MG,mg",
+    "area-km2": "587040",
+    "gdp": "10530000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -25.6071002,
+        "lon": 43.2202072
+      },
+      "ne": {
+        "lat": -11.9519693,
+        "lon": 50.4862553
+      }
+    }
+  },
+  "mv": {
+    "name": "Maldives",
+    "alpha-2": "MV",
+    "alpha-3": "MDV",
+    "country-code": "462",
+    "iso_3166-2": "ISO 3166-2:MV",
+    "region": "Asia",
+    "sub-region": "Southern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "034",
+    "intermediate-region-code": "",
+    "dial_code": "+960",
+    "geonameid": "1282028",
+    "capital": "Male",
+    "currency": "Rufiyaa",
+    "language-codes": "dv,en",
+    "area-km2": "300",
+    "gdp": "2270000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -0.9074935,
+        "lon": 72.3554187
+      },
+      "ne": {
+        "lat": 7.3106246,
+        "lon": 73.9700962
+      }
+    }
+  },
+  "mx": {
+    "name": "Mexico",
+    "alpha-2": "MX",
+    "alpha-3": "MEX",
+    "country-code": "484",
+    "iso_3166-2": "ISO 3166-2:MX",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Central America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "013",
+    "dial_code": "+52",
+    "geonameid": "3996063",
+    "capital": "Mexico City",
+    "currency": "Peso",
+    "language-codes": "es-MX",
+    "area-km2": "1972550",
+    "gdp": "1327000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 14.3886243,
+        "lon": -118.59919
+      },
+      "ne": {
+        "lat": 32.7186553,
+        "lon": -86.493266
+      }
+    }
+  },
+  "mh": {
+    "name": "Marshall Islands",
+    "alpha-2": "MH",
+    "alpha-3": "MHL",
+    "country-code": "584",
+    "iso_3166-2": "ISO 3166-2:MH",
+    "region": "Oceania",
+    "sub-region": "Micronesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "057",
+    "intermediate-region-code": "",
+    "dial_code": "+692",
+    "geonameid": "2080185",
+    "capital": "Majuro",
+    "currency": "Dollar",
+    "language-codes": "mh,en-MH",
+    "area-km2": "181",
+    "gdp": "193000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -0.5481258,
+        "lon": 163.4985095
+      },
+      "ne": {
+        "lat": 14.4518742,
+        "lon": 178.4985095
+      }
+    }
+  },
+  "mk": {
+    "name": "North Macedonia",
+    "alpha-2": "MK",
+    "alpha-3": "MKD",
+    "country-code": "807",
+    "iso_3166-2": "ISO 3166-2:MK",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+389",
+    "geonameid": "718075",
+    "capital": "Skopje",
+    "currency": "Denar",
+    "language-codes": "mk,sq,tr,rmm,sr",
+    "area-km2": "25333",
+    "gdp": "10650000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 40.8536596,
+        "lon": 20.4529023
+      },
+      "ne": {
+        "lat": 42.3735359,
+        "lon": 23.034051
+      }
+    }
+  },
+  "ml": {
+    "name": "Mali",
+    "alpha-2": "ML",
+    "alpha-3": "MLI",
+    "country-code": "466",
+    "iso_3166-2": "ISO 3166-2:ML",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+223",
+    "geonameid": "2453866",
+    "capital": "Bamako",
+    "currency": "Franc",
+    "language-codes": "fr-ML,bm",
+    "area-km2": "1240000",
+    "gdp": "11370000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 10.147811,
+        "lon": -12.2402835
+      },
+      "ne": {
+        "lat": 25.001084,
+        "lon": 4.2673828
+      }
+    }
+  },
+  "mt": {
+    "name": "Malta",
+    "alpha-2": "MT",
+    "alpha-3": "MLT",
+    "country-code": "470",
+    "iso_3166-2": "ISO 3166-2:MT",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+356",
+    "geonameid": "2562770",
+    "capital": "Valletta",
+    "currency": "Euro",
+    "language-codes": "mt,en-MT",
+    "area-km2": "316",
+    "gdp": "9541000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 35.6029696,
+        "lon": 13.9324226
+      },
+      "ne": {
+        "lat": 36.2852706,
+        "lon": 14.8267966
+      }
+    }
+  },
+  "mm": {
+    "name": "Myanmar",
+    "alpha-2": "MM",
+    "alpha-3": "MMR",
+    "country-code": "104",
+    "iso_3166-2": "ISO 3166-2:MM",
+    "region": "Asia",
+    "sub-region": "South-eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "035",
+    "intermediate-region-code": "",
+    "dial_code": "+95",
+    "geonameid": "1327865",
+    "capital": "Nay Pyi Taw",
+    "currency": "Kyat",
+    "language-codes": "my",
+    "area-km2": "678500",
+    "gdp": "59430000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 9.4399432,
+        "lon": 92.1719423
+      },
+      "ne": {
+        "lat": 28.547835,
+        "lon": 101.1700796
+      }
+    }
+  },
+  "me": {
+    "name": "Montenegro",
+    "alpha-2": "ME",
+    "alpha-3": "MNE",
+    "country-code": "499",
+    "iso_3166-2": "ISO 3166-2:ME",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+382",
+    "geonameid": "3194884",
+    "capital": "Podgorica",
+    "currency": "Euro",
+    "language-codes": "sr,hu,bs,sq,hr,rom",
+    "area-km2": "14026",
+    "gdp": "4518000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 41.7495999,
+        "lon": 18.4195781
+      },
+      "ne": {
+        "lat": 43.5585061,
+        "lon": 20.3561641
+      }
+    }
+  },
+  "mn": {
+    "name": "Mongolia",
+    "alpha-2": "MN",
+    "alpha-3": "MNG",
+    "country-code": "496",
+    "iso_3166-2": "ISO 3166-2:MN",
+    "region": "Asia",
+    "sub-region": "Eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "030",
+    "intermediate-region-code": "",
+    "dial_code": "+976",
+    "geonameid": "2029969",
+    "capital": "Ulan Bator",
+    "currency": "Tugrik",
+    "language-codes": "mn,ru",
+    "area-km2": "1565000",
+    "gdp": "11140000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 41.5800276,
+        "lon": 87.73762
+      },
+      "ne": {
+        "lat": 52.1496,
+        "lon": 119.931949
+      }
+    }
+  },
+  "mp": {
+    "name": "Northern Mariana Islands",
+    "alpha-2": "MP",
+    "alpha-3": "MNP",
+    "country-code": "580",
+    "iso_3166-2": "ISO 3166-2:MP",
+    "region": "Oceania",
+    "sub-region": "Micronesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "057",
+    "intermediate-region-code": "",
+    "dial_code": "+1670",
+    "geonameid": "4041468",
+    "capital": "Saipan",
+    "currency": "Dollar",
+    "language-codes": "fil,tl,zh,ch-MP,en-MP",
+    "area-km2": "477",
+    "gdp": "733000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 14.036565,
+        "lon": 144.813338
+      },
+      "ne": {
+        "lat": 20.616556,
+        "lon": 146.154418
+      }
+    }
+  },
+  "mz": {
+    "name": "Mozambique",
+    "alpha-2": "MZ",
+    "alpha-3": "MOZ",
+    "country-code": "508",
+    "iso_3166-2": "ISO 3166-2:MZ",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+258",
+    "geonameid": "1036973",
+    "capital": "Maputo",
+    "currency": "Metical",
+    "language-codes": "pt-MZ,vmw",
+    "area-km2": "801590",
+    "gdp": "14670000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -26.9209427,
+        "lon": 30.2138197
+      },
+      "ne": {
+        "lat": -10.3252149,
+        "lon": 41.0545908
+      }
+    }
+  },
+  "mr": {
+    "name": "Mauritania",
+    "alpha-2": "MR",
+    "alpha-3": "MRT",
+    "country-code": "478",
+    "iso_3166-2": "ISO 3166-2:MR",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+222",
+    "geonameid": "2378080",
+    "capital": "Nouakchott",
+    "currency": "Ouguiya",
+    "language-codes": "ar-MR,fuc,snk,fr,mey,wo",
+    "area-km2": "1030700",
+    "gdp": "4183000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 14.7209909,
+        "lon": -17.068081
+      },
+      "ne": {
+        "lat": 27.314942,
+        "lon": -4.8333344
+      }
+    }
+  },
+  "ms": {
+    "name": "Montserrat",
+    "alpha-2": "MS",
+    "alpha-3": "MSR",
+    "country-code": "500",
+    "iso_3166-2": "ISO 3166-2:MS",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1664",
+    "geonameid": "3578097",
+    "capital": "Plymouth",
+    "currency": "Dollar",
+    "language-codes": "en-MS",
+    "area-km2": "102",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": 16.475,
+        "lon": -62.450667
+      },
+      "ne": {
+        "lat": 17.0152978,
+        "lon": -61.9353818
+      }
+    }
+  },
+  "mu": {
+    "name": "Mauritius",
+    "alpha-2": "MU",
+    "alpha-3": "MUS",
+    "country-code": "480",
+    "iso_3166-2": "ISO 3166-2:MU",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+230",
+    "geonameid": "934292",
+    "capital": "Port Louis",
+    "currency": "Rupee",
+    "language-codes": "en-MU,bho,fr",
+    "area-km2": "2040",
+    "gdp": "11900000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -20.725,
+        "lon": 56.3825151
+      },
+      "ne": {
+        "lat": -10.138,
+        "lon": 63.7151319
+      }
+    }
+  },
+  "mw": {
+    "name": "Malawi",
+    "alpha-2": "MW",
+    "alpha-3": "MWI",
+    "country-code": "454",
+    "iso_3166-2": "ISO 3166-2:MW",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+265",
+    "geonameid": "927384",
+    "capital": "Lilongwe",
+    "currency": "Kwacha",
+    "language-codes": "ny,yao,tum,swk",
+    "area-km2": "118480",
+    "gdp": "3683000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -17.1296031,
+        "lon": 32.6703616
+      },
+      "ne": {
+        "lat": -9.3683261,
+        "lon": 35.9185731
+      }
+    }
+  },
+  "my": {
+    "name": "Malaysia",
+    "alpha-2": "MY",
+    "alpha-3": "MYS",
+    "country-code": "458",
+    "iso_3166-2": "ISO 3166-2:MY",
+    "region": "Asia",
+    "sub-region": "South-eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "035",
+    "intermediate-region-code": "",
+    "dial_code": "+60",
+    "geonameid": "1733045",
+    "capital": "Kuala Lumpur",
+    "currency": "Ringgit",
+    "language-codes": "ms-MY,en,zh,ta,te,ml,pa,th",
+    "area-km2": "329750",
+    "gdp": "312400000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -5.1076241,
+        "lon": 105.3471939
+      },
+      "ne": {
+        "lat": 9.8923759,
+        "lon": 120.3471939
+      }
+    }
+  },
+  "yt": {
+    "name": "Mayotte",
+    "alpha-2": "YT",
+    "alpha-3": "MYT",
+    "country-code": "175",
+    "iso_3166-2": "ISO 3166-2:YT",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+262",
+    "geonameid": "1024031",
+    "capital": "Mamoudzou",
+    "currency": "Euro",
+    "language-codes": "fr-YT",
+    "area-km2": "374",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": -13.0210119,
+        "lon": 45.0183298
+      },
+      "ne": {
+        "lat": -12.6365902,
+        "lon": 45.2999917
+      }
+    }
+  },
+  "na": {
+    "name": "Namibia",
+    "alpha-2": "NA",
+    "alpha-3": "NAM",
+    "country-code": "516",
+    "iso_3166-2": "ISO 3166-2:NA",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Southern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "018",
+    "dial_code": "+264",
+    "geonameid": "3355338",
+    "capital": "Windhoek",
+    "currency": "Dollar",
+    "language-codes": "en-NA,af,de,hz,naq",
+    "area-km2": "825418",
+    "gdp": "12300000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -28.96945,
+        "lon": 11.5280384
+      },
+      "ne": {
+        "lat": -16.9634855,
+        "lon": 25.2617671
+      }
+    }
+  },
+  "nc": {
+    "name": "New Caledonia",
+    "alpha-2": "NC",
+    "alpha-3": "NCL",
+    "country-code": "540",
+    "iso_3166-2": "ISO 3166-2:NC",
+    "region": "Oceania",
+    "sub-region": "Melanesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "054",
+    "intermediate-region-code": "",
+    "dial_code": "+687",
+    "geonameid": "2139685",
+    "capital": "Noumea",
+    "currency": "Franc",
+    "language-codes": "fr-NC",
+    "area-km2": "19060",
+    "gdp": "9280000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -23.2217509,
+        "lon": 162.6034343
+      },
+      "ne": {
+        "lat": -17.6868616,
+        "lon": 167.8109827
+      }
+    }
+  },
+  "ne": {
+    "name": "Niger",
+    "alpha-2": "NE",
+    "alpha-3": "NER",
+    "country-code": "562",
+    "iso_3166-2": "ISO 3166-2:NE",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+227",
+    "geonameid": "2440476",
+    "capital": "Niamey",
+    "currency": "Franc",
+    "language-codes": "fr-NE,ha,kr,dje",
+    "area-km2": "1267000",
+    "gdp": "7304000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 11.693756,
+        "lon": 0.1689653
+      },
+      "ne": {
+        "lat": 23.517178,
+        "lon": 15.996667
+      }
+    }
+  },
+  "ng": {
+    "name": "Nigeria",
+    "alpha-2": "NG",
+    "alpha-3": "NGA",
+    "country-code": "566",
+    "iso_3166-2": "ISO 3166-2:NG",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+234",
+    "geonameid": "2328926",
+    "capital": "Abuja",
+    "currency": "Naira",
+    "language-codes": "en-NG,ha,yo,ig,ff",
+    "area-km2": "923768",
+    "gdp": "502000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 4.0690959,
+        "lon": 2.676932
+      },
+      "ne": {
+        "lat": 13.885645,
+        "lon": 14.678014
+      }
+    }
+  },
+  "ni": {
+    "name": "Nicaragua",
+    "alpha-2": "NI",
+    "alpha-3": "NIC",
+    "country-code": "558",
+    "iso_3166-2": "ISO 3166-2:NI",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Central America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "013",
+    "dial_code": "+505",
+    "geonameid": "3617476",
+    "capital": "Managua",
+    "currency": "Cordoba",
+    "language-codes": "es-NI,en",
+    "area-km2": "129494",
+    "gdp": "11260000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 10.7076565,
+        "lon": -87.901532
+      },
+      "ne": {
+        "lat": 15.0331183,
+        "lon": -82.6227023
+      }
+    }
+  },
+  "nu": {
+    "name": "Niue",
+    "alpha-2": "NU",
+    "alpha-3": "NIU",
+    "country-code": "570",
+    "iso_3166-2": "ISO 3166-2:NU",
+    "region": "Oceania",
+    "sub-region": "Polynesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "061",
+    "intermediate-region-code": "",
+    "dial_code": "+683",
+    "geonameid": "4036232",
+    "capital": "Alofi",
+    "currency": "Dollar",
+    "language-codes": "niu,en-NU",
+    "area-km2": "260",
+    "gdp": "10010000",
+    "boundingBox": {
+      "sw": {
+        "lat": -19.3548665,
+        "lon": -170.1595029
+      },
+      "ne": {
+        "lat": -18.7534559,
+        "lon": -169.5647229
+      }
+    }
+  },
+  "nl": {
+    "name": "Netherlands",
+    "alpha-2": "NL",
+    "alpha-3": "NLD",
+    "country-code": "528",
+    "iso_3166-2": "ISO 3166-2:NL",
+    "region": "Europe",
+    "sub-region": "Western Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "155",
+    "intermediate-region-code": "",
+    "dial_code": "+31",
+    "geonameid": "2750405",
+    "capital": "Amsterdam",
+    "currency": "Euro",
+    "language-codes": "nl-NL,fy-NL",
+    "area-km2": "41526",
+    "gdp": "722300000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 50.7295671,
+        "lon": 1.9193492
+      },
+      "ne": {
+        "lat": 53.7253321,
+        "lon": 7.2274985
+      }
+    }
+  },
+  "no": {
+    "name": "Norway",
+    "alpha-2": "NO",
+    "alpha-3": "NOR",
+    "country-code": "578",
+    "iso_3166-2": "ISO 3166-2:NO",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+47",
+    "geonameid": "3144096",
+    "capital": "Oslo",
+    "currency": "Krone",
+    "language-codes": "no,nb,nn,se,fi",
+    "area-km2": "324220",
+    "gdp": "515800000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 57.7590052,
+        "lon": 4.0875274
+      },
+      "ne": {
+        "lat": 71.3848787,
+        "lon": 31.7614911
+      }
+    }
+  },
+  "np": {
+    "name": "Nepal",
+    "alpha-2": "NP",
+    "alpha-3": "NPL",
+    "country-code": "524",
+    "iso_3166-2": "ISO 3166-2:NP",
+    "region": "Asia",
+    "sub-region": "Southern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "034",
+    "intermediate-region-code": "",
+    "dial_code": "+977",
+    "geonameid": "1282988",
+    "capital": "Kathmandu",
+    "currency": "Rupee",
+    "language-codes": "ne,en",
+    "area-km2": "140800",
+    "gdp": "19340000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 26.3477581,
+        "lon": 80.0586226
+      },
+      "ne": {
+        "lat": 30.446945,
+        "lon": 88.2015257
+      }
+    }
+  },
+  "nr": {
+    "name": "Nauru",
+    "alpha-2": "NR",
+    "alpha-3": "NRU",
+    "country-code": "520",
+    "iso_3166-2": "ISO 3166-2:NR",
+    "region": "Oceania",
+    "sub-region": "Micronesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "057",
+    "intermediate-region-code": "",
+    "dial_code": "+674",
+    "geonameid": "2110425",
+    "capital": "Yaren",
+    "currency": "Dollar",
+    "language-codes": "na,en-NR",
+    "area-km2": "21",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": -0.5541334,
+        "lon": 166.9091794
+      },
+      "ne": {
+        "lat": -0.5025906,
+        "lon": 166.9589235
+      }
+    }
+  },
+  "nz": {
+    "name": "New Zealand",
+    "alpha-2": "NZ",
+    "alpha-3": "NZL",
+    "country-code": "554",
+    "iso_3166-2": "ISO 3166-2:NZ",
+    "region": "Oceania",
+    "sub-region": "Australia and New Zealand",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "053",
+    "intermediate-region-code": "",
+    "dial_code": "+64",
+    "geonameid": "2186224",
+    "capital": "Wellington",
+    "currency": "Dollar",
+    "language-codes": "en-NZ,mi",
+    "area-km2": "268680",
+    "gdp": "181100000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -52.8213687,
+        "lon": -179.059153
+      },
+      "ne": {
+        "lat": -29.0303303,
+        "lon": 179.3643594
+      }
+    }
+  },
+  "om": {
+    "name": "Oman",
+    "alpha-2": "OM",
+    "alpha-3": "OMN",
+    "country-code": "512",
+    "iso_3166-2": "ISO 3166-2:OM",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+968",
+    "geonameid": "286963",
+    "capital": "Muscat",
+    "currency": "Rial",
+    "language-codes": "ar-OM,en,bal,ur",
+    "area-km2": "212460",
+    "gdp": "81950000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 16.4649608,
+        "lon": 52
+      },
+      "ne": {
+        "lat": 26.7026737,
+        "lon": 60.054577
+      }
+    }
+  },
+  "pk": {
+    "name": "Pakistan",
+    "alpha-2": "PK",
+    "alpha-3": "PAK",
+    "country-code": "586",
+    "iso_3166-2": "ISO 3166-2:PK",
+    "region": "Asia",
+    "sub-region": "Southern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "034",
+    "intermediate-region-code": "",
+    "dial_code": "+92",
+    "geonameid": "1168579",
+    "capital": "Islamabad",
+    "currency": "Rupee",
+    "language-codes": "ur-PK,en-PK,pa,sd,ps,brh",
+    "area-km2": "803940",
+    "gdp": "236500000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 23.5393916,
+        "lon": 60.872855
+      },
+      "ne": {
+        "lat": 37.084107,
+        "lon": 77.1203914
+      }
+    }
+  },
+  "pa": {
+    "name": "Panama",
+    "alpha-2": "PA",
+    "alpha-3": "PAN",
+    "country-code": "591",
+    "iso_3166-2": "ISO 3166-2:PA",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Central America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "013",
+    "dial_code": "+507",
+    "geonameid": "3703430",
+    "capital": "Panama City",
+    "currency": "Balboa",
+    "language-codes": "es-PA,en",
+    "area-km2": "78200",
+    "gdp": "40620000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 7.0338679,
+        "lon": -83.0517245
+      },
+      "ne": {
+        "lat": 9.8701757,
+        "lon": -77.1393779
+      }
+    }
+  },
+  "pn": {
+    "name": "Pitcairn",
+    "alpha-2": "PN",
+    "alpha-3": "PCN",
+    "country-code": "612",
+    "iso_3166-2": "ISO 3166-2:PN",
+    "region": "Oceania",
+    "sub-region": "Polynesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "061",
+    "intermediate-region-code": "",
+    "dial_code": "+872",
+    "geonameid": "4030699",
+    "capital": "Adamstown",
+    "currency": "Dollar",
+    "language-codes": "en-PN",
+    "area-km2": "47",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": -25.1306736,
+        "lon": -130.8049862
+      },
+      "ne": {
+        "lat": -23.8655769,
+        "lon": -124.717534
+      }
+    }
+  },
+  "pe": {
+    "name": "Peru",
+    "alpha-2": "PE",
+    "alpha-3": "PER",
+    "country-code": "604",
+    "iso_3166-2": "ISO 3166-2:PE",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+51",
+    "geonameid": "3932488",
+    "capital": "Lima",
+    "currency": "Sol",
+    "language-codes": "es-PE,qu,ay",
+    "area-km2": "1285220",
+    "gdp": "210300000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -20.1984472,
+        "lon": -84.6356535
+      },
+      "ne": {
+        "lat": -0.0392818,
+        "lon": -68.6519906
+      }
+    }
+  },
+  "ph": {
+    "name": "Philippines",
+    "alpha-2": "PH",
+    "alpha-3": "PHL",
+    "country-code": "608",
+    "iso_3166-2": "ISO 3166-2:PH",
+    "region": "Asia",
+    "sub-region": "South-eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "035",
+    "intermediate-region-code": "",
+    "dial_code": "+63",
+    "geonameid": "1694008",
+    "capital": "Manila",
+    "currency": "Peso",
+    "language-codes": "tl,en-PH,fil",
+    "area-km2": "300000",
+    "gdp": "272200000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 4.2158064,
+        "lon": 114.0952145
+      },
+      "ne": {
+        "lat": 21.3217806,
+        "lon": 126.8072562
+      }
+    }
+  },
+  "pw": {
+    "name": "Palau",
+    "alpha-2": "PW",
+    "alpha-3": "PLW",
+    "country-code": "585",
+    "iso_3166-2": "ISO 3166-2:PW",
+    "region": "Oceania",
+    "sub-region": "Micronesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "057",
+    "intermediate-region-code": "",
+    "dial_code": "+680",
+    "geonameid": "1559582",
+    "capital": "Melekeok",
+    "currency": "Dollar",
+    "language-codes": "pau,sov,en-PW,tox,ja,fil,zh",
+    "area-km2": "458",
+    "gdp": "221000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 2.748,
+        "lon": 131.0685462
+      },
+      "ne": {
+        "lat": 8.222,
+        "lon": 134.7714735
+      }
+    }
+  },
+  "pg": {
+    "name": "Papua New Guinea",
+    "alpha-2": "PG",
+    "alpha-3": "PNG",
+    "country-code": "598",
+    "iso_3166-2": "ISO 3166-2:PG",
+    "region": "Oceania",
+    "sub-region": "Melanesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "054",
+    "intermediate-region-code": "",
+    "dial_code": "+675",
+    "geonameid": "2088628",
+    "capital": "Port Moresby",
+    "currency": "Kina",
+    "language-codes": "en-PG,ho,meu,tpi",
+    "area-km2": "462840",
+    "gdp": "16100000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -13.1816069,
+        "lon": 136.7489081
+      },
+      "ne": {
+        "lat": 1.8183931,
+        "lon": 151.7489081
+      }
+    }
+  },
+  "pl": {
+    "name": "Poland",
+    "alpha-2": "PL",
+    "alpha-3": "POL",
+    "country-code": "616",
+    "iso_3166-2": "ISO 3166-2:PL",
+    "region": "Europe",
+    "sub-region": "Eastern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "151",
+    "intermediate-region-code": "",
+    "dial_code": "+48",
+    "geonameid": "798544",
+    "capital": "Warsaw",
+    "currency": "Zloty",
+    "language-codes": "pl",
+    "area-km2": "312685",
+    "gdp": "513900000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 49.0020468,
+        "lon": 14.1229707
+      },
+      "ne": {
+        "lat": 55.0336963,
+        "lon": 24.145783
+      }
+    }
+  },
+  "pr": {
+    "name": "Puerto Rico",
+    "alpha-2": "PR",
+    "alpha-3": "PRI",
+    "country-code": "630",
+    "iso_3166-2": "ISO 3166-2:PR",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1939",
+    "geonameid": "4566966",
+    "capital": "San Juan",
+    "currency": "Dollar",
+    "language-codes": "en-PR,es-PR",
+    "area-km2": "9104",
+    "gdp": "93520000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 17.9268695,
+        "lon": -67.271492
+      },
+      "ne": {
+        "lat": 18.5159789,
+        "lon": -65.5897525
+      }
+    }
+  },
+  "kp": {
+    "name": "Korea (Democratic People's Republic of)",
+    "alpha-2": "KP",
+    "alpha-3": "PRK",
+    "country-code": "408",
+    "iso_3166-2": "ISO 3166-2:KP",
+    "region": "Asia",
+    "sub-region": "Eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "030",
+    "intermediate-region-code": "",
+    "dial_code": "+850",
+    "geonameid": "1873107",
+    "capital": "Pyongyang",
+    "currency": "Won",
+    "language-codes": "ko-KP",
+    "area-km2": "120540",
+    "gdp": "28000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 37.5867855,
+        "lon": 124.0913902
+      },
+      "ne": {
+        "lat": 43.0089642,
+        "lon": 130.924647
+      }
+    }
+  },
+  "pt": {
+    "name": "Portugal",
+    "alpha-2": "PT",
+    "alpha-3": "PRT",
+    "country-code": "620",
+    "iso_3166-2": "ISO 3166-2:PT",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+351",
+    "geonameid": "2264397",
+    "capital": "Lisbon",
+    "currency": "Euro",
+    "language-codes": "pt-PT,mwl",
+    "area-km2": "92391",
+    "gdp": "219300000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 29.8288021,
+        "lon": -31.5575303
+      },
+      "ne": {
+        "lat": 42.1543112,
+        "lon": -6.1891593
+      }
+    }
+  },
+  "py": {
+    "name": "Paraguay",
+    "alpha-2": "PY",
+    "alpha-3": "PRY",
+    "country-code": "600",
+    "iso_3166-2": "ISO 3166-2:PY",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+595",
+    "geonameid": "3437598",
+    "capital": "Asuncion",
+    "currency": "Guarani",
+    "language-codes": "es-PY,gn",
+    "area-km2": "406750",
+    "gdp": "30560000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -27.6063935,
+        "lon": -62.6442036
+      },
+      "ne": {
+        "lat": -19.2876472,
+        "lon": -54.258
+      }
+    }
+  },
+  "ps": {
+    "name": "Palestine, State of",
+    "alpha-2": "PS",
+    "alpha-3": "PSE",
+    "country-code": "275",
+    "iso_3166-2": "ISO 3166-2:PS",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+970",
+    "geonameid": "6254930",
+    "capital": "East Jerusalem",
+    "currency": "Shekel",
+    "language-codes": "ar-PS",
+    "area-km2": "5970",
+    "gdp": "6641000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 31.2201289,
+        "lon": 34.0689732
+      },
+      "ne": {
+        "lat": 32.5521479,
+        "lon": 35.5739235
+      }
+    }
+  },
+  "pf": {
+    "name": "French Polynesia",
+    "alpha-2": "PF",
+    "alpha-3": "PYF",
+    "country-code": "258",
+    "iso_3166-2": "ISO 3166-2:PF",
+    "region": "Oceania",
+    "sub-region": "Polynesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "061",
+    "intermediate-region-code": "",
+    "dial_code": "+689",
+    "geonameid": "4030656",
+    "capital": "Papeete",
+    "currency": "Franc",
+    "language-codes": "fr-PF,ty",
+    "area-km2": "4167",
+    "gdp": "5650000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -28.0990232,
+        "lon": -154.9360599
+      },
+      "ne": {
+        "lat": -7.6592173,
+        "lon": -134.244799
+      }
+    }
+  },
+  "qa": {
+    "name": "Qatar",
+    "alpha-2": "QA",
+    "alpha-3": "QAT",
+    "country-code": "634",
+    "iso_3166-2": "ISO 3166-2:QA",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+974",
+    "geonameid": "289688",
+    "capital": "Doha",
+    "currency": "Rial",
+    "language-codes": "ar-QA,es",
+    "area-km2": "11437",
+    "gdp": "213100000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 24.4707534,
+        "lon": 50.5675
+      },
+      "ne": {
+        "lat": 26.3830212,
+        "lon": 52.638011
+      }
+    }
+  },
+  "re": {
+    "name": "R\u00e9union",
+    "alpha-2": "RE",
+    "alpha-3": "REU",
+    "country-code": "638",
+    "iso_3166-2": "ISO 3166-2:RE",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+262",
+    "geonameid": "935317",
+    "capital": "Saint-Denis",
+    "currency": "Euro",
+    "language-codes": "fr-RE",
+    "area-km2": "2517",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": -21.3897308,
+        "lon": 55.2164268
+      },
+      "ne": {
+        "lat": -20.8717136,
+        "lon": 55.8366924
+      }
+    }
+  },
+  "ro": {
+    "name": "Romania",
+    "alpha-2": "RO",
+    "alpha-3": "ROU",
+    "country-code": "642",
+    "iso_3166-2": "ISO 3166-2:RO",
+    "region": "Europe",
+    "sub-region": "Eastern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "151",
+    "intermediate-region-code": "",
+    "dial_code": "+40",
+    "geonameid": "798549",
+    "capital": "Bucharest",
+    "currency": "Leu",
+    "language-codes": "ro,hu,rom",
+    "area-km2": "237500",
+    "gdp": "188900000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 43.618682,
+        "lon": 20.2619773
+      },
+      "ne": {
+        "lat": 48.2653964,
+        "lon": 30.0454257
+      }
+    }
+  },
+  "ru": {
+    "name": "Russian Federation",
+    "alpha-2": "RU",
+    "alpha-3": "RUS",
+    "country-code": "643",
+    "iso_3166-2": "ISO 3166-2:RU",
+    "region": "Europe",
+    "sub-region": "Eastern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "151",
+    "intermediate-region-code": "",
+    "dial_code": "+7",
+    "geonameid": "2017370",
+    "capital": "Moscow",
+    "currency": "Ruble",
+    "language-codes": "ru,tt,xal,cau,ady,kv,ce,tyv,cv,udm,tut,mns,bua,myv,mdf,chm,ba,inh,tut,kbd,krc,ava,sah,nog",
+    "area-km2": "17100000",
+    "gdp": "2113000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 41.1850968,
+        "lon": 19.6389
+      },
+      "ne": {
+        "lat": 82.0586232,
+        "lon": 180
+      }
+    }
+  },
+  "rw": {
+    "name": "Rwanda",
+    "alpha-2": "RW",
+    "alpha-3": "RWA",
+    "country-code": "646",
+    "iso_3166-2": "ISO 3166-2:RW",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+250",
+    "geonameid": "49518",
+    "capital": "Kigali",
+    "currency": "Franc",
+    "language-codes": "rw,en-RW,fr-RW,sw",
+    "area-km2": "26338",
+    "gdp": "7700000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -2.8389804,
+        "lon": 28.8617546
+      },
+      "ne": {
+        "lat": -1.0474083,
+        "lon": 30.8990738
+      }
+    }
+  },
+  "sa": {
+    "name": "Saudi Arabia",
+    "alpha-2": "SA",
+    "alpha-3": "SAU",
+    "country-code": "682",
+    "iso_3166-2": "ISO 3166-2:SA",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+966",
+    "geonameid": "102358",
+    "capital": "Riyadh",
+    "currency": "Rial",
+    "language-codes": "ar-SA",
+    "area-km2": "1960582",
+    "gdp": "718500000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 16.29,
+        "lon": 34.4571718
+      },
+      "ne": {
+        "lat": 32.1543377,
+        "lon": 55.6666851
+      }
+    }
+  },
+  "sd": {
+    "name": "Sudan",
+    "alpha-2": "SD",
+    "alpha-3": "SDN",
+    "country-code": "729",
+    "iso_3166-2": "ISO 3166-2:SD",
+    "region": "Africa",
+    "sub-region": "Northern Africa",
+    "intermediate-region": "",
+    "region-code": "002",
+    "sub-region-code": "015",
+    "intermediate-region-code": "",
+    "dial_code": "+249",
+    "geonameid": "366755",
+    "capital": "Khartoum",
+    "currency": "Pound",
+    "language-codes": "ar-SD,en,fia",
+    "area-km2": "1861484",
+    "gdp": "52500000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 8.685278,
+        "lon": 21.8145046
+      },
+      "ne": {
+        "lat": 22.224918,
+        "lon": 39.0576252
+      }
+    }
+  },
+  "sn": {
+    "name": "Senegal",
+    "alpha-2": "SN",
+    "alpha-3": "SEN",
+    "country-code": "686",
+    "iso_3166-2": "ISO 3166-2:SN",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+221",
+    "geonameid": "2245662",
+    "capital": "Dakar",
+    "currency": "Franc",
+    "language-codes": "fr-SN,wo,fuc,mnk",
+    "area-km2": "196190",
+    "gdp": "15360000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 12.2372838,
+        "lon": -17.7862419
+      },
+      "ne": {
+        "lat": 16.6919712,
+        "lon": -11.3458996
+      }
+    }
+  },
+  "sg": {
+    "name": "Singapore",
+    "alpha-2": "SG",
+    "alpha-3": "SGP",
+    "country-code": "702",
+    "iso_3166-2": "ISO 3166-2:SG",
+    "region": "Asia",
+    "sub-region": "South-eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "035",
+    "intermediate-region-code": "",
+    "dial_code": "+65",
+    "geonameid": "1880251",
+    "capital": "Singapore",
+    "currency": "Dollar",
+    "language-codes": "cmn,en-SG,ms-SG,ta-SG,zh-SG",
+    "area-km2": "693",
+    "gdp": "295700000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 1.1304753,
+        "lon": 103.6920359
+      },
+      "ne": {
+        "lat": 1.4504753,
+        "lon": 104.0120359
+      }
+    }
+  },
+  "sh": {
+    "name": "Saint Helena, Ascension and Tristan da Cunha",
+    "alpha-2": "SH",
+    "alpha-3": "SHN",
+    "country-code": "654",
+    "iso_3166-2": "ISO 3166-2:SH",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+290",
+    "geonameid": "3370751",
+    "capital": "Jamestown",
+    "currency": "Pound",
+    "language-codes": "en-SH",
+    "area-km2": "410",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": -16.23,
+        "lon": -5.9973424
+      },
+      "ne": {
+        "lat": -15.704,
+        "lon": -5.4234153
+      }
+    }
+  },
+  "sj": {
+    "name": "Svalbard and Jan Mayen",
+    "alpha-2": "SJ",
+    "alpha-3": "SJM",
+    "country-code": "744",
+    "iso_3166-2": "ISO 3166-2:SJ",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+47",
+    "geonameid": "607072",
+    "capital": "Longyearbyen",
+    "currency": "Krone",
+    "language-codes": "no,ru",
+    "area-km2": "62049",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": 70.6260825,
+        "lon": -9.6848146
+      },
+      "ne": {
+        "lat": 81.028076,
+        "lon": 34.6891253
+      }
+    }
+  },
+  "sb": {
+    "name": "Solomon Islands",
+    "alpha-2": "SB",
+    "alpha-3": "SLB",
+    "country-code": "090",
+    "iso_3166-2": "ISO 3166-2:SB",
+    "region": "Oceania",
+    "sub-region": "Melanesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "054",
+    "intermediate-region-code": "",
+    "dial_code": "+677",
+    "geonameid": "2103350",
+    "capital": "Honiara",
+    "currency": "Dollar",
+    "language-codes": "en-SB,tpi",
+    "area-km2": "28450",
+    "gdp": "1099000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -13.2424298,
+        "lon": 155.3190556
+      },
+      "ne": {
+        "lat": -4.81085,
+        "lon": 170.3964667
+      }
+    }
+  },
+  "sl": {
+    "name": "Sierra Leone",
+    "alpha-2": "SL",
+    "alpha-3": "SLE",
+    "country-code": "694",
+    "iso_3166-2": "ISO 3166-2:SL",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+232",
+    "geonameid": "2403846",
+    "capital": "Freetown",
+    "currency": "Leone",
+    "language-codes": "en-SL,men,tem",
+    "area-km2": "71740",
+    "gdp": "4607000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 6.755,
+        "lon": -13.5003389
+      },
+      "ne": {
+        "lat": 9.999973,
+        "lon": -10.271683
+      }
+    }
+  },
+  "sv": {
+    "name": "El Salvador",
+    "alpha-2": "SV",
+    "alpha-3": "SLV",
+    "country-code": "222",
+    "iso_3166-2": "ISO 3166-2:SV",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Central America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "013",
+    "dial_code": "+503",
+    "geonameid": "3585968",
+    "capital": "San Salvador",
+    "currency": "Dollar",
+    "language-codes": "es-SV",
+    "area-km2": "21040",
+    "gdp": "24670000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 12.976046,
+        "lon": -90.1790975
+      },
+      "ne": {
+        "lat": 14.4510488,
+        "lon": -87.6351394
+      }
+    }
+  },
+  "sm": {
+    "name": "San Marino",
+    "alpha-2": "SM",
+    "alpha-3": "SMR",
+    "country-code": "674",
+    "iso_3166-2": "ISO 3166-2:SM",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+378",
+    "geonameid": "3168068",
+    "capital": "San Marino",
+    "currency": "Euro",
+    "language-codes": "it-SM",
+    "area-km2": "61",
+    "gdp": "1866000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 43.8937002,
+        "lon": 12.4033246
+      },
+      "ne": {
+        "lat": 43.992093,
+        "lon": 12.5160665
+      }
+    }
+  },
+  "so": {
+    "name": "Somalia",
+    "alpha-2": "SO",
+    "alpha-3": "SOM",
+    "country-code": "706",
+    "iso_3166-2": "ISO 3166-2:SO",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+252",
+    "geonameid": "51537",
+    "capital": "Mogadishu",
+    "currency": "Shilling",
+    "language-codes": "so-SO,ar-SO,it,en-SO",
+    "area-km2": "637657",
+    "gdp": "2372000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -1.8031969,
+        "lon": 40.98918
+      },
+      "ne": {
+        "lat": 12.1889121,
+        "lon": 51.6177696
+      }
+    }
+  },
+  "pm": {
+    "name": "Saint Pierre and Miquelon",
+    "alpha-2": "PM",
+    "alpha-3": "SPM",
+    "country-code": "666",
+    "iso_3166-2": "ISO 3166-2:PM",
+    "region": "Americas",
+    "sub-region": "Northern America",
+    "intermediate-region": "",
+    "region-code": "019",
+    "sub-region-code": "021",
+    "intermediate-region-code": "",
+    "dial_code": "+508",
+    "geonameid": "3424932",
+    "capital": "Saint-Pierre",
+    "currency": "Euro",
+    "language-codes": "fr-PM",
+    "area-km2": "242",
+    "gdp": "215300000",
+    "boundingBox": {
+      "sw": {
+        "lat": 46.5507173,
+        "lon": -56.6972961
+      },
+      "ne": {
+        "lat": 47.365,
+        "lon": -55.9033333
+      }
+    }
+  },
+  "rs": {
+    "name": "Serbia",
+    "alpha-2": "RS",
+    "alpha-3": "SRB",
+    "country-code": "688",
+    "iso_3166-2": "ISO 3166-2:RS",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+381",
+    "geonameid": "6290252",
+    "capital": "Belgrade",
+    "currency": "Dinar",
+    "language-codes": "sr,hu,bs,rom",
+    "area-km2": "88361",
+    "gdp": "43680000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 42.2322435,
+        "lon": 18.8142875
+      },
+      "ne": {
+        "lat": 46.1900524,
+        "lon": 23.006309
+      }
+    }
+  },
+  "st": {
+    "name": "Sao Tome and Principe",
+    "alpha-2": "ST",
+    "alpha-3": "STP",
+    "country-code": "678",
+    "iso_3166-2": "ISO 3166-2:ST",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Middle Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "017",
+    "dial_code": "+239",
+    "geonameid": "2410758",
+    "capital": "Sao Tome",
+    "currency": "Dobra",
+    "language-codes": "pt-ST",
+    "area-km2": "1001",
+    "gdp": "311000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -0.2135137,
+        "lon": 6.260642
+      },
+      "ne": {
+        "lat": 1.9257601,
+        "lon": 7.6704783
+      }
+    }
+  },
+  "sr": {
+    "name": "Suriname",
+    "alpha-2": "SR",
+    "alpha-3": "SUR",
+    "country-code": "740",
+    "iso_3166-2": "ISO 3166-2:SR",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+597",
+    "geonameid": "3382998",
+    "capital": "Paramaribo",
+    "currency": "Dollar",
+    "language-codes": "nl-SR,en,srn,hns,jv",
+    "area-km2": "163270",
+    "gdp": "5009000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 1.8312802,
+        "lon": -58.070833
+      },
+      "ne": {
+        "lat": 6.225,
+        "lon": -53.8433358
+      }
+    }
+  },
+  "sk": {
+    "name": "Slovakia",
+    "alpha-2": "SK",
+    "alpha-3": "SVK",
+    "country-code": "703",
+    "iso_3166-2": "ISO 3166-2:SK",
+    "region": "Europe",
+    "sub-region": "Eastern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "151",
+    "intermediate-region-code": "",
+    "dial_code": "+421",
+    "geonameid": "3057568",
+    "capital": "Bratislava",
+    "currency": "Euro",
+    "language-codes": "sk,hu",
+    "area-km2": "48845",
+    "gdp": "96960000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 47.7314286,
+        "lon": 16.8331891
+      },
+      "ne": {
+        "lat": 49.6138162,
+        "lon": 22.56571
+      }
+    }
+  },
+  "si": {
+    "name": "Slovenia",
+    "alpha-2": "SI",
+    "alpha-3": "SVN",
+    "country-code": "705",
+    "iso_3166-2": "ISO 3166-2:SI",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+386",
+    "geonameid": "3190538",
+    "capital": "Ljubljana",
+    "currency": "Euro",
+    "language-codes": "sl,sh",
+    "area-km2": "20273",
+    "gdp": "46820000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 45.4214242,
+        "lon": 13.3754696
+      },
+      "ne": {
+        "lat": 46.8766816,
+        "lon": 16.5967702
+      }
+    }
+  },
+  "se": {
+    "name": "Sweden",
+    "alpha-2": "SE",
+    "alpha-3": "SWE",
+    "country-code": "752",
+    "iso_3166-2": "ISO 3166-2:SE",
+    "region": "Europe",
+    "sub-region": "Northern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "154",
+    "intermediate-region-code": "",
+    "dial_code": "+46",
+    "geonameid": "2661886",
+    "capital": "Stockholm",
+    "currency": "Krona",
+    "language-codes": "sv-SE,se,sma,fi-SE",
+    "area-km2": "449964",
+    "gdp": "552000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 55.1331192,
+        "lon": 10.5930952
+      },
+      "ne": {
+        "lat": 69.0599699,
+        "lon": 24.1776819
+      }
+    }
+  },
+  "sz": {
+    "name": "Eswatini",
+    "alpha-2": "SZ",
+    "alpha-3": "SWZ",
+    "country-code": "748",
+    "iso_3166-2": "ISO 3166-2:SZ",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Southern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "018",
+    "dial_code": "+268",
+    "geonameid": "934841",
+    "capital": "Mbabane",
+    "currency": "Lilangeni",
+    "language-codes": "en-SZ,ss-SZ",
+    "area-km2": "17363",
+    "gdp": "3807000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -27.3175201,
+        "lon": 30.7908
+      },
+      "ne": {
+        "lat": -25.71876,
+        "lon": 32.1349923
+      }
+    }
+  },
+  "sc": {
+    "name": "Seychelles",
+    "alpha-2": "SC",
+    "alpha-3": "SYC",
+    "country-code": "690",
+    "iso_3166-2": "ISO 3166-2:SC",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+248",
+    "geonameid": "241170",
+    "capital": "Victoria",
+    "currency": "Rupee",
+    "language-codes": "en-SC,fr-SC",
+    "area-km2": "455",
+    "gdp": "1271000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -10.4649258,
+        "lon": 45.9988759
+      },
+      "ne": {
+        "lat": -3.512,
+        "lon": 56.4979396
+      }
+    }
+  },
+  "sy": {
+    "name": "Syrian Arab Republic",
+    "alpha-2": "SY",
+    "alpha-3": "SYR",
+    "country-code": "760",
+    "iso_3166-2": "ISO 3166-2:SY",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+963",
+    "geonameid": "163843",
+    "capital": "Damascus",
+    "currency": "Pound",
+    "language-codes": "ar-SY,ku,hy,arc,fr,en",
+    "area-km2": "185180",
+    "gdp": "64700000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 32.311354,
+        "lon": 35.4714427
+      },
+      "ne": {
+        "lat": 37.3184589,
+        "lon": 42.3745687
+      }
+    }
+  },
+  "tc": {
+    "name": "Turks and Caicos Islands",
+    "alpha-2": "TC",
+    "alpha-3": "TCA",
+    "country-code": "796",
+    "iso_3166-2": "ISO 3166-2:TC",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1649",
+    "geonameid": "3576916",
+    "capital": "Cockburn Town",
+    "currency": "Dollar",
+    "language-codes": "en-TC",
+    "area-km2": "430",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": 20.9553418,
+        "lon": -72.6799046
+      },
+      "ne": {
+        "lat": 22.1630989,
+        "lon": -70.8643591
+      }
+    }
+  },
+  "td": {
+    "name": "Chad",
+    "alpha-2": "TD",
+    "alpha-3": "TCD",
+    "country-code": "148",
+    "iso_3166-2": "ISO 3166-2:TD",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Middle Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "017",
+    "dial_code": "+235",
+    "geonameid": "2434508",
+    "capital": "N'Djamena",
+    "currency": "Franc",
+    "language-codes": "fr-TD,ar-TD,sre",
+    "area-km2": "1284000",
+    "gdp": "13590000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 7.44107,
+        "lon": 13.47348
+      },
+      "ne": {
+        "lat": 23.4975,
+        "lon": 24.0
+      }
+    }
+  },
+  "tg": {
+    "name": "Togo",
+    "alpha-2": "TG",
+    "alpha-3": "TGO",
+    "country-code": "768",
+    "iso_3166-2": "ISO 3166-2:TG",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Western Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "011",
+    "dial_code": "+228",
+    "geonameid": "2363686",
+    "capital": "Lome",
+    "currency": "Franc",
+    "language-codes": "fr-TG,ee,hna,kbp,dag,ha",
+    "area-km2": "56785",
+    "gdp": "4299000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 5.926547,
+        "lon": -0.1439746
+      },
+      "ne": {
+        "lat": 11.1395102,
+        "lon": 1.8087605
+      }
+    }
+  },
+  "th": {
+    "name": "Thailand",
+    "alpha-2": "TH",
+    "alpha-3": "THA",
+    "country-code": "764",
+    "iso_3166-2": "ISO 3166-2:TH",
+    "region": "Asia",
+    "sub-region": "South-eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "035",
+    "intermediate-region-code": "",
+    "dial_code": "+66",
+    "geonameid": "1605651",
+    "capital": "Bangkok",
+    "currency": "Baht",
+    "language-codes": "th,en",
+    "area-km2": "514000",
+    "gdp": "400900000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 5.612851,
+        "lon": 97.3438072
+      },
+      "ne": {
+        "lat": 20.4648337,
+        "lon": 105.636812
+      }
+    }
+  },
+  "tj": {
+    "name": "Tajikistan",
+    "alpha-2": "TJ",
+    "alpha-3": "TJK",
+    "country-code": "762",
+    "iso_3166-2": "ISO 3166-2:TJ",
+    "region": "Asia",
+    "sub-region": "Central Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "143",
+    "intermediate-region-code": "",
+    "dial_code": "+992",
+    "geonameid": "1220409",
+    "capital": "Dushanbe",
+    "currency": "Somoni",
+    "language-codes": "tg,ru",
+    "area-km2": "143100",
+    "gdp": "8513000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 36.6711153,
+        "lon": 67.3332775
+      },
+      "ne": {
+        "lat": 41.0450935,
+        "lon": 75.1539563
+      }
+    }
+  },
+  "tk": {
+    "name": "Tokelau",
+    "alpha-2": "TK",
+    "alpha-3": "TKL",
+    "country-code": "772",
+    "iso_3166-2": "ISO 3166-2:TK",
+    "region": "Oceania",
+    "sub-region": "Polynesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "061",
+    "intermediate-region-code": "",
+    "dial_code": "+690",
+    "geonameid": "4031074",
+    "capital": "",
+    "currency": "Dollar",
+    "language-codes": "tkl,en-TK",
+    "area-km2": "10",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": -9.6442499,
+        "lon": -172.7213673
+      },
+      "ne": {
+        "lat": -8.3328631,
+        "lon": -170.9797586
+      }
+    }
+  },
+  "tm": {
+    "name": "Turkmenistan",
+    "alpha-2": "TM",
+    "alpha-3": "TKM",
+    "country-code": "795",
+    "iso_3166-2": "ISO 3166-2:TM",
+    "region": "Asia",
+    "sub-region": "Central Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "143",
+    "intermediate-region-code": "",
+    "dial_code": "+993",
+    "geonameid": "1218197",
+    "capital": "Ashgabat",
+    "currency": "Manat",
+    "language-codes": "tk,ru,uz",
+    "area-km2": "488100",
+    "gdp": "40560000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 35.129093,
+        "lon": 52.335076
+      },
+      "ne": {
+        "lat": 42.7975571,
+        "lon": 66.6895177
+      }
+    }
+  },
+  "tl": {
+    "name": "Timor-Leste",
+    "alpha-2": "TL",
+    "alpha-3": "TLS",
+    "country-code": "626",
+    "iso_3166-2": "ISO 3166-2:TL",
+    "region": "Asia",
+    "sub-region": "South-eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "035",
+    "intermediate-region-code": "",
+    "dial_code": "+670",
+    "geonameid": "1966436",
+    "capital": "Dili",
+    "currency": "Dollar",
+    "language-codes": "tet,pt-TL,id,en",
+    "area-km2": "15007",
+    "gdp": "6129000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -9.5642775,
+        "lon": 124.0415703
+      },
+      "ne": {
+        "lat": -8.0895459,
+        "lon": 127.5335392
+      }
+    }
+  },
+  "to": {
+    "name": "Tonga",
+    "alpha-2": "TO",
+    "alpha-3": "TON",
+    "country-code": "776",
+    "iso_3166-2": "ISO 3166-2:TO",
+    "region": "Oceania",
+    "sub-region": "Polynesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "061",
+    "intermediate-region-code": "",
+    "dial_code": "+676",
+    "geonameid": "4032283",
+    "capital": "Nuku'alofa",
+    "currency": "Pa'anga",
+    "language-codes": "to,en-TO",
+    "area-km2": "748",
+    "gdp": "477000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -24.1034499,
+        "lon": -179.3866055
+      },
+      "ne": {
+        "lat": -15.3655722,
+        "lon": -173.5295458
+      }
+    }
+  },
+  "tt": {
+    "name": "Trinidad and Tobago",
+    "alpha-2": "TT",
+    "alpha-3": "TTO",
+    "country-code": "780",
+    "iso_3166-2": "ISO 3166-2:TT",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1868",
+    "geonameid": "3573591",
+    "capital": "Port of Spain",
+    "currency": "Dollar",
+    "language-codes": "en-TT,hns,fr,es,zh",
+    "area-km2": "5128",
+    "gdp": "27130000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 9.8732106,
+        "lon": -62.083056
+      },
+      "ne": {
+        "lat": 11.5628372,
+        "lon": -60.2895848
+      }
+    }
+  },
+  "tn": {
+    "name": "Tunisia",
+    "alpha-2": "TN",
+    "alpha-3": "TUN",
+    "country-code": "788",
+    "iso_3166-2": "ISO 3166-2:TN",
+    "region": "Africa",
+    "sub-region": "Northern Africa",
+    "intermediate-region": "",
+    "region-code": "002",
+    "sub-region-code": "015",
+    "intermediate-region-code": "",
+    "dial_code": "+216",
+    "geonameid": "2464461",
+    "capital": "Tunis",
+    "currency": "Dinar",
+    "language-codes": "ar-TN,fr",
+    "area-km2": "163610",
+    "gdp": "48380000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 30.230236,
+        "lon": 7.5219807
+      },
+      "ne": {
+        "lat": 37.7612052,
+        "lon": 11.8801133
+      }
+    }
+  },
+  "tr": {
+    "name": "Turkey",
+    "alpha-2": "TR",
+    "alpha-3": "TUR",
+    "country-code": "792",
+    "iso_3166-2": "ISO 3166-2:TR",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+90",
+    "geonameid": "298795",
+    "capital": "Ankara",
+    "currency": "Lira",
+    "language-codes": "tr-TR,ku,diq,az,av",
+    "area-km2": "780580",
+    "gdp": "821800000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 35.8076804,
+        "lon": 25.6212891
+      },
+      "ne": {
+        "lat": 42.297,
+        "lon": 44.8176638
+      }
+    }
+  },
+  "tv": {
+    "name": "Tuvalu",
+    "alpha-2": "TV",
+    "alpha-3": "TUV",
+    "country-code": "798",
+    "iso_3166-2": "ISO 3166-2:TV",
+    "region": "Oceania",
+    "sub-region": "Polynesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "061",
+    "intermediate-region-code": "",
+    "dial_code": "+688",
+    "geonameid": "2110297",
+    "capital": "Funafuti",
+    "currency": "Dollar",
+    "language-codes": "tvl,en,sm,gil",
+    "area-km2": "26",
+    "gdp": "38000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -9.9939389,
+        "lon": 175.1590468
+      },
+      "ne": {
+        "lat": -5.4369611,
+        "lon": 178.7344938
+      }
+    }
+  },
+  "tw": {
+    "name": "Taiwan, Province of China",
+    "alpha-2": "TW",
+    "alpha-3": "TWN",
+    "country-code": "158",
+    "iso_3166-2": "ISO 3166-2:TW",
+    "region": "Asia",
+    "sub-region": "Eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "030",
+    "intermediate-region-code": "",
+    "dial_code": "+886",
+    "geonameid": "1668284",
+    "capital": "Taipei",
+    "currency": "Dollar",
+    "language-codes": "zh-TW,zh,nan,hak",
+    "area-km2": "35980",
+    "gdp": "484700000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 10.374269,
+        "lon": 114.3599058
+      },
+      "ne": {
+        "lat": 26.4372222,
+        "lon": 122.297
+      }
+    }
+  },
+  "tz": {
+    "name": "Tanzania, United Republic of",
+    "alpha-2": "TZ",
+    "alpha-3": "TZA",
+    "country-code": "834",
+    "iso_3166-2": "ISO 3166-2:TZ",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+255",
+    "geonameid": "149590",
+    "capital": "Dodoma",
+    "currency": "Shilling",
+    "language-codes": "sw-TZ,en,ar",
+    "area-km2": "945087",
+    "gdp": "31940000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -11.761254,
+        "lon": 29.3269773
+      },
+      "ne": {
+        "lat": -0.9854812,
+        "lon": 40.6584071
+      }
+    }
+  },
+  "ug": {
+    "name": "Uganda",
+    "alpha-2": "UG",
+    "alpha-3": "UGA",
+    "country-code": "800",
+    "iso_3166-2": "ISO 3166-2:UG",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+256",
+    "geonameid": "226074",
+    "capital": "Kampala",
+    "currency": "Shilling",
+    "language-codes": "en-UG,lg,sw,ar",
+    "area-km2": "236040",
+    "gdp": "22600000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -1.4823179,
+        "lon": 29.573433
+      },
+      "ne": {
+        "lat": 4.2340766,
+        "lon": 35.000308
+      }
+    }
+  },
+  "ua": {
+    "name": "Ukraine",
+    "alpha-2": "UA",
+    "alpha-3": "UKR",
+    "country-code": "804",
+    "iso_3166-2": "ISO 3166-2:UA",
+    "region": "Europe",
+    "sub-region": "Eastern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "151",
+    "intermediate-region-code": "",
+    "dial_code": "+380",
+    "geonameid": "690791",
+    "capital": "Kiev",
+    "currency": "Hryvnia",
+    "language-codes": "uk,ru-UA,rom,pl,hu",
+    "area-km2": "603700",
+    "gdp": "175500000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 44.184598,
+        "lon": 22.137059
+      },
+      "ne": {
+        "lat": 52.3791473,
+        "lon": 40.2275801
+      }
+    }
+  },
+  "uy": {
+    "name": "Uruguay",
+    "alpha-2": "UY",
+    "alpha-3": "URY",
+    "country-code": "858",
+    "iso_3166-2": "ISO 3166-2:UY",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+598",
+    "geonameid": "3439705",
+    "capital": "Montevideo",
+    "currency": "Peso",
+    "language-codes": "es-UY",
+    "area-km2": "176220",
+    "gdp": "57110000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -35.7824481,
+        "lon": -58.4948438
+      },
+      "ne": {
+        "lat": -30.0853962,
+        "lon": -53.0755833
+      }
+    }
+  },
+  "us": {
+    "name": "United States of America",
+    "alpha-2": "US",
+    "alpha-3": "USA",
+    "country-code": "840",
+    "iso_3166-2": "ISO 3166-2:US",
+    "region": "Americas",
+    "sub-region": "Northern America",
+    "intermediate-region": "",
+    "region-code": "019",
+    "sub-region-code": "021",
+    "intermediate-region-code": "",
+    "dial_code": "+1",
+    "geonameid": "6252001",
+    "capital": "Washington",
+    "currency": "Dollar",
+    "language-codes": "en-US,es-US,haw,fr",
+    "area-km2": "9629091",
+    "gdp": "16720000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 24.9493,
+        "lon": -125.0011
+      },
+      "ne": {
+        "lat": 49.5904,
+        "lon": -66.9326
+      }
+    }
+  },
+  "uz": {
+    "name": "Uzbekistan",
+    "alpha-2": "UZ",
+    "alpha-3": "UZB",
+    "country-code": "860",
+    "iso_3166-2": "ISO 3166-2:UZ",
+    "region": "Asia",
+    "sub-region": "Central Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "143",
+    "intermediate-region-code": "",
+    "dial_code": "+998",
+    "geonameid": "1512440",
+    "capital": "Tashkent",
+    "currency": "Som",
+    "language-codes": "uz,ru,tg",
+    "area-km2": "447400",
+    "gdp": "55180000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 37.1821164,
+        "lon": 55.9977865
+      },
+      "ne": {
+        "lat": 45.590118,
+        "lon": 73.1397362
+      }
+    }
+  },
+  "va": {
+    "name": "Holy See",
+    "alpha-2": "VA",
+    "alpha-3": "VAT",
+    "country-code": "336",
+    "iso_3166-2": "ISO 3166-2:VA",
+    "region": "Europe",
+    "sub-region": "Southern Europe",
+    "intermediate-region": "",
+    "region-code": "150",
+    "sub-region-code": "039",
+    "intermediate-region-code": "",
+    "dial_code": "+379",
+    "geonameid": "3164670",
+    "capital": "Vatican City",
+    "currency": "Euro",
+    "language-codes": "la,it,fr",
+    "area-km2": "0",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": 41.9002044,
+        "lon": 12.4457442
+      },
+      "ne": {
+        "lat": 41.9073912,
+        "lon": 12.4583653
+      }
+    }
+  },
+  "vc": {
+    "name": "Saint Vincent and the Grenadines",
+    "alpha-2": "VC",
+    "alpha-3": "VCT",
+    "country-code": "670",
+    "iso_3166-2": "ISO 3166-2:VC",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1784",
+    "geonameid": "3577815",
+    "capital": "Kingstown",
+    "currency": "Dollar",
+    "language-codes": "en-VC,fr",
+    "area-km2": "389",
+    "gdp": "742000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 12.5166548,
+        "lon": -61.6657471
+      },
+      "ne": {
+        "lat": 13.583,
+        "lon": -60.9094146
+      }
+    }
+  },
+  "ve": {
+    "name": "Venezuela (Bolivarian Republic of)",
+    "alpha-2": "VE",
+    "alpha-3": "VEN",
+    "country-code": "862",
+    "iso_3166-2": "ISO 3166-2:VE",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "South America",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "005",
+    "dial_code": "+58",
+    "geonameid": "3625428",
+    "capital": "Caracas",
+    "currency": "Bolivar",
+    "language-codes": "es-VE",
+    "area-km2": "912050",
+    "gdp": "367500000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 0.647529,
+        "lon": -73.3529632
+      },
+      "ne": {
+        "lat": 15.9158431,
+        "lon": -59.5427079
+      }
+    }
+  },
+  "vg": {
+    "name": "Virgin Islands (British)",
+    "alpha-2": "VG",
+    "alpha-3": "VGB",
+    "country-code": "092",
+    "iso_3166-2": "ISO 3166-2:VG",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1284",
+    "geonameid": "3577718",
+    "capital": "Road Town",
+    "currency": "Dollar",
+    "language-codes": "en-VG",
+    "area-km2": "153",
+    "gdp": "1095000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 17.623468,
+        "lon": -65.159094
+      },
+      "ne": {
+        "lat": 18.464984,
+        "lon": -64.512674
+      }
+    }
+  },
+  "vi": {
+    "name": "Virgin Islands (U.S.)",
+    "alpha-2": "VI",
+    "alpha-3": "VIR",
+    "country-code": "850",
+    "iso_3166-2": "ISO 3166-2:VI",
+    "region": "Americas",
+    "sub-region": "Latin America and the Caribbean",
+    "intermediate-region": "Caribbean",
+    "region-code": "019",
+    "sub-region-code": "419",
+    "intermediate-region-code": "029",
+    "dial_code": "+1340",
+    "geonameid": "4796775",
+    "capital": "Charlotte Amalie",
+    "currency": "Dollar",
+    "language-codes": "en-VI",
+    "area-km2": "352",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": 17.623468,
+        "lon": -65.159094
+      },
+      "ne": {
+        "lat": 18.464984,
+        "lon": -64.512674
+      }
+    }
+  },
+  "vn": {
+    "name": "Viet Nam",
+    "alpha-2": "VN",
+    "alpha-3": "VNM",
+    "country-code": "704",
+    "iso_3166-2": "ISO 3166-2:VN",
+    "region": "Asia",
+    "sub-region": "South-eastern Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "035",
+    "intermediate-region-code": "",
+    "dial_code": "+84",
+    "geonameid": "1562822",
+    "capital": "Hanoi",
+    "currency": "Dong",
+    "language-codes": "vi,en,fr,zh,km",
+    "area-km2": "329560",
+    "gdp": "170000000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 8.1790665,
+        "lon": 102.14441
+      },
+      "ne": {
+        "lat": 23.393395,
+        "lon": 114.3337595
+      }
+    }
+  },
+  "vu": {
+    "name": "Vanuatu",
+    "alpha-2": "VU",
+    "alpha-3": "VUT",
+    "country-code": "548",
+    "iso_3166-2": "ISO 3166-2:VU",
+    "region": "Oceania",
+    "sub-region": "Melanesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "054",
+    "intermediate-region-code": "",
+    "dial_code": "+678",
+    "geonameid": "2134431",
+    "capital": "Port Vila",
+    "currency": "Vatu",
+    "language-codes": "bi,en-VU,fr-VU",
+    "area-km2": "12200",
+    "gdp": "828000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -20.4627425,
+        "lon": 166.3355255
+      },
+      "ne": {
+        "lat": -12.8713777,
+        "lon": 170.449982
+      }
+    }
+  },
+  "wf": {
+    "name": "Wallis and Futuna",
+    "alpha-2": "WF",
+    "alpha-3": "WLF",
+    "country-code": "876",
+    "iso_3166-2": "ISO 3166-2:WF",
+    "region": "Oceania",
+    "sub-region": "Polynesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "061",
+    "intermediate-region-code": "",
+    "dial_code": "+681",
+    "geonameid": "4034749",
+    "capital": "Mata Utu",
+    "currency": "Franc",
+    "language-codes": "wls,fud,fr-WF",
+    "area-km2": "274",
+    "gdp": "",
+    "boundingBox": {
+      "sw": {
+        "lat": -14.5630748,
+        "lon": -178.3873749
+      },
+      "ne": {
+        "lat": -12.9827961,
+        "lon": -175.9190391
+      }
+    }
+  },
+  "ws": {
+    "name": "Samoa",
+    "alpha-2": "WS",
+    "alpha-3": "WSM",
+    "country-code": "882",
+    "iso_3166-2": "ISO 3166-2:WS",
+    "region": "Oceania",
+    "sub-region": "Polynesia",
+    "intermediate-region": "",
+    "region-code": "009",
+    "sub-region-code": "061",
+    "intermediate-region-code": "",
+    "dial_code": "+685",
+    "geonameid": "4034894",
+    "capital": "Apia",
+    "currency": "Tala",
+    "language-codes": "sm,en-WS",
+    "area-km2": "2944",
+    "gdp": "705000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -14.2770916,
+        "lon": -173.0091864
+      },
+      "ne": {
+        "lat": -13.2381892,
+        "lon": -171.1929229
+      }
+    }
+  },
+  "ye": {
+    "name": "Yemen",
+    "alpha-2": "YE",
+    "alpha-3": "YEM",
+    "country-code": "887",
+    "iso_3166-2": "ISO 3166-2:YE",
+    "region": "Asia",
+    "sub-region": "Western Asia",
+    "intermediate-region": "",
+    "region-code": "142",
+    "sub-region-code": "145",
+    "intermediate-region-code": "",
+    "dial_code": "+967",
+    "geonameid": "69543",
+    "capital": "Sanaa",
+    "currency": "Rial",
+    "language-codes": "ar-YE",
+    "area-km2": "527970",
+    "gdp": "43890000000",
+    "boundingBox": {
+      "sw": {
+        "lat": 11.9084802,
+        "lon": 41.60825
+      },
+      "ne": {
+        "lat": 19.0,
+        "lon": 54.7389375
+      }
+    }
+  },
+  "za": {
+    "name": "South Africa",
+    "alpha-2": "ZA",
+    "alpha-3": "ZAF",
+    "country-code": "710",
+    "iso_3166-2": "ISO 3166-2:ZA",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Southern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "018",
+    "dial_code": "+27",
+    "geonameid": "953987",
+    "capital": "Pretoria",
+    "currency": "Rand",
+    "language-codes": "zu,xh,af,nso,en-ZA,tn,st,ts,ss,ve,nr",
+    "area-km2": "1219912",
+    "gdp": "353900000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -47.1788335,
+        "lon": 16.3335213
+      },
+      "ne": {
+        "lat": -22.1250301,
+        "lon": 38.2898954
+      }
+    }
+  },
+  "zm": {
+    "name": "Zambia",
+    "alpha-2": "ZM",
+    "alpha-3": "ZMB",
+    "country-code": "894",
+    "iso_3166-2": "ISO 3166-2:ZM",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+260",
+    "geonameid": "895949",
+    "capital": "Lusaka",
+    "currency": "Kwacha",
+    "language-codes": "en-ZM,bem,loz,lun,lue,ny,toi",
+    "area-km2": "752614",
+    "gdp": "22240000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -18.0765945,
+        "lon": 21.9993509
+      },
+      "ne": {
+        "lat": -8.2712822,
+        "lon": 33.701111
+      }
+    }
+  },
+  "zw": {
+    "name": "Zimbabwe",
+    "alpha-2": "ZW",
+    "alpha-3": "ZWE",
+    "country-code": "716",
+    "iso_3166-2": "ISO 3166-2:ZW",
+    "region": "Africa",
+    "sub-region": "Sub-Saharan Africa",
+    "intermediate-region": "Eastern Africa",
+    "region-code": "002",
+    "sub-region-code": "202",
+    "intermediate-region-code": "014",
+    "dial_code": "+263",
+    "geonameid": "878675",
+    "capital": "Harare",
+    "currency": "Dollar",
+    "language-codes": "en-ZW,sn,nr,nd",
+    "area-km2": "390580",
+    "gdp": "10480000000",
+    "boundingBox": {
+      "sw": {
+        "lat": -22.4241096,
+        "lon": 25.2373
+      },
+      "ne": {
+        "lat": -15.6097033,
+        "lon": 33.0683413
+      }
+    }
+  }
+}
