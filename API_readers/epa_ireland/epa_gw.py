@@ -49,7 +49,7 @@ async def process_link(client: httpx.AsyncClient, row: pd.Series) -> Optional[pd
 
 
 # Async function to fetch all data
-async def fetch_all_data() -> tuple[BaseException | Any]:
+async def fetch_all_data():
     async with httpx.AsyncClient(timeout=30.0) as client:
         tasks = []
         for _, row in initial_df.iterrows():
