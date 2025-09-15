@@ -6,7 +6,7 @@ import io
 import logging
 from typing import Optional, Any
 from utils.coordinates_to_cells import prepare_coordinates
-from API_readers.epa_ireland.epa_ireland_mappings.epa_ireland_mapping import DATA_ALIASES
+from API_readers.epa_ireland.epa_ireland_mappings.epa_ireland_mapping import DATA_ALIASES, GLOBAL_MAPPING
 
 coordinates = 'API_readers/epa_ireland/constants/EPA_coordinates.csv'
 initial_df = pd.read_csv(coordinates, sep=',', header=0)
@@ -88,9 +88,9 @@ async def read_data(spatial_range, time_range, data_range, level):
     # Concatenate all collected DataFrames
     final_df = pd.concat(all_data, ignore_index=True)
 
-    # Drop 'groundwater level [m]' and rename 'timestamp' to 'date'
+    # Drop 'groundwater level [m]' and rename 'timestamp' to 'Timestamp'
     final_df = final_df.drop('groundwater level [m]', axis=1)
-    final_df = final_df.rename(columns={'timestamp': 'date'})
+    final_df = final_df.rename(columns={'timestamp': 'Timestamp'})
 
     # Prepare coordinates for spatial filtering
     unique_points = final_df[['id', 'lat', 'lon']].drop_duplicates()
@@ -106,7 +106,7 @@ async def read_data(spatial_range, time_range, data_range, level):
 
     # Apply additional time filter to ensure consistency
     time_from, time_to = pd.to_datetime(time_range[0]), pd.to_datetime(time_range[1])
-    final_df = final_df[(final_df['date'] >= time_from) & (final_df['date'] <= time_to)]
+    final_df = final_df[(final_df['Timestamp'] >= time_from) & (final_df['Timestamp'] <= time_to)]
 
     # Select numeric columns based on data_range
     category_columns = {col for col, cat in DATA_ALIASES.items() if cat in data_range}
@@ -117,13 +117,18 @@ async def read_data(spatial_range, time_range, data_range, level):
 
     # Define measurement columns
     measurement_columns = ['groundwater depth [m b.g.l]']
-    final_df = final_df[['id', 'date'] + measurement_columns]
+    final_df = final_df[['id', 'Timestamp'] + measurement_columns]
 
     # Merge with coordinates to include S2CELL
     final_df = final_df.merge(coordinates[['id', 'S2CELL']], on='id')
 
+    final_df.Timestamp = pd.to_datetime(final_df.Timestamp).dt.date
+
     # Set index and pivot the DataFrame
-    final_df = final_df.set_index(['date', 'S2CELL'])
-    final_df_pivot = final_df.pivot_table(index='date', columns='S2CELL', values=measurement_columns)
+    final_df = final_df.set_index(['Timestamp', 'S2CELL'])
+    final_df = final_df.rename(GLOBAL_MAPPING, axis=1)
+    final_df['Groundwater Depth [cm]'] *= 100
+
+    final_df_pivot = final_df.pivot_table(index='Timestamp', columns='S2CELL', values=['Groundwater Depth [cm]'])
 
     return final_df_pivot
