@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock, patch, Mock
 import pandas as pd
-from API_readers.hubeau.hubeau_piezo_read import read_data
+from API_readers.hubeau.hubeau_piezo_read_vbrgm import read_data
 
 
 @pytest.mark.asyncio
