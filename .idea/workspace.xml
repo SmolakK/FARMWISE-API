@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e861ba43-0096-452f-bd7e-8db19b445a06" name="Changes" comment="" />
+    <list default="true" id="e861ba43-0096-452f-bd7e-8db19b445a06" name="Changes" comment="new sources added">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mappings/data_source_mapping.py" beforeDir="false" afterPath="$PROJECT_DIR$/mappings/data_source_mapping.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -40,17 +43,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.db_users.executor&quot;: &quot;Run&quot;,
-    &quot;Python.hubeau_piezo_read.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/GIT/FARMWISE&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.coordinates_to_cells.executor": "Run",
+    "Python.db_users.executor": "Run",
+    "Python.egdi_read_d10.executor": "Run",
+    "Python.epa_gw.executor": "Debug",
+    "Python.gios_gw.executor": "Debug",
+    "Python.gios_scraper.executor": "Debug",
+    "Python.hubeau_piezo_read.executor": "Debug",
+    "Python.main.executor": "Run",
+    "Python.main_call.executor": "Debug",
+    "Python.wetterdienst_dwd.executor": "Debug",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/JakubM/Documents/GitHub/FARMWISE/API_readers/UA_sw_quality",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers\UA_sw_quality" />
+      <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers\CHMI_Meteo" />
+      <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers\EPA Ireland" />
+      <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers" />
+      <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers\gios_gw\gios_gw_mappings" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\GitHub\FARMWISE\API_readers\cds" />
       <recent name="D:\GitHub\FARMWISE\API_readers\imgw_hydro\imgw_mappings" />
@@ -59,7 +76,7 @@
       <recent name="D:\GitHub\FARMWISE\API_readers\gios\constants" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.hubeau_piezo_read">
+  <component name="RunManager">
     <configuration name="egdi_read_d10" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="ENV_FILES" value="" />
@@ -126,28 +143,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="hubeau_read" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="FARMWISE" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/Hub'Eau" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/Hub'Eau/hubeau_read.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="hubeau_wq_read" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="ENV_FILES" value="" />
@@ -170,22 +165,36 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="wetterdienst_dwd" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="FARMWISE" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/wetterdienst" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/wetterdienst/wetterdienst_dwd.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.egdi_read_d10" />
         <item itemvalue="Python.hubeau_piezo_read" />
         <item itemvalue="Python.get_piezo_stations" />
         <item itemvalue="Python.hubeau_wq_read" />
-        <item itemvalue="Python.hubeau_read" />
-        <item itemvalue="Python.egdi_read_d10" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-python-sdk-5b207ade9991-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.17890.14" />
-      </set>
-    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -196,7 +205,43 @@
       <option name="presentableId" value="Default" />
       <updated>1711356955598</updated>
     </task>
+    <task id="LOCAL-00001" summary="new sources added">
+      <option name="closed" value="true" />
+      <created>1747298700162</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1747298700162</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/Jakub_farmwise" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="new sources added" />
+    <option name="LAST_COMMIT_MESSAGE" value="new sources added" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -214,6 +259,46 @@
           <url>file://$PROJECT_DIR$/API_readers/cds/cds_utils/cds_data_read.py</url>
           <line>65</line>
           <option name="timeStamp" value="412" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/wetterdienst/wetterdienst_dwd.py</url>
+          <line>105</line>
+          <option name="timeStamp" value="413" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/gios/gios_scraper.py</url>
+          <line>167</line>
+          <option name="timeStamp" value="414" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/gios/gios_scraper.py</url>
+          <line>83</line>
+          <option name="timeStamp" value="418" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/gios/gios_scraper.py</url>
+          <line>31</line>
+          <option name="timeStamp" value="419" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/imgw/imgw_api_synop_daily.py</url>
+          <line>142</line>
+          <option name="timeStamp" value="420" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main_call.py</url>
+          <line>89</line>
+          <option name="timeStamp" value="422" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main_call.py</url>
+          <line>80</line>
+          <option name="timeStamp" value="423" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/API_readers/EPA Ireland/epa_gw.py</url>
+          <line>79</line>
+          <option name="timeStamp" value="424" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
