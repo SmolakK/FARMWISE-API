@@ -1,5 +1,5 @@
 import pandas as pd
-from API_readers.hubeau.hubeau_mappings.hubeau_mapping_wq import MAPPING, CODES, PARAMETERS_MAPPING
+from API_readers.hubeau.hubeau_mappings.hubeau_mapping_sw_quality import MAPPING, CODES, PARAMETERS_MAPPING
 from utils.coordinates_to_cells import prepare_coordinates
 import warnings
 from utils.data_operators import flatten_list
@@ -17,14 +17,23 @@ async def fetch_data(api, pt_id, he_period_bounds, data_requested_codes, verbose
         print(f"Fetching data for point ID: {pt_id} with parameters: {data_requested_codes}")
 
     try:
+        # TMP DEV TEST here we test getting info on the monitoring STATION (before the Time Series data):
+        # dftest = api.get_station(code_station=pt_id)
+        # print(dftest)
+        
         # Fetch data using the hub API
         df = await asyncio.to_thread(
             api.get_data,
             code_station=pt_id,
+            code_parametre=data_requested_codes,
+            code_support='3', # Code 3 = 'Eau' (only data for water)
+            # Note that start_date, end_date arguments are not yet defined in api(HubQualRiv).get_data function,
+            # that is why we use the HubEau online API official argument names here:
             date_debut_prelevement=he_period_bounds[0],
             date_fin_prelevement=he_period_bounds[1],
-            code_param=data_requested_codes,
-            only_valid_data=True
+            # Ignore data qualified of Incorrect ou Uncertain:
+            code_qualification='0,1,4'
+            # NOT AVAILABLE in hub lib for this type of data: only_valid_data=True
         )
 
         # Ensure proper DataFrame formatting
@@ -44,13 +53,13 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range. 2 text dates (str) of format YYYY-mm-dd
-    :param data_range: A list of GW quality parameters requested, e.g., ('nitrate', 'phosphorus', 'potassium', 'pesticides') (not case sensitive) (see PARAMETERS_MAPPING)
+    :param data_range: A list of SW quality parameters requested, e.g., ('nitrate', 'phosphorus', 'potassium', 'pesticides') (not case sensitive) (see PARAMETERS_MAPPING)
     :param level: S2Cell level.
     :param nmax_pts: maximum number of points to select for data extraction (an optional limitation that may be used only during tests)
     :param verbose_level: level of details to write in the console (0: none; 1: some; >=2: lots of details)
     :return: A pandas DataFrame containing the processed data.
     """
-    url = 'https://hubeau.eaufrance.fr/api/v1/qualite_nappes/analyses'
+    url = 'https://hubeau.eaufrance.fr/api/v2/qualite_rivieres/analyse_pc' # NOT USED IN THIS SCRIPT (but indireclty via hub)
 
     # NO MORE NEEDED: north, south, east, west = spatial_range
     # NO MORE NEEDED: bbox = [west, south, east, north]  # Create bbox
@@ -71,13 +80,9 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
 
     ################### PARAMETERS (preparing list of...) ###################
 
-    # Not required for now (but kept here in case it is needed in a future version...):
-    # gwquality_params_df = pd.read_csv(r'API_readers/hubeau/constants/farmwise_gwquality_parameters.csv', dtype=str)
-    # With argument dtype=str so that even the code_param column (e.g., 1340 for Nitrates) will be read as text here.
-
     # Diagnostic info:
     if (verbose_level >= 1):
-        print("\nPARAMETERS (GW Quality substances)...\n")
+        print("\nPARAMETERS (SW Quality)...\n")
         print("Asked parameter names (data_range set, all made lower case) =")
         print(data_asked_raw_set)
 
@@ -121,10 +126,12 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
 
     if (verbose_level >= 1):
         print("\nPOINTS...\n")
-        print("Selecting France GW monitoring points inside the Spatial Range...")
+        print("Selecting France SW monitoring STATIONS (points x long.,y lat.) inside the Spatial Range...")
 
-    coors = pd.read_csv(r'API_readers/hubeau/constants/farmwise_gwquality_points_sel_for_hubeau.csv')
-    coordinates = prepare_coordinates(coordinates=coors, spatial_range=spatial_range, level=level)
+    coords = pd.read_csv(r'API_readers/hubeau/constants/farmwise_sw_quality_stations_sel_for_hubeau.csv')
+    # Renaming to make compatible with the function:
+    coords.rename(columns={'x_longitude':'lon', 'y_latitude':'lat'}, inplace=True)
+    coordinates = prepare_coordinates(coordinates=coords, spatial_range=spatial_range, level=level)
 
     # Exiting here if no point was selected (0 point found in the specified spatial_range):
     if coordinates is None:
@@ -142,7 +149,7 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
         print("  {} points are selected for this query".format(len(coordinates)))
 
     # List of point IDs to iterate (loop) over:
-    pt_ids_lst = coordinates["code_bss_new"].to_list()
+    pt_ids_lst = coordinates["code_station"].to_list()
     if (verbose_level >= 2):
         print(pt_ids_lst)
 
@@ -153,11 +160,6 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
 
     # LIST of dataframes to accumulate what we get for the N points (inside the loop below)
     accum_dfs = []
-
-    # List of required fields in the output from HubEau, specified to reduce the nb of columns of data transmitted by
-    # HubEau, and thus to make the get ops faster
-    he_req_fields = ['bss_id', 'latitude', 'longitude', 'code_param', 'nom_param', 'date_debut_prelevement', 'resultat',
-                     'symbole_unite', 'code_remarque_analyse']
 
     # Date (extraction period) parameters for the HubEau query:
     # (input argument should be text dates YYYY-mm-dd, else datetime/timestamp compatible types)
@@ -177,10 +179,10 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
         he_period_bounds[1] = "{:%Y-%m-%d}".format(time_range[1])
 
     if (verbose_level >= 1):
-        print("\nDOWNLOADING: HubEau (France) GW Quality data...\n")
+        print("\nDOWNLOADING: HubEau (France) SW Quality (Naïades) data...\n")
 
     # Initialisation of the hubeaupyutils API object
-    api = hub.init_api('groundwater_qual')
+    api = hub.init_api('river_qual', version=2) # (Important to use V2!)
 
     # Prepare tasks for asynchronous data fetching
     tasks = [
@@ -190,12 +192,22 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     responses = await asyncio.gather(*tasks)
 
     # Collect and process responses
-    accum_dfs = [df for df in responses if df is not None and not df.empty]
+    accum_dfs = [df for df in responses if (df is not None) and (not df.empty)]
 
     if not accum_dfs:
         return None
 
+    if (verbose_level >= 2):
+        print("Number of dataframes obtained (before concatenating them): len(accum_dfs) =")
+        print(len(accum_dfs))
+
     df = pd.concat(accum_dfs, ignore_index=True)
+    # TODO (not essential, 2025 maybe?):
+    # Could prevent a warning here, by pre-selecting only the useful columns inside accum_dfs creation from responses...
+    # ...the warning being related to "empty or all-NA columns when determining the result dtypes".
+
+    # Renaming to keep a Python code more similar to that for GW quality data...:
+    df.rename(columns={'libelle_parametre':'nom_param', 'code_station':'point_id', 'code_parametre':'code_param'}, inplace=True)
 
     # If no data, there is nothing else to do:
     if (len(df) == 0):
@@ -206,29 +218,32 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
         print(df)
 
     if (verbose_level >= 2):
-        print("\nList of all {} point IDs ('bss_id'):".format(df['bss_id'].nunique()))
-        print(df['bss_id'].unique())
+        print("\nList of all {} point IDs ('code_station'):".format(df['point_id'].nunique()))
+        print(df['point_id'].unique())
         print("\nList of all column names (before further processing of the DataFrame):")
         print(df.columns.to_list())
 
     # NOT NEEDED anymore I think: df.set_index(['latitude', 'longitude', 'date_debut_prelevement'])
 
     # Selecting columns to discard some columns that are not used anymore (for now)
-    df = df[['bss_id', 'latitude', 'longitude', 'nom_param', 'resultat', 'symbole_unite', 'date_debut_prelevement']]
-    # TODO (Marc) MAYBE: ADD 'code_remarque_analyse' ... but HOW, and what to do then in .pivot_table() !? (TO discuss in 2025)
+    df = df[['point_id', 'latitude', 'longitude', 'code_param', 'nom_param', 'resultat', 'symbole_unite', 'code_remarque', 'date_debut_prelevement', 'libelle_support', 'libelle_fraction']]
+    # Remarks:
+    # * The libelle_fraction field is kept temporarily just to allow a more detailed inspection of the data we got, although all "fractions" are kept.
+    # * TODO (Marc) We should USE the 'code_remarque' info ... but HOW, and what to do then in .pivot_table() !? (TO discuss in 2025)
+    #   This 'code_remarque' --> 'mnemo_remarque' text field, indicates whether the result is quantitative (>LOQ) or censored data (<LOQ or <LOD), or other special cases.
 
     # Removing fully redundant data rows, if any (altough it should not)
     df = df.drop_duplicates()
 
     # DEVELOPER NOTE: I have chosen to aggregate with point_id, in case there would be unexcepted variability
     # in the point's coordinate values (although it should not).
-    # Still we assume that for a given point (bss_id) we should always get the same lat,long (unique) coordinate values,
+    # Still we assume that for a given point (point_id) we should always get the same lat,long (unique) coordinate values,
     # so that we can get a point's coordinates from its first values of 'latitude' and 'longitude' (see below).
 
     # This reference DataFrame of point coordinates (df_ref_coords) will be used later to merge those coordinates back
     # with the point they belong to. That is used here because we prefer to aggregate by point_id rather than lat,long.
-    df_ref_coords = df[['bss_id', 'latitude', 'longitude']].rename(
-        {'bss_id': 'point_id', 'latitude': 'lat', 'longitude': 'lon'}, axis=1).groupby(
+    df_ref_coords = df[['point_id', 'latitude', 'longitude']].rename(
+        {'point_id': 'point_id', 'latitude': 'lat', 'longitude': 'lon'}, axis=1).groupby(
         'point_id').first()  # (by key = "point_id")
     if (verbose_level >= 2):
         print("\nPOINT COORDINATES ref. DataFrame df_ref_coords =")
@@ -236,12 +251,12 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
 
     # Aggregating the data by Point ID and by Date,
     # with aggregated value = mean of raw values, and info on measurement units = first (heading) most frequent (mode) text info)
-    df = pd.pivot_table(df, index=['bss_id', 'date_debut_prelevement'],
+    df = pd.pivot_table(df, index=['point_id', 'date_debut_prelevement'],
                         columns='nom_param',
                         values=['resultat', 'symbole_unite'],
                         aggfunc={'resultat': 'mean', 'symbole_unite': lambda x: x.mode().head(
                             1)}).reset_index()  # (protected in case of symbole_unite all empty = None)
-    df = df.rename({'bss_id': 'point_id', 'date_debut_prelevement': 'Timestamp'}, axis=1)
+    df = df.rename({'point_id': 'point_id', 'date_debut_prelevement': 'Timestamp'}, axis=1)
 
     # Reminder of the DataFrame format at this stage:
     # It looks like this (example):
@@ -254,7 +269,7 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     # That is, the columns have two levels: two outer 'groups' (resultat, symbole_unite) and
     # as many inner columns inside those groups as there are parameters (here = 2 substances).
 
-    # TODO Marc please CHECK if this works!!? Not sure it does: 'resultat' column no more existing I think??
+    # TODO Marc please CHECK if relevant for Naiades SW quality data?? First tests suggest that symbole_unite = mg/L (no molecule detail) for 'Phosphore total' (code 1350).
     phosphore_column = [x for x in df.columns if "Phosphore total" in x]
     if len(phosphore_column) > 0:  # P2O5 to P
         df.loc[df.loc[:, ('symbole_unite', 'Phosphore total')] == 'mg(P2O5)/L', (
@@ -297,7 +312,6 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
 
     # Resample days
     df.reset_index(inplace=True)
-
     df = df.set_index("Timestamp").groupby('S2CELL').resample('1D').first()
     # TODO QUESTION: What is this for? Is it really important that the time series in df have a regular 1-day time step here???
 
