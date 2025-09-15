@@ -25,3 +25,12 @@ def create_user(db: Session, user: UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def delete_user(db: Session, username: str):
+    user = get_user_by_username(db, username)
+    if user:
+        db.delete(user)
+        db.commit()
+        return True
+    return False
