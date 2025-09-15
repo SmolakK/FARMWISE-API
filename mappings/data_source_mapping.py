@@ -73,7 +73,7 @@ API_PATH_RANGES = {
     'API_readers.imgw_hydro.imgw_api_hydro_daily': (
         ((54.8396, 49.0023, 24.1453, 14.1226),
          ('1951-01-01', CURRENT_DAY),
-         ['water quantity'],
+         ['surface water quantity'],
          'daily',
          1,
          1)
@@ -110,10 +110,18 @@ API_PATH_RANGES = {
          1,
          1)
     ),
-    'API_readers.hubeau.hubeau_piezo_read': (
+    'API_readers.hubeau.hubeau_piezo_read_vbrgm': (
         ((51.09, 41.33, 9.56, -5.14),
          ('1950-01-01', CURRENT_DAY),
          ['groundwater quantity'],
+         'none',
+         1,
+         1)
+    ),
+    'API_readers.hubeau.hubeau_sw_quality_read': (
+        ((51.09, 41.33, 9.56, -5.14),
+         ('1950-01-01', CURRENT_DAY),
+         ['surface water quality'],
          'none',
          1,
          1)
