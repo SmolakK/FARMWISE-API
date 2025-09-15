@@ -34,20 +34,26 @@ async def read_data(spatial_range, time_range, data_range, level):
     def load_raster_data():
         with rasterio.open(EGDI_FILE) as dataset:
             window = from_bounds(left=west, bottom=south, right=east, top=north, transform=dataset.transform)
+            win_transform = rasterio.windows.transform(window, dataset.transform)
 
             # Read the data within the window
             data = dataset.read(1, window=window)
 
-            # Generate meshgrid of row and column indices
-            rows, cols = data.shape
-            row_indices, col_indices = np.meshgrid(
-                np.arange(window.row_off, window.row_off + rows),
-                np.arange(window.col_off, window.col_off + cols),
-                indexing='ij'
+            # Column and row coordinates within the window
+            cols = np.arange(data.shape[1])
+            rows = np.arange(data.shape[0])
+
+            # Build meshgrid in pixel space
+            col_indices, row_indices = np.meshgrid(cols, rows)
+
+            # Convert to spatial coords
+            x_coords, y_coords = rasterio.transform.xy(
+                win_transform, row_indices, col_indices, offset="center"
             )
 
-            # Get corresponding x, y coordinates using the transform
-            x_coords, y_coords = rasterio.transform.xy(dataset.transform, row_indices, col_indices, offset='center')
+            # Cast to numpy arrays
+            x_coords = np.array(x_coords)
+            y_coords = np.array(y_coords)
 
             return data, x_coords, y_coords
 
