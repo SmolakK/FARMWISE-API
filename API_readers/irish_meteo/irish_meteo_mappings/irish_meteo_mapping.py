@@ -1,9 +1,9 @@
 # aliases for the data fields
 DATA_ALIASES = {
-    'precipitation_height': 'precipitation'
+    'precipitation [mm]': 'precipitation'
 }
 
 # global mapping of parameter codes to descriptions and units
 GLOBAL_MAPPING = {
-    'precipitation_height': "Precipitation total [mm]",
+    'precipitation [mm]': "Precipitation total [mm]",
 }

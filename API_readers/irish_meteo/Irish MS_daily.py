@@ -6,6 +6,8 @@ import zipfile
 from typing import Tuple
 import re
 from tqdm.asyncio import tqdm
+from utils.coordinates_to_cells import prepare_coordinates
+from API_readers.irish_meteo.irish_meteo_mappings.irish_meteo_mapping import DATA_ALIASES,GLOBAL_MAPPING
 
 BASE_URL = "https://cli.fusio.net/cli/climate_data/webdata/dly{}.zip"
 
@@ -110,8 +112,8 @@ async def process_working_links(df: pd.DataFrame) -> pd.DataFrame:
     return pd.concat(valid_dfs, ignore_index=True) if valid_dfs else pd.DataFrame()
 
 
-async def read_data() -> pd.DataFrame:
-    csv_file = "EPA_ireland_stations.csv"
+async def read_data(spatial_range, time_range, data_range, level):
+    csv_file = "API_readers/irish_meteo/EPA_ireland_stations.csv"
     df = generate_links(csv_file)
 
     async with httpx.AsyncClient() as client:
@@ -121,12 +123,38 @@ async def read_data() -> pd.DataFrame:
     df_with_status = df.merge(status_df, on="download_link", how="left")
 
     combined_df = await process_working_links(df_with_status)
-    return combined_df
 
+    if combined_df.empty:
+        return pd.DataFrame()
 
-def main():
-    asyncio.run(read_data())
+    # --- Apply spatial filtering ---
+    unique_points = combined_df[['id', 'lat', 'lon']].drop_duplicates()
+    coordinates = prepare_coordinates(unique_points, spatial_range=spatial_range, level=level)
 
+    if coordinates is None or coordinates.empty:
+        return pd.DataFrame()
 
-if __name__ == "__main__":
-    main()
+    valid_ids = coordinates['id'].unique()
+    combined_df = combined_df[combined_df['id'].isin(valid_ids)]
+
+    combined_df = combined_df.rename({'date': 'Timestamp'}, axis=1)
+
+    # --- Apply time filtering ---
+    time_from, time_to = pd.to_datetime(time_range[0]), pd.to_datetime(time_range[1])
+    combined_df['Timestamp'] = pd.to_datetime(combined_df['Timestamp'])
+    combined_df = combined_df[(combined_df['Timestamp'] >= time_from) & (combined_df['Timestamp'] <= time_to)]
+    combined_df['Timestamp'] = combined_df['Timestamp'].dt.date
+
+    combined_df['precipitation [mm]'] = combined_df['precipitation [mm]'].astype('float')
+
+    # Merge with coordinates to add S2CELL
+    combined_df = combined_df.merge(coordinates[['id', 'S2CELL']], on='id')
+
+    # Pivot so final structure is aligned
+    combined_df = combined_df.set_index(['Timestamp', 'S2CELL'])
+    combined_df = combined_df.rename(GLOBAL_MAPPING, axis=1)
+    combined_df = combined_df[['Precipitation total [mm]']]
+
+    final_df_pivot = combined_df.pivot_table(index='Timestamp', columns='S2CELL')
+
+    return final_df_pivot

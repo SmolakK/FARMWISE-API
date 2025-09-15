@@ -129,7 +129,7 @@ API_PATH_RANGES = {
     'API_readers.UA_sw_quality.ukrainian_surface_water': (
         ((52.3791, 44.3824, 40.2276, 22.1371),
          ('1950-01-01', CURRENT_DAY),
-         ['sw quality'],
+         ['surface water quality'],
          'monthly',
          1,
          1)
@@ -150,14 +150,14 @@ API_PATH_RANGES = {
          1,
          1)
     ),
-    'API_readers.The Irish Meteorological Service.Irish MS_daily': (
+    'API_readers.irish_meteo.Irish MS_daily': (
         ((55.3822, 51.4476, -6.0024, -10.4781),
          ('1985-01-01', CURRENT_DAY),
          ['precipitation'],
          'daily',
          1,
          1)
-    )
+    ),
     'API_readers.hubeau.hubeau_sw_quality_read': (
         ((51.09, 41.33, 9.56, -5.14),
          ('1950-01-01', CURRENT_DAY),
