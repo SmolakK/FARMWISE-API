@@ -1,6 +1,6 @@
 from wetterdienst.provider.dwd.observation import DwdObservationRequest, DwdObservationResolution
 import pandas as pd
-from utils import prepare_coordinates
+from utils.coordinates_to_cells import prepare_coordinates
 import warnings
 import asyncio
 import datetime as dt
