@@ -83,6 +83,10 @@ async def read_data(spatial_range, time_range, data_range, level):
         print("Warning: Number of columns does not match the number of custom headers.")
 
     unique_points = combined_df[['point_id', 'lat', 'lon']].drop_duplicates()
+    unique_points = unique_points[pd.to_numeric(unique_points[['lat','lon']].stack(), errors='coerce')
+                .unstack()
+                .notna()
+                .all(axis=1)]
     coordinates = prepare_coordinates(coordinates=unique_points, spatial_range=spatial_range, level=level)
     if coordinates is None or coordinates.empty:
         logging.info("No coordinates within spatial range.")
@@ -102,10 +106,13 @@ async def read_data(spatial_range, time_range, data_range, level):
         return pd.DataFrame()
 
     # Ensure numeric columns
-    combined_df[new_headers] = combined_df[new_headers].apply(pd.to_numeric, errors='coerce')
+    cols_to_convert = [col for col in new_headers if col != "date"]
+    combined_df[cols_to_convert] = combined_df[cols_to_convert].apply(pd.to_numeric, errors='coerce')
 
     final_df = combined_df[['point_id', 'date'] + new_headers]
+    final_df = final_df.loc[:, ~final_df.columns.duplicated()]
     final_df = final_df.merge(coordinates[['point_id', 'S2CELL']], on='point_id')
+
 
     # Set MultiIndex
     final_df = final_df.set_index(['date', 'S2CELL'])
