@@ -5,7 +5,7 @@ scheduler = BackgroundScheduler()
 
 
 def start_scheduler(temp_dir):
-    scheduler.add_job(cleanup_old_files, 'interval', minutes=60, args=[temp_dir, 3600])
+    scheduler.add_job(cleanup_old_files, 'interval', minutes=360, args=[temp_dir, 3600])
     scheduler.start()
 
 
