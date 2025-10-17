@@ -113,7 +113,7 @@ async def read_data(spatial_range, time_range, data_range, level):
     final_df = final_df.loc[:, ~final_df.columns.duplicated()]
     final_df = final_df.merge(coordinates[['point_id', 'S2CELL']], on='point_id')
 
-
+    final_df = final_df[[x for x in final_df.columns if x not in ['lat','lon','point_id']]]
     # Set MultiIndex
     final_df = final_df.set_index(['date', 'S2CELL'])
 
