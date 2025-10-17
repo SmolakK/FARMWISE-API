@@ -32,3 +32,4 @@ API_readers/soilgrids/temp_storage/out.tif
 routers/__pycache__/data_call.cpython-39.pyc
 .idea/workspace.xml
 temp_files/
+.idea/workspace.xml
