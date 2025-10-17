@@ -4,6 +4,7 @@ __pycache__
 .idea/FARMWISE.iml
 .idea/misc.xml
 .idea/workspace.xml
+.idea/*
 fidel.env
 working_backup.py
 main_call_example.py

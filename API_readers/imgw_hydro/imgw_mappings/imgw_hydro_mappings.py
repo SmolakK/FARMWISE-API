@@ -20,6 +20,6 @@ WATER_SELECTED = [
 ]
 
 DATA_ALIASES = {
-    "Water level [cm]": 'water quantity',
-    "Flow [m³/s]": 'water quantity'
+    "Water level [cm]": 'surface water quantity',
+    "Flow [m³/s]": 'surface water quantity'
 }
