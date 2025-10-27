@@ -181,10 +181,11 @@ async def read_data(spatial_range, time_range, data_range, level):
 
         final_df = final_df[['id', 'date'] + available_columns]
         final_df = final_df.merge(coordinates[['id', 'S2CELL']], on='id')
+        final_df = final_df.rename({'date':'Timestamp'},axis=1)
 
         # Set MultiIndex
-        final_df = final_df.set_index(['date', 'S2CELL'])
+        final_df = final_df.set_index(['Timestamp', 'S2CELL'])
 
         # Pivot the DataFrame asynchronously
-        final_df_pivot = final_df.pivot_table(index='date', columns='S2CELL')
+        final_df_pivot = final_df.pivot_table(index='Timestamp', columns='S2CELL')
         return final_df_pivot
