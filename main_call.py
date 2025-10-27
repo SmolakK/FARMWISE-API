@@ -8,6 +8,7 @@ import importlib
 import pandas as pd
 import logging
 import asyncio
+import quality_assess
 
 logger = logging.getLogger(__name__)
 COUNTRY_BBOXES = return_country_bboxes()
@@ -38,7 +39,7 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     """
     data_storage = []  # This will store data called from different APIs
     api_metadata = []
-
+    # api_reports = []
     if country is not None:
         if isinstance(country, str):
             country = [country]  # Support single country input
@@ -64,26 +65,32 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
         if spatial_overlap and temporal_overlap and len(data_overlap) > 0:  # If overlaps
             try:
                 module = importlib.import_module(api_name)  # Import the proper module
+                api_name_suffix = api_name.split('.')[-1]
                 # Read data from the module (parameters are the same for all read_data() functions)
                 api_response_data = await asyncio.wait_for(
                     module.read_data(spatial_range=bounding_box, time_range=(time_from, time_to),
                                      data_range=factors, level=level),
                     timeout=timeout)
                 if isinstance(api_response_data, pd.DataFrame):
-                    api_name_suffix = api_name.split('.')[-1]
                     api_columns = list(api_response_data.columns.get_level_values(0).unique())
                     api_dates = list(api_response_data.index.astype(str).unique())
                     api_dates = [api_dates[0],api_dates[-1]]
                     api_cells = list(api_response_data.columns.get_level_values(1).unique())
                     bbox = extract_bbox(api_cells)
-                    api_metadata.append({
+                    meta = {
                         "api_name": api_name_suffix,
                         "columns": api_columns,
                         "dates_range": api_dates,
                         "bounding_box (NSEW)": bbox,
                         "status": "success" if isinstance(api_response_data, pd.DataFrame) else "failure",
                         "error": str(e) if "e" in locals() else None  # Add error details if any
-                    })
+                    }
+                    api_metadata.append(meta)
+                    # request_ranges = {'bbox':bounding_box,'level':level,'time_from':time_from,
+                    #                   'time_to':time_to,'factors':factors}
+                    # api_report = quality_assess.assess_data_quality(api_response_data,meta,ranges,request_ranges)
+                    # pd.DataFrame(api_report).to_csv(
+                    #     rf"""report_{api_name_suffix}_{level}_{time_from}_{time_to}_{country}.csv""")
                     if separate_api:
                         api_response_data = api_response_data.add_suffix(f' ({api_name_suffix})')
                     data_storage.append(api_response_data)
@@ -111,8 +118,81 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
         logger.warning("No data retrieved from available APIs")
         return pd.DataFrame()
 
-# Example using bounding box
-# asyncio.run(read_data(bounding_box=(51.09, 50.00, 14.56, 14.14), level=10, time_from='2017-01-10', time_to='2017-01-12', factors=['temperature', 'precipitation']))
 
+# import random
+# from datetime import datetime, timedelta
+#
+# EUROPE_COUNTRIES = ["Ireland"]
+#
+# # FACTORS = [
+# #     'temperature', 'precipitation', 'potential evaporation', 'soil',
+# #     'surface water quantity', 'land cover', 'hydraulic conductivity',
+# #     'depth to watertable', 'groundwater quality', 'groundwater quantity',
+# #     'surface water quality'
+# # ]
+# FACTORS = [
+#     'precipitation','temperature'
+# ]
+#
+#
+# def generate_test_cases(
+#         n_countries=10, n_levels=3, n_dates=3,
+#         date_start="2010-01-01", date_end="2020-01-20",
+#         date_range_days=720
+# ):
+#     """
+#     Generates parameterized test cases for read_data().
+#
+#     :param n_countries: How many random countries to pick from Europe
+#     :param n_levels: How many random levels to generate
+#     :param n_dates: How many random date ranges to generate
+#     :param date_start: Earliest possible start date
+#     :param date_end: Latest possible end date
+#     :param date_range_days: Length of each test date window (days)
+#     :return: List of test case dictionaries
+#     """
+#     test_cases = []
+#
+#     chosen_countries = random.sample(EUROPE_COUNTRIES, n_countries)
+#     chosen_levels = random.sample(range(5, 12), n_levels)
+#
+#     # Convert to datetime
+#     date_start = datetime.fromisoformat(date_start)
+#     date_end = datetime.fromisoformat(date_end)
+#
+#     for country in chosen_countries:
+#         for level in chosen_levels:
+#             for _ in range(n_dates):
+#                 # Pick random date window
+#                 start = date_start + timedelta(
+#                     days=random.randint(0, (date_end - date_start).days - date_range_days)
+#                 )
+#                 end = start + timedelta(days=date_range_days)
+#
+#                 test_cases.append({
+#                     "country": country,
+#                     "level": level,
+#                     "time_from": start.strftime("%Y-%m-%d"),
+#                     "time_to": end.strftime("%Y-%m-%d"),
+#                     "factors": FACTORS
+#                 })
+#
+#     return test_cases
+#
+#
+# # Example usage:
+# TEST_CASES = generate_test_cases()
+#
+# for case in TEST_CASES:
+#     # Example using bounding box
+#     asyncio.run(read_data(**case))
+
+# Example using bounding box
+# asyncio.run(read_data(bounding_box=(71, 34, 45, -25), level=10, time_from='2010-01-10', time_to='2010-02-10', factors=['temperature', 'precipitation','potential evaporation',
+#                                                                                                                        'soil','surface water quantity','land cover','hydraulic conductivity',
+#                                                                                                                        'depth to watertable','groundwater quality','groundwater quantity',
+#                                                                                                                        'surface water quality',]))
+#
 # Example using country
 # asyncio.run(read_data(country='Poland', level=10, time_from='2017-01-10', time_to='2017-01-12', factors=['temperature', 'precipitation']))
+
