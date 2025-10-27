@@ -145,7 +145,7 @@ async def read_data(spatial_range, time_range, data_range, level):
     combined_df = combined_df[(combined_df['Timestamp'] >= time_from) & (combined_df['Timestamp'] <= time_to)]
     combined_df['Timestamp'] = combined_df['Timestamp'].dt.date
 
-    combined_df['precipitation [mm]'] = combined_df['precipitation [mm]'].astype('float')
+    combined_df['precipitation [mm]'] = pd.to_numeric(combined_df['precipitation [mm]'],errors='coerce')
 
     # Merge with coordinates to add S2CELL
     combined_df = combined_df.merge(coordinates[['id', 'S2CELL']], on='id')
