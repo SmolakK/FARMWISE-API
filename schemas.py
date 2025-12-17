@@ -48,6 +48,10 @@ class ReadDataRequest(BaseModel):
         False,
         description="If True, apply interpolation to the resulting data."
     )
+    produce_map: Optional[bool] = Field(
+        False,
+        description="If True, produce a map on output."
+    )
 
     @field_validator("time_from", "time_to")
     def validate_date(cls, value):
