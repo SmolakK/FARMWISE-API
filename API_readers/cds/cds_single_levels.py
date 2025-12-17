@@ -17,7 +17,7 @@ async def read_data(spatial_range, time_range, data_range, level):
     :param time_range: A tuple containing the start and end timestamps defining the time range.
     :param data_range: A list of data types requested.
                        Allowed data types: 'precipitation', 'sunlight', 'cloud cover', 'temperature',
-                       'wind', 'pressure', 'humidity'.
+                       'wind', 'pressure', 'humidity', 'soil_humidity'.
     :param level: S2Cell level.
     :return:
     """
