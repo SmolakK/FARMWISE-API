@@ -15,10 +15,11 @@ COUNTRY_BBOXES = return_country_bboxes()
 
 
 async def read_data(bounding_box=None, country=None, level=None, time_from=None, time_to=None,
-                    factors=None, separate_api=False, timeout=600, interpolation=False):
+                    factors=None, separate_api=False, timeout=600, interpolation=False, produce_map=False):
     """
     Main data reading call - combines different APIs which overlap with the requested area and time range.
 
+    :param produce_map: If true, a map will be produced.
     :param interpolation: If true, interpolation is applied to the resulting data. Especially useful for maps and
     high data resolutions.
     :param timeout: Timeout for each API after which the process will skip this API.
@@ -107,10 +108,15 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
             combined_data = combined_data.groupby(level=0).mean()  # average data from separate APIs
             if interpolation:  # be aware this inserts values to NaNs
                 combined_data = interpolate(combined_data, bounding_box, level)
-            return {"data": combined_data,  # The DataFrame containing the concatenated data
+            result = {"data": combined_data,  # The DataFrame containing the concatenated data
                     "metadata": {"apis": api_metadata  # List of metadata dictionaries for each API
                                  }
                     }
+            if produce_map:
+                from utils.map_ploter import create_folium_map
+                html_content = create_folium_map(combined_data,downsample_factor=1)
+                result['map'] = html_content
+            return result
         except Exception as e:
             logger.error(f'Error concatenating data: {e}')
             return pd.DataFrame()  # Return an empty DataFrame if concatenation fails
@@ -194,5 +200,5 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
 #                                                                                                                        'surface water quality',]))
 #
 # Example using country
-# asyncio.run(read_data(country='Poland', level=10, time_from='2017-01-10', time_to='2017-01-12', factors=['temperature', 'precipitation']))
+# asyncio.run(read_data(country='Poland', level=10, time_from='2017-01-10', time_to='2017-01-12', factors=['temperature', 'precipitation'], produce_map=True))
 
