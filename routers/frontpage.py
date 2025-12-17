@@ -182,8 +182,9 @@ async def secured_frontend_page():
                     time_from: document.getElementById("from").value,
                     time_to: document.getElementById("to").value,
                     factors: factors,
-                    separate_api: false,
-                    interpolation: false
+                    separate_api: document.getElementById("separate_api").checked,
+                    interpolation: !document.getElementById("no_interpolation").checked,
+                    produce_map: document.getElementById("produce_map").checked
                 };
 
                 if (useCountry) {
@@ -232,6 +233,7 @@ async def secured_frontend_page():
         </script>
     </head>
     <body>
+    
         <div id="app">Loading...</div>
         <button onclick="logout()" style="position: fixed; top: 5px; right: 10px;">Logout</button>
     </body>
@@ -248,6 +250,54 @@ async def api_call_page(current_user: User = Depends(get_current_active_user)):
     <html>
     <head>
         <style>
+                           .about-container {{
+                position: fixed;
+                top: 12px;
+                left: 12px;
+                z-index: 1000;
+                font-family: Arial, sans-serif;
+            }}
+            
+            .about-icon {{
+                background: #ffffff;
+                border: 1px solid #ccc;
+                border-radius: 20px;
+                padding: 6px 12px;
+                font-size: 13px;
+                cursor: help;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            }}
+            
+            .about-tooltip {{
+                display: none;
+                position: absolute;
+                top: 38px;
+                left: 0;
+                width: 320px;
+                background: #ffffff;
+                border-radius: 8px;
+                padding: 14px;
+                font-size: 13px;
+                line-height: 1.45;
+                box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+            }}
+            
+            .about-icon:hover + .about-tooltip {{
+    display: block;
+            }}
+                        .logo-container {{
+                position: fixed;
+                top: 40px;
+                right: 12px;
+                z-index: 1000;
+            }}
+            
+            .logo-container img {{
+                height: 120px;          /* adjust if needed */
+                width: auto;
+                opacity: 0.9;
+            }}
+
             body {{
                 font-family: Arial, sans-serif;
                 background-color: #f5f5f5;
@@ -325,17 +375,55 @@ async def api_call_page(current_user: User = Depends(get_current_active_user)):
         </style>
     </head>
     <body>
+        <div class="logo-container">
+        <img src="/static/farmwise_logo.png" alt="FARMWISE logo">
+        </div>
+
+        <div class="about-container">
+            <span class="about-icon">About ⓘ</span>
+            <div class="about-tooltip">
+                <strong>FARMWISE API</strong><br><br>
+        
+                This interface allows you to query spatio-temporal
+                environmental and agricultural indicators derived
+                from multiple data sources.<br><br>
+        
+                You can:
+                <ul style="padding-left: 18px; margin: 6px 0;">
+                    <li>Select data by country or custom bounding box</li>
+                    <li>Define time ranges and spatial resolution (S2)</li>
+                    <li>Choose multiple parameters</li>
+                    <li>Generate interactive maps</li>
+                </ul>
+        
+                All requests are processed on demand and require authentication.
+                
+                            This API was created thanks to the project funded from the European Union’s Horizon Europe research and innovation programme under GA Nº 101135533.
+                    Authors: Kamil Smolak, Jakub Misiewicz, Wiesław Fiałkiewicz, Arkadiusz Głogowski, Marc Laurencelle, Damien Rambourg.
+            </div>
+        </div>
+
     <form id="apiForm" action="javascript:void(0);">
         <h2>FARMWISE API</h2>
 
         <!-- Location mode -->
-        <div style="grid-column: span 2;">
-            <input type="radio" id="use_country" name="location_mode" value="country" checked>
-            <label for="use_country">Select by Country</label>
-
-            <input type="radio" id="use_bbox" name="location_mode" value="bbox">
-            <label for="use_bbox">Select by Bounding Box</label>
+        <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 6px;">
+        
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <input type="radio" id="use_country" name="location_mode" value="country" checked>
+                <label for="use_country">Select by Country</label>
+                <span style="font-size: 0.85em; color: #555;">
+                    (Data will be generated based on the bounding box defined by the most distant points of selected countries)
+                </span>
+            </div>
+        
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="radio" id="use_bbox" name="location_mode" value="bbox">
+                <label for="use_bbox">Select by Bounding Box</label>
+            </div>
+        
         </div>
+
 
         <!-- Country selection -->
         <div>
@@ -347,7 +435,7 @@ async def api_call_page(current_user: User = Depends(get_current_active_user)):
 
         <!-- Factors selection -->
         <div>
-            <label for="factors">Select Factors:</label>
+            <label for="factors">Select Parameters:</label>
             <select id="factors" name="factors" multiple size="6">
                 {factor_options}
             </select>
@@ -362,6 +450,12 @@ async def api_call_page(current_user: User = Depends(get_current_active_user)):
                 <label>E: <input type="text" id="bbox_e" name="bbox_e" disabled></label>
                 <label>W: <input type="text" id="bbox_w" name="bbox_w" disabled></label>
             </div>
+                <small class="bbox-description" style="display:block; margin-top:4px; color:#666;">
+        Coordinates should be entered in decimal degrees (WGS 84).<br>
+        N = northernmost latitude, S = southernmost latitude,<br>
+        E = easternmost longitude, W = westernmost longitude.<br>
+        Example: N=51.15, S=50.80, E=17.20, W=16.80 (Wrocław, Poland area).
+                </small>
         </div>
 
         <!-- Time selection -->
@@ -382,6 +476,21 @@ async def api_call_page(current_user: User = Depends(get_current_active_user)):
             </label>
             <input type="number" id="s2_level" name="s2_level" min="2" max="14" value="10">
         </div>
+        
+        <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 6px;">
+        <label>
+            <input type="checkbox" id="separate_api" name="separate_api">
+            Produce APIs outputs separately (in separate columns)
+        </label>
+        <label>
+            <input type="checkbox" id="produce_map" name="produce_map">
+            Produce an interactive map
+        </label>
+        <label>
+            <input type="checkbox" id="no_interpolation" name="no_interpolation" checked>
+            Do not interpolate data for visualization (faster response)
+        </label>
+    </div>
 
         <!-- Buttons -->
         <div class="buttons">
