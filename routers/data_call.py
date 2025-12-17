@@ -121,7 +121,8 @@ async def read_data_endpoint(
             time_to=request_body.time_to,
             factors=request_body.factors,
             separate_api=request_body.separate_api,
-            interpolation=request_body.interpolation
+            interpolation=request_body.interpolation,
+            produce_map=request_body.produce_map
         )
 
         if not result:
@@ -144,11 +145,23 @@ async def read_data_endpoint(
             json.dump(metadata, mf, indent=4)
         metadata_file.close()
 
+        if request_body.produce_map:
+            map_html = result.get('map')
+            # Save map
+            if map_html:
+                map_file = tempfile.NamedTemporaryFile(delete=False, suffix='.html', mode='w+', dir=temp_dir,
+                                                       encoding='utf-8')
+                map_file.write(map_html)
+                map_file.close()
+
         # Generate download links
         load_dotenv('public_host.env')
-        base_url = os.getenv("PUBLIC_BASE_URL")
+        base_url = os.getenv("PUBLIC_BASE_URL", "localhost:8000")
         data_download_link = f"http://{base_url}/download/{os.path.basename(data_file.name)}"
         metadata_download_link = f"http://{base_url}/download/{os.path.basename(metadata_file.name)}"
+        map_download_link = None
+        if request_body.produce_map:
+            map_download_link = f"http://{base_url}/download/{os.path.basename(map_file.name)}"
 
         # Send the email
         email_content = (
@@ -160,9 +173,15 @@ async def read_data_endpoint(
             f"- Level: {request_body.level}\n"
             f"- Factors: {', '.join(request_body.factors)}\n"
             f"- Location Mode: {'Country: ' + ', '.join(request_body.country) if hasattr(request_body, 'country') and request_body.country else 'Bounding Box: ' + str(request_body.bounding_box)}\n\n"
-            f"DO NOT RESPOND TO THIS EMAIL\n"
         )
-        send_email(current_user.email, "Your Data is Ready", email_content)
+        if map_download_link:
+            email_content += f"Map File: {map_download_link}\n\n"
+        email_content += f"DO NOT RESPOND TO THIS EMAIL\n"
+
+        try:
+            send_email(current_user.email, "Your Data is Ready", email_content)
+        except Exception as e:
+            logger.error(f"Failed to send email: {e}")
 
         # Return success response
         return "Data processing completed successfully. A download link has been sent to your email."
@@ -205,4 +224,87 @@ async def download_file(file_name: str, background_tasks: BackgroundTasks, reque
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+@api_router.post("/read-data-direct")
+@limiter.limit("10/minute")
+async def read_data_direct(
+    request_body: ReadDataRequest,
+    request: Request,
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Same as /read-data but returns direct REST download links instead of sending email.
+    """
+
+    logger.info("Started direct data processing request")
+
+    try:
+        result = await read_data(
+            bounding_box=getattr(request_body, "bounding_box", None),
+            country=getattr(request_body, "country", None),
+            level=request_body.level,
+            time_from=request_body.time_from,
+            time_to=request_body.time_to,
+            factors=request_body.factors,
+            separate_api=request_body.separate_api,
+            interpolation=request_body.interpolation,
+            produce_map=request_body.produce_map
+        )
+
+        if not result:
+            raise HTTPException(
+                status_code=404,
+                detail="No data available for the selected parameters."
+            )
+
+        df = result["data"]
+        metadata = result["metadata"]
+
+        temp_dir = request.app.state.temp_dir
+
+        # --- SAVE CSV ---
+        data_file = tempfile.NamedTemporaryFile(
+            delete=False, suffix=".csv", mode="w+", dir=temp_dir
+        )
+        df.to_csv(data_file.name, index=True)
+        data_file.close()
+
+        # --- SAVE JSON METADATA ---
+        metadata_file = tempfile.NamedTemporaryFile(
+            delete=False, suffix=".json", mode="w+", dir=temp_dir
+        )
+        with open(metadata_file.name, "w") as mf:
+            json.dump(metadata, mf, indent=4)
+        metadata_file.close()
+
+        # --- OPTIONAL MAP ---
+        map_url = None
+        if request_body.produce_map:
+            map_html = result.get("map")
+            if map_html:
+                map_file = tempfile.NamedTemporaryFile(
+                    delete=False, suffix=".html", mode="w+", dir=temp_dir
+                )
+                map_file.write(map_html)
+                map_file.close()
+                map_url = f"/download/{os.path.basename(map_file.name)}"
+
+        # --- BASE URL ---
+        load_dotenv("public_host.env")
+        base_url = os.getenv("PUBLIC_BASE_URL", "localhost:8000")
+
+        # --- BUILD RESPONSE ---
+        response = {
+            "status": "success",
+            "data_url": f"http://{base_url}/download/{os.path.basename(data_file.name)}",
+            "metadata_url": f"http://{base_url}/download/{os.path.basename(metadata_file.name)}",
+            "map_url": f"http://{base_url}/download/{os.path.basename(map_file.name)}"
+            if map_url else None
+        }
+
+        return response
+
+    except Exception as e:
+        logger.error(f"Error in /read-data-direct: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
