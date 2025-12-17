@@ -172,7 +172,7 @@ def interpolate(df_data, spatial_range, level):
     # Interpolate data to the finer S2 cell grid
     columns_to = [x for x in df_data.columns if x != 'lat' and x != 'lon']
     interpolated_data = {}
-    for colname in columns_to:
+    for colname in tqdm(columns_to,total=len(columns_to)):
         to_concat = {}
         for day, values in df_data.groupby(level=0):
             filtered_vals = values[[colname,'lat','lon']][~values[colname].isna()]
