@@ -285,18 +285,26 @@ async def api_call_page(current_user: User = Depends(get_current_active_user)):
             .about-icon:hover + .about-tooltip {{
     display: block;
             }}
-                        .logo-container {{
-                position: fixed;
-                top: 40px;
-                right: 12px;
-                z-index: 1000;
-            }}
-            
-            .logo-container img {{
-                height: 120px;          /* adjust if needed */
-                width: auto;
-                opacity: 0.9;
-            }}
+                    .logo-container {{
+            position: fixed;
+            top: 12px;
+            z-index: 1000;
+        }}
+        
+        .logo-container.left {{
+            left: 40px;
+        }}
+        
+        .logo-container.right {{
+            right: 40px;
+        }}
+        
+        .logo-container img {{
+            height: 102px;   /* keep both logos visually balanced */
+            width: auto;
+            opacity: 0.9;
+        }}
+
 
             body {{
                 font-family: Arial, sans-serif;
@@ -375,9 +383,13 @@ async def api_call_page(current_user: User = Depends(get_current_active_user)):
         </style>
     </head>
     <body>
-        <div class="logo-container">
+    <div class="logo-container left">
+        <img src="/static/upwr.png" alt="UPWr logo">
+    </div>
+    
+    <div class="logo-container right">
         <img src="/static/farmwise_logo.png" alt="FARMWISE logo">
-        </div>
+    </div>
 
         <div class="about-container">
             <span class="about-icon">About ⓘ</span>
