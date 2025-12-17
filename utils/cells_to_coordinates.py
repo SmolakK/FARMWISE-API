@@ -1,3 +1,6 @@
+import pandas as pd
+import s2sphere
+
 def _s2cell_id_to_coordinate(s2cell_id):
     """
     Convert an S2Cell ID to the coordinates of its center.
@@ -20,8 +23,17 @@ def s2cells_to_coordinates(pivoted_table):
     # Extract S2Cell IDs from the index
     s2cells = pivoted_table.index.get_level_values(1)
 
+    # Clean S2Cell IDs (remove trailing suffixes like " (egdi_read_d10)")
+    s2cells_clean = (
+        pd.Series(s2cells)
+            .astype(str)
+            .str.replace(r'\s*\([^)]*\)$', '', regex=True)  # remove (egdi_read_d10)
+            .str.extract(r'CellId:\s*([0-9a-fA-F]+)')[0]  # extract the hex cell ID
+            .dropna()
+    )
+
     # Convert S2Cell IDs to coordinates using _s2cell_id_to_coordinate function
-    s2_coordinates = [_s2cell_id_to_coordinate(x) for x in s2cells]
+    s2_coordinates = [_s2cell_id_to_coordinate(s2sphere.CellId.from_token(x)) for x in s2cells_clean]
 
     # Add latitude and longitude columns to the transposed DataFrame
     pivoted_table[['lat', 'lon']] = s2_coordinates
