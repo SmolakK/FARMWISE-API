@@ -41,7 +41,7 @@ API_PATH_RANGES = {
     'API_readers.cds.cds_single_levels': (
         ((71, 34, 45, -25),
          ('1950-01-01', FIVE_BEFORE),
-         ['temperature', 'precipitation'],
+         ['temperature', 'precipitation', 'soil humidity'],
          'daily',
          2,
          1)
@@ -118,14 +118,14 @@ API_PATH_RANGES = {
          1,
          1)
     ),
-    'API_readers.CHMI_Meteo.CHMI_meteo': (
-        ((51.0557, 48.5518, 18.8592, 12.0907),
-         ('1961-01-01', CURRENT_DAY),
-         ['precipitation'],
-         'daily',
-         1,
-         1)
-    ),
+    # 'API_readers.CHMI_Meteo.CHMI_meteo': (
+    #     ((51.0557, 48.5518, 18.8592, 12.0907),
+    #      ('1961-01-01', CURRENT_DAY),
+    #      ['precipitation'],
+    #      'daily',
+    #      1,
+    #      1)
+    # ),
     'API_readers.UA_sw_quality.ukrainian_surface_water': (
         ((52.3791, 44.3824, 40.2276, 22.1371),
          ('1950-01-01', CURRENT_DAY),
