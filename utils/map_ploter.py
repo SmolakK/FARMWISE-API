@@ -755,9 +755,4 @@ def create_folium_map(
 
     html_string = m.get_root().render()
 
-    file_size_mb = os.path.getsize(output_file) / 1024 / 1024
-    print(f"\n✓ Saved Folium map to {output_file}")
-    print(f"File size: {file_size_mb:.1f} MB")
-    print(f"Total overlays: {len(overlay_data)}")
-
     return html_string
