@@ -1,11 +1,20 @@
 import os.path
 import logging
+import numpy as np
 import rasterio
-from datetime import datetime
+from datetime import datetime, date
 import asyncio
 import pandas as pd
 from utils.coordinates_to_cells import prepare_coordinates
-from utils.interpolate_data import interpolate
+from rasterio.windows import from_bounds
+from rasterio.warp import transform_bounds
+from tqdm import tqdm
+from rasterio.warp import (
+    transform_bounds,
+    calculate_default_transform,
+    reproject,
+    Resampling
+)
 
 async def read_data(
         spatial_range:tuple, time_range:tuple, data_range:list, level:int
@@ -35,16 +44,126 @@ async def read_data(
 
     Notes
     -----
-    Source raster path:
-    eea_data/eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif (EEA_DATA variable)
+    Source raster path (EEA_DATA variable):
+    eea_data/eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif
     """
 
+    #FIXME: idk logging this way
     logging.basicConfig(format="%(message)s", level=logging.INFO)
     logging.info("DOWNLOADING: EEA")
 
     EEA_DATA = os.path.join(
+        'API_readers',
+        'eea',
         'eea_data',
         'eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif'
     )
 
+    # Parse time range
+    start, end = time_range
+    start = datetime.strptime(start, '%Y-%m-%d').date()
+    end = datetime.strptime(end, '%Y-%m-%d').date()
 
+    # Raster year constraint
+    raster_year = 2018
+    if not (start.year <= raster_year <= end.year):
+        logging.warning("Requested time range does not include raster year 2018")
+        return pd.DataFrame()
+
+    # Read raster async-safe
+    clipped, transform = await asyncio.to_thread(read_raster_window, EEA_DATA, spatial_range)
+
+    height, width = clipped.shape
+
+    # Generate lat/lon grids
+    rows, cols = np.meshgrid(np.arange(height), np.arange(width), indexing="ij")
+    xs, ys = rasterio.transform.xy(transform, rows, cols, offset='center')
+    xs = np.array(xs)
+    ys = np.array(ys)
+
+    data_rows = []
+
+    # Build row records
+    for i in tqdm(range(height), desc="Building dataframe rows"):
+        for j in range(width):
+            value = clipped[i, j]
+
+            # Skip nodata
+            if np.isnan(value):
+                continue
+
+            data_rows.append({
+                "lat": ys[i*j],
+                "lon": xs[i*j],
+                "value": float(value)
+            })
+
+    # Convert to DataFrame
+    df = pd.DataFrame(data_rows)
+
+    if df.empty:
+        logging.warning("No raster data in selected bbox")
+        return df
+
+    # Assign S2 cells
+    df = prepare_coordinates(df, spatial_range, level)
+    df = df.set_index("S2CELL")
+
+    # Aggregate per cell
+    df = df.groupby(level=0).mean().reset_index()
+    df = df.drop(['lat', 'lon'], axis=1)
+    df.value = round(df.value,0)
+    df["Timestamp"] = pd.to_datetime('2018-01-01').floor("D")
+
+   # Pivot final format
+    final_df = df.pivot_table(index="Timestamp", columns="S2CELL")
+    return final_df
+
+
+def read_raster_window(path, spatial_range):
+    """
+    Read raster window and return data reprojected to EPSG:4326
+    """
+
+    north, south, east, west = spatial_range
+    dst_crs = "EPSG:4326"
+
+    with rasterio.open(path) as src:
+        # bbox 4326 → CRS rastra (do wycięcia)
+        left, bottom, right, top = transform_bounds(
+            dst_crs, src.crs, west, south, east, north
+        )
+
+        # wycinamy okno w CRS źródłowym
+        window = from_bounds(left, bottom, right, top, transform=src.transform)
+        src_data = src.read(1, window=window).astype(float)
+        src_data[src_data == src.nodata] = np.nan
+        src_transform = src.window_transform(window)
+
+        # --- obliczamy transformację docelową (4326) ---
+        dst_transform, dst_width, dst_height = calculate_default_transform(
+            src.crs,
+            dst_crs,
+            window.width,
+            window.height,
+            *rasterio.transform.array_bounds(
+                window.height, window.width, src_transform
+            )
+        )
+
+        # bufor wynikowy
+        dst_data = np.empty((dst_height, dst_width), dtype=float)
+        dst_data[:] = np.nan
+
+        # reprojekcja
+        reproject(
+            source=src_data,
+            destination=dst_data,
+            src_transform=src_transform,
+            src_crs=src.crs,
+            dst_transform=dst_transform,
+            dst_crs=dst_crs,
+            resampling=Resampling.nearest
+        )
+
+    return dst_data, dst_transform
