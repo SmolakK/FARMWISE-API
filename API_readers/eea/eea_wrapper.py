@@ -123,23 +123,18 @@ def read_raster_window(path, spatial_range):
     """
     Read raster window and return data reprojected to EPSG:4326
     """
-
     north, south, east, west = spatial_range
     dst_crs = "EPSG:4326"
 
     with rasterio.open(path) as src:
-        # bbox 4326 → CRS rastra (do wycięcia)
         left, bottom, right, top = transform_bounds(
             dst_crs, src.crs, west, south, east, north
         )
-
-        # wycinamy okno w CRS źródłowym
         window = from_bounds(left, bottom, right, top, transform=src.transform)
         src_data = src.read(1, window=window).astype(float)
         src_data[src_data == src.nodata] = np.nan
         src_transform = src.window_transform(window)
 
-        # --- obliczamy transformację docelową (4326) ---
         dst_transform, dst_width, dst_height = calculate_default_transform(
             src.crs,
             dst_crs,
@@ -150,11 +145,8 @@ def read_raster_window(path, spatial_range):
             )
         )
 
-        # bufor wynikowy
         dst_data = np.empty((dst_height, dst_width), dtype=float)
         dst_data[:] = np.nan
-
-        # reprojekcja
         reproject(
             source=src_data,
             destination=dst_data,
