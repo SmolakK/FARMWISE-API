@@ -8,7 +8,6 @@ import pandas as pd
 from utils.coordinates_to_cells import prepare_coordinates
 from rasterio.windows import from_bounds
 from rasterio.warp import transform_bounds
-from tqdm import tqdm
 from rasterio.warp import (
     transform_bounds,
     calculate_default_transform,
@@ -84,7 +83,7 @@ async def read_data(
     data_rows = []
 
     # Build row records
-    for i in tqdm(range(height), desc="Building dataframe rows"):
+    for i in range(height):
         for j in range(width):
             value = clipped[i, j]
 
