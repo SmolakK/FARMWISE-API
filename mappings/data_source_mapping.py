@@ -169,7 +169,7 @@ API_PATH_RANGES = {
     'API_readers.eea.eea_read': (
         ((73, 24, 73, -56),
          ('2018-01-01', CURRENT_DAY),
-         ['soil'],
+         ['environmental data (EEA)'],
          'none',
          1,
          1)
