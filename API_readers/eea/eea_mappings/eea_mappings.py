@@ -1,5 +1,5 @@
 # list of parameters in the parameter column
-PARAMETER_VALUES = []
+PARAMETER_VALUES = ['environmental data (EEA)']
 
 # selection list for parameters
 PARAMETER_SELECTION = []
