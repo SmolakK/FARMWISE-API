@@ -92,13 +92,14 @@ async def read_data(
     # Build row records
     for i in range(height):
         for j in range(width):
+            idx = i * width + j
             value = clipped[i, j]
             # Skip nodata
             if np.isnan(value):
                 continue
             data_rows.append({
-                "lat": ys[i*j],
-                "lon": xs[i*j],
+                "lat": ys[idx],
+                "lon": xs[idx],
                 "value": float(value)
             })
 
