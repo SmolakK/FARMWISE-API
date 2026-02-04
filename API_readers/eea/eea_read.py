@@ -2,7 +2,7 @@ import os.path
 import logging
 import numpy as np
 import rasterio
-from datetime import datetime, date
+from datetime import datetime
 import asyncio
 import pandas as pd
 from utils.coordinates_to_cells import prepare_coordinates
@@ -47,7 +47,6 @@ async def read_data(
     eea_data/eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif
     """
 
-    #FIXME: idk logging this way
     logging.basicConfig(format="%(message)s", level=logging.INFO)
     logging.info("DOWNLOADING: EEA")
 
