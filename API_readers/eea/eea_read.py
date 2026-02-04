@@ -118,8 +118,10 @@ async def read_data(
     df.value = round(df.value,0)
     df["Timestamp"] = pd.to_datetime('2018-01-01').floor("D")
 
-   # Pivot final format
-    final_df = df.pivot_table(index="Timestamp", columns="S2CELL")
+    dates = pd.date_range(start='2018-01-01', end=end, freq='D')
+    df_expanded = pd.concat([df.assign(Timestamp=d) for d in dates])
+    final_df = df_expanded.pivot_table(index="Timestamp", columns="S2CELL")
+
     return final_df
 
 
