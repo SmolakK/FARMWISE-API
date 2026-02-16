@@ -22,7 +22,7 @@
             },
             {
                 "file": "c17",
-                "code": "HoldingsPerKm2",
+                "code": "HldnPK2",
                 "label": "Holdings per square km",
                 "unit": "Number/km2"
             }
@@ -81,7 +81,7 @@
             },
             {
                 "file": "c18e",
-                "code": "FallowShare",
+                "code": "FllwShr",
                 "label": "The fallow land share of UAA",
                 "unit": "Percentage"
             },
@@ -127,22 +127,10 @@
                 "unit": "Heads"
             },
             {
-                "file": "c21b",
-                "code": "BovineDensity",
-                "label": "Bovine per hectare UAA",
-                "unit": "Heads/ha"
-            },
-            {
                 "file": "c21c",
                 "code": "PIGS",
                 "label": "Number of pigs",
                 "unit": "Heads"
-            },
-            {
-                "file": "c21c",
-                "code": "PigsDensity",
-                "label": "Pigs per hectare UAA",
-                "unit": "Heads/ha"
             },
             {
                 "file": "c21d",
@@ -151,34 +139,16 @@
                 "unit": "Heads"
             },
             {
-                "file": "c21d",
-                "code": "SheepDensity",
-                "label": "Sheep per hectare UAA",
-                "unit": "Heads/ha"
-            },
-            {
                 "file": "c21e",
                 "code": "GOATS",
                 "label": "Goats",
                 "unit": "Heads"
             },
             {
-                "file": "c21e",
-                "code": "GoatsDensity",
-                "label": "Goats per hectare UAA",
-                "unit": "Heads/ha"
-            },
-            {
                 "file": "c21f",
                 "code": "POULTRY",
                 "label": "Poultry",
                 "unit": "Heads"
-            },
-            {
-                "file": "c21f",
-                "code": "PoultryDensity",
-                "label": "Poultry per hectare UAA",
-                "unit": "Heads/ha"
             }
         ]
     },
@@ -369,13 +339,13 @@
         "variables": [
             {
                 "file": "c19",
-                "code": "UAAXK0000_ORG",
+                "code": "UAAXK00",
                 "label": "Organic utilised agricultural area",
                 "unit": "Hectare"
             },
             {
                 "file": "c19",
-                "code": "OrgShare",
+                "code": "OrgShar",
                 "label": "Share of organic farmland relative to UAA",
                 "unit": "Percentage"
             }
