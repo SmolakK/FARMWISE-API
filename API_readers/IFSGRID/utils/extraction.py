@@ -1,25 +1,26 @@
 import geopandas as gpd
 import pandas as pd
-from shapely.geometry import box
 from typing import Tuple
 import os
 import json
 
 def factor_mapping_extractor(factor, aliasaes, data_path):
 
-    with open("definitions.json", "r") as f:
+    with open(r"API_readers\IFSGRID\utils\definitions.json", "r") as f:
         file = json.load(f)
 
     code_file = {}
-    for factor in file:
-        for var in file[factor]["variables"]:
+    for fac in file:
+        for var in file[fac]["variables"]:
             code_file[var['code']] = var['file']    
 
-    shpfile_paths = []
+    shpfile_paths = {}
     for key in aliasaes:
-        if aliasaes[key] == factor:
+        if aliasaes[key] == factor[0]:
             filename = code_file[key]
-            shpfile_paths.append(os.path.join(data_path,f'{filename}.shp'))
+            shpfile_paths[key] = os.path.join(data_path,filename,f'{filename}.shp')
+    
+    return shpfile_paths
 
 def extract_values(
     shp_path: str,
@@ -54,8 +55,7 @@ def extract_values(
     if gdf.crs.to_epsg() != 4326:
         gdf = gdf.to_crs(epsg=4326)
 
-    bbox_geom = box(*bbox)
-    gdf_bbox = gdf[gdf.geometry.intersects(bbox_geom)].copy()
+    gdf_bbox = gdf[gdf.geometry.intersects(bbox)].copy()
 
     if gdf_bbox.empty:
         return pd.DataFrame(columns=["lon", "lat", "factor"])
@@ -64,8 +64,12 @@ def extract_values(
     result = pd.DataFrame({
         "lon": gdf_bbox.geometry.x,
         "lat": gdf_bbox.geometry.y,
-        "factor": gdf_bbox[factor_feature].values
+        factor_feature: gdf_bbox[factor_feature].values
     })
+    from shapely.geometry import Point
+    geometry = [Point(xy) for xy in zip(result["lon"], result["lat"])]
+    gdf = gpd.GeoDataFrame(result, geometry=geometry, crs="EPSG:4326")
+    gdf.to_file("result.shp")
 
     return result
 
