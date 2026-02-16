@@ -166,5 +166,18 @@ API_PATH_RANGES = {
          1,
          1)
     ),
+    'API_readers.IFSGRID.IFSGRID_read': (
+        ((51.09, 41.33, 9.56, -5.14),
+        ('2020-01-01', CURRENT_DAY),
+        [
+            'livestock pressure',
+            'surface water quality',
+            'land cover',
+            'agricultural structure'
+        ],
+        'none',
+        1,
+        1)
+    ),
 }
 
