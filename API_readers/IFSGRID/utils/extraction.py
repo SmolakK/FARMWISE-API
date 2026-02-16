@@ -2,7 +2,24 @@ import geopandas as gpd
 import pandas as pd
 from shapely.geometry import box
 from typing import Tuple
+import os
+import json
 
+def factor_mapping_extractor(factor, aliasaes, data_path):
+
+    with open("definitions.json", "r") as f:
+        file = json.load(f)
+
+    code_file = {}
+    for factor in file:
+        for var in file[factor]["variables"]:
+            code_file[var['code']] = var['file']    
+
+    shpfile_paths = []
+    for key in aliasaes:
+        if aliasaes[key] == factor:
+            filename = code_file[key]
+            shpfile_paths.append(os.path.join(data_path,f'{filename}.shp'))
 
 def extract_values(
     shp_path: str,
@@ -51,3 +68,7 @@ def extract_values(
     })
 
     return result
+
+
+def stack_values():
+    pass
