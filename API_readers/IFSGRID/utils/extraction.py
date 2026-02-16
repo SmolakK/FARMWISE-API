@@ -66,10 +66,6 @@ def extract_values(
         "lat": gdf_bbox.geometry.y,
         factor_feature: gdf_bbox[factor_feature].values
     })
-    from shapely.geometry import Point
-    geometry = [Point(xy) for xy in zip(result["lon"], result["lat"])]
-    gdf = gpd.GeoDataFrame(result, geometry=geometry, crs="EPSG:4326")
-    gdf.to_file("result.shp")
 
     return result
 
