@@ -167,7 +167,7 @@ API_PATH_RANGES = {
          1)
     ),
     'API_readers.IFSGRID.IFSGRID_read': (
-        ((51.09, 41.33, 9.56, -5.14),
+        ((80, -21.7, 55.97, -61.95),
         ('2020-01-01', CURRENT_DAY),
         [
             'livestock pressure',
