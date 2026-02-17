@@ -1,64 +1,53 @@
-import os
-import asyncio
-from API_readers.IFSGRID.mappings.IFSGRID_mappings import DATA_ALIASES
-from API_readers.IFSGRID.utils.extraction import factor_mapping_extractor, extract_values
-from shapely.geometry import box
 import pandas as pd
-from utils.coordinates_to_cells import prepare_coordinates
-from API_readers.IFSGRID.utils.preparation import check_overlap
+from API_readers.IFSGRID.utils.extraction import stack_values
+from API_readers.IFSGRID.utils.preparation import (
+    check_overlap, 
+    build_bbox, 
+    aggregate_spatial, 
+    expand_time_dimension
+)
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(
+        spatial_range:tuple, time_range:tuple, data_range:list, level:int
+    ) -> pd.Dataframe:
+    """
+    Read, process and aggregate IFSGRID data for a given
+    spatial and temporal range.
 
-    DATASET = os.path.join(
-        'API_readers',
-        'IFSGRID',
-        'data',
-        'IFSGRID',
-        'data'
-    )
+    Parameters
+    ----------
+    spatial_range : tuple of float (north, south, east, west)
+        Geographic extent in EPSG:4326 coordinate system.
+    time_range : tuple of str (start_date, end_date)
+        Date range in format "YYYY-MM-DD".
+    data_range : list of str
+        List of logical factor names to extract.
+    level : int
+        S2 cell resolution level used for spatial aggregation.
 
+    Returns
+    -------
+    pd.DataFrame
+        Pivoted DataFrame indexed by daily timestamps with
+        S2CELL identifiers as columns.
+
+    None
+        Returned when:
+        - Requested time range does not overlap with available data.
+        - No spatial data is found within the bounding box.
+    """
     start_date, end_date = check_overlap(time_range)
+
     if start_date is None:
         return None
     
-    data_paths = factor_mapping_extractor(data_range, DATA_ALIASES, DATASET)
-    factor_data_frame = pd.DataFrame(columns=['lat','lon'])
+    bbox_geom = build_bbox(spatial_range)
+    factors_data = stack_values(data_range, bbox_geom)
+
+    if factors_data.empty:
+        return None
     
-    north, south, east, west = spatial_range
-    bbox_geom = box(west, south, east, north)
-
-    for key, value in data_paths.items():
-        try:
-            data = extract_values(value, key, bbox_geom)
-            factor_data_frame = pd.merge(
-                factor_data_frame, 
-                data, 
-                on=["lat", "lon"], 
-                how="outer"
-            )
-        except Exception as e:
-            print(value, e)
-            
-    df = prepare_coordinates(factor_data_frame, spatial_range, level)
-    df = df.set_index('S2CELL')
-    df = df.groupby(level=0).mean().reset_index()
-    df = df.drop(['lat', 'lon'], axis=1)
-
-    dates = pd.date_range(start='2018-01-01', end=end_date, freq='D')
-    df_expanded = pd.concat([df.assign(Timestamp=d) for d in dates])
-    final_df = df_expanded.pivot_table(index="Timestamp", columns="S2CELL")
+    aggregated_df = aggregate_spatial(factors_data, spatial_range, level)
+    final_df = expand_time_dimension(aggregated_df, start_date, end_date)
 
     return final_df
-
-# Define the input parameters
-N, S, E, W = 51.2, 49.0, 17.1, 15.0
-TIME_FROM, TIME_TO = '2018-01-01', '2020-12-31'
-FACTORS = ['agricultural structure']
-LEVEL = 8
-
-# Run the async function
-if __name__ == "__main__":
-    result = asyncio.run(read_data((N, S, E, W), (TIME_FROM, TIME_TO), FACTORS, LEVEL))
-    print(result)
-
-    
