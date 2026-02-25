@@ -93,7 +93,10 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                     # pd.DataFrame(api_report).to_csv(
                     #     rf"""report_{api_name_suffix}_{level}_{time_from}_{time_to}_{country}.csv""")
                     if separate_api:
-                        api_response_data = api_response_data.add_suffix(f' ({api_name_suffix})')
+                        api_response_data.columns = api_response_data.columns.set_levels(
+                            [api_response_data.columns.levels[0] + f" ({api_name_suffix})",
+                             api_response_data.columns.levels[1]]
+                        )
                     data_storage.append(api_response_data)
                     logger.info(f'Data retrieved from {api_name_suffix}')
             except asyncio.TimeoutError:
