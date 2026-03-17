@@ -166,5 +166,13 @@ API_PATH_RANGES = {
          1,
          1)
     ),
+    'API_readers.EuroCropV2.EuroCropV2_read': (
+        ((80, -21.7, 55.97, -61.95),
+         ('2008-01-01', '2023-12-31'),
+         ['land cover'],
+         'none',
+         1,
+         1)
+    ),
 }
 
