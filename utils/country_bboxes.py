@@ -1,8 +1,9 @@
+import os
 import json
 
 
 def return_country_bboxes():
-    jpath = f'utils\country_codes'
+    jpath = os.path.join('utils','country_codes')
     with open(jpath,'r') as jfile:
         country_json = json.load(jfile)
 

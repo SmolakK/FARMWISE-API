@@ -179,5 +179,13 @@ API_PATH_RANGES = {
         1,
         1)
     ),
+    'API_readers.eea.eea_read': (
+        ((73, 24, 73, -56),
+         ('2018-01-01', CURRENT_DAY),
+         ['environmental data (EEA)'],
+         'none',
+         1,
+         1)
+    )
 }
 
