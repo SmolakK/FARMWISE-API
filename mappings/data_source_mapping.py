@@ -174,5 +174,26 @@ API_PATH_RANGES = {
          1,
          1)
     ),
+    'API_readers.IFSGRID.IFSGRID_read': (
+        ((80, -21.7, 55.97, -61.95),
+        ('2020-01-01', CURRENT_DAY),
+        [
+            'livestock pressure',
+            'surface water quality',
+            'land cover',
+            'agricultural structure'
+        ],
+        'none',
+        1,
+        1)
+    ),
+    'API_readers.eea.eea_read': (
+        ((73, 24, 73, -56),
+         ('2018-01-01', CURRENT_DAY),
+         ['environmental data (EEA)'],
+         'none',
+         1,
+         1)
+    )
 }
 
