@@ -5,6 +5,9 @@ __pycache__
 .idea/misc.xml
 .idea/workspace.xml
 .idea/*
+.venv
+.vscode
+*.egg-info
 fidel.env
 working_backup.py
 main_call_example.py
@@ -34,3 +37,4 @@ routers/__pycache__/data_call.cpython-39.pyc
 .idea/workspace.xml
 temp_files/
 .idea/workspace.xml
+eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif
