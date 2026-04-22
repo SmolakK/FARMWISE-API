@@ -37,4 +37,5 @@ routers/__pycache__/data_call.cpython-39.pyc
 .idea/workspace.xml
 temp_files/
 .idea/workspace.xml
+API_readers/IFSGRID/data/IFSGRID/*
 eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif

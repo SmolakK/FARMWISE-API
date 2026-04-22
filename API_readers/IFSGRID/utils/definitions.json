@@ -1,0 +1,371 @@
+{
+    "Agricultural_holdings": {
+        "dataset_name": "Agricultural holdings",
+        "variables": [
+            {
+                "file": "c17",
+                "code": "HOLDING",
+                "label": "Number of holdings",
+                "unit": "Number"
+            },
+            {
+                "file": "c17",
+                "code": "UAA",
+                "label": "Utilised agricultural area",
+                "unit": "Hectare"
+            },
+            {
+                "file": "c17",
+                "code": "SO_EURO",
+                "label": "Standard output",
+                "unit": "Euro"
+            },
+            {
+                "file": "c17",
+                "code": "HldnPK2",
+                "label": "Holdings per square km",
+                "unit": "Number/km2"
+            }
+        ]
+    },
+    "Agricultural_area": {
+        "dataset_name": "Agricultural area",
+        "variables": [
+            {
+                "file": "c18a",
+                "code": "UAA",
+                "label": "Utilised agricultural area",
+                "unit": "Hectare"
+            },
+            {
+                "file": "c18b",
+                "code": "ARA",
+                "label": "Arable land",
+                "unit": "Hectare"
+            },
+            {
+                "file": "c18b",
+                "code": "AraShare",
+                "label": "The arable land share of UAA",
+                "unit": "Percentage"
+            },
+            {
+                "file": "c18c",
+                "code": "PECR",
+                "label": "Permanent crops",
+                "unit": "Hectare"
+            },
+            {
+                "file": "c18c",
+                "code": "PecrShare",
+                "label": "The permanent crops share of UAA",
+                "unit": "Percentage"
+            },
+            {
+                "file": "c18d",
+                "code": "J0000T",
+                "label": "Permanent grassland",
+                "unit": "Hectare"
+            },
+            {
+                "file": "c18d",
+                "code": "GrassShare",
+                "label": "The grassland share of UAA",
+                "unit": "Percentage"
+            },
+            {
+                "file": "c18e",
+                "code": "Q0000T",
+                "label": "Fallow land",
+                "unit": "Hectare"
+            },
+            {
+                "file": "c18e",
+                "code": "FllwShr",
+                "label": "The fallow land share of UAA",
+                "unit": "Percentage"
+            },
+            {
+                "file": "c18f",
+                "code": "F4000T",
+                "label": "Nuts",
+                "unit": "Hectare"
+            },
+            {
+                "file": "c18g",
+                "code": "W1000T",
+                "label": "Wines",
+                "unit": "Hectare"
+            },
+            {
+                "file": "c18h",
+                "code": "O1000T",
+                "label": "Olives",
+                "unit": "Hectare"
+            }
+        ]
+    },
+    "Livestock_units": {
+        "dataset_name": "Livestock units",
+        "variables": [
+            {
+                "file": "c21a",
+                "code": "LSU",
+                "label": "Livestock units",
+                "unit": "Livestock units"
+            },
+            {
+                "file": "c21a",
+                "code": "LSUdensity",
+                "label": "Livestock units per hectare UAA",
+                "unit": "LSU/ha"
+            },
+            {
+                "file": "c21b",
+                "code": "BOVINE",
+                "label": "Bovine animals",
+                "unit": "Heads"
+            },
+            {
+                "file": "c21c",
+                "code": "PIGS",
+                "label": "Number of pigs",
+                "unit": "Heads"
+            },
+            {
+                "file": "c21d",
+                "code": "SHEEP",
+                "label": "Sheep",
+                "unit": "Heads"
+            },
+            {
+                "file": "c21e",
+                "code": "GOATS",
+                "label": "Goats",
+                "unit": "Heads"
+            },
+            {
+                "file": "c21f",
+                "code": "POULTRY",
+                "label": "Poultry",
+                "unit": "Heads"
+            }
+        ]
+    },
+    "Labour_force": {
+        "dataset_name": "Labour force",
+        "variables": [
+            {
+                "file": "c22a",
+                "code": "FAM_FARM",
+                "label": "Share of family farm",
+                "unit": "Percentage"
+            },
+            {
+                "file": "c22b",
+                "code": "FLF_D_R_T_PERS",
+                "label": "Total number of persons working on the farm",
+                "unit": "Persons"
+            },
+            {
+                "file": "c22b",
+                "code": "FLF_D_RFAM_T_PERS",
+                "label": "Total number of family persons working on the farm",
+                "unit": "Persons"
+            },
+            {
+                "file": "c22b",
+                "code": "FLF_D_RNFAM_T_PERS",
+                "label": "Total number of nonfamily persons working on the farm",
+                "unit": "Persons"
+            },
+            {
+                "file": "c22c",
+                "code": "AWU",
+                "label": "Total annual work unit",
+                "unit": "Annual work unit"
+            },
+            {
+                "file": "c22c",
+                "code": "AWU_FAM",
+                "label": "Family labour force",
+                "unit": "Annual work unit"
+            },
+            {
+                "file": "c22d",
+                "code": "AWU_NFAM",
+                "label": "Non-family labour force",
+                "unit": "Annual work unit"
+            },
+            {
+                "file": "c22d",
+                "code": "AWU_WORKER",
+                "label": "Seasonal and occasional labour force",
+                "unit": "Annual work unit"
+            }
+        ]
+    },
+    "Age_structure_farm_manager": {
+        "dataset_name": "Age structure of farm manager",
+        "variables": [
+            {
+                "file": "c23",
+                "code": "HOLDING",
+                "label": "Number of holdings",
+                "unit": "Number"
+            },
+            {
+                "file": "c23",
+                "code": "Y_LT40",
+                "label": "Farms with manager below 40",
+                "unit": "Number"
+            },
+            {
+                "file": "c23",
+                "code": "Y_LT40_Share",
+                "label": "Share of farms with manager below 40",
+                "unit": "Percentage"
+            },
+            {
+                "file": "c23",
+                "code": "Y_GE65",
+                "label": "Farms with manager 65 or older",
+                "unit": "Number"
+            },
+            {
+                "file": "c23",
+                "code": "Y_GE65_Share",
+                "label": "Share of farms with manager 65 or older",
+                "unit": "Percentage"
+            },
+            {
+                "file": "c23",
+                "code": "AGE_MANAGER",
+                "label": "Total age of farm managers",
+                "unit": "Number"
+            },
+            {
+                "file": "c23",
+                "code": "AGE",
+                "label": "Average age of farm managers",
+                "unit": "Years"
+            }
+        ]
+    },
+    "Agricultural_training_of_farm_manager": {
+        "dataset_name": "Agricultural training of farm manager",
+        "variables": [
+            {
+                "file": "c24",
+                "code": "HOLDING",
+                "label": "Number of holdings",
+                "unit": "Number"
+            },
+            {
+                "file": "c24",
+                "code": "BASIC",
+                "label": "Basic agricultural training",
+                "unit": "Number"
+            },
+            {
+                "file": "c24",
+                "code": "BasicShare",
+                "label": "Share with basic agricultural training",
+                "unit": "Percentage"
+            },
+            {
+                "file": "c24",
+                "code": "FULL",
+                "label": "Full agricultural training",
+                "unit": "Number"
+            },
+            {
+                "file": "c24",
+                "code": "FullShare",
+                "label": "Share with full agricultural training",
+                "unit": "Percentage"
+            },
+            {
+                "file": "c24",
+                "code": "PRACT",
+                "label": "Practical agricultural training",
+                "unit": "Number"
+            },
+            {
+                "file": "c24",
+                "code": "PractShare",
+                "label": "Share with practical agricultural training",
+                "unit": "Percentage"
+            },
+            {
+                "file": "c24",
+                "code": "Control",
+                "label": "Control (sum of shares)",
+                "unit": "Number"
+            }
+        ]
+    },
+    "Gender_gap": {
+        "dataset_name": "Gender gap",
+        "variables": [
+            {
+                "file": "c_sex",
+                "code": "FEMALE",
+                "label": "Holdings with female managers",
+                "unit": "Number"
+            },
+            {
+                "file": "c_sex",
+                "code": "MALE",
+                "label": "Holdings with male managers",
+                "unit": "Number"
+            },
+            {
+                "file": "c_sex",
+                "code": "FemShare",
+                "label": "Share of female managers",
+                "unit": "Percentage"
+            },
+            {
+                "file": "c_sex",
+                "code": "HOLDING",
+                "label": "Number of holdings",
+                "unit": "Number"
+            }
+        ]
+    },
+    "Organic_farming": {
+        "dataset_name": "Organic farming",
+        "variables": [
+            {
+                "file": "c19",
+                "code": "UAAXK00",
+                "label": "Organic utilised agricultural area",
+                "unit": "Hectare"
+            },
+            {
+                "file": "c19",
+                "code": "OrgShar",
+                "label": "Share of organic farmland relative to UAA",
+                "unit": "Percentage"
+            }
+        ]
+    },
+    "Irrigation_methods": {
+        "dataset_name": "Irrigation methods",
+        "variables": [
+            {
+                "file": "c20",
+                "code": "UAA_IB",
+                "label": "Irrigable utilised agricultural area",
+                "unit": "Hectare"
+            },
+            {
+                "file": "c20",
+                "code": "IrrShare",
+                "label": "Share of irrigable land relative to UAA",
+                "unit": "Percentage"
+            }
+        ]
+    }
+}
