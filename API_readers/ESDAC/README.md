@@ -1,0 +1,1 @@
+The permission to use the data specified above is granted on condition that, under NO CIRCUMSTANCES are these data passed to third parties. They can be used for any purpose, including commercial gain.
