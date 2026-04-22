@@ -171,6 +171,11 @@ API_PATH_RANGES = {
          ('2008-01-01', '2023-12-31'),
          ['land cover'],
          'none',
+    'API_readers.correctiv.correctiv_read': (
+        ((54.9015649769422183, 47.3985582099588498, 15.0265025546610858, 5.9905334858242725),
+         ('1990-01-01', '2021-12-31'),
+         ['surface water quality'],
+         'monthly',
          1,
          1)
     ),
@@ -196,4 +201,3 @@ API_PATH_RANGES = {
          1)
     )
 }
-
