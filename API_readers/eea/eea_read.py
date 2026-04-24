@@ -68,7 +68,6 @@ async def read_data(
         logging.warning(
             "Requested time range does not include raster year 2018"
         )
-        return pd.DataFrame()
 
     # Read raster async-safe
     clipped, transform = await asyncio.to_thread(
@@ -119,7 +118,7 @@ async def read_data(
     df.value = round(df.value,0)
     df["Timestamp"] = pd.to_datetime('2018-01-01').floor("D")
 
-    dates = pd.date_range(start='2018-01-01', end=end, freq='D')
+    dates = pd.date_range(start=start, end=end, freq='D')
     df_expanded = pd.concat([df.assign(Timestamp=d) for d in dates])
     final_df = df_expanded.pivot_table(index="Timestamp", columns="S2CELL")
 

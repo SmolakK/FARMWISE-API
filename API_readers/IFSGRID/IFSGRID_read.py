@@ -9,7 +9,7 @@ from API_readers.IFSGRID.utils.preparation import (
 
 async def read_data(
         spatial_range:tuple, time_range:tuple, data_range:list, level:int
-    ) -> pd.Dataframe:
+    ):
     """
     Read, process and aggregate IFSGRID data for a given
     spatial and temporal range.

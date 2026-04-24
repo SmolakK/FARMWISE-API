@@ -31,7 +31,6 @@ def data_agregation(extracted_data, spatial_range, level):
     """
 
     df = prepare_coordinates(extracted_data, spatial_range, level)
-
     df = (
         df.set_index("S2CELL")
         .groupby(level=0)
