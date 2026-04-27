@@ -70,9 +70,6 @@ DATA_ALIASES = {
     'GrassShare': 'land cover',
     'Q0000T': 'land cover',
     'FllwShr': 'land cover',
-    # 'F4000T': 'land cover',
-    # 'W1000T': 'land cover',
-    # 'O1000T': 'land cover',
     'UAAXK00': 'land cover',
     'OrgShar': 'land cover',
     'HOLDING': 'agricultural structure',
@@ -90,6 +87,30 @@ DATA_ALIASES = {
     'IrrShare': 'surface water quality'
  }
 
-
 # global mapping of parameter codes to descriptions and units
-GLOBAL_MAPPING = {}
+GLOBAL_MAPPING = {
+    'UAA': 'Area of land actually used for agricultural purposes',
+    'ARA': 'Area of arable land',
+    'AraShare': 'Share of arable land in the total agricultural area',
+    'PECR': 'Area of permanent crops (e.g., orchards, plantations)',
+    'PecrShare': 'Percentage of permanent crops in the UAA',
+    'J0000T': 'Area of permanent grassland (meadows and pastures)',
+    'GrassShare': 'Share of meadows and pastures in UAA',
+    'Q0000T': 'Area of fallow land',
+    'FllwShr': 'Share of fallow land in the UAA',
+    'UAAXK00': 'Area of farmland managed using organic methods',
+    'OrgShar': 'Percentage share of organic farming in total UAA',
+    'HOLDING': 'Number of farms',
+    'UAA': 'Total utilised agricultural area',
+    'SO_EURO': 'Standard agricultural output expressed in euros',
+    'HldnPK2': 'Density of farms',
+    'LSU': 'Number of livestock units',
+    'LSUdensity': 'Livestock density per hectare of agricultural land',
+    'BOVINE': 'Number of head of stock',
+    'PIGS': 'Number of pigs',
+    'SHEEP': 'Number of sheep',
+    'GOATS': 'Number of goats',
+    'POULTRY': 'Number of poultry',
+    'UAA_IB': 'Area of irrigable farmland', 
+    'IrrShare': 'The share of irrigated land in the total area of agricultural land'
+ }
