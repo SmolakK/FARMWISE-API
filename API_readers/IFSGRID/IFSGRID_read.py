@@ -6,7 +6,7 @@ from API_readers.IFSGRID.utils.preparation import (
     aggregate_spatial, 
     expand_time_dimension
 )
-
+from API_readers.IFSGRID.mappings.IFSGRID_mappings import GLOBAL_MAPPING
 async def read_data(
         spatial_range:tuple, time_range:tuple, data_range:list, level:int
     ):
@@ -50,4 +50,10 @@ async def read_data(
     aggregated_df = aggregate_spatial(factors_data, spatial_range, level)
     final_df = expand_time_dimension(aggregated_df, start_date, end_date)
 
+    final_df.columns = pd.MultiIndex.from_tuples(
+    [
+        (GLOBAL_MAPPING.get(var, var), cell)
+        for var, cell in final_df.columns
+    ]
+    )
     return final_df
