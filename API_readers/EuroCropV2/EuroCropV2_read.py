@@ -4,7 +4,7 @@ from typing import Tuple, List
 
 from API_readers.EuroCropV2.utils.extractors import extract_data_by_bbox, extract_years
 from API_readers.EuroCropV2.utils.preparation import data_agregation, data_melting
-
+from API_readers.EuroCropV2.mappings.EuroCropV2_mappings import GLOBAL_MAPPING
 
 async def read_data(
     spatial_range: Tuple[float, float, float, float],
@@ -56,22 +56,16 @@ async def read_data(
         "points.csv",
     )
 
-    # --- step 1: spatial filtering ---
     extracted_data = extract_data_by_bbox(data_path, spatial_range)
 
     if extracted_data.empty:
         return pd.DataFrame()
-
-    # --- step 2: time filtering ---
     extracted_data = extract_years(extracted_data, time_range)
-
-    # --- step 3: spatial aggregation ---
     aggregated_data = data_agregation(extracted_data, spatial_range, level)
 
     if aggregated_data.empty:
         return pd.DataFrame()
 
-    # --- step 4: reshape to time series ---
     melted_data = data_melting(aggregated_data, time_range)
-
+    melted_data = melted_data.rename(columns=GLOBAL_MAPPING, level=0)
     return melted_data
