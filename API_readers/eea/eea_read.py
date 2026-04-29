@@ -15,6 +15,8 @@ from rasterio.warp import (
     Resampling
 )
 
+from API_readers.eea.eea_mappings.eea_mappings import GLOBAL_MAPPING
+
 async def read_data(
         spatial_range:tuple, time_range:tuple, data_range:list, level:int
     )->pd.DataFrame:
@@ -121,7 +123,7 @@ async def read_data(
     dates = pd.date_range(start=start, end=end, freq='D')
     df_expanded = pd.concat([df.assign(Timestamp=d) for d in dates])
     final_df = df_expanded.pivot_table(index="Timestamp", columns="S2CELL")
-
+    final_df = final_df.rename(columns=GLOBAL_MAPPING, level=0)
     return final_df
 
 

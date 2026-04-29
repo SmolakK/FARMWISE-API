@@ -10,12 +10,12 @@ from API_readers.correctiv.utils.extractors import (
     time_extraction_wide
 )
 from API_readers.correctiv.utils.preparation import data_melting
-
+from API_readers.correctiv.mappings.correctiv_mappings import GLOBAL_MAPPING
 
 async def read_data(
-    spatial_range: Tuple[float, float, float, float],
-    time_range: Tuple[str, str],
-    data_range: Tuple[str, str],  # (niewykorzystywane, ale zostawiam dla kompatybilności)
+    spatial_range: tuple,
+    time_range: tuple,
+    data_range: tuple,
     level: int
 ) -> pd.DataFrame:
     """
@@ -75,6 +75,7 @@ async def read_data(
     data_with_S2CELL = data_with_S2CELL[
         ['min_gwl', 'mean_gwl', 'max_gwl', 'S2CELL', 'date']
     ].copy()
+
     data_agg = (
         data_with_S2CELL
         .groupby(['S2CELL', 'date'], as_index=False)
@@ -95,4 +96,5 @@ async def read_data(
         aggfunc='first'
     )
 
+    result = result.rename(columns=GLOBAL_MAPPING, level=0)
     return result

@@ -8,4 +8,6 @@ PARAMETER_SELECTION = []
 DATA_ALIASES = {}
 
 # global mapping of parameter codes to descriptions and units
-GLOBAL_MAPPING = {}
+GLOBAL_MAPPING = {
+    'value': 'environmental data (EEA)'
+}
