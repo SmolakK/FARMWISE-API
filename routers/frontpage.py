@@ -14,7 +14,6 @@ available_factors = list(set(available_factors))
 
 frontpage_router = APIRouter()
 
-
 @frontpage_router.get("/", response_class=HTMLResponse)
 async def login_page():
     html_content = """
@@ -29,27 +28,93 @@ async def login_page():
                     height: 100vh;
                     background-color: #f5f5f5;
                     font-family: Arial, sans-serif;
+                    margin: 0;
                 }
-                form {
+
+                .login-container {
                     background-color: #fff;
-                    padding: 20px;
+                    padding: 25px;
                     border-radius: 10px;
                     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                    width: 300px;
+                    width: 340px;
+                    text-align: center;
                 }
+
+                .logos {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 20px;
+                    margin-bottom: 20px;
+                }
+
+                .logos img {
+                    max-height: 70px;
+                    max-width: 130px;
+                    object-fit: contain;
+                }
+
+                form {
+                    text-align: left;
+                }
+
+                h2 {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+
                 label {
                     display: block;
                     margin-top: 10px;
                     font-weight: bold;
                 }
-                input[type="text"], input[type="password"], input[type="submit"] {
+
+                input[type="text"],
+                input[type="password"] {
                     width: 100%;
                     margin-top: 5px;
-                    padding: 5px;
+                    padding: 8px;
+                    box-sizing: border-box;
                 }
+
+                input[type="submit"] {
+                    width: 100%;
+                    margin-top: 20px;
+                    padding: 10px;
+                    background-color: #2e7d32;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: bold;
+                }
+
+                input[type="submit"]:hover {
+                    background-color: #256628;
+                }
+
+                .contact {
+                    margin-top: 18px;
+                    font-size: 13px;
+                    color: #555;
+                    text-align: center;
+                    line-height: 1.4;
+                }
+
+                .contact a {
+                    color: #2e7d32;
+                    text-decoration: none;
+                    font-weight: bold;
+                }
+
+                .contact a:hover {
+                    text-decoration: underline;
+                }
+
                 .error {
                     color: red;
                     margin-top: 10px;
+                    text-align: center;
                 }
             </style>
             <script>
@@ -82,18 +147,31 @@ async def login_page():
             </script>
         </head>
         <body>
-            <form onsubmit="login(event)">
-                <h2 style="text-align:center;">FARMWISE API Login</h2>
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+            <div class="login-container">
+                <div class="logos">
+                    <img src="/static/farmwise_logo.png" alt="FARMWISE logo">
+                    <img src="/static/upwr.png" alt="UPWr logo">
+                </div>
 
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <h2>FARMWISE API Login</h2>
 
-                <input type="submit" value="Login">
+                <form onsubmit="login(event)">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
 
-                <div id="error" class="error"></div>
-            </form>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+
+                    <input type="submit" value="Login">
+
+                    <div id="error" class="error"></div>
+                </form>
+
+                <div class="contact">
+                    If you need access, please write an email to:<br>
+                    <a href="mailto:framwise.api@gmail.com">framwise.api@gmail.com</a>
+                </div>
+            </div>
         </body>
     </html>
     """
