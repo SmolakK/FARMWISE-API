@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 10px; color: #222; padding: 24px; background: #fff; }
+  h1 { font-size: 15px; margin-bottom: 4px; color: #1a3a5c; }
+  .subtitle { font-size: 10px; color: #555; margin-bottom: 18px; }
+  h2 { font-size: 12px; background: #1a3a5c; color: #fff; padding: 5px 8px; margin-top: 16px; margin-bottom: 0; border-radius: 3px 3px 0 0; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+  th { background: #dce8f5; text-align: left; padding: 5px 8px; font-size: 10px; color: #1a3a5c; border: 1px solid #b0c8e0; }
+  td { padding: 4px 8px; border: 1px solid #ccc; vertical-align: top; }
+  tr:nth-child(even) td { background: #f5f9fd; }
+  code { background: #eef3f8; padding: 1px 4px; border-radius: 2px; font-size: 9px; font-family: monospace; }
+  .global { font-family: monospace; font-size: 9px; color: #333; background: #f0f4f0; padding: 1px 4px; border-radius: 2px; }
+  .renamed { color: #b05000; font-weight: bold; font-size: 9px; display: block; margin-top: 2px; }
+  .note { background: #fff8e1; border-left: 3px solid #f5a623; padding: 8px 10px; margin-top: 16px; font-size: 10px; border-radius: 0 3px 3px 0; }
+  .legend { margin-top: 16px; }
+  .legend h2 { background: #4a6741; }
+  .leg-row { display: flex; gap: 8px; padding: 4px 8px; border: 1px solid #ccc; border-top: none; font-size: 10px; }
+  .leg-row:nth-child(even) { background: #f5f9f4; }
+  .leg-key { font-family: monospace; background: #eef3f8; padding: 1px 4px; border-radius: 2px; min-width: 80px; }
+  footer { margin-top: 20px; font-size: 9px; color: #888; border-top: 1px solid #ddd; padding-top: 6px; }
+  .lang-en { color: #555; font-style: italic; }
+  .sep { color: #bbb; margin: 0 2px; }
+  .f-temp     { background: #ffe0b2; color: #7a3800; }
+  .f-precip   { background: #bbdefb; color: #0d47a1; }
+  .f-pet      { background: #c8e6c9; color: #1b5e20; }
+  .f-swq-qty  { background: #e1bee7; color: #4a148c; }
+  .f-swq-qual { background: #ffcdd2; color: #7f0000; }
+  .factor-badge { display: inline-block; padding: 1px 6px; border-radius: 10px; font-size: 9px; font-weight: bold; white-space: nowrap; }
+  @media print {
+    body { padding: 12px; }
+    h2, th, .factor-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    tr:nth-child(even) td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<h1>QUADICA — Opis kolumn plików danych / Column descriptions</h1>
+<div class="subtitle">Ebeling et al. (2022) · HydroShare DOI: 10.4211/hs.0ec5f43e43c349ff818a8d57699c0fe1</div>
+
+<!-- c_annual -->
+<h2>c_annual_with_coords.csv — roczne dane jakości wody / annual water quality data</h2>
+<table>
+  <tr><th style="width:18%">Kolumna (oryginalna → globalna)</th><th style="width:19%">Polski</th><th style="width:19%">English</th><th style="width:8%">Jednostka</th><th style="width:20%">Nazwa globalna / Global name</th><th>Grupa / Factor</th></tr>
+  <tr><td><code>n_Q</code><span class="renamed">→ n_Q_annual</span></td><td>Liczba pomiarów przepływu w dniach poboru próbek (roczna)</td><td>No. of discharge obs. on sampling days (annual)</td><td>—</td><td><span class="global">No. of Discharge Observations on Sampling Days Annual [-]</span></td><td><span class="factor-badge f-swq-qty">surface water quantity</span></td></tr>
+  <tr><td><code>median_Q</code><span class="renamed">→ median_Q_annual</span></td><td>Mediana przepływu w dniach poboru próbek (roczna)</td><td>Median discharge on sampling days (annual)</td><td>m³/s</td><td><span class="global">Median Discharge on Sampling Days Annual [m³/s]</span></td><td><span class="factor-badge f-swq-qty">surface water quantity</span></td></tr>
+  <tr><td><code>n_NO3</code></td><td>Liczba obserwacji azotanów</td><td>No. of nitrate observations</td><td>—</td><td><span class="global">No. of Nitrate Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_NO3N</code></td><td>Mediana stężenia NO₃-N</td><td>Median nitrate concentration NO₃-N</td><td>mg N/L</td><td><span class="global">Nitrate Concentration NO3-N [mg N/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_Nmin</code></td><td>Liczba obserwacji azotu mineralnego</td><td>No. of mineral nitrogen observations</td><td>—</td><td><span class="global">No. of Mineral Nitrogen Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_Nmin</code></td><td>Mediana stężenia N_min</td><td>Median mineral nitrogen concentration</td><td>mg N/L</td><td><span class="global">Mineral Nitrogen Concentration Nmin [mg N/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_TN</code></td><td>Liczba obserwacji azotu całkowitego</td><td>No. of total nitrogen observations</td><td>—</td><td><span class="global">No. of Total Nitrogen Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_TN</code></td><td>Mediana stężenia TN</td><td>Median total nitrogen concentration</td><td>mg N/L</td><td><span class="global">Total Nitrogen Concentration TN [mg N/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_PO4</code></td><td>Liczba obserwacji fosforanów</td><td>No. of phosphate observations</td><td>—</td><td><span class="global">No. of Phosphate Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_PO4P</code></td><td>Mediana stężenia PO₄-P</td><td>Median phosphate concentration PO₄-P</td><td>mg P/L</td><td><span class="global">Phosphate Concentration PO4-P [mg P/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_TP</code></td><td>Liczba obserwacji fosforu całkowitego</td><td>No. of total phosphorus observations</td><td>—</td><td><span class="global">No. of Total Phosphorus Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_TP</code></td><td>Mediana stężenia TP</td><td>Median total phosphorus concentration</td><td>mg P/L</td><td><span class="global">Total Phosphorus Concentration TP [mg P/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_DOC</code></td><td>Liczba obserwacji DOC</td><td>No. of DOC observations</td><td>—</td><td><span class="global">No. of DOC Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_DOC</code></td><td>Mediana stężenia DOC</td><td>Median DOC concentration</td><td>mg C/L</td><td><span class="global">Dissolved Organic Carbon Concentration DOC [mg C/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_TOC</code></td><td>Liczba obserwacji TOC</td><td>No. of TOC observations</td><td>—</td><td><span class="global">No. of TOC Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_TOC</code></td><td>Mediana stężenia TOC</td><td>Median TOC concentration</td><td>mg C/L</td><td><span class="global">Total Organic Carbon Concentration TOC [mg C/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+</table>
+
+<!-- n_surplus -->
+<h2>n_surplus_with_coords.csv — nadwyżka azotu (roczna) / nitrogen surplus (annual)</h2>
+<table>
+  <tr><th style="width:18%">Kolumna (oryginalna → globalna)</th><th style="width:19%">Polski</th><th style="width:19%">English</th><th style="width:8%">Jednostka</th><th style="width:20%">Nazwa globalna / Global name</th><th>Grupa / Factor</th></tr>
+  <tr><td><code>N_nonagri</code></td><td>Nadwyżka N ze źródeł nierolniczych</td><td>N surplus from non-agricultural sources</td><td>kg N/ha/yr</td><td><span class="global">Non-Agricultural Nitrogen Surplus [kg N/ha/yr]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>N_agri</code></td><td>Nadwyżka N ze źródeł rolniczych</td><td>N surplus from agricultural sources</td><td>kg N/ha/yr</td><td><span class="global">Agricultural Nitrogen Surplus [kg N/ha/yr]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>N_total</code></td><td>Całkowita nadwyżka N</td><td>Total N surplus</td><td>kg N/ha/yr</td><td><span class="global">Total Nitrogen Surplus [kg N/ha/yr]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>N_agri_frac</code></td><td>Udział źródeł rolniczych w nadwyżce N</td><td>Fraction of agricultural N surplus</td><td>0–1</td><td><span class="global">Agricultural Fraction of Nitrogen Surplus [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+</table>
+
+<!-- pet -->
+<h2>pet_monthly_with_coords.csv — ewapotranspiracja potencjalna / potential evapotranspiration</h2>
+<table>
+  <tr><th style="width:18%">Kolumna (oryginalna → globalna)</th><th style="width:19%">Polski</th><th style="width:19%">English</th><th style="width:8%">Jednostka</th><th style="width:20%">Nazwa globalna / Global name</th><th>Grupa / Factor</th></tr>
+  <tr><td><code>pet</code></td><td>Ewapotranspiracja potencjalna — miesięczna suma</td><td>Potential evapotranspiration — monthly sum</td><td>mm/month</td><td><span class="global">Potential Evaporation [m]</span></td><td><span class="factor-badge f-pet">potential evaporation</span></td></tr>
+</table>
+
+<!-- pre -->
+<h2>per_monthly_with_coords.csv — opady / precipitation</h2>
+<table>
+  <tr><th style="width:18%">Kolumna (oryginalna → globalna)</th><th style="width:19%">Polski</th><th style="width:19%">English</th><th style="width:8%">Jednostka</th><th style="width:20%">Nazwa globalna / Global name</th><th>Grupa / Factor</th></tr>
+  <tr><td><code>pre</code></td><td>Opady atmosferyczne — miesięczna suma</td><td>Precipitation — monthly sum</td><td>mm/month</td><td><span class="global">Precipitation total [mm]</span></td><td><span class="factor-badge f-precip">precipitation</span></td></tr>
+</table>
+
+<!-- q_annual -->
+<h2>q_annual_with_coords.csv — roczny przepływ / annual discharge</h2>
+<table>
+  <tr><th style="width:18%">Kolumna (oryginalna → globalna)</th><th style="width:19%">Polski</th><th style="width:19%">English</th><th style="width:8%">Jednostka</th><th style="width:20%">Nazwa globalna / Global name</th><th>Grupa / Factor</th></tr>
+  <tr><td><code>n_Qdaily</code></td><td>Liczba dziennych pomiarów przepływu w roku</td><td>No. of daily discharge measurements per year</td><td>—</td><td><span class="global">No. of Daily Discharge Observations [-]</span></td><td><span class="factor-badge f-swq-qty">surface water quantity</span></td></tr>
+  <tr><td><code>median_Qdaily</code></td><td>Mediana dziennego przepływu w roku</td><td>Median daily discharge per year</td><td>m³/s</td><td><span class="global">Mean Daily Discharge [m³/s]</span></td><td><span class="factor-badge f-swq-qty">surface water quantity</span></td></tr>
+</table>
+
+<!-- tavg -->
+<h2>tavg_monthly_with_coords.csv — temperatura powietrza / air temperature</h2>
+<table>
+  <tr><th style="width:18%">Kolumna (oryginalna → globalna)</th><th style="width:19%">Polski</th><th style="width:19%">English</th><th style="width:8%">Jednostka</th><th style="width:20%">Nazwa globalna / Global name</th><th>Grupa / Factor</th></tr>
+  <tr><td><code>tavg</code></td><td>Średnia temperatura powietrza — miesięczna mediana</td><td>Mean air temperature — monthly median</td><td>°C</td><td><span class="global">Temperature [°C]</span></td><td><span class="factor-badge f-temp">temperature</span></td></tr>
+</table>
+
+<!-- wrtds -->
+<h2>wrtds_monthly_with_coords_date_merged.csv — model WRTDS (miesięczny) / WRTDS model (monthly)</h2>
+<table>
+  <tr><th style="width:18%">Kolumna (oryginalna → globalna)</th><th style="width:19%">Polski</th><th style="width:19%">English</th><th style="width:8%">Jednostka</th><th style="width:20%">Nazwa globalna / Global name</th><th>Grupa / Factor</th></tr>
+  <tr><td><code>n_Q</code><span class="renamed">→ n_Q_wrtds</span></td><td>Liczba obserwacji przepływu (WRTDS, miesięczna)</td><td>No. of discharge observations (WRTDS, monthly)</td><td>—</td><td><span class="global">WRTDS No. of Discharge Observations [-]</span></td><td><span class="factor-badge f-swq-qty">surface water quantity</span></td></tr>
+  <tr><td><code>median_Q</code><span class="renamed">→ median_Q_wrtds</span></td><td>Mediana przepływu miesięcznego (WRTDS)</td><td>Median monthly discharge (WRTDS)</td><td>m³/s</td><td><span class="global">WRTDS Median Monthly Discharge [m³/s]</span></td><td><span class="factor-badge f-swq-qty">surface water quantity</span></td></tr>
+  <tr><td><code>n_C_NO3</code></td><td>Liczba obserwacji NO₃</td><td>No. of nitrate observations</td><td>—</td><td><span class="global">WRTDS No. of Nitrate Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_C_NO3</code></td><td>Mediana obserwowanego stężenia NO₃-N</td><td>Median observed nitrate concentration</td><td>mg N/L</td><td><span class="global">WRTDS Median Nitrate Concentration NO3-N [mg N/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_C_PO4</code></td><td>Liczba obserwacji PO₄</td><td>No. of phosphate observations</td><td>—</td><td><span class="global">WRTDS No. of Phosphate Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_C_PO4</code></td><td>Mediana obserwowanego stężenia PO₄-P</td><td>Median observed phosphate concentration</td><td>mg P/L</td><td><span class="global">WRTDS Median Phosphate Concentration PO4-P [mg P/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_C_Nmin</code></td><td>Liczba obserwacji Nmin</td><td>No. of mineral nitrogen observations</td><td>—</td><td><span class="global">WRTDS No. of Mineral Nitrogen Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_C_Nmin</code></td><td>Mediana obserwowanego stężenia Nmin</td><td>Median observed mineral nitrogen concentration</td><td>mg N/L</td><td><span class="global">WRTDS Median Mineral Nitrogen Concentration Nmin [mg N/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_C_TN</code></td><td>Liczba obserwacji TN</td><td>No. of total nitrogen observations</td><td>—</td><td><span class="global">WRTDS No. of Total Nitrogen Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_C_TN</code></td><td>Mediana obserwowanego stężenia TN</td><td>Median observed total nitrogen concentration</td><td>mg N/L</td><td><span class="global">WRTDS Median Total Nitrogen Concentration TN [mg N/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_C_TP</code></td><td>Liczba obserwacji TP</td><td>No. of total phosphorus observations</td><td>—</td><td><span class="global">WRTDS No. of Total Phosphorus Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_C_TP</code></td><td>Mediana obserwowanego stężenia TP</td><td>Median observed total phosphorus concentration</td><td>mg P/L</td><td><span class="global">WRTDS Median Total Phosphorus Concentration TP [mg P/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_C_DOC</code></td><td>Liczba obserwacji DOC</td><td>No. of DOC observations</td><td>—</td><td><span class="global">WRTDS No. of DOC Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_C_DOC</code></td><td>Mediana obserwowanego stężenia DOC</td><td>Median observed DOC concentration</td><td>mg C/L</td><td><span class="global">WRTDS Median DOC Concentration [mg C/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_C_TOC</code></td><td>Liczba obserwacji TOC</td><td>No. of TOC observations</td><td>—</td><td><span class="global">WRTDS No. of TOC Observations [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_C_TOC</code></td><td>Mediana obserwowanego stężenia TOC</td><td>Median observed TOC concentration</td><td>mg C/L</td><td><span class="global">WRTDS Median TOC Concentration [mg C/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_FNC_NO3</code></td><td>Liczba wartości FNC NO₃</td><td>No. of flow-normalized nitrate values</td><td>—</td><td><span class="global">WRTDS No. of Flow-Normalized Nitrate Values [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_FNC_NO3</code></td><td>Mediana stężenia znorm. NO₃-N</td><td>Median flow-normalized nitrate concentration</td><td>mg N/L</td><td><span class="global">WRTDS Flow-Normalized Nitrate Concentration NO3-N [mg N/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_FNC_PO4</code></td><td>Liczba wartości FNC PO₄</td><td>No. of flow-normalized phosphate values</td><td>—</td><td><span class="global">WRTDS No. of Flow-Normalized Phosphate Values [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_FNC_PO4</code></td><td>Mediana stężenia znorm. PO₄-P</td><td>Median flow-normalized phosphate concentration</td><td>mg P/L</td><td><span class="global">WRTDS Flow-Normalized Phosphate Concentration PO4-P [mg P/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_FNC_Nmin</code></td><td>Liczba wartości FNC Nmin</td><td>No. of flow-normalized mineral nitrogen values</td><td>—</td><td><span class="global">WRTDS No. of Flow-Normalized Mineral Nitrogen Values [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_FNC_Nmin</code></td><td>Mediana stężenia znorm. Nmin</td><td>Median flow-normalized mineral nitrogen concentration</td><td>mg N/L</td><td><span class="global">WRTDS Flow-Normalized Mineral Nitrogen Concentration Nmin [mg N/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_FNC_TN</code></td><td>Liczba wartości FNC TN</td><td>No. of flow-normalized total nitrogen values</td><td>—</td><td><span class="global">WRTDS No. of Flow-Normalized Total Nitrogen Values [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_FNC_TN</code></td><td>Mediana stężenia znorm. TN</td><td>Median flow-normalized total nitrogen concentration</td><td>mg N/L</td><td><span class="global">WRTDS Flow-Normalized Total Nitrogen Concentration TN [mg N/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_FNC_TP</code></td><td>Liczba wartości FNC TP</td><td>No. of flow-normalized total phosphorus values</td><td>—</td><td><span class="global">WRTDS No. of Flow-Normalized Total Phosphorus Values [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_FNC_TP</code></td><td>Mediana stężenia znorm. TP</td><td>Median flow-normalized total phosphorus concentration</td><td>mg P/L</td><td><span class="global">WRTDS Flow-Normalized Total Phosphorus Concentration TP [mg P/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_FNC_DOC</code></td><td>Liczba wartości FNC DOC</td><td>No. of flow-normalized DOC values</td><td>—</td><td><span class="global">WRTDS No. of Flow-Normalized DOC Values [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_FNC_DOC</code></td><td>Mediana stężenia znorm. DOC</td><td>Median flow-normalized DOC concentration</td><td>mg C/L</td><td><span class="global">WRTDS Flow-Normalized DOC Concentration [mg C/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>n_FNC_TOC</code></td><td>Liczba wartości FNC TOC</td><td>No. of flow-normalized TOC values</td><td>—</td><td><span class="global">WRTDS No. of Flow-Normalized TOC Values [-]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>median_FNC_TOC</code></td><td>Mediana stężenia znorm. TOC</td><td>Median flow-normalized TOC concentration</td><td>mg C/L</td><td><span class="global">WRTDS Flow-Normalized TOC Concentration [mg C/L]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_Flux_NO3</code></td><td>Średni ładunek NO₃-N</td><td>Mean nitrate flux</td><td>kg N/ha/mo</td><td><span class="global">WRTDS Mean Nitrate Flux NO3-N [kg N/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_FNFlux_NO3</code></td><td>Średni znorm. ładunek NO₃-N</td><td>Mean flow-normalized nitrate flux</td><td>kg N/ha/mo</td><td><span class="global">WRTDS Mean Flow-Normalized Nitrate Flux NO3-N [kg N/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_Flux_PO4</code></td><td>Średni ładunek PO₄-P</td><td>Mean phosphate flux</td><td>kg P/ha/mo</td><td><span class="global">WRTDS Mean Phosphate Flux PO4-P [kg P/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_FNFlux_PO4</code></td><td>Średni znorm. ładunek PO₄-P</td><td>Mean flow-normalized phosphate flux</td><td>kg P/ha/mo</td><td><span class="global">WRTDS Mean Flow-Normalized Phosphate Flux PO4-P [kg P/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_Flux_Nmin</code></td><td>Średni ładunek Nmin</td><td>Mean mineral nitrogen flux</td><td>kg N/ha/mo</td><td><span class="global">WRTDS Mean Mineral Nitrogen Flux Nmin [kg N/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_FNFlux_Nmin</code></td><td>Średni znorm. ładunek Nmin</td><td>Mean flow-normalized mineral nitrogen flux</td><td>kg N/ha/mo</td><td><span class="global">WRTDS Mean Flow-Normalized Mineral Nitrogen Flux Nmin [kg N/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_Flux_TN</code></td><td>Średni ładunek TN</td><td>Mean total nitrogen flux</td><td>kg N/ha/mo</td><td><span class="global">WRTDS Mean Total Nitrogen Flux TN [kg N/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_FNFlux_TN</code></td><td>Średni znorm. ładunek TN</td><td>Mean flow-normalized total nitrogen flux</td><td>kg N/ha/mo</td><td><span class="global">WRTDS Mean Flow-Normalized Total Nitrogen Flux TN [kg N/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_Flux_TP</code></td><td>Średni ładunek TP</td><td>Mean total phosphorus flux</td><td>kg P/ha/mo</td><td><span class="global">WRTDS Mean Total Phosphorus Flux TP [kg P/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_FNFlux_TP</code></td><td>Średni znorm. ładunek TP</td><td>Mean flow-normalized total phosphorus flux</td><td>kg P/ha/mo</td><td><span class="global">WRTDS Mean Flow-Normalized Total Phosphorus Flux TP [kg P/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_Flux_DOC</code></td><td>Średni ładunek DOC</td><td>Mean DOC flux</td><td>kg C/ha/mo</td><td><span class="global">WRTDS Mean DOC Flux [kg C/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_FNFlux_DOC</code></td><td>Średni znorm. ładunek DOC</td><td>Mean flow-normalized DOC flux</td><td>kg C/ha/mo</td><td><span class="global">WRTDS Mean Flow-Normalized DOC Flux [kg C/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_Flux_TOC</code></td><td>Średni ładunek TOC</td><td>Mean TOC flux</td><td>kg C/ha/mo</td><td><span class="global">WRTDS Mean TOC Flux [kg C/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+  <tr><td><code>mean_FNFlux_TOC</code></td><td>Średni znorm. ładunek TOC</td><td>Mean flow-normalized TOC flux</td><td>kg C/ha/mo</td><td><span class="global">WRTDS Mean Flow-Normalized TOC Flux [kg C/ha/month]</span></td><td><span class="factor-badge f-swq-qual">surface water quality</span></td></tr>
+</table>
+
+<!-- legenda związków -->
+<div class="legend">
+<h2>Oznaczenia związków (* w WRTDS) / Compound codes (* in WRTDS)</h2>
+<div class="leg-row"><span class="leg-key">NO3</span><span>Azotany — NO₃-N</span><span class="sep">·</span><span class="lang-en">Nitrate — NO₃-N</span></div>
+<div class="leg-row"><span class="leg-key">PO4</span><span>Fosforany — PO₄-P</span><span class="sep">·</span><span class="lang-en">Phosphate — PO₄-P</span></div>
+<div class="leg-row"><span class="leg-key">Nmin</span><span>Mineralny azot (NO₃-N + NH₄-N)</span><span class="sep">·</span><span class="lang-en">Mineral nitrogen (NO₃-N + NH₄-N)</span></div>
+<div class="leg-row"><span class="leg-key">TN</span><span>Azot całkowity</span><span class="sep">·</span><span class="lang-en">Total nitrogen</span></div>
+<div class="leg-row"><span class="leg-key">TP</span><span>Fosfor całkowity</span><span class="sep">·</span><span class="lang-en">Total phosphorus</span></div>
+<div class="leg-row"><span class="leg-key">DOC</span><span>Rozpuszczony węgiel organiczny</span><span class="sep">·</span><span class="lang-en">Dissolved organic carbon</span></div>
+<div class="leg-row"><span class="leg-key">TOC</span><span>Całkowity węgiel organiczny</span><span class="sep">·</span><span class="lang-en">Total organic carbon</span></div>
+</div>
+
+<!-- legenda grup -->
+<div class="legend" style="margin-top:12px;">
+<h2>Legenda grup / Factor legend</h2>
+<div class="leg-row"><span class="factor-badge f-temp">temperature</span><span>Temperatura powietrza / Air temperature</span></div>
+<div class="leg-row"><span class="factor-badge f-precip">precipitation</span><span>Opady / Precipitation</span></div>
+<div class="leg-row"><span class="factor-badge f-pet">potential evaporation</span><span>Ewapotranspiracja potencjalna / Potential evapotranspiration</span></div>
+<div class="leg-row"><span class="factor-badge f-swq-qty">surface water quantity</span><span>Ilość wód powierzchniowych / Surface water quantity</span></div>
+<div class="leg-row"><span class="factor-badge f-swq-qual">surface water quality</span><span>Jakość wód powierzchniowych / Surface water quality</span></div>
+</div>
+
+<div class="note">
+  ⚠️ <strong>Uwaga / Note:</strong> Kolumny oznaczone <span style="color:#b05000;font-weight:bold">→ nowa_nazwa</span> zostały przemianowane ze względu na konflikt nazw między plikami. / Columns marked <span style="color:#b05000;font-weight:bold">→ new_name</span> were renamed due to naming conflict between files. Verify against <em>Metadata_QUADICA.pdf</em> from the HydroShare repository.
+</div>
+
+<footer>QUADICA · Ebeling P., Kumar R., Weber M., Musolff A. (2022) · Earth System Science Data 14, 3715–3741 · doi:10.5194/essd-14-3715-2022</footer>
+</body>
+</html>
