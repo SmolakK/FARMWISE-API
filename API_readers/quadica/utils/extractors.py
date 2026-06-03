@@ -305,5 +305,4 @@ def temporal_extraction(data, timerange):
     pd.DataFrame
         Filtered dataset (not implemented).
     """
-    # logika wycinajaca konkretny zakres z melted danych
     pass
