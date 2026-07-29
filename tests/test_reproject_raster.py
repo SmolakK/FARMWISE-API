@@ -3,7 +3,7 @@ import rasterio
 from rasterio.transform import from_origin
 from rasterio.crs import CRS
 import numpy as np
-from utils.reproject_raster import reproject_raster
+from core.utils.reproject_raster import reproject_raster
 
 
 @pytest.fixture

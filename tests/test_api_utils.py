@@ -2,8 +2,7 @@ import os
 import time
 import pytest
 import tempfile
-from unittest.mock import patch
-from api_utils import cleanup_old_files, secure_filename
+from server.api_utils import cleanup_old_files, secure_filename
 
 
 # Test for cleanup_old_files

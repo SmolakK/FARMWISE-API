@@ -1,20 +1,38 @@
 # test_read_data.py
 import pytest
 import inspect
+import os
 import pandas as pd
-from unittest.mock import patch, AsyncMock
-from API_readers.eea.eea_read import read_data
+from adapters.API_readers.eea.eea_read import read_data
+from core.utils.paths import DATA_ROOT
+
+EEA_RASTER = (
+    DATA_ROOT
+    / "eea"
+    / "eea_data"
+    / "eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif"
+)
+requires_eea_raster = pytest.mark.skipif(
+    not EEA_RASTER.exists()
+    or os.getenv("FARMWISE_RUN_INTEGRATION_TESTS") != "1",
+    reason=(
+        "EEA integration tests require the raster and "
+        "FARMWISE_RUN_INTEGRATION_TESTS=1"
+    ),
+)
 
 @pytest.mark.asyncio
 async def test_is_coroutine():
     assert inspect.iscoroutinefunction(read_data)
 
 @pytest.mark.asyncio
+@requires_eea_raster
 async def test_handles_none_dataframe():
     df = await read_data((0,0,0,0), ('2000-01-01','2000-01-02'), [], 0)
     assert df is None or isinstance(df, pd.DataFrame)
 
 @pytest.mark.asyncio
+@requires_eea_raster
 async def test_coordinates_in_range():
     df = await read_data(
         (50,49,17,16),
@@ -29,12 +47,14 @@ async def test_coordinates_in_range():
             assert df['lon'].between(-180, 180).all()
 
 @pytest.mark.asyncio
+@requires_eea_raster
 async def test_s2cell_generated_if_exists():
     df = await read_data((50,49,17,16), ('2018-01-01','2018-01-02'), ['land cover'], 10)
     if isinstance(df, pd.DataFrame) and 'S2CELL' in df.columns:
         assert not df['S2CELL'].isna().all()
 
 @pytest.mark.asyncio
+@requires_eea_raster
 async def test_timestamp_is_datetime_day_precision():
     df = await read_data((50,49,17,16), ('2018-01-01','2018-01-02'), ['land cover'], 10)
     if isinstance(df, pd.DataFrame) and 'Timestamp' in df.columns:
@@ -45,6 +65,7 @@ async def test_timestamp_is_datetime_day_precision():
         assert (df['Timestamp'].dt.nanosecond == 0).all()
 
 @pytest.mark.asyncio
+@requires_eea_raster
 async def test_no_duplicates_on_lat_lon_timestamp():
     df = await read_data((50,49,17,16), ('2018-01-01','2018-01-02'), ['land cover'], 10)
     if isinstance(df, pd.DataFrame):
@@ -53,6 +74,7 @@ async def test_no_duplicates_on_lat_lon_timestamp():
             assert not df.duplicated(subset=subset).any()
 
 @pytest.mark.asyncio
+@requires_eea_raster
 async def test_timestamp_within_range():
     df = await read_data((50,49,17,16), ('2018-01-01','2018-01-02'), ['land cover'], 10)
     if isinstance(df, pd.DataFrame) and 'Timestamp' in df.columns:

@@ -1,8 +1,8 @@
 import pytest
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker
-from user_database import Base
-from sql_schemas import User
+from server.user_database import Base
+from server.sql_schemas import User
 
 
 # Configure a SQLite in-memory database for testing

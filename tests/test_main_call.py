@@ -24,12 +24,12 @@ s2_cell_2 = CellId.from_lat_lng(LatLng.from_degrees(50.5, 14.2))
 
 
 @pytest.mark.asyncio
-@patch("mappings.data_source_mapping.API_PATH_RANGES", mock_api_path_ranges)
-@patch("importlib.import_module")
-@patch("utils.overlap_checks.spatial_ranges_overlap", return_value=True)
-@patch("utils.overlap_checks.time_ranges_overlap", return_value=True)
-@patch("utils.country_bboxes.return_country_bboxes", return_value=mock_country_bboxes)
-async def test_read_data_with_bbox_and_country(mock_country_bboxes_func, mock_time_overlap, mock_spatial_overlap, mock_import_module):
+@patch("core.main_call.API_PATH_RANGES", mock_api_path_ranges)
+@patch("core.main_call.importlib.import_module")
+@patch("core.main_call.spatial_ranges_overlap", return_value=True)
+@patch("core.main_call.time_ranges_overlap", return_value=True)
+@patch("core.main_call.COUNTRY_BBOXES", mock_country_bboxes)
+async def test_read_data_with_bbox_and_country(mock_time_overlap, mock_spatial_overlap, mock_import_module):
     # Create MultiIndex for columns
     arrays = [
         ["Temperature", "Precipitation"],
@@ -49,7 +49,7 @@ async def test_read_data_with_bbox_and_country(mock_country_bboxes_func, mock_ti
     mock_import_module.return_value = mock_module
 
     # Call the function under test
-    from main_call import read_data
+    from core.main_call import read_data
     result = await read_data(
         bounding_box=(51.09, 50.00, 14.56, 14.14),
         level=10,

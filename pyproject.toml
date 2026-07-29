@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "farmwise-api"
+version = "0.1.0"
+description = "European agricultural and environmental data aggregation API"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "aiofiles",
+    "aiohttp",
+    "apscheduler",
+    "beautifulsoup4",
+    "bcrypt<4.1",
+    "cdsapi",
+    "duckdb",
+    "email-validator",
+    "fastapi",
+    "folium",
+    "geopy",
+    "geopandas",
+    "httpx",
+    "nest-asyncio",
+    "numpy",
+    "pandas",
+    "passlib[bcrypt]",
+    "pillow",
+    "pyproj",
+    "python-dotenv",
+    "python-jose[cryptography]",
+    "python-multipart",
+    "rasterio",
+    "requests",
+    "s2sphere",
+    "scipy",
+    "shapely",
+    "slowapi",
+    "soilgrids",
+    "sqlalchemy",
+    "tenacity",
+    "tqdm",
+    "uvicorn[standard]",
+    "wetterdienst",
+    "xarray",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["adapters*", "core*", "server*"]
+exclude = ["tests*", "internal-lib*"]
+
+[tool.setuptools.package-data]
+"adapters.API_readers" = [
+    "**/*.csv",
+    "**/*.json",
+    "**/*.md",
+    "**/*.parquet",
+    "**/*.tif",
+    "**/*.txt",
+    "**/*.xml",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

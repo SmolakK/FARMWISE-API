@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-from utils.coordinates_to_cells import get_s2_cells
+from core.utils.coordinates_to_cells import get_s2_cells
 import numpy as np
 
 def bbox_intersects(b1, b2):

@@ -1,13 +1,11 @@
 import pytest
-from unittest.mock import patch, MagicMock, AsyncMock
-from bs4 import BeautifulSoup
+from unittest.mock import patch, AsyncMock
 import pandas as pd
-from datetime import datetime
-from API_readers.gios.gios_scraper import extract_point_ids, scrape_point_data, read_data
+from adapters.API_readers.gios.gios_scraper import extract_point_ids, read_data
 
 
 @pytest.mark.asyncio
-@patch("API_readers.gios.gios_scraper.httpx.AsyncClient")
+@patch("adapters.API_readers.gios.gios_scraper.httpx.AsyncClient")
 async def test_extract_point_ids(mock_client):
     # Mock the AsyncClient response
     mock_response = AsyncMock()
@@ -29,10 +27,10 @@ async def test_extract_point_ids(mock_client):
 
 
 @pytest.mark.asyncio
-@patch("API_readers.gios.gios_scraper.extract_point_ids")
-@patch("API_readers.gios.gios_scraper.scrape_point_data")
-@patch("API_readers.gios.gios_scraper.prepare_coordinates")
-@patch("API_readers.gios.gios_scraper.pd.read_csv")
+@patch("adapters.API_readers.gios.gios_scraper.extract_point_ids")
+@patch("adapters.API_readers.gios.gios_scraper.scrape_point_data")
+@patch("adapters.API_readers.gios.gios_scraper.prepare_coordinates")
+@patch("adapters.API_readers.gios.gios_scraper.pd.read_csv")
 async def test_read_data(mock_read_csv, mock_prepare_coordinates, mock_scrape_point_data, mock_extract_point_ids):
     # Mock the point IDs
     mock_extract_point_ids.return_value = "123,456"

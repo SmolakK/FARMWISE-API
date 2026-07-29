@@ -1,15 +1,15 @@
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 import pandas as pd
-from API_readers.imgw_hydro.imgw_api_hydro_daily import read_data  # Adjust the import path
+from adapters.API_readers.imgw_hydro.imgw_api_hydro_daily import read_data
 from io import BytesIO
 import zipfile
 
 
 @pytest.mark.asyncio
-@patch("API_readers.imgw_hydro.imgw_api_hydro_daily.prepare_coordinates")
-@patch("API_readers.imgw_hydro.imgw_api_hydro_daily.httpx.AsyncClient")
-@patch("API_readers.imgw_hydro.imgw_api_hydro_daily.pd.read_csv")
+@patch("adapters.API_readers.imgw_hydro.imgw_api_hydro_daily.prepare_coordinates")
+@patch("adapters.API_readers.imgw_hydro.imgw_api_hydro_daily.httpx.AsyncClient")
+@patch("adapters.API_readers.imgw_hydro.imgw_api_hydro_daily.pd.read_csv")
 async def test_read_data(mock_read_csv, mock_httpx_client, mock_prepare_coordinates):
     # Mock the imgw_coordinates.csv file
     def mock_read_csv_side_effect(file, *args, **kwargs):
@@ -24,7 +24,7 @@ async def test_read_data(mock_read_csv, mock_httpx_client, mock_prepare_coordina
         else:  # Handles other CSV files (e.g., imgw_coordinates.csv)
             return pd.DataFrame({
                 "Unnamed: 0": [250180460, 254230010, 250190430, 250210030],
-                "Name": ["ADAMOWICE,Poland", "ALEKSANDRÓWKA,Poland", "ALWERNIA,Poland", "ANNOPOL,Poland"],
+                "Name": ["ADAMOWICE,Poland", "ALEKSANDRĂ“WKA,Poland", "ALWERNIA,Poland", "ANNOPOL,Poland"],
                 "lat": [51.9399783, 51.5719923, 50.0690434, 50.8851655],
                 "lon": [20.4814776, 21.5422823, 19.5396737, 21.8550836]
             })

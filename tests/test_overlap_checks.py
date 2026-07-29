@@ -1,6 +1,5 @@
 import pytest
-from datetime import datetime
-from utils.overlap_checks import spatial_ranges_overlap, time_ranges_overlap
+from core.utils.overlap_checks import spatial_ranges_overlap, time_ranges_overlap
 
 
 # Test spatial_ranges_overlap

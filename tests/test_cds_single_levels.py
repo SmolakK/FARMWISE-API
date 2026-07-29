@@ -2,15 +2,14 @@ import pytest
 from unittest.mock import patch, MagicMock
 import pandas as pd
 from datetime import datetime
-from API_readers.cds.cds_single_levels import read_data
+from adapters.API_readers.cds.cds_single_levels import read_data
 
 
 @pytest.mark.asyncio
-@patch("API_readers.cds.cds_single_levels.cdsapi.Client")
-@patch("API_readers.cds.cds_single_levels.xr.open_dataset")
-@patch("API_readers.cds.cds_single_levels.prepare_coordinates")
-@patch("API_readers.cds.cds_single_levels.os.path.join", return_value="/mocked/path/temp_data.nc")
-async def test_read_data(mock_join, mock_prepare_coordinates, mock_open_dataset, mock_cds_client):
+@patch("adapters.API_readers.cds.cds_single_levels.cdsapi.Client")
+@patch("adapters.API_readers.cds.cds_single_levels.xr.open_dataset")
+@patch("adapters.API_readers.cds.cds_single_levels.prepare_coordinates")
+async def test_read_data(mock_prepare_coordinates, mock_open_dataset, mock_cds_client):
     # Mock the CDS API client retrieve method
     mock_retrieve = MagicMock()
     mock_cds_client.return_value.retrieve = mock_retrieve
@@ -50,7 +49,10 @@ async def test_read_data(mock_join, mock_prepare_coordinates, mock_open_dataset,
 
     # Assertions
     mock_retrieve.assert_called_once()
-    mock_open_dataset.assert_called_once_with("/mocked/path/temp_data.nc")
+    opened_path = mock_open_dataset.call_args.args[0]
+    assert str(opened_path).endswith(
+        "reanalysis-era5-single-levels_temp_data.nc"
+    )
     mock_prepare_coordinates.assert_called_once()
 
     # Validate the arguments passed to prepare_coordinates
@@ -67,9 +69,11 @@ async def test_read_data(mock_join, mock_prepare_coordinates, mock_open_dataset,
     # Validate data transformations
     assert isinstance(result, pd.DataFrame)
     # Temperature should be converted from Kelvin to Celsius
-    assert result["Temperature [°C]"].iloc[0][0] == pytest.approx(0)  # 273.15 K -> 0°C
+    assert result["Temperature [°C]"].iloc[0, 0] == pytest.approx(0)
     # Precipitation should be converted from meters to daily total in mm
-    assert result["Precipitation total [mm]"].iloc[0][0] == pytest.approx(0.01 * 24 * 60 * 60)  # Converted to mm
+    assert result["Precipitation total [mm]"].iloc[0, 0] == pytest.approx(
+        0.01 * 24 * 60 * 60
+    )
 
     # Ensure the result is pivoted by Timestamp and S2CELL
     assert result.index.name == "Timestamp"

@@ -1,12 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
-from main import app, lifespan
-from routers.data_call import api_router
-from routers.auth import auth_router
-from unittest.mock import patch, MagicMock
-from fastapi import FastAPI
+from server.main import app
+from unittest.mock import patch
 import os
-from security import setup_security
 
 
 @pytest.fixture
@@ -17,17 +13,15 @@ def client():
     return TestClient(app)
 
 
-def test_app_startup_and_shutdown(client):
+def test_app_startup_and_shutdown(client, tmp_path):
     """
     Test app startup and shutdown logic.
     """
-    with patch("main.start_scheduler") as mock_start_scheduler, \
-         patch("main.shutdown_scheduler") as mock_shutdown_scheduler, \
-         patch("tempfile.mkdtemp") as mock_mkdtemp, \
-         patch("shutil.rmtree") as mock_rmtree:
-
-        # Mock temporary directory creation
-        mock_mkdtemp.return_value = "/mock/temp/dir"
+    runtime_dir = tmp_path / "runtime"
+    with patch("server.main.TEMP_DIR", runtime_dir), \
+         patch("server.main.start_scheduler") as mock_start_scheduler, \
+         patch("server.main.shutdown_scheduler") as mock_shutdown_scheduler, \
+         patch("server.main.shutil.rmtree") as mock_rmtree:
 
         # Simulate lifespan
         with TestClient(app) as client:
@@ -42,16 +36,16 @@ def test_app_startup_and_shutdown(client):
 
         # Assert scheduler stopped and temp dir removed
         mock_shutdown_scheduler.assert_called_once()
-        mock_rmtree.assert_called_once_with(actual_dir, ignore_errors=True)
+        mock_rmtree.assert_called_once_with(str(runtime_dir), ignore_errors=True)
 
 
 def test_routers_included(client):
     """
     Test that the API routers are included in the app.
     """
-    routes = [route.path for route in app.routes]
+    routes = app.openapi()["paths"].keys()
     assert any("/read-data" in route for route in routes), "Data API router not included"
-    assert any("/docs" in route for route in routes), "Auth API router not included"
+    assert app.docs_url == "/docs", "OpenAPI documentation route not configured"
     assert any("/token" in route for route in routes), "Token API router not included"
     assert any("/users/me" in route for route in routes), "Users Me API router not included"
 

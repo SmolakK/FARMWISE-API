@@ -1,13 +1,13 @@
 import pytest
-from unittest.mock import AsyncMock, patch, Mock
+from unittest.mock import Mock, patch
 import pandas as pd
-from API_readers.hubeau.get_piezo_stations import get_station_codes  # Adjust the import path as necessary
+from adapters.API_readers.hubeau.get_piezo_stations import get_station_codes  # Adjust the import path as necessary
 
 @pytest.mark.asyncio
-@patch("API_readers.hubeau.get_piezo_stations.httpx.AsyncClient")  # Adjust based on your import
+@patch("adapters.API_readers.hubeau.get_piezo_stations.httpx.AsyncClient")  # Adjust based on your import
 async def test_get_station_codes(mock_async_client):
     # Create mock responses
-    mock_response_page_1 = AsyncMock()
+    mock_response_page_1 = Mock()
     mock_response_page_1.json = Mock(return_value={
         "data": [
             {"code_bss": "STATION1", "x": 2.3522, "y": 48.8566},
@@ -17,7 +17,7 @@ async def test_get_station_codes(mock_async_client):
     })
     mock_response_page_1.status_code = 200
 
-    mock_response_page_2 = AsyncMock()
+    mock_response_page_2 = Mock()
     mock_response_page_2.json = Mock(return_value={
         "data": [
             {"code_bss": "STATION3", "x": 2.3636, "y": 48.8636}

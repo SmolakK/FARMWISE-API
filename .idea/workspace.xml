@@ -5,8 +5,289 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e861ba43-0096-452f-bd7e-8db19b445a06" name="Changes" comment="new sources added">
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/CHMI_Meteo/CHMI_meteo.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/CHMI_Meteo/json_files_list.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/ESDAC/ESDAC_mappings/ESDAC_mappings.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/ESDAC/ESDAC_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/ESDAC/ESDAC_wrapper.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/ESDAC/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/ESDAC/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/EuroCropV2/EuroCropV2_read.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/EuroCropV2/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/EuroCropV2/mappings/EuroCropV2_mappings.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/EuroCropV2/mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/EuroCropV2/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/EuroCropV2/utils/extractors.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/EuroCropV2/utils/preparation.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/IFSGRID/IFSGRID_read.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/IFSGRID/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/IFSGRID/data/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/IFSGRID/mappings/IFSGRID_mappings.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/IFSGRID/mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/IFSGRID/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/IFSGRID/utils/definitions.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/IFSGRID/utils/extraction.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/IFSGRID/utils/preparation.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/UA_sw_quality/UA_sw_quality_mappings/UA_sw_quality_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/UA_sw_quality/UA_sw_quality_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/UA_sw_quality/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/UA_sw_quality/ukrainian_surface_water.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/cds/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/cds/cds_land_cover.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/cds/cds_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/cds/cds_mappings/cds_land_cover_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/cds/cds_mappings/cds_single_levels_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/cds/cds_mappings/cds_vegetation_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/cds/cds_single_levels.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/cds/cds_utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/cds/cds_utils/cds_data_read.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/cds/cds_vegetation.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/corine/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/corine/corine_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/corine/corine_mappings/corine_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/corine/corine_read.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/correctiv/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/correctiv/correctiv_read.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/correctiv/mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/correctiv/mappings/correctiv_mappings.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/correctiv/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/correctiv/utils/extractors.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/correctiv/utils/preparation.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/eea/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/eea/eea_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/eea/eea_mappings/eea_mappings.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/eea/eea_read.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/egdi/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/egdi/data/gewp7_peu1_d10km_4326.tif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/egdi/data/gewp7_peu1_d10km_4326.tif.aux.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/egdi/data/gewp7_peu7_4326.tif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/egdi/egdi_read_d10.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/egdi/egdi_read_hc.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/epa_ireland/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/epa_ireland/constants/EPA_coordinates.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/epa_ireland/epa_gw.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/epa_ireland/epa_ireland_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/epa_ireland/epa_ireland_mappings/epa_ireland_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/geosphere/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/geosphere/geosphere.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/geosphere/geosphere_mapping/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/geosphere/geosphere_mapping/geosphere_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios/constants/gios_coordinates.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios/gios_api_stations.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios/gios_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios/gios_mappings/gios_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios/gios_scraper.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios/gios_utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios_gw/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios_gw/constants/gios_gw_stations.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios_gw/gios_gw.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios_gw/gios_gw_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios_gw/gios_gw_mappings/gios_gw_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/gios_gw/gios_gw_stations.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/constants/farmwise_gwquality_parameters.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/constants/farmwise_gwquality_points_sel_for_hubeau.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/constants/farmwise_gwquantity_piezos_sel_for_hubeau.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/constants/farmwise_sw_quality_stations_sel_for_hubeau.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/get_piezo_stations.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/hubeau_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/hubeau_mappings/hubeau_mapping_piezo.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/hubeau_mappings/hubeau_mapping_sw_quality.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/hubeau_mappings/hubeau_mapping_wq.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/hubeau_piezo_read_vbrgm.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/hubeau_sw_quality_read.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/hubeau/hubeau_wq_read.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw/constants/imgw_coordinates.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw/constants/imgw_raw.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw/imgw_api_stations.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw/imgw_api_synop_daily.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw/imgw_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw/imgw_mappings/synop_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw_hydro/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw_hydro/constants/imgw_coordinates.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw_hydro/imgw_api_hydro_daily.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw_hydro/imgw_hydro_stations_api.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw_hydro/imgw_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/imgw_hydro/imgw_mappings/imgw_hydro_mappings.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/irish_meteo/EPA_ireland_stations.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/irish_meteo/Irish MS_daily.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/irish_meteo/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/irish_meteo/irish_meteo_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/irish_meteo/irish_meteo_mappings/irish_meteo_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/soilgrids/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/soilgrids/soilgrids_call.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/soilgrids/soilgrids_mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/soilgrids/soilgrids_mappings/soilgrids_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/wetterdienst/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/wetterdienst/wetterdienst_dwd.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/wetterdienst/wetterdienst_mapping/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/API_readers/wetterdienst/wetterdienst_mapping/dwd_mapping.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/adapters/mappings/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/utils/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/FARMWISE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/FARMWISE.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mappings/data_source_mapping.py" beforeDir="false" afterPath="$PROJECT_DIR$/mappings/data_source_mapping.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/CHMI_Meteo/CHMI_meteo.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/CHMI_Meteo/json_files_list.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/ESDAC/ESDAC_mappings/ESDAC_mappings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/ESDAC/ESDAC_wrapper.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/ESDAC/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/ESDAC/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/EuroCropV2/EuroCropV2_read.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/EuroCropV2/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/EuroCropV2/mappings/EuroCropV2_mappings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/EuroCropV2/mappings/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/EuroCropV2/utils/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/EuroCropV2/utils/extractors.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/EuroCropV2/utils/preparation.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/IFSGRID/IFSGRID_read.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/IFSGRID/data/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/IFSGRID/mappings/IFSGRID_mappings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/IFSGRID/utils/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/IFSGRID/utils/definitions.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/IFSGRID/utils/extraction.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/IFSGRID/utils/preparation.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/UA_sw_quality/UA_sw_quality_mappings/UA_sw_quality_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/UA_sw_quality/ukrainian_surface_water.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/cds/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/cds/cds_land_cover.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/cds/cds_mappings/cds_land_cover_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/cds/cds_mappings/cds_single_levels_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/cds/cds_mappings/cds_vegetation_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/cds/cds_single_levels.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/cds/cds_utils/cds_data_read.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/cds/cds_vegetation.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/corine/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/corine/corine_mappings/corine_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/corine/corine_read.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/correctiv/correctiv_read.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/correctiv/mappings/correctiv_mappings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/correctiv/utils/extractors.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/correctiv/utils/preparation.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/eea/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/eea/eea_mappings/eea_mappings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/eea/eea_read.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/egdi/data/gewp7_peu1_d10km_4326.tif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/egdi/data/gewp7_peu1_d10km_4326.tif.aux.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/egdi/data/gewp7_peu7_4326.tif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/egdi/egdi_read_d10.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/egdi/egdi_read_hc.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/epa_ireland/constants/EPA_coordinates.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/epa_ireland/epa_gw.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/epa_ireland/epa_ireland_mappings/epa_ireland_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/geosphere/geosphere.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/geosphere/geosphere_mapping/geosphere_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/gios/constants/gios_coordinates.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/gios/gios_api_stations.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/gios/gios_mappings/gios_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/gios/gios_scraper.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/gios/gios_utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/gios_gw/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/gios_gw/constants/gios_gw_stations.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/gios_gw/gios_gw.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/gios_gw/gios_gw_mappings/gios_gw_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/gios_gw/gios_gw_stations.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/hubeau/constants/farmwise_gwquality_parameters.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/hubeau/constants/farmwise_gwquality_points_sel_for_hubeau.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/hubeau/constants/farmwise_gwquantity_piezos_sel_for_hubeau.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/hubeau/constants/farmwise_sw_quality_stations_sel_for_hubeau.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/hubeau/get_piezo_stations.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/hubeau/hubeau_mappings/hubeau_mapping_piezo.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/hubeau/hubeau_mappings/hubeau_mapping_sw_quality.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/hubeau/hubeau_mappings/hubeau_mapping_wq.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/hubeau/hubeau_piezo_read_vbrgm.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/hubeau/hubeau_sw_quality_read.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/hubeau/hubeau_wq_read.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/imgw/constants/imgw_coordinates.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/imgw/constants/imgw_raw.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/imgw/imgw_api_stations.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/imgw/imgw_api_synop_daily.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/imgw/imgw_mappings/synop_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/imgw_hydro/constants/imgw_coordinates.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/imgw_hydro/imgw_api_hydro_daily.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/imgw_hydro/imgw_hydro_stations_api.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/imgw_hydro/imgw_mappings/imgw_hydro_mappings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/irish_meteo/EPA_ireland_stations.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/irish_meteo/Irish MS_daily.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/irish_meteo/irish_meteo_mappings/irish_meteo_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/soilgrids/soilgrids_call.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/soilgrids/soilgrids_mappings/soilgrids_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/soilgrids/temp_storage/out.tif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/wetterdienst/wetterdienst_dwd.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API_readers/wetterdienst/wetterdienst_mapping/dwd_mapping.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/crud.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hashing_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/hashing_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logging_config.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/logging_config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_call.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/main_call.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mappings/data_source_mapping.py" beforeDir="false" afterPath="$PROJECT_DIR$/adapters/mappings/data_source_mapping.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quality_assess.py" beforeDir="false" afterPath="$PROJECT_DIR$/quality_assess.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/routers/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/data_call.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/routers/data_call.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/frontpage.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/routers/frontpage.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scheduler.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/scheduler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/security.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sql_schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/sql_schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_api_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_api_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_cds_single_levels.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_cds_single_levels.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_cds_vegetation.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_cds_vegetation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_cells_to_coordinates.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_cells_to_coordinates.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_coordinates_to_cells.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_coordinates_to_cells.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_corine_read.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_corine_read.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_crud.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_data_operators.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_data_operators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_db_users.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_db_users.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_eea.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_eea.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_egdi_read_d10.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_egdi_read_d10.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_egdi_read_hc.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_egdi_read_hc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_generate_cells.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_generate_cells.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_geosphere.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_geosphere.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_get_piezo_stations.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_get_piezo_stations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_gios_api_stations.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_gios_api_stations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_gios_scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_gios_scraper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_hashing_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_hashing_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_hubeau_piezo_read.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_hubeau_piezo_read.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_imgw_api_hydro_daily.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_imgw_api_hydro_daily.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_imgw_api_synop_daily.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_imgw_api_synop_daily.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_imgw_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_imgw_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_interpolate_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_interpolate_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_main_call.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_main_call.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_name_to_coordinates.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_name_to_coordinates.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_overlap_checks.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_overlap_checks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_reproject_raster.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_reproject_raster.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_scheduler.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_scheduler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_security.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_security.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_soilgrids_call.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_soilgrids_call.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_sql_schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sql_schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_wetterdienst_dwd.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_wetterdienst_dwd.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_database.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/user_database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/adapters/API_readers/CHMI_Meteo/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/cells_to_coordinates.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/cells_to_coordinates.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/coordinates_to_cells.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/coordinates_to_cells.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/country_bboxes.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/country_bboxes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/country_codes" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/country_codes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/data_operators.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/data_operators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/email_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/email_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/generate_cells.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/generate_cells.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/imgw_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/imgw_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/interpolate_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/interpolate_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/map_ploter.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/map_ploter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/merge_bboxes.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/merge_bboxes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/name_to_coordinates.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/name_to_coordinates.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/overlap_checks.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/overlap_checks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/reproject_raster.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/reproject_raster.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,8 +316,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo">{
-  &quot;customColor&quot;: &quot;&quot;,
-  &quot;associatedIndex&quot;: 3
+  &quot;associatedIndex&quot;: 5
 }</component>
   <component name="ProjectId" id="2eAotEIqp7kd8bHmw2cEK0VgbmV" />
   <component name="ProjectViewState">
@@ -45,19 +325,15 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Python.coordinates_to_cells.executor": "Run",
-    "Python.db_users.executor": "Run",
-    "Python.egdi_read_d10.executor": "Run",
-    "Python.epa_gw.executor": "Debug",
-    "Python.gios_gw.executor": "Debug",
-    "Python.gios_scraper.executor": "Debug",
-    "Python.hubeau_piezo_read.executor": "Debug",
     "Python.main.executor": "Run",
-    "Python.main_call.executor": "Debug",
-    "Python.wetterdienst_dwd.executor": "Debug",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/JakubM/Documents/GitHub/FARMWISE/API_readers/UA_sw_quality",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+    "last_opened_file_path": "D:/GitHub/FARMWISE",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -69,14 +345,37 @@
       <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers\gios_gw\gios_gw_mappings" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\GitHub\FARMWISE\server" />
+      <recent name="D:\GitHub\FARMWISE\adapters" />
+      <recent name="D:\GitHub\FARMWISE\core" />
+      <recent name="D:\GitHub\FARMWISE\static" />
       <recent name="D:\GitHub\FARMWISE\API_readers\cds" />
-      <recent name="D:\GitHub\FARMWISE\API_readers\imgw_hydro\imgw_mappings" />
-      <recent name="D:\GitHub\FARMWISE\utils" />
-      <recent name="D:\GitHub\FARMWISE\API_readers\imgw_hydro\constants" />
-      <recent name="D:\GitHub\FARMWISE\API_readers\gios\constants" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main">
+    <configuration name="CHMI_meteo" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="FARMWISE" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/CHMI_Meteo" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/CHMI_Meteo/CHMI_meteo.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="egdi_read_d10" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="ENV_FILES" value="" />
@@ -90,29 +389,8 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/egdi/egdi_read_d10.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="get_piezo_stations" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="FARMWISE" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/hubeau" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/hubeau/get_piezo_stations.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -134,6 +412,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/hubeau/hubeau_piezo_read.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -143,7 +422,31 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="hubeau_wq_read" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="FARMWISE" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="PYTHONNOUSERSITE" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="D:\GitHub\FARMWISE\server\main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main_call" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -152,11 +455,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API_readers/hubeau" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/hubeau/hubeau_wq_read.py" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="D:\GitHub\FARMWISE\core\main_call.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -178,6 +482,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API_readers/wetterdienst/wetterdienst_dwd.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -187,14 +492,31 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.wetterdienst_dwd" />
+      <item itemvalue="Python.CHMI_meteo" />
+      <item itemvalue="Python.egdi_read_d10" />
+      <item itemvalue="Python.hubeau_piezo_read" />
+      <item itemvalue="Python.main" />
+      <item itemvalue="Python.main_call" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
+        <item itemvalue="Python.main_call" />
+        <item itemvalue="Python.CHMI_meteo" />
         <item itemvalue="Python.egdi_read_d10" />
         <item itemvalue="Python.hubeau_piezo_read" />
-        <item itemvalue="Python.get_piezo_stations" />
-        <item itemvalue="Python.hubeau_wq_read" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23339.19" />
+        <option value="bundled-python-sdk-0029f7779945-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23339.19" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -204,6 +526,29 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711356955598</updated>
+      <workItem from="1764157918074" duration="7756000" />
+      <workItem from="1764230482954" duration="8607000" />
+      <workItem from="1764603042599" duration="41000" />
+      <workItem from="1764855530249" duration="7546000" />
+      <workItem from="1764922348202" duration="8123000" />
+      <workItem from="1765196450397" duration="8000" />
+      <workItem from="1765973955774" duration="6382000" />
+      <workItem from="1766140117967" duration="52000" />
+      <workItem from="1768387555630" duration="3995000" />
+      <workItem from="1768466008395" duration="773000" />
+      <workItem from="1769074861827" duration="1358000" />
+      <workItem from="1769167261038" duration="638000" />
+      <workItem from="1776846109843" duration="1845000" />
+      <workItem from="1776858714646" duration="6554000" />
+      <workItem from="1776939354135" duration="7139000" />
+      <workItem from="1776948918507" duration="674000" />
+      <workItem from="1777010897045" duration="4392000" />
+      <workItem from="1777276677873" duration="951000" />
+      <workItem from="1777454186195" duration="3402000" />
+      <workItem from="1777544956235" duration="12000" />
+      <workItem from="1777981991734" duration="848000" />
+      <workItem from="1778233807942" duration="166000" />
+      <workItem from="1785309190529" duration="5689000" />
     </task>
     <task id="LOCAL-00001" summary="new sources added">
       <option name="closed" value="true" />
@@ -215,6 +560,9 @@
     </task>
     <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -247,58 +595,24 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/routers/auth.py</url>
-          <option name="timeStamp" value="219" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/API_readers/imgw_hydro/imgw_hydro_stations_api.py</url>
+          <url>file://$PROJECT_DIR$/adapters/API_readers/imgw_hydro/imgw_hydro_stations_api.py</url>
           <line>19</line>
           <option name="timeStamp" value="325" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/API_readers/cds/cds_utils/cds_data_read.py</url>
+          <url>file://$PROJECT_DIR$/adapters/API_readers/cds/cds_utils/cds_data_read.py</url>
           <line>65</line>
           <option name="timeStamp" value="412" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/API_readers/wetterdienst/wetterdienst_dwd.py</url>
-          <line>105</line>
-          <option name="timeStamp" value="413" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/API_readers/gios/gios_scraper.py</url>
-          <line>167</line>
-          <option name="timeStamp" value="414" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/API_readers/gios/gios_scraper.py</url>
-          <line>83</line>
-          <option name="timeStamp" value="418" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/API_readers/gios/gios_scraper.py</url>
-          <line>31</line>
-          <option name="timeStamp" value="419" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/API_readers/imgw/imgw_api_synop_daily.py</url>
-          <line>142</line>
-          <option name="timeStamp" value="420" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main_call.py</url>
-          <line>89</line>
-          <option name="timeStamp" value="422" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main_call.py</url>
-          <line>80</line>
-          <option name="timeStamp" value="423" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/API_readers/EPA Ireland/epa_gw.py</url>
+          <url>file://$PROJECT_DIR$/adapters/API_readers/EPA Ireland/epa_gw.py</url>
           <line>79</line>
           <option name="timeStamp" value="424" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/adapters/API_readers/CHMI_Meteo/CHMI_meteo.py</url>
+          <line>261</line>
+          <option name="timeStamp" value="562" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -309,5 +623,8 @@
         </breakpoint>
       </default-breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/FARMWISE$main.coverage" NAME="main Coverage Results" MODIFIED="1777982211583" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

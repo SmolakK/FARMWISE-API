@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from unittest.mock import patch, MagicMock
-from utils.cells_to_coordinates import s2cells_to_coordinates, _s2cell_id_to_coordinate
+from core.utils.cells_to_coordinates import s2cells_to_coordinates, _s2cell_id_to_coordinate
 import s2sphere
 
 
@@ -21,7 +21,7 @@ def test_s2cell_id_to_coordinate():
     assert result == pytest.approx((50, 14))
 
 
-@patch("utils.cells_to_coordinates._s2cell_id_to_coordinate")
+@patch("core.utils.cells_to_coordinates._s2cell_id_to_coordinate")
 def test_s2cells_to_coordinates(mock_s2cell_id_to_coordinate, mock_s2cell):
     # Mock the _s2cell_id_to_coordinate function
     mock_s2cell_id_to_coordinate.side_effect = lambda x: (50.0 + x, 14.0 + x)

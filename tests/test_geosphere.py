@@ -1,13 +1,12 @@
 import pytest
 import pandas as pd
-from unittest.mock import AsyncMock, patch, MagicMock
-from datetime import datetime
-from API_readers.geosphere.geosphere import read_data, fetch_station_metadata, fetch_station_data
+from unittest.mock import patch, MagicMock
+from adapters.API_readers.geosphere.geosphere import read_data, fetch_station_metadata, fetch_station_data
 
 @pytest.mark.asyncio
-@patch("API_readers.geosphere.geosphere.prepare_coordinates")
-@patch("API_readers.geosphere.geosphere.fetch_station_metadata")
-@patch("API_readers.geosphere.geosphere.fetch_station_data")
+@patch("adapters.API_readers.geosphere.geosphere.prepare_coordinates")
+@patch("adapters.API_readers.geosphere.geosphere.fetch_station_metadata")
+@patch("adapters.API_readers.geosphere.geosphere.fetch_station_data")
 async def test_read_data(mock_fetch_station_data, mock_fetch_station_metadata, mock_prepare_coordinates):
     # Mock fetch_station_metadata
     mock_metadata = pd.DataFrame({
@@ -58,7 +57,7 @@ async def test_read_data(mock_fetch_station_data, mock_fetch_station_metadata, m
 
 
 @pytest.mark.asyncio
-@patch("API_readers.geosphere.geosphere.httpx.AsyncClient")
+@patch("adapters.API_readers.geosphere.geosphere.httpx.AsyncClient")
 async def test_fetch_station_metadata(mock_httpx_client):
     # Mock HTTP response
     mock_response = MagicMock()
@@ -82,7 +81,7 @@ async def test_fetch_station_metadata(mock_httpx_client):
 
 
 @pytest.mark.asyncio
-@patch("API_readers.geosphere.geosphere.httpx.AsyncClient")
+@patch("adapters.API_readers.geosphere.geosphere.httpx.AsyncClient")
 async def test_fetch_station_data(mock_httpx_client):
     # Mock HTTP response
     mock_response = MagicMock()

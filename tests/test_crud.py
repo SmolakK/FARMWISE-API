@@ -1,10 +1,10 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sql_schemas import Base, User
-from schemas import UserCreate
-from crud import get_user_by_username, get_user_by_email, create_user
-from hashing_utils import verify_password
+from server.sql_schemas import Base
+from server.schemas import UserCreate
+from server.crud import get_user_by_username, get_user_by_email, create_user
+from server.hashing_utils import verify_password
 
 
 # Setup test database

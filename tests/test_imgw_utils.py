@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from utils.imgw_utils import expand_range, create_timestamp_from_row, get_years_between_dates
+from core.utils.imgw_utils import expand_range, create_timestamp_from_row, get_years_between_dates
 
 
 def test_expand_range_single_year():

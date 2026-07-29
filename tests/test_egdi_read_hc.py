@@ -1,15 +1,14 @@
 import pytest
 import numpy as np
 import pandas as pd
-from unittest.mock import AsyncMock, patch, MagicMock
-from datetime import datetime
-from API_readers.egdi.egdi_read_hc import read_data
+from unittest.mock import patch, MagicMock
+from adapters.API_readers.egdi.egdi_read_hc import read_data
 
 
 @pytest.mark.asyncio
-@patch("API_readers.egdi.egdi_read_hc.asyncio.to_thread")
-@patch("API_readers.egdi.egdi_read_hc.prepare_coordinates")
-@patch("API_readers.egdi.egdi_read_hc.rasterio.open")
+@patch("adapters.API_readers.egdi.egdi_read_hc.asyncio.to_thread")
+@patch("adapters.API_readers.egdi.egdi_read_hc.prepare_coordinates")
+@patch("adapters.API_readers.egdi.egdi_read_hc.rasterio.open")
 async def test_read_data(mock_rasterio_open, mock_prepare_coordinates, mock_to_thread):
     # Mock rasterio dataset
     mock_dataset = MagicMock()

@@ -1,61 +1,79 @@
-import pytest
-from unittest.mock import AsyncMock, patch, Mock
+from unittest.mock import AsyncMock, patch
+
 import pandas as pd
-from API_readers.hubeau.hubeau_piezo_read_vbrgm import read_data
+import pytest
+
+from adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm import read_data
 
 
 @pytest.mark.asyncio
-@patch("API_readers.hubeau.hubeau_piezo_read.prepare_coordinates")
-@patch("API_readers.hubeau.hubeau_piezo_read.get_station_codes")
-@patch("API_readers.hubeau.hubeau_piezo_read.httpx.AsyncClient")
-async def test_read_data(mock_client, mock_get_station_codes, mock_prepare_coordinates):
-    # Mock station codes response
-    mock_get_station_codes.return_value = pd.DataFrame({
-        "code_bss": ["STATION1", "STATION2"],
-        "x": [2.3522, 2.3333],
-        "y": [48.8566, 48.8333]
-    })
+@patch(
+    "adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm.fetch_data",
+    new_callable=AsyncMock,
+)
+@patch("adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm.prepare_coordinates")
+@patch("adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm.pd.read_csv")
+@patch("adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm.hub.init_api")
+async def test_read_data(
+    mock_init_api,
+    mock_read_csv,
+    mock_prepare_coordinates,
+    mock_fetch_data,
+):
+    coordinates = pd.DataFrame(
+        {
+            "code_bss_old": ["OLD1", "OLD2"],
+            "code_bss_new": ["STATION1", "STATION2"],
+            "lat": [48.8566, 48.8333],
+            "lon": [2.3522, 2.3333],
+            "S2CELL": ["cell1", "cell2"],
+        }
+    )
+    mock_read_csv.return_value = coordinates
+    def prepare(
+        frame=None,
+        spatial_range=None,
+        level=None,
+        *,
+        coordinates=None,
+        **_kwargs,
+    ):
+        selected = coordinates if coordinates is not None else frame
+        if "point_id" not in selected:
+            return selected
+        return selected.assign(
+            S2CELL=selected["point_id"].map(
+                {"STATION1": "cell1", "STATION2": "cell2"}
+            )
+        )
 
-    # Mock API response for groundwater data
-    mock_response_page_1 = AsyncMock()
-    mock_response_page_1.json = Mock(return_value={
-        "data": [
-            {"date_mesure": "2018-01-01", "niveau_nappe_eau": 2.0, "profondeur_nappe": 10.0, "code_bss": "STATION1"},
-            {"date_mesure": "2018-01-01", "niveau_nappe_eau": 1.5, "profondeur_nappe": 8.0, "code_bss": "STATION2"}
-        ],
-        "next": False
-    })
-    mock_response_page_1.status_code = 200
+    mock_prepare_coordinates.side_effect = prepare
+    mock_fetch_data.side_effect = [
+        pd.DataFrame(
+            {
+                "date_mesure": ["2018-01-01"],
+                "niveau_nappe_eau": [2.0],
+                "code_bss_old": ["OLD1"],
+            }
+        ),
+        pd.DataFrame(
+            {
+                "date_mesure": ["2018-01-01"],
+                "niveau_nappe_eau": [1.5],
+                "code_bss_old": ["OLD2"],
+            }
+        ),
+    ]
 
-    # Mock the HTTP client's get method
-    mock_client.return_value.__aenter__.return_value.get.return_value = mock_response_page_1
+    result = await read_data(
+        spatial_range=(49.0, 48.0, 3.0, 2.0),
+        time_range=("2018-01-01", "2018-01-02"),
+        data_range=["groundwater quantity"],
+        level=8,
+    )
 
-    # Mock prepare_coordinates
-    def mock_prepare(df, spatial_range, level):
-        df["S2CELL"] = [f"cell{i}" for i in range(len(df))]
-        return df
-
-    mock_prepare_coordinates.side_effect = mock_prepare
-
-    # Test parameters
-    spatial_range = (48.2, 40.0, 6.1, 3.0)
-    time_range = ('2018-01-01', '2018-12-31')
-    data_range = ['land cover']
-    level = 8
-
-    # Call the async function
-    result = await read_data(spatial_range, time_range, data_range, level)
-
-    # Assert the result is a DataFrame
     assert isinstance(result, pd.DataFrame)
-
-    # Assert the shape of the DataFrame
     assert not result.empty
-
-    # Assert the column structure (check for presence of S2CELLs and timestamps)
     assert "Groundwater Level [cm]" in result.columns.get_level_values(0)
-    assert "Groundwater Depth [cm]" in result.columns.get_level_values(0)
-
-    # Assert that data values are multiplied correctly
-    df_values = result["Groundwater Level [cm]"].iloc[0, 0]
-    assert df_values == 200
+    assert result["Groundwater Level [cm]"].iloc[0, 0] == 200
+    mock_init_api.assert_called_once_with("piezometry")

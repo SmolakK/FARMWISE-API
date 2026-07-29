@@ -1,7 +1,5 @@
-import pytest
-import s2sphere
 from shapely.geometry import Polygon
-from utils.generate_cells import generate_s2cell_polygons, generate_s2cell_points
+from core.utils.generate_cells import generate_s2cell_polygons, generate_s2cell_points
 
 
 def test_generate_s2cell_polygons():

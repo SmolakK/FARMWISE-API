@@ -1,5 +1,5 @@
 import pytest
-from hashing_utils import get_password_hash, verify_password  # Adjust import paths based on your project structure
+from server.hashing_utils import get_password_hash, verify_password  # Adjust import paths based on your project structure
 
 @pytest.fixture
 def password():

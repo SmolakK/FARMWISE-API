@@ -1,11 +1,10 @@
-import pytest
 from unittest.mock import patch, MagicMock
 from geopy.exc import GeocoderUnavailable
-from utils.name_to_coordinates import get_coordinates
+from core.utils.name_to_coordinates import get_coordinates
 
 
 # Test successful geocoding
-@patch('utils.name_to_coordinates.Nominatim')
+@patch('core.utils.name_to_coordinates.Nominatim')
 def test_get_coordinates_success(mock_nominatim):
     # Mock Nominatim and its geocode method
     mock_geolocator = MagicMock()
@@ -21,7 +20,7 @@ def test_get_coordinates_success(mock_nominatim):
 
 
 # Test geocoding failure with retries
-@patch('utils.name_to_coordinates.Nominatim')
+@patch('core.utils.name_to_coordinates.Nominatim')
 def test_get_coordinates_failure_with_retries(mock_nominatim):
     # Mock Nominatim and simulate GeocoderUnavailable exception
     mock_geolocator = MagicMock()
@@ -37,7 +36,7 @@ def test_get_coordinates_failure_with_retries(mock_nominatim):
 
 
 # Test geocoding with no results
-@patch('utils.name_to_coordinates.Nominatim')
+@patch('core.utils.name_to_coordinates.Nominatim')
 def test_get_coordinates_no_results(mock_nominatim):
     # Mock Nominatim and simulate no result
     mock_geolocator = MagicMock()

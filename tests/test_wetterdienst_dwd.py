@@ -1,14 +1,12 @@
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 import pandas as pd
-from wetterdienst.provider.dwd.observation import DwdObservationRequest, DwdObservationResolution
-from API_readers.wetterdienst.wetterdienst_dwd import read_data
-from utils.coordinates_to_cells import prepare_coordinates
+from adapters.API_readers.wetterdienst.wetterdienst_dwd import read_data
 
 
 @pytest.mark.asyncio
-@patch("API_readers.wetterdienst.wetterdienst_dwd.prepare_coordinates")
-@patch("API_readers.wetterdienst.wetterdienst_dwd.DwdObservationRequest")
+@patch("adapters.API_readers.wetterdienst.wetterdienst_dwd.prepare_coordinates")
+@patch("adapters.API_readers.wetterdienst.wetterdienst_dwd.DwdObservationRequest")
 async def test_read_data(mock_dwd_request, mock_prepare_coordinates):
     # Mock DwdObservationRequest
     mock_request_instance = MagicMock()

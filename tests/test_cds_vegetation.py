@@ -1,19 +1,18 @@
 import pytest
 from unittest.mock import patch, MagicMock
 import pandas as pd
-import os
 from datetime import datetime
-from API_readers.cds.cds_vegetation import read_data
+from adapters.API_readers.cds.cds_vegetation import read_data
 
 
 @pytest.mark.asyncio
-@patch("API_readers.cds.cds_vegetation.cdsapi.Client")
-@patch("API_readers.cds.cds_vegetation.zipfile.ZipFile")
-@patch("API_readers.cds.cds_vegetation.glob.glob")
-@patch("API_readers.cds.cds_vegetation.xr.open_dataset")
-@patch("API_readers.cds.cds_vegetation.prepare_coordinates")
-@patch("API_readers.cds.cds_vegetation.os.remove")
-@patch("API_readers.cds.cds_vegetation.os.path.join", return_value="/mocked/path/temp_data.zip")
+@patch("adapters.API_readers.cds.cds_vegetation.cdsapi.Client")
+@patch("adapters.API_readers.cds.cds_vegetation.zipfile.ZipFile")
+@patch("adapters.API_readers.cds.cds_vegetation.glob.glob")
+@patch("adapters.API_readers.cds.cds_vegetation.xr.open_dataset")
+@patch("adapters.API_readers.cds.cds_vegetation.prepare_coordinates")
+@patch("adapters.API_readers.cds.cds_vegetation.os.remove")
+@patch("adapters.API_readers.cds.cds_vegetation.os.path.join", return_value="/mocked/path/temp_data.zip")
 async def test_read_data(
     mock_join,
     mock_os_remove,

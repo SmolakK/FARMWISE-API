@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 import numpy as np
-from utils.interpolate_data import (
+from core.utils.interpolate_data import (
     mean_cell_size,
     mean_cell_edge,
     haversine,
@@ -75,7 +75,7 @@ def sample_data():
     return data
 
 
-@patch("utils.interpolate_data.s2cells_to_coordinates", side_effect=lambda x: x)
+@patch("core.utils.interpolate_data.s2cells_to_coordinates", side_effect=lambda x: x)
 def test_interpolate(mock_s2cells_to_coordinates, sample_data):
     spatial_range = (40.0, 30.0, -70.0, -80.0)
     level = 4

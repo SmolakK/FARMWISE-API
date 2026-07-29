@@ -2,15 +2,14 @@ import pytest
 from unittest.mock import patch, MagicMock
 import pandas as pd
 import numpy as np
-from API_readers.soilgrids.soilgrids_call import read_data, fetch_soil_data
-from utils.coordinates_to_cells import prepare_coordinates
+from adapters.API_readers.soilgrids.soilgrids_call import read_data
 
 
 @pytest.mark.asyncio
-@patch("API_readers.soilgrids.soilgrids_call.fetch_soil_data")
-@patch("API_readers.soilgrids.soilgrids_call.prepare_coordinates")
-@patch("API_readers.soilgrids.soilgrids_call.how_many")
-@patch("API_readers.soilgrids.soilgrids_call.SoilGrids")
+@patch("adapters.API_readers.soilgrids.soilgrids_call.fetch_soil_data")
+@patch("adapters.API_readers.soilgrids.soilgrids_call.prepare_coordinates")
+@patch("adapters.API_readers.soilgrids.soilgrids_call.how_many")
+@patch("adapters.API_readers.soilgrids.soilgrids_call.SoilGrids")
 async def test_read_data(mock_soilgrids, mock_how_many, mock_prepare_coordinates, mock_fetch_soil_data):
     # Mock SoilGrids client
     mock_soilgrids_instance = MagicMock()
