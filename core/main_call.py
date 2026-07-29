@@ -26,8 +26,8 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     :param bounding_box: A tuple containing the geographical coordinates (N, S, E, W) of the area for which data is requested.
                          Format: (North, South, East, West) in decimal degrees.
     :param level: S2Cell level.
-    :param time_from: The starting time from when data should be collected. Format: Unix timestamp.
-    :param time_to: The ending time to when data should be collected. Format: Unix timestamp.
+    :param time_from: The starting date from when data should be collected. Format: YYYY-MM-DD.
+    :param time_to: The ending date to when data should be collected. Format: YYYY-MM-DD.
     :param factors: A list of factors specifying the type of data requested.
                     Examples of allowed factors: 'precipitation', 'temperature'
 

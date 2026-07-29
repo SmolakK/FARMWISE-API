@@ -58,6 +58,9 @@ where = ["."]
 include = ["adapters*", "core*", "server*"]
 exclude = ["tests*", "internal-lib*"]
 
+[tool.setuptools]
+py-modules = ["main", "main_call"]
+
 [tool.setuptools.package-data]
 "adapters.API_readers" = [
     "**/*.csv",

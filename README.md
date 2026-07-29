@@ -1,9 +1,13 @@
 # FARMWISE API
 
-FARMWISE aggregates agricultural and environmental data from European data
-providers. A request describes an area (a country or a bounding box), a date
-range, an S2 cell level, and one or more factors. The service selects matching
-adapters, downloads their data, normalizes it to S2 cells, and returns a CSV
+FARMWISE is dual-use:
+
+- as a local Python library through `main_call`;
+- as an HTTP service through `main`.
+
+A request describes an area (a country or a bounding box), a date range, an S2
+cell level, and one or more factors. FARMWISE selects matching adapters,
+downloads their data, normalizes it to S2 cells, and returns the combined data
 with source metadata and an optional HTML map.
 
 ## Project layout
@@ -21,6 +25,8 @@ server/
   *.py               persistence, security, and background services
 static/              frontend assets
 tests/               unit and integration tests
+main_call.py          stable local-library entry point
+main.py               stable server entry point
 ```
 
 All imports are rooted at one of the three top-level packages (`adapters`,
@@ -66,10 +72,40 @@ Writable cache files and the default SQLite database are stored under
 `FARMWISE_CACHE_DIR` (by default the user's `.cache/farmwise` directory).
 Set `FARMWISE_DATABASE_URL` to use another SQLAlchemy database URL.
 
-## Running
+## Local library usage
+
+```python
+import asyncio
+
+from main_call import read_data
+
+result = asyncio.run(
+    read_data(
+        country="Poland",
+        level=10,
+        time_from="2018-01-01",
+        time_to="2018-01-07",
+        factors=["temperature", "precipitation"],
+    )
+)
+
+data = result["data"]
+metadata = result["metadata"]
+```
+
+`read_data` is asynchronous, so applications already using asyncio should call
+it with `await read_data(...)`.
+
+## Server usage
 
 ```powershell
-python -m uvicorn server.main:app --reload
+python main.py
+```
+
+For development with automatic reload:
+
+```powershell
+python -m uvicorn main:app --reload
 ```
 
 Open `http://localhost:8000`, or use the OpenAPI documentation at

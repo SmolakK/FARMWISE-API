@@ -1,7 +1,7 @@
 import os.path
 import cdsapi
 from datetime import datetime
-# from API_readers.cds.cds_mappings.cds_soilgrid_mappings import DATA_ALIASES, GLOBAL_MAPPING
+# from adapters.API_readers.cds.cds_mappings.cds_soilgrid_mappings import DATA_ALIASES, GLOBAL_MAPPING
 
 
 async def read_data(spatial_range, time_range, data_range, level):
