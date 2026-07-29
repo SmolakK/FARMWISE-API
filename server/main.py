@@ -13,11 +13,11 @@ import os
 import asyncio
 from pathlib import Path
 
-from core.utils.paths import PROJECT_ROOT, prefetch_all
+from core.utils.paths import CACHE_ROOT, prefetch_all
 
-STATIC_DIR = PROJECT_ROOT / "static"
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 TEMP_DIR = Path(
-    os.getenv("FARMWISE_TEMP_DIR", PROJECT_ROOT / "temp_files")
+    os.getenv("FARMWISE_TEMP_DIR", CACHE_ROOT / "temp_files")
 ).resolve()
 
 # Create the database tables

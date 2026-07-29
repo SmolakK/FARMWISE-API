@@ -22,8 +22,8 @@ core/
 server/
   main.py            FastAPI application
   routers/           authentication, frontend, and data endpoints
+  static/            packaged frontend assets
   *.py               persistence, security, and background services
-static/              frontend assets
 tests/               unit and integration tests
 main_call.py          stable local-library entry point
 main.py               stable server entry point
@@ -36,11 +36,26 @@ All imports are rooted at one of the three top-level packages (`adapters`,
 
 Python 3.10 or newer is required.
 
+Install the local-library variant:
+
+```powershell
+python -m pip install farmwise-api
+```
+
+Install the server variant, including FastAPI, authentication, persistence,
+and the ASGI server:
+
+```powershell
+python -m pip install "farmwise-api[server]"
+```
+
+For development from a repository checkout:
+
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[server,dev]"
 ```
 
 The Hub'Eau adapters use the bundled helper library:
@@ -67,6 +82,10 @@ Large adapter datasets may be supplied under `adapters/API_readers` or through
 `FARMWISE_DATA_DIR`. Remote prefetching is disabled by default; enable it with
 `FARMWISE_PREFETCH_DATA=true` after replacing placeholder entries in
 `core/utils/data_manifest.py` with real URLs and checksums.
+
+The multi-gigabyte EuroCropV2 `points.csv` dataset is intentionally excluded
+from the pip distribution. Provide it through `FARMWISE_DATA_DIR`, or configure
+its remote source in the data manifest before using that adapter.
 
 Writable cache files and the default SQLite database are stored under
 `FARMWISE_CACHE_DIR` (by default the user's `.cache/farmwise` directory).
@@ -98,8 +117,10 @@ it with `await read_data(...)`.
 
 ## Server usage
 
+After installing `farmwise-api[server]`, start the service with:
+
 ```powershell
-python main.py
+farmwise-api
 ```
 
 For development with automatic reload:

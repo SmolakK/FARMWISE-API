@@ -9,7 +9,7 @@ from server.logging_config import logger
 from server.security import limiter, get_current_active_user
 import asyncio
 import json
-from core.utils.email_utils import send_email
+from server.email_utils import send_email
 from dotenv import load_dotenv
 from core.utils.paths import PROJECT_ROOT
 

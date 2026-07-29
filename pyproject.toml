@@ -11,13 +11,9 @@ requires-python = ">=3.10"
 dependencies = [
     "aiofiles",
     "aiohttp",
-    "apscheduler",
     "beautifulsoup4",
-    "bcrypt<4.1",
     "cdsapi",
     "duckdb",
-    "email-validator",
-    "fastapi",
     "folium",
     "geopy",
     "geopandas",
@@ -25,33 +21,43 @@ dependencies = [
     "nest-asyncio",
     "numpy",
     "pandas",
-    "passlib[bcrypt]",
     "pillow",
     "pyproj",
-    "python-dotenv",
-    "python-jose[cryptography]",
-    "python-multipart",
     "rasterio",
     "requests",
     "s2sphere",
     "scipy",
     "shapely",
-    "slowapi",
     "soilgrids",
-    "sqlalchemy",
     "tenacity",
     "tqdm",
-    "uvicorn[standard]",
     "wetterdienst",
     "xarray",
 ]
 
 [project.optional-dependencies]
+server = [
+    "apscheduler",
+    "bcrypt<4.1",
+    "email-validator",
+    "fastapi",
+    "passlib[bcrypt]",
+    "pydantic",
+    "python-dotenv",
+    "python-jose[cryptography]",
+    "python-multipart",
+    "slowapi",
+    "sqlalchemy",
+    "uvicorn[standard]",
+]
 dev = [
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
 ]
+
+[project.scripts]
+farmwise-api = "main:run"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -70,6 +76,13 @@ py-modules = ["main", "main_call"]
     "**/*.tif",
     "**/*.txt",
     "**/*.xml",
+]
+"core.utils" = ["country_codes"]
+"server" = ["static/*"]
+
+[tool.setuptools.exclude-package-data]
+"adapters.API_readers" = [
+    "EuroCropV2/data/points.csv",
 ]
 
 [tool.pytest.ini_options]

@@ -3,12 +3,14 @@ from email.mime.text import MIMEText
 from server.logging_config import logger
 from dotenv import load_dotenv
 import os
-from core.utils.paths import PROJECT_ROOT
+from pathlib import Path
+
+SMTP_ENV_FILE = Path(__file__).resolve().parent / "smtp.env"
 
 
 def send_email(to_email, subject, body):
     try:
-        load_dotenv(PROJECT_ROOT / "server" / "smtp.env")
+        load_dotenv(SMTP_ENV_FILE)
         smtp_server = os.getenv("EMAIL_HOST")
         smtp_port = int(os.getenv("EMAIL_PORT"))
         smtp_user = os.getenv("EMAIL_USER")
