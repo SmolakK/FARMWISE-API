@@ -1,4 +1,14 @@
-from adapters.mappings.data_source_mapping import API_PATH_RANGES
+from adapters.mappings.data_source_mapping import (
+    API_PATH_RANGES,
+    DATA_SOURCE_WEIGHTS,
+    DATA_TYPE_HARMONIZATION_METHODS,
+)
+from core.harmonization import (
+    DEFAULT_SOURCE_WEIGHT,
+    harmonize_data,
+    validate_harmonization_methods,
+    validate_source_weights,
+)
 from core.utils.overlap_checks import spatial_ranges_overlap, time_ranges_overlap
 from core.utils.interpolate_data import interpolate
 from core.utils.cells_to_coordinates import extract_bbox
@@ -14,7 +24,8 @@ COUNTRY_BBOXES = return_country_bboxes()
 
 
 async def read_data(bounding_box=None, country=None, level=None, time_from=None, time_to=None,
-                    factors=None, separate_api=False, timeout=600, interpolation=False, produce_map=False):
+                    factors=None, separate_api=False, timeout=600, interpolation=False,
+                    produce_map=False, source_weights=None, harmonization_methods=None):
     """
     Main data reading call - combines different APIs which overlap with the requested area and time range.
 
@@ -23,6 +34,11 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     high data resolutions.
     :param timeout: Timeout for each API after which the process will skip this API.
     :param separate_api: If True APIs are stored in separate columns and not averaged
+    :param source_weights: Optional mapping of full API module paths to relative
+                           source weights. Values override DATA_SOURCE_WEIGHTS.
+    :param harmonization_methods: Optional mapping of logical data types to
+                                  harmonization methods. Values override
+                                  DATA_TYPE_HARMONIZATION_METHODS.
     :param bounding_box: A tuple containing the geographical coordinates (N, S, E, W) of the area for which data is requested.
                          Format: (North, South, East, West) in decimal degrees.
     :param level: S2Cell level.
@@ -37,7 +53,17 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
 
     Note: `API_PATH_RANGES` is a dictionary mapping API names to their spatial, temporal, and data range constraints.
     """
-    data_storage = []  # This will store data called from different APIs
+    effective_source_weights = dict(DATA_SOURCE_WEIGHTS)
+    if source_weights:
+        effective_source_weights.update(source_weights)
+    effective_source_weights = validate_source_weights(effective_source_weights)
+
+    effective_methods = dict(DATA_TYPE_HARMONIZATION_METHODS)
+    if harmonization_methods:
+        effective_methods.update(harmonization_methods)
+    effective_methods = validate_harmonization_methods(effective_methods)
+
+    data_storage = []  # (source path, DataFrame, matching logical data types)
     api_metadata = []
     # api_reports = []
     if country is not None:
@@ -96,7 +122,9 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                             [api_response_data.columns.levels[0] + f" ({api_name_suffix})",
                              api_response_data.columns.levels[1]]
                         )
-                    data_storage.append(api_response_data)
+                    data_storage.append(
+                        (api_name, api_response_data, tuple(sorted(data_overlap)))
+                    )
                     logger.info(f'Data retrieved from {api_name_suffix}')
             except asyncio.TimeoutError:
                 logger.error(f'Request to {api_name_suffix} timed out')
@@ -106,13 +134,33 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     # Concatenate data if any DataFrames were retrieved
     if data_storage:
         try:
-            combined_data = pd.concat(data_storage)
-            combined_data = combined_data.groupby(level=0).mean()  # average data from separate APIs
+            if separate_api:
+                combined_data = pd.concat(
+                    [data for _source, data, _types in data_storage]
+                )
+                combined_data = combined_data.groupby(level=0).mean()
+            else:
+                combined_data = harmonize_data(
+                    data_storage,
+                    source_weights=effective_source_weights,
+                    data_type_methods=effective_methods,
+                )
             if interpolation:  # be aware this inserts values to NaNs
                 combined_data = interpolate(combined_data, bounding_box, level)
             result = {"data": combined_data,  # The DataFrame containing the concatenated data
-                    "metadata": {"apis": api_metadata  # List of metadata dictionaries for each API
-                                 }
+                    "metadata": {
+                        "apis": api_metadata,
+                        "harmonization": {
+                            "enabled": not separate_api,
+                            "source_weights": {
+                                source: effective_source_weights.get(
+                                    source, DEFAULT_SOURCE_WEIGHT
+                                )
+                                for source, _data, _types in data_storage
+                            },
+                            "methods": effective_methods,
+                        },
+                    }
                     }
             if produce_map:
                 from core.utils.map_ploter import create_folium_map

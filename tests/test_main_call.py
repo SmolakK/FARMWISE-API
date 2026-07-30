@@ -260,3 +260,91 @@ async def test_read_data_returns_empty_frame_when_concatenation_fails(monkeypatc
     )
 
     assert result.empty
+
+
+@pytest.mark.asyncio
+async def test_read_data_applies_source_weights_and_type_methods(monkeypatch):
+    from core import main_call
+
+    cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
+    columns = pd.MultiIndex.from_tuples(
+        [("Temperature [C]", cell), ("Precipitation [mm]", cell)]
+    )
+    frames = {
+        "provider.first": pd.DataFrame(
+            [[10.0, 2.0]],
+            index=pd.to_datetime(["2024-01-01"]),
+            columns=columns,
+        ),
+        "provider.second": pd.DataFrame(
+            [[20.0, 8.0]],
+            index=pd.to_datetime(["2024-01-01"]),
+            columns=columns,
+        ),
+    }
+    modules = {}
+    for source, frame in frames.items():
+        module = MagicMock()
+        module.read_data = AsyncMock(return_value=frame)
+        modules[source] = module
+
+    monkeypatch.setattr(
+        main_call,
+        "API_PATH_RANGES",
+        {
+            source: [
+                (55, 49, 24, 14),
+                ("2020-01-01", "2030-01-01"),
+                ["temperature", "precipitation"],
+            ]
+            for source in frames
+        },
+    )
+    monkeypatch.setattr(main_call, "spatial_ranges_overlap", lambda *_args: True)
+    monkeypatch.setattr(main_call, "time_ranges_overlap", lambda *_args: True)
+    monkeypatch.setattr(
+        main_call.importlib, "import_module", lambda name: modules[name]
+    )
+    monkeypatch.setattr(main_call, "extract_bbox", lambda _cells: (51, 51, 17, 17))
+
+    result = await main_call.read_data(
+        bounding_box=(55, 49, 24, 14),
+        level=10,
+        time_from="2024-01-01",
+        time_to="2024-01-02",
+        factors=["temperature", "precipitation"],
+        source_weights={"provider.first": 3.0, "provider.second": 1.0},
+        harmonization_methods={"precipitation": "max"},
+    )
+
+    assert result["data"].loc[
+        "2024-01-01", ("Temperature [C]", cell)
+    ] == 12.5
+    assert result["data"].loc[
+        "2024-01-01", ("Precipitation [mm]", cell)
+    ] == 8.0
+    assert result["metadata"]["harmonization"]["source_weights"] == {
+        "provider.first": 3.0,
+        "provider.second": 1.0,
+    }
+    assert result["metadata"]["harmonization"]["methods"]["precipitation"] == "max"
+
+
+@pytest.mark.asyncio
+async def test_read_data_validates_harmonization_before_calling_sources(monkeypatch):
+    from core import main_call
+
+    import_module = MagicMock()
+    monkeypatch.setattr(main_call.importlib, "import_module", import_module)
+
+    with pytest.raises(ValueError, match="Unknown harmonization method"):
+        await main_call.read_data(
+            bounding_box=(55, 49, 24, 14),
+            level=10,
+            time_from="2024-01-01",
+            time_to="2024-01-02",
+            factors=["temperature"],
+            harmonization_methods={"temperature": "not-a-method"},
+        )
+
+    import_module.assert_not_called()

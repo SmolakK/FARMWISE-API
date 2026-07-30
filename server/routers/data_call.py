@@ -53,6 +53,10 @@ async def process_and_send_email(request_body, request, user_email):
         factors = request_body.factors
         separate_api = getattr(request_body, 'separate_api', False)
         interpolation = getattr(request_body, 'interpolation', False)
+        source_weights = getattr(request_body, 'source_weights', None)
+        harmonization_methods = getattr(
+            request_body, 'harmonization_methods', None
+        )
 
         result = await read_data(
             bounding_box=boundingbox,
@@ -62,7 +66,9 @@ async def process_and_send_email(request_body, request, user_email):
             time_to=time_to,
             factors=factors,
             separate_api=separate_api,
-            interpolation=interpolation
+            interpolation=interpolation,
+            source_weights=source_weights,
+            harmonization_methods=harmonization_methods,
         )
 
         if _has_no_data(result):
@@ -131,7 +137,11 @@ async def read_data_endpoint(
             factors=request_body.factors,
             separate_api=request_body.separate_api,
             interpolation=request_body.interpolation,
-            produce_map=request_body.produce_map
+            produce_map=request_body.produce_map,
+            source_weights=getattr(request_body, "source_weights", None),
+            harmonization_methods=getattr(
+                request_body, "harmonization_methods", None
+            ),
         )
 
         if _has_no_data(result):
@@ -261,7 +271,11 @@ async def read_data_direct(
             factors=request_body.factors,
             separate_api=request_body.separate_api,
             interpolation=request_body.interpolation,
-            produce_map=request_body.produce_map
+            produce_map=request_body.produce_map,
+            source_weights=getattr(request_body, "source_weights", None),
+            harmonization_methods=getattr(
+                request_body, "harmonization_methods", None
+            ),
         )
 
         if _has_no_data(result):

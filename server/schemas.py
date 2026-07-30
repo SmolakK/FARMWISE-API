@@ -1,7 +1,11 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
-from typing import List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional
 from datetime import datetime
 from adapters.mappings.data_source_mapping import API_PATH_RANGES
+from core.harmonization import (
+    validate_harmonization_methods,
+    validate_source_weights,
+)
 
 # Dynamically extract all unique factors from API_PATH_RANGES
 valid_factors = set(
@@ -52,6 +56,18 @@ class ReadDataRequest(BaseModel):
         False,
         description="If True, produce a map on output."
     )
+    source_weights: Optional[Dict[str, float]] = Field(
+        None,
+        description=(
+            "Optional source weight overrides keyed by full adapter module path."
+        )
+    )
+    harmonization_methods: Optional[Dict[str, str]] = Field(
+        None,
+        description=(
+            "Optional harmonization method overrides keyed by logical data type."
+        )
+    )
 
     @field_validator("time_from", "time_to")
     def validate_date(cls, value):
@@ -76,6 +92,18 @@ class ReadDataRequest(BaseModel):
         if any(factor not in valid_factors for factor in value):
             raise ValueError(f"Factors must be within {valid_factors}")
         return value
+
+    @field_validator("source_weights")
+    def check_source_weights(cls, value):
+        return validate_source_weights(value) if value is not None else value
+
+    @field_validator("harmonization_methods")
+    def check_harmonization_methods(cls, value):
+        return (
+            validate_harmonization_methods(value)
+            if value is not None
+            else value
+        )
 
 
 # Define the response model

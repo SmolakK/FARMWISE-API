@@ -204,3 +204,43 @@ API_PATH_RANGES = {
          1)
     )
 }
+
+# Relative confidence assigned to each source during cross-source
+# harmonization.  The values are deliberately neutral until they are
+# calibrated against reference datasets.  A missing future source also
+# receives a weight of 1.0 in the harmonization layer.
+#
+# Keep this dictionary separate from ``API_PATH_RANGES`` so the established
+# six-element tuple format remains backwards compatible.
+DATA_SOURCE_WEIGHTS = {
+    api_path: 1.0
+    for api_path in API_PATH_RANGES
+}
+
+
+# Harmonization method selected for each logical data type.  New data types
+# can be added here without changing the aggregation code.  A caller can also
+# override these values for a single ``read_data`` call.
+#
+# Available methods:
+# - weighted_mean, mean, weighted_median, median
+# - weighted_mode, mode, priority
+# - min, max, sum
+DATA_TYPE_HARMONIZATION_METHODS = {
+    "default": "weighted_mean",
+    "temperature": "weighted_mean",
+    "precipitation": "weighted_mean",
+    "soil": "weighted_mean",
+    "soil humidity": "weighted_mean",
+    "potential evaporation": "weighted_mean",
+    "surface water quantity": "weighted_mean",
+    "land cover": "weighted_mode",
+    "hydraulic conductivity": "weighted_mean",
+    "depth to watertable": "weighted_mean",
+    "groundwater quality": "weighted_mean",
+    "groundwater quantity": "weighted_mean",
+    "surface water quality": "weighted_mean",
+    "livestock pressure": "weighted_mean",
+    "agricultural structure": "weighted_mean",
+    "environmental data (EEA)": "weighted_mean",
+}

@@ -18,6 +18,8 @@ def test_valid_read_data_request():
         "factors": valid_factors,
         "separate_api": True,
         "interpolation": False,
+        "source_weights": {"provider.module": 2.0},
+        "harmonization_methods": {"temperature": "weighted_mean"},
     }
     request = ReadDataRequest(**data)
     assert request.bounding_box == valid_bounding_box
@@ -25,6 +27,10 @@ def test_valid_read_data_request():
     assert request.time_from == valid_time_from
     assert request.time_to == valid_time_to
     assert request.factors == valid_factors
+    assert request.source_weights == {"provider.module": 2.0}
+    assert request.harmonization_methods == {
+        "temperature": "weighted_mean"
+    }
 
 
 def test_invalid_date_format():
@@ -67,6 +73,31 @@ def test_invalid_factors():
             time_to=valid_time_to,
             factors=["invalid_factor"],  # Not in `valid_factors`
         )
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("source_weights", {"provider": -1}, "must be finite and non-negative"),
+        (
+            "harmonization_methods",
+            {"temperature": "random"},
+            "Unknown harmonization method",
+        ),
+    ],
+)
+def test_invalid_harmonization_configuration(field, value, message):
+    request = {
+        "bounding_box": valid_bounding_box,
+        "level": 10,
+        "time_from": valid_time_from,
+        "time_to": valid_time_to,
+        "factors": valid_factors,
+        field: value,
+    }
+
+    with pytest.raises(ValidationError, match=message):
+        ReadDataRequest(**request)
 
 
 def test_valid_user_create():

@@ -115,6 +115,34 @@ metadata = result["metadata"]
 `read_data` is asynchronous, so applications already using asyncio should call
 it with `await read_data(...)`.
 
+When several sources provide the same value, FARMWISE harmonizes them using
+the source weights and per-data-type methods defined in
+`adapters.mappings.data_source_mapping`. Both dictionaries can also be
+overridden for one call:
+
+```python
+result = await read_data(
+    country="Poland",
+    level=10,
+    time_from="2018-01-01",
+    time_to="2018-01-07",
+    factors=["temperature", "precipitation"],
+    source_weights={
+        "adapters.API_readers.imgw.imgw_api_synop_daily": 2.0,
+        "adapters.API_readers.cds.cds_single_levels": 1.0,
+    },
+    harmonization_methods={
+        "temperature": "weighted_mean",
+        "precipitation": "weighted_median",
+    },
+)
+```
+
+Supported methods are `weighted_mean`, `mean`, `weighted_median`, `median`,
+`weighted_mode`, `mode`, `priority`, `min`, `max`, and `sum`. The effective
+configuration used for a response is included in
+`result["metadata"]["harmonization"]`.
+
 ## Server usage
 
 After installing `farmwise-api[server]`, start the service with:
