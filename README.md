@@ -192,3 +192,19 @@ Authenticated clients can call `POST /read-data-direct`:
 
 The response contains download links for the data CSV, metadata JSON, and,
 when requested, an HTML map.
+
+## Evaluation and benchmarks
+
+Reproducible experiments for per-source quality, coverage pre-check efficiency,
+scaling, and ERA5-observational-source agreement live in
+[`evaluation/`](evaluation/README.md). Install the plotting extra and regenerate
+the offline controls with:
+
+```powershell
+python -m pip install -e ".[evaluation]"
+python -m evaluation.run_all
+```
+
+The committed logs and figures are explicitly labelled synthetic controls.
+Use `evaluation.collect_cross_source` and observed dispatch latencies before
+reporting the results as empirical or publication-ready.

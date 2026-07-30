@@ -55,17 +55,20 @@ dev = [
     "pytest-asyncio",
     "pytest-cov",
 ]
+evaluation = [
+    "matplotlib",
+]
 
 [project.scripts]
 farmwise-api = "main:run"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["adapters*", "core*", "server*"]
+include = ["adapters*", "core*", "server*", "evaluation*"]
 exclude = ["tests*", "internal-lib*"]
 
 [tool.setuptools]
-py-modules = ["main", "main_call"]
+py-modules = ["main", "main_call", "quality_assess"]
 
 [tool.setuptools.package-data]
 "adapters.API_readers" = [

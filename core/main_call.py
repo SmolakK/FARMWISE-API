@@ -9,6 +9,7 @@ from core.harmonization import (
     validate_harmonization_methods,
     validate_source_weights,
 )
+from core.quality_assess import assess_data_quality, persist_quality_report
 from core.utils.overlap_checks import spatial_ranges_overlap, time_ranges_overlap
 from core.utils.interpolate_data import interpolate
 from core.utils.cells_to_coordinates import extract_bbox
@@ -18,14 +19,49 @@ import importlib
 import pandas as pd
 import logging
 import asyncio
+from time import perf_counter
+from uuid import uuid4
 
 logger = logging.getLogger(__name__)
 COUNTRY_BBOXES = return_country_bboxes()
 
 
+def plan_source_dispatch(
+    bounding_box,
+    time_from,
+    time_to,
+    factors,
+    source_ranges=None,
+):
+    """Evaluate the coverage pre-check for every configured source."""
+    source_ranges = API_PATH_RANGES if source_ranges is None else source_ranges
+    requested_factors = set(factors or [])
+    plan = []
+
+    for source, ranges in source_ranges.items():
+        spatial_overlap = spatial_ranges_overlap(bounding_box, ranges[0])
+        temporal_overlap = time_ranges_overlap(
+            (time_from, time_to), ranges[1]
+        )
+        factor_overlap = sorted(requested_factors.intersection(ranges[2]))
+        plan.append(
+            {
+                "source": source,
+                "spatial_overlap": spatial_overlap,
+                "temporal_overlap": temporal_overlap,
+                "factor_overlap": factor_overlap,
+                "dispatched": bool(
+                    spatial_overlap and temporal_overlap and factor_overlap
+                ),
+            }
+        )
+    return plan
+
+
 async def read_data(bounding_box=None, country=None, level=None, time_from=None, time_to=None,
                     factors=None, separate_api=False, timeout=600, interpolation=False,
-                    produce_map=False, source_weights=None, harmonization_methods=None):
+                    produce_map=False, source_weights=None, harmonization_methods=None,
+                    persist_quality_reports=True, quality_report_dir=None):
     """
     Main data reading call - combines different APIs which overlap with the requested area and time range.
 
@@ -39,6 +75,10 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     :param harmonization_methods: Optional mapping of logical data types to
                                   harmonization methods. Values override
                                   DATA_TYPE_HARMONIZATION_METHODS.
+    :param persist_quality_reports: Persist each per-source quality assessment
+                                    as JSON when True.
+    :param quality_report_dir: Optional report directory override. By default
+                               reports use the FARMWISE cache directory.
     :param bounding_box: A tuple containing the geographical coordinates (N, S, E, W) of the area for which data is requested.
                          Format: (North, South, East, West) in decimal degrees.
     :param level: S2Cell level.
@@ -65,7 +105,9 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
 
     data_storage = []  # (source path, DataFrame, matching logical data types)
     api_metadata = []
-    # api_reports = []
+    api_reports = []
+    dispatch_metrics = []
+    request_id = uuid4().hex
     if country is not None:
         if isinstance(country, str):
             country = [country]  # Support single country input
@@ -81,55 +123,132 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     elif bounding_box is None:
         raise ValueError("You must provide either a 'bounding_box' or a 'country' parameter.")
 
-    for api_name, ranges in API_PATH_RANGES.items():  # Iterate over API ranges
-        api_spatial_range = ranges[0]  # Spatial range
-        api_time_range = ranges[1]  # Temporal range
-        api_data_range = set(ranges[2])  # Data range
-        spatial_overlap = spatial_ranges_overlap(bounding_box, api_spatial_range)  # Check spatial overlap
-        temporal_overlap = time_ranges_overlap((time_from, time_to), api_time_range)  # Check temporal overlap
-        data_overlap = set(factors).intersection(api_data_range)  # Check data overlap
-        if spatial_overlap and temporal_overlap and len(data_overlap) > 0:  # If overlaps
+    precheck_started = perf_counter()
+    dispatch_plan = plan_source_dispatch(
+        bounding_box, time_from, time_to, factors
+    )
+    precheck_seconds = perf_counter() - precheck_started
+
+    for decision in dispatch_plan:
+        if not decision["dispatched"]:
+            continue
+
+        api_name = decision["source"]
+        api_name_suffix = api_name.split(".")[-1]
+        ranges = API_PATH_RANGES[api_name]
+        data_overlap = decision["factor_overlap"]
+        dispatch_started = perf_counter()
+        dispatch_status = "failure"
+        dispatch_error = None
+
+        try:
+            module = importlib.import_module(api_name)
+            api_response_data = await asyncio.wait_for(
+                module.read_data(
+                    spatial_range=bounding_box,
+                    time_range=(time_from, time_to),
+                    data_range=factors,
+                    level=level,
+                ),
+                timeout=timeout,
+            )
+            if not isinstance(api_response_data, pd.DataFrame):
+                dispatch_status = "invalid_response"
+                continue
+            if api_response_data.empty:
+                dispatch_status = "empty"
+                continue
+
+            api_columns = list(
+                api_response_data.columns.get_level_values(0).unique()
+            )
+            api_dates = [
+                str(api_response_data.index.min()),
+                str(api_response_data.index.max()),
+            ]
+            api_cells = list(
+                api_response_data.columns.get_level_values(1).unique()
+            )
+            meta = {
+                "api_name": api_name_suffix,
+                "source": api_name,
+                "columns": api_columns,
+                "dates_range": api_dates,
+                "bounding_box (NSEW)": extract_bbox(api_cells),
+                "status": "success",
+                "error": None,
+            }
+            api_metadata.append(meta)
+
+            request_ranges = {
+                "bbox": bounding_box,
+                "level": level,
+                "time_from": time_from,
+                "time_to": time_to,
+                "factors": factors,
+            }
             try:
-                module = importlib.import_module(api_name)  # Import the proper module
-                api_name_suffix = api_name.split('.')[-1]
-                # Read data from the module (parameters are the same for all read_data() functions)
-                api_response_data = await asyncio.wait_for(
-                    module.read_data(spatial_range=bounding_box, time_range=(time_from, time_to),
-                                     data_range=factors, level=level),
-                    timeout=timeout)
-                if isinstance(api_response_data, pd.DataFrame):
-                    api_columns = list(api_response_data.columns.get_level_values(0).unique())
-                    api_dates = list(api_response_data.index.astype(str).unique())
-                    api_dates = [api_dates[0],api_dates[-1]]
-                    api_cells = list(api_response_data.columns.get_level_values(1).unique())
-                    bbox = extract_bbox(api_cells)
-                    meta = {
-                        "api_name": api_name_suffix,
-                        "columns": api_columns,
-                        "dates_range": api_dates,
-                        "bounding_box (NSEW)": bbox,
-                        "status": "success" if isinstance(api_response_data, pd.DataFrame) else "failure",
-                        "error": str(e) if "e" in locals() else None  # Add error details if any
-                    }
-                    api_metadata.append(meta)
-                    # request_ranges = {'bbox':bounding_box,'level':level,'time_from':time_from,
-                    #                   'time_to':time_to,'factors':factors}
-                    # api_report = quality_assess.assess_data_quality(api_response_data,meta,ranges,request_ranges)
-                    # pd.DataFrame(api_report).to_csv(
-                    #     rf"""report_{api_name_suffix}_{level}_{time_from}_{time_to}_{country}.csv""")
-                    if separate_api:
-                        api_response_data.columns = api_response_data.columns.set_levels(
-                            [api_response_data.columns.levels[0] + f" ({api_name_suffix})",
-                             api_response_data.columns.levels[1]]
-                        )
-                    data_storage.append(
-                        (api_name, api_response_data, tuple(sorted(data_overlap)))
+                api_report = await asyncio.to_thread(
+                    assess_data_quality,
+                    api_response_data,
+                    meta,
+                    ranges,
+                    request_ranges,
+                )
+                if persist_quality_reports:
+                    report_path = await asyncio.to_thread(
+                        persist_quality_report,
+                        api_report,
+                        output_dir=quality_report_dir,
+                        request_id=request_id,
+                        source=api_name,
                     )
-                    logger.info(f'Data retrieved from {api_name_suffix}')
-            except asyncio.TimeoutError:
-                logger.error(f'Request to {api_name_suffix} timed out')
-            except Exception as e:
-                logger.error(f'Failed to retrieve data from {api_name}: {e}')
+                    api_report["report_path"] = str(report_path)
+                api_reports.append(api_report)
+            except Exception as quality_error:
+                logger.warning(
+                    "Quality assessment failed for %s: %s",
+                    api_name,
+                    quality_error,
+                )
+                api_reports.append(
+                    {
+                        "api_name": api_name_suffix,
+                        "source": api_name,
+                        "status": "error",
+                        "error": str(quality_error),
+                    }
+                )
+
+            if separate_api:
+                api_response_data.columns = api_response_data.columns.set_levels(
+                    [
+                        api_response_data.columns.levels[0]
+                        + f" ({api_name_suffix})",
+                        api_response_data.columns.levels[1],
+                    ]
+                )
+            data_storage.append(
+                (api_name, api_response_data, tuple(data_overlap))
+            )
+            dispatch_status = "success"
+            logger.info(f"Data retrieved from {api_name_suffix}")
+        except asyncio.TimeoutError:
+            dispatch_status = "timeout"
+            dispatch_error = f"Timed out after {timeout} seconds"
+            logger.error(f"Request to {api_name_suffix} timed out")
+        except Exception as error:
+            dispatch_error = str(error)
+            logger.error(f"Failed to retrieve data from {api_name}: {error}")
+        finally:
+            dispatch_metrics.append(
+                {
+                    "source": api_name,
+                    "status": dispatch_status,
+                    "wall_seconds": perf_counter() - dispatch_started,
+                    "error": dispatch_error,
+                }
+            )
 
     # Concatenate data if any DataFrames were retrieved
     if data_storage:
@@ -149,7 +268,21 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                 combined_data = interpolate(combined_data, bounding_box, level)
             result = {"data": combined_data,  # The DataFrame containing the concatenated data
                     "metadata": {
+                        "request_id": request_id,
                         "apis": api_metadata,
+                        "quality_reports": api_reports,
+                        "coverage_precheck": {
+                            "candidate_sources": len(dispatch_plan),
+                            "dispatched_sources": sum(
+                                item["dispatched"] for item in dispatch_plan
+                            ),
+                            "requests_avoided": sum(
+                                not item["dispatched"] for item in dispatch_plan
+                            ),
+                            "precheck_seconds": precheck_seconds,
+                            "sources": dispatch_plan,
+                        },
+                        "dispatch": dispatch_metrics,
                         "harmonization": {
                             "enabled": not separate_api,
                             "source_weights": {
@@ -251,3 +384,6 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
 #
 # Example using country
 # asyncio.run(read_data(country='Poland', level=10, time_from='2017-01-10', time_to='2017-01-12', factors=['temperature', 'precipitation'], produce_map=True))
+
+
+__all__ = ["plan_source_dispatch", "read_data"]

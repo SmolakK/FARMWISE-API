@@ -348,3 +348,95 @@ async def test_read_data_validates_harmonization_before_calling_sources(monkeypa
         )
 
     import_module.assert_not_called()
+
+
+def test_plan_source_dispatch_records_each_precheck_reason():
+    from core.main_call import plan_source_dispatch
+
+    plan = plan_source_dispatch(
+        (55, 49, 24, 14),
+        "2024-01-01",
+        "2024-01-02",
+        ["temperature"],
+        source_ranges={
+            "selected": [
+                (55, 49, 24, 14),
+                ("2020-01-01", "2030-01-01"),
+                ["temperature"],
+            ],
+            "outside-space": [
+                (45, 40, 10, 5),
+                ("2020-01-01", "2030-01-01"),
+                ["temperature"],
+            ],
+            "outside-time": [
+                (55, 49, 24, 14),
+                ("1990-01-01", "2000-01-01"),
+                ["temperature"],
+            ],
+            "outside-factor": [
+                (55, 49, 24, 14),
+                ("2020-01-01", "2030-01-01"),
+                ["soil"],
+            ],
+        },
+    )
+
+    assert [item["source"] for item in plan if item["dispatched"]] == ["selected"]
+    assert sum(not item["dispatched"] for item in plan) == 3
+
+
+@pytest.mark.asyncio
+async def test_read_data_persists_per_source_quality_report(monkeypatch, tmp_path):
+    from core import main_call
+
+    cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
+    frame = pd.DataFrame(
+        [[5.0]],
+        index=pd.to_datetime(["2024-01-01"]),
+        columns=pd.MultiIndex.from_tuples([("Temperature", cell)]),
+    )
+    module = MagicMock()
+    module.read_data = AsyncMock(return_value=frame)
+    monkeypatch.setattr(
+        main_call,
+        "API_PATH_RANGES",
+        {
+            "provider.adapter": [
+                (55, 49, 24, 14),
+                ("2020-01-01", "2030-01-01"),
+                ["temperature"],
+            ],
+            "provider.unused": [
+                (45, 40, 10, 5),
+                ("2020-01-01", "2030-01-01"),
+                ["temperature"],
+            ],
+        },
+    )
+    monkeypatch.setattr(main_call.importlib, "import_module", lambda _name: module)
+    monkeypatch.setattr(main_call, "extract_bbox", lambda _cells: (51, 51, 17, 17))
+    monkeypatch.setattr(
+        main_call,
+        "assess_data_quality",
+        MagicMock(return_value={"api_name": "adapter", "S2_completeness": 1.0}),
+    )
+
+    result = await main_call.read_data(
+        bounding_box=(55, 49, 24, 14),
+        level=10,
+        time_from="2024-01-01",
+        time_to="2024-01-02",
+        factors=["temperature"],
+        quality_report_dir=tmp_path,
+    )
+
+    reports = result["metadata"]["quality_reports"]
+    assert len(reports) == 1
+    assert reports[0]["S2_completeness"] == 1
+    assert pd.notna(reports[0]["report_path"])
+    assert len(list(tmp_path.glob("*.json"))) == 1
+    assert result["metadata"]["coverage_precheck"]["candidate_sources"] == 2
+    assert result["metadata"]["coverage_precheck"]["dispatched_sources"] == 1
+    assert result["metadata"]["coverage_precheck"]["requests_avoided"] == 1
+    assert result["metadata"]["dispatch"][0]["status"] == "success"

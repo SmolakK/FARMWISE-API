@@ -68,6 +68,10 @@ class ReadDataRequest(BaseModel):
             "Optional harmonization method overrides keyed by logical data type."
         )
     )
+    persist_quality_reports: Optional[bool] = Field(
+        True,
+        description="Persist a quality report for each successful source."
+    )
 
     @field_validator("time_from", "time_to")
     def validate_date(cls, value):
