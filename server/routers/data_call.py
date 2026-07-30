@@ -16,6 +16,14 @@ from core.utils.paths import PROJECT_ROOT
 api_router = APIRouter()
 
 
+def _has_no_data(result):
+    """Return True when the core call did not produce a non-empty data frame."""
+    if not isinstance(result, dict):
+        return True
+    data = result.get("data")
+    return data is None or getattr(data, "empty", False)
+
+
 # Dependency to check for client disconnection
 async def monitor_client_disconnection(request: Request, stop_event: asyncio.Event):
     """
@@ -57,7 +65,7 @@ async def process_and_send_email(request_body, request, user_email):
             interpolation=interpolation
         )
 
-        if not result:
+        if _has_no_data(result):
             send_email(user_email, "Data Processing Failed", "No data available for the selected parameters.")
             return
 
@@ -126,7 +134,7 @@ async def read_data_endpoint(
             produce_map=request_body.produce_map
         )
 
-        if not result:
+        if _has_no_data(result):
             logger.error("No data found for the selected parameters.")
             return {"status": "failure", "message": "No data available for the selected parameters."}
 
@@ -146,6 +154,7 @@ async def read_data_endpoint(
             json.dump(metadata, mf, indent=4)
         metadata_file.close()
 
+        map_file = None
         if request_body.produce_map:
             map_html = result.get('map')
             # Save map
@@ -161,7 +170,7 @@ async def read_data_endpoint(
         data_download_link = f"http://{base_url}/download/{os.path.basename(data_file.name)}"
         metadata_download_link = f"http://{base_url}/download/{os.path.basename(metadata_file.name)}"
         map_download_link = None
-        if request_body.produce_map:
+        if request_body.produce_map and map_file is not None:
             map_download_link = f"http://{base_url}/download/{os.path.basename(map_file.name)}"
 
         # Send the email
@@ -223,6 +232,8 @@ async def download_file(file_name: str, background_tasks: BackgroundTasks, reque
     except ValueError as e:
         logger.error(f"Error processing request: {e}")
         raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
@@ -253,7 +264,7 @@ async def read_data_direct(
             produce_map=request_body.produce_map
         )
 
-        if not result:
+        if _has_no_data(result):
             raise HTTPException(
                 status_code=404,
                 detail="No data available for the selected parameters."
@@ -306,6 +317,8 @@ async def read_data_direct(
 
         return response
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error in /read-data-direct: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")

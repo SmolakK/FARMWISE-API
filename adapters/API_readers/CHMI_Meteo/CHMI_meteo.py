@@ -14,7 +14,7 @@ BASE_URL = "https://opendata.chmi.cz/meteorology/climate/historical/data/daily/"
 DOWNLOAD_DIR = Path("downloaded_json")
 DOWNLOAD_DIR.mkdir(exist_ok=True, parents=True)
 BATCH_SIZE = 5
-FINAL_COLS = ['station_ID', 'date', 'latitude', 'longitude', 'precipitation [mm]', 'temperature [°c]']
+FINAL_COLS = ['station_ID', 'date', 'lat', 'lon', 'precipitation [mm]', 'temperature [°c]']
 CURRENT_DATE = datetime.now().strftime('%Y-%m-%dT00:00:00Z')
 
 

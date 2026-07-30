@@ -103,7 +103,7 @@ def standardize_dataframe(df, schema):
                 df[col] = pd.to_numeric(df[col], errors='coerce')
                 if dtype == 'int':
                     df[col] = df[col].astype('Int64')
-            elif dtype == 'Timestamp':
+            elif dtype in ['Timestamp', 'datetime']:
                 df[col] = pd.to_datetime(df[col], format='%d.%m.%Y', errors='coerce')
             elif dtype == 'category':
                 df[col] = df[col].astype('category')

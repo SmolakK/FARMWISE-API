@@ -1,5 +1,12 @@
-from unittest.mock import MagicMock, patch
+from datetime import timedelta
+from types import SimpleNamespace
+from unittest.mock import ANY, MagicMock, patch
+
+import pytest
+from fastapi import HTTPException
+from jose import jwt
 from sqlalchemy.orm import Session
+from server import security
 from server.security import authenticate_user
 
 
@@ -43,3 +50,78 @@ def test_authenticate_user_nonexistent_user():
 
     result = authenticate_user(db, "nonexistentuser", "password")
     assert not result, "Authentication succeeded for a nonexistent user"
+
+
+def test_create_access_token_contains_subject_and_expiry(monkeypatch):
+    monkeypatch.setattr(security, "SECRET_KEY", "test-secret")
+    monkeypatch.setattr(security, "ALGORITHM", "HS256")
+
+    token = security.create_access_token(
+        {"sub": "alice"}, expires_delta=timedelta(minutes=5)
+    )
+    payload = jwt.decode(token, "test-secret", algorithms=["HS256"])
+
+    assert payload["sub"] == "alice"
+    assert "exp" in payload
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_returns_database_user(monkeypatch):
+    monkeypatch.setattr(security, "SECRET_KEY", "test-secret")
+    monkeypatch.setattr(security, "ALGORITHM", "HS256")
+    token = security.create_access_token({"sub": "alice"})
+    user = SimpleNamespace(username="alice", disabled=False)
+    lookup = MagicMock(return_value=user)
+    monkeypatch.setattr(security, "get_user_by_username", lookup)
+
+    result = await security.get_current_user(db=MagicMock(), token=token)
+
+    assert result is user
+    lookup.assert_called_once_with(ANY, username="alice")
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "token",
+    [
+        "not-a-token",
+        jwt.encode({"role": "reader"}, "test-secret", algorithm="HS256"),
+    ],
+)
+async def test_get_current_user_rejects_invalid_token(monkeypatch, token):
+    monkeypatch.setattr(security, "SECRET_KEY", "test-secret")
+    monkeypatch.setattr(security, "ALGORITHM", "HS256")
+
+    with pytest.raises(HTTPException) as exc_info:
+        await security.get_current_user(db=MagicMock(), token=token)
+
+    assert exc_info.value.status_code == 401
+    assert exc_info.value.headers["WWW-Authenticate"] == "Bearer"
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_rejects_deleted_user(monkeypatch):
+    monkeypatch.setattr(security, "SECRET_KEY", "test-secret")
+    monkeypatch.setattr(security, "ALGORITHM", "HS256")
+    token = security.create_access_token({"sub": "deleted"})
+    monkeypatch.setattr(security, "get_user_by_username", MagicMock(return_value=None))
+
+    with pytest.raises(HTTPException) as exc_info:
+        await security.get_current_user(db=MagicMock(), token=token)
+
+    assert exc_info.value.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_current_active_user_accepts_enabled_user():
+    user = SimpleNamespace(disabled=False)
+
+    assert await security.get_current_active_user(user) is user
+
+
+@pytest.mark.asyncio
+async def test_get_current_active_user_rejects_disabled_user():
+    with pytest.raises(HTTPException) as exc_info:
+        await security.get_current_active_user(SimpleNamespace(disabled=True))
+
+    assert exc_info.value.status_code == 400

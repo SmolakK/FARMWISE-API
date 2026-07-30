@@ -3,7 +3,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from server.sql_schemas import Base
 from server.schemas import UserCreate
-from server.crud import get_user_by_username, get_user_by_email, create_user
+from server.crud import (
+    create_user,
+    delete_user,
+    get_user_by_email,
+    get_user_by_username,
+)
 from server.hashing_utils import verify_password
 
 
@@ -45,3 +50,9 @@ def test_get_user_by_email(test_db):
     user = get_user_by_email(test_db, "testuser@example.com")
     assert user is not None
     assert user.email == "testuser@example.com"
+
+
+def test_delete_user(test_db):
+    assert delete_user(test_db, "testuser") is True
+    assert get_user_by_username(test_db, "testuser") is None
+    assert delete_user(test_db, "testuser") is False

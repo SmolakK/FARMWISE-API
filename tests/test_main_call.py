@@ -1,5 +1,6 @@
 import pytest
 import pandas as pd
+import asyncio
 from s2sphere import CellId, LatLng
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -96,3 +97,166 @@ async def test_read_data_with_bbox_and_country(mock_time_overlap, mock_spatial_o
     assert result_multi_country['data'] is not False, "The result should not be False (multiple countries)"
     assert "Temperature" in result_multi_country["data"].columns, "Temperature column is missing (multiple countries)"
     assert "Precipitation" in result_multi_country["data"].columns, "Precipitation column is missing (multiple countries)"
+
+
+@pytest.mark.asyncio
+async def test_read_data_requires_country_or_bounding_box():
+    from core.main_call import read_data
+
+    with pytest.raises(ValueError, match="either a 'bounding_box' or a 'country'"):
+        await read_data(
+            level=10,
+            time_from="2024-01-01",
+            time_to="2024-01-02",
+            factors=["temperature"],
+        )
+
+
+@pytest.mark.asyncio
+async def test_read_data_rejects_unknown_country(monkeypatch):
+    from core import main_call
+
+    monkeypatch.setattr(main_call, "COUNTRY_BBOXES", {"Poland": (55, 49, 24, 14)})
+
+    with pytest.raises(ValueError, match="Atlantis"):
+        await main_call.read_data(
+            country="Atlantis",
+            level=10,
+            time_from="2024-01-01",
+            time_to="2024-01-02",
+            factors=["temperature"],
+        )
+
+
+@pytest.mark.asyncio
+async def test_read_data_skips_non_overlapping_sources(monkeypatch):
+    from core import main_call
+
+    monkeypatch.setattr(
+        main_call,
+        "API_PATH_RANGES",
+        {"unused.adapter": [(55, 49, 24, 14), ("2020-01-01", "2030-01-01"), ["temperature"]]},
+    )
+    monkeypatch.setattr(main_call, "spatial_ranges_overlap", lambda *_args: False)
+    import_module = MagicMock()
+    monkeypatch.setattr(main_call.importlib, "import_module", import_module)
+
+    result = await main_call.read_data(
+        bounding_box=(55, 49, 24, 14),
+        level=10,
+        time_from="2024-01-01",
+        time_to="2024-01-02",
+        factors=["temperature"],
+    )
+
+    assert result.empty
+    import_module.assert_not_called()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("failure", [asyncio.TimeoutError(), RuntimeError("API failed")])
+async def test_read_data_isolates_adapter_failures(monkeypatch, failure):
+    from core import main_call
+
+    monkeypatch.setattr(
+        main_call,
+        "API_PATH_RANGES",
+        {"broken.adapter": [(55, 49, 24, 14), ("2020-01-01", "2030-01-01"), ["temperature"]]},
+    )
+    monkeypatch.setattr(main_call, "spatial_ranges_overlap", lambda *_args: True)
+    monkeypatch.setattr(main_call, "time_ranges_overlap", lambda *_args: True)
+    module = MagicMock()
+    module.read_data = AsyncMock(side_effect=failure)
+    monkeypatch.setattr(main_call.importlib, "import_module", lambda _name: module)
+
+    result = await main_call.read_data(
+        bounding_box=(55, 49, 24, 14),
+        level=10,
+        time_from="2024-01-01",
+        time_to="2024-01-02",
+        factors=["temperature"],
+        timeout=0.1,
+    )
+
+    assert result.empty
+
+
+@pytest.mark.asyncio
+async def test_read_data_applies_separation_interpolation_and_map(monkeypatch):
+    from core import main_call
+    from core.utils import map_ploter
+
+    cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
+    frame = pd.DataFrame(
+        [[5.0]],
+        index=pd.to_datetime(["2024-01-01"]),
+        columns=pd.MultiIndex.from_tuples([("Temperature", cell)]),
+    )
+    module = MagicMock()
+    module.read_data = AsyncMock(return_value=frame)
+    monkeypatch.setattr(
+        main_call,
+        "API_PATH_RANGES",
+        {"provider.adapter": [(55, 49, 24, 14), ("2020-01-01", "2030-01-01"), ["temperature"]]},
+    )
+    monkeypatch.setattr(main_call, "spatial_ranges_overlap", lambda *_args: True)
+    monkeypatch.setattr(main_call, "time_ranges_overlap", lambda *_args: True)
+    monkeypatch.setattr(main_call.importlib, "import_module", lambda _name: module)
+    monkeypatch.setattr(main_call, "extract_bbox", lambda _cells: (51, 51, 17, 17))
+    interpolate = MagicMock(side_effect=lambda data, *_args: data)
+    monkeypatch.setattr(main_call, "interpolate", interpolate)
+    create_map = MagicMock(return_value="<html>map</html>")
+    monkeypatch.setattr(map_ploter, "create_folium_map", create_map)
+
+    result = await main_call.read_data(
+        bounding_box=(55, 49, 24, 14),
+        level=10,
+        time_from="2024-01-01",
+        time_to="2024-01-02",
+        factors=["temperature"],
+        separate_api=True,
+        interpolation=True,
+        produce_map=True,
+    )
+
+    assert list(result["data"].columns.get_level_values(0)) == [
+        "Temperature (adapter)"
+    ]
+    assert result["map"] == "<html>map</html>"
+    assert result["metadata"]["apis"][0]["api_name"] == "adapter"
+    interpolate.assert_called_once()
+    create_map.assert_called_once_with(result["data"], downsample_factor=1)
+
+
+@pytest.mark.asyncio
+async def test_read_data_returns_empty_frame_when_concatenation_fails(monkeypatch):
+    from core import main_call
+
+    cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
+    frame = pd.DataFrame(
+        [[5.0]],
+        index=pd.to_datetime(["2024-01-01"]),
+        columns=pd.MultiIndex.from_tuples([("Temperature", cell)]),
+    )
+    module = MagicMock()
+    module.read_data = AsyncMock(return_value=frame)
+    monkeypatch.setattr(
+        main_call,
+        "API_PATH_RANGES",
+        {"provider.adapter": [(55, 49, 24, 14), ("2020-01-01", "2030-01-01"), ["temperature"]]},
+    )
+    monkeypatch.setattr(main_call, "spatial_ranges_overlap", lambda *_args: True)
+    monkeypatch.setattr(main_call, "time_ranges_overlap", lambda *_args: True)
+    monkeypatch.setattr(main_call.importlib, "import_module", lambda _name: module)
+    monkeypatch.setattr(main_call, "extract_bbox", lambda _cells: (51, 51, 17, 17))
+    monkeypatch.setattr(main_call.pd, "concat", MagicMock(side_effect=ValueError("bad frames")))
+
+    result = await main_call.read_data(
+        bounding_box=(55, 49, 24, 14),
+        level=10,
+        time_from="2024-01-01",
+        time_to="2024-01-02",
+        factors=["temperature"],
+    )
+
+    assert result.empty
