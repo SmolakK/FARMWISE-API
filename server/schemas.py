@@ -72,6 +72,12 @@ class ReadDataRequest(BaseModel):
         True,
         description="Persist a quality report for each successful source."
     )
+    assess_quality: Optional[bool] = Field(
+        True,
+        description=(
+            "Run per-source quality assessment. Disable for lower latency."
+        )
+    )
 
     @field_validator("time_from", "time_to")
     def validate_date(cls, value):

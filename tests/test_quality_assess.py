@@ -120,3 +120,78 @@ def test_persist_quality_report_writes_standard_json(tmp_path):
     assert path.parent == tmp_path
     assert payload["request_id"] == "request-1"
     assert payload["api_name"] == "mock"
+
+
+def test_s2_covering_is_cached_between_source_reports(monkeypatch):
+    calls = []
+    quality_assess._get_s2_cells_cached.cache_clear()
+    monkeypatch.setattr(
+        quality_assess,
+        "get_s2_cells",
+        lambda bbox, level: calls.append((bbox, level)) or ["cell-1"],
+    )
+    arguments = (
+        _quality_frame(),
+        {
+            "api_name": "mock",
+            "columns": ["Temperature [C]", "Precipitation [mm]"],
+        },
+        (
+            (55, 49, 24, 14),
+            ("2020-01-01", "2030-01-01"),
+            ["temperature", "precipitation"],
+        ),
+        {
+            "bbox": (52, 50, 20, 16),
+            "level": 10,
+            "time_from": "2024-01-01",
+            "time_to": "2024-01-03",
+            "factors": ["temperature", "precipitation"],
+        },
+    )
+
+    quality_assess.assess_data_quality(*arguments)
+    quality_assess.assess_data_quality(*arguments)
+
+    assert calls == [((52, 50, 20, 16), 10)]
+    quality_assess._get_s2_cells_cached.cache_clear()
+
+
+def test_long_expected_period_uses_counts_for_missing_rates(monkeypatch):
+    monkeypatch.setattr(
+        quality_assess,
+        "_get_s2_cells_cached",
+        lambda _bbox, _level: ("cell-1",),
+    )
+    frame = pd.DataFrame(
+        [[1.0], [2.0]],
+        index=pd.to_datetime(["2000-01-01", "2000-01-02"]),
+        columns=pd.MultiIndex.from_tuples([("Temperature [C]", "cell-1")]),
+    )
+
+    report = quality_assess.assess_data_quality(
+        frame,
+        {"api_name": "mock", "columns": ["Temperature [C]"]},
+        (
+            (55, 49, 24, 14),
+            ("1900-01-01", "2100-12-31"),
+            ["temperature"],
+        ),
+        {
+            "bbox": (52, 50, 20, 16),
+            "level": 10,
+            "time_from": "1900-01-01",
+            "time_to": "2100-12-31",
+            "factors": ["temperature"],
+        },
+    )
+
+    expected_days = (
+        pd.Timestamp("2100-12-31") - pd.Timestamp("1900-01-01")
+    ).days + 1
+    assert report["total_missing_values"] == pytest.approx(
+        1 - 2 / expected_days
+    )
+    assert report["missing_days"] == pytest.approx(
+        1 - 2 / expected_days
+    )

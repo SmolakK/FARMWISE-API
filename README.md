@@ -115,6 +115,16 @@ metadata = result["metadata"]
 `read_data` is asynchronous, so applications already using asyncio should call
 it with `await read_data(...)`.
 
+Per-source quality assessment is enabled by default. For latency-sensitive
+requests it can be skipped explicitly:
+
+```python
+result = await read_data(..., assess_quality=False)
+```
+
+When enabled, quality reports run concurrently with subsequent adapter calls
+and reuse cached S2 coverings.
+
 When several sources provide the same value, FARMWISE harmonizes them using
 the source weights and per-data-type methods defined in
 `adapters.mappings.data_source_mapping`. Both dictionaries can also be

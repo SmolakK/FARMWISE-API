@@ -26,6 +26,49 @@ logger = logging.getLogger(__name__)
 COUNTRY_BBOXES = return_country_bboxes()
 
 
+async def _assess_source_quality(
+    *,
+    frame,
+    metadata,
+    ranges,
+    request_ranges,
+    persist,
+    output_dir,
+    request_id,
+    source,
+):
+    """Run and optionally persist one source report without blocking the loop."""
+    started = perf_counter()
+    try:
+        report = await asyncio.to_thread(
+            assess_data_quality,
+            frame,
+            metadata,
+            ranges,
+            request_ranges,
+        )
+        if persist:
+            report_path = await asyncio.to_thread(
+                persist_quality_report,
+                report,
+                output_dir=output_dir,
+                request_id=request_id,
+                source=source,
+            )
+            report["report_path"] = str(report_path)
+        report["assessment_wall_seconds"] = perf_counter() - started
+        return report
+    except Exception as error:
+        logger.warning("Quality assessment failed for %s: %s", source, error)
+        return {
+            "api_name": metadata["api_name"],
+            "source": source,
+            "status": "error",
+            "error": str(error),
+            "assessment_wall_seconds": perf_counter() - started,
+        }
+
+
 def plan_source_dispatch(
     bounding_box,
     time_from,
@@ -61,7 +104,8 @@ def plan_source_dispatch(
 async def read_data(bounding_box=None, country=None, level=None, time_from=None, time_to=None,
                     factors=None, separate_api=False, timeout=600, interpolation=False,
                     produce_map=False, source_weights=None, harmonization_methods=None,
-                    persist_quality_reports=True, quality_report_dir=None):
+                    assess_quality=True, persist_quality_reports=True,
+                    quality_report_dir=None):
     """
     Main data reading call - combines different APIs which overlap with the requested area and time range.
 
@@ -77,6 +121,8 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                                   DATA_TYPE_HARMONIZATION_METHODS.
     :param persist_quality_reports: Persist each per-source quality assessment
                                     as JSON when True.
+    :param assess_quality: Run per-source quality assessment when True. Set to
+                           False for latency-sensitive calls.
     :param quality_report_dir: Optional report directory override. By default
                                reports use the FARMWISE cache directory.
     :param bounding_box: A tuple containing the geographical coordinates (N, S, E, W) of the area for which data is requested.
@@ -106,6 +152,7 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     data_storage = []  # (source path, DataFrame, matching logical data types)
     api_metadata = []
     api_reports = []
+    quality_tasks = []
     dispatch_metrics = []
     request_id = uuid4().hex
     if country is not None:
@@ -187,37 +234,20 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                 "time_to": time_to,
                 "factors": factors,
             }
-            try:
-                api_report = await asyncio.to_thread(
-                    assess_data_quality,
-                    api_response_data,
-                    meta,
-                    ranges,
-                    request_ranges,
-                )
-                if persist_quality_reports:
-                    report_path = await asyncio.to_thread(
-                        persist_quality_report,
-                        api_report,
-                        output_dir=quality_report_dir,
-                        request_id=request_id,
-                        source=api_name,
+            if assess_quality:
+                quality_tasks.append(
+                    asyncio.create_task(
+                        _assess_source_quality(
+                            frame=api_response_data.copy(deep=False),
+                            metadata=meta,
+                            ranges=ranges,
+                            request_ranges=request_ranges,
+                            persist=persist_quality_reports,
+                            output_dir=quality_report_dir,
+                            request_id=request_id,
+                            source=api_name,
+                        )
                     )
-                    api_report["report_path"] = str(report_path)
-                api_reports.append(api_report)
-            except Exception as quality_error:
-                logger.warning(
-                    "Quality assessment failed for %s: %s",
-                    api_name,
-                    quality_error,
-                )
-                api_reports.append(
-                    {
-                        "api_name": api_name_suffix,
-                        "source": api_name,
-                        "status": "error",
-                        "error": str(quality_error),
-                    }
                 )
 
             if separate_api:
@@ -250,6 +280,11 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                 }
             )
 
+    quality_wait_started = perf_counter()
+    if quality_tasks:
+        api_reports = list(await asyncio.gather(*quality_tasks))
+    quality_wait_seconds = perf_counter() - quality_wait_started
+
     # Concatenate data if any DataFrames were retrieved
     if data_storage:
         try:
@@ -271,6 +306,11 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                         "request_id": request_id,
                         "apis": api_metadata,
                         "quality_reports": api_reports,
+                        "quality_assessment": {
+                            "enabled": assess_quality,
+                            "sources_assessed": len(api_reports),
+                            "final_wait_seconds": quality_wait_seconds,
+                        },
                         "coverage_precheck": {
                             "candidate_sources": len(dispatch_plan),
                             "dispatched_sources": sum(
@@ -377,13 +417,22 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
 #     asyncio.run(read_data(**case))
 
 # Example using bounding box
-# asyncio.run(read_data(bounding_box=(71, 34, 45, -25), level=10, time_from='2010-01-10', time_to='2010-02-10', factors=['temperature', 'precipitation','potential evaporation',
-#                                                                                                                        'soil','surface water quantity','land cover','hydraulic conductivity',
-#                                                                                                                        'depth to watertable','groundwater quality','groundwater quantity',
-#                                                                                                                        'surface water quality',]))
-#
-# Example using country
-# asyncio.run(read_data(country='Poland', level=10, time_from='2017-01-10', time_to='2017-01-12', factors=['temperature', 'precipitation'], produce_map=True))
+if __name__ == "__main__":
+    asyncio.run(read_data(
+        bounding_box=(71, 34, 45, -25),
+        level=10,
+        time_from='2010-01-10',
+        time_to='2010-02-10',
+        factors=[
+            'temperature', 'precipitation', 'potential evaporation',
+            'soil', 'surface water quantity', 'land cover',
+            'hydraulic conductivity', 'depth to watertable',
+            'groundwater quality', 'groundwater quantity',
+            'surface water quality',
+        ],
+    ))
+
+    # asyncio.run(read_data(country='Poland', level=10, time_from='2017-01-10', time_to='2017-01-12', factors=['temperature', 'precipitation'], produce_map=True))
 
 
 __all__ = ["plan_source_dispatch", "read_data"]

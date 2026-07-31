@@ -69,6 +69,7 @@ async def process_and_send_email(request_body, request, user_email):
             interpolation=interpolation,
             source_weights=source_weights,
             harmonization_methods=harmonization_methods,
+            assess_quality=getattr(request_body, "assess_quality", True),
             persist_quality_reports=getattr(
                 request_body, "persist_quality_reports", True
             ),
@@ -145,6 +146,7 @@ async def read_data_endpoint(
             harmonization_methods=getattr(
                 request_body, "harmonization_methods", None
             ),
+            assess_quality=getattr(request_body, "assess_quality", True),
             persist_quality_reports=getattr(
                 request_body, "persist_quality_reports", True
             ),
@@ -282,6 +284,7 @@ async def read_data_direct(
             harmonization_methods=getattr(
                 request_body, "harmonization_methods", None
             ),
+            assess_quality=getattr(request_body, "assess_quality", True),
             persist_quality_reports=getattr(
                 request_body, "persist_quality_reports", True
             ),

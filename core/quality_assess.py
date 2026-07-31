@@ -3,20 +3,24 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from functools import lru_cache
 import json
 import math
 from pathlib import Path
 import re
+from threading import Lock
 from typing import Any
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import is_numeric_dtype
 
 from core.utils.coordinates_to_cells import get_s2_cells
 from core.utils.paths import CACHE_ROOT
 
 
 DEFAULT_QUALITY_REPORT_DIR = CACHE_ROOT / "quality_reports"
+_S2_CACHE_LOCK = Lock()
 
 
 def bbox_intersects(b1, b2):
@@ -36,7 +40,7 @@ def bbox_intersects(b1, b2):
 
 def assess_data_quality(df, metadata, ranges, req_ranges):
     """Assess one source response against its advertised and requested coverage."""
-    frame = df.copy()
+    frame = df.copy(deep=False)
     api_bbox = ranges[0]
     api_time = ranges[1]
     api_factors = list(ranges[2])
@@ -51,7 +55,9 @@ def assess_data_quality(df, metadata, ranges, req_ranges):
 
     intersects, intersection = bbox_intersects(api_bbox, req_bbox)
     expected_cells = (
-        set(get_s2_cells(intersection, req_level)) if intersects else set()
+        set(_get_s2_cells_cached(tuple(intersection), req_level))
+        if intersects
+        else set()
     )
     returned_cells = (
         set(frame.columns.get_level_values(1).unique())
@@ -69,11 +75,16 @@ def assess_data_quality(df, metadata, ranges, req_ranges):
 
     actual_start = max(req_start, api_start)
     actual_end = min(req_end, api_end)
-    numeric = frame.apply(pd.to_numeric, errors="coerce")
+    numeric = (
+        frame.copy(deep=False)
+        if all(is_numeric_dtype(dtype) for dtype in frame.dtypes)
+        else frame.apply(pd.to_numeric, errors="coerce")
+    )
     numeric.index = pd.to_datetime(numeric.index)
     numeric = numeric.sort_index()
 
     daily = _daily_frame(numeric, actual_start, actual_end)
+    expected_days = _expected_day_count(actual_start, actual_end)
     report = {
         "api_name": metadata.get("api_name"),
         "source": metadata.get("source", metadata.get("api_name")),
@@ -84,10 +95,18 @@ def assess_data_quality(df, metadata, ranges, req_ranges):
             len(expected_cells.intersection(returned_cells)),
             len(expected_cells),
         ),
-        "total_missing_values": _missing_rate(daily),
-        "factor_missing_values": _missing_rate(daily),
-        "factor_missing_value_rates": _factor_missing_rates(daily),
-        "missing_days": _missing_day_rate(daily),
+        "total_missing_values": _missing_rate(
+            daily, expected_rows=expected_days
+        ),
+        "factor_missing_values": _missing_rate(
+            daily, expected_rows=expected_days
+        ),
+        "factor_missing_value_rates": _factor_missing_rates(
+            daily, expected_rows=expected_days
+        ),
+        "missing_days": _missing_day_rate(
+            daily, expected_rows=expected_days
+        ),
         "expected_start": actual_start.isoformat(),
         "expected_end": actual_end.isoformat(),
         "returned_start": _timestamp_or_none(numeric.index.min()),
@@ -137,6 +156,21 @@ def persist_quality_report(
     return path
 
 
+@lru_cache(maxsize=32)
+def _get_s2_cells_cached_inner(bbox: tuple, level: int) -> tuple:
+    """Cache immutable S2 coverings reused by overlapping source reports."""
+    return tuple(get_s2_cells(bbox, level))
+
+
+def _get_s2_cells_cached(bbox: tuple, level: int) -> tuple:
+    """Serialize cache misses so concurrent source reports compute once."""
+    with _S2_CACHE_LOCK:
+        return _get_s2_cells_cached_inner(bbox, level)
+
+
+_get_s2_cells_cached.cache_clear = _get_s2_cells_cached_inner.cache_clear
+
+
 def _daily_frame(
     frame: pd.DataFrame,
     expected_start: pd.Timestamp,
@@ -145,12 +179,18 @@ def _daily_frame(
     if frame.empty or expected_start > expected_end:
         return pd.DataFrame(columns=frame.columns)
     daily = frame.resample("D").mean()
-    expected_days = pd.date_range(
-        expected_start.normalize(),
-        expected_end.normalize(),
-        freq="D",
-    )
-    return daily.reindex(expected_days)
+    return daily.loc[
+        expected_start.normalize():expected_end.normalize()
+    ]
+
+
+def _expected_day_count(
+    expected_start: pd.Timestamp,
+    expected_end: pd.Timestamp,
+) -> int:
+    if expected_start > expected_end:
+        return 0
+    return (expected_end.normalize() - expected_start.normalize()).days + 1
 
 
 def _factor_columns(frame: pd.DataFrame) -> list[Any]:
@@ -161,7 +201,11 @@ def _factor_columns(frame: pd.DataFrame) -> list[Any]:
     return list(frame.columns.unique())
 
 
-def _factor_missing_rates(frame: pd.DataFrame) -> dict[str, float | None]:
+def _factor_missing_rates(
+    frame: pd.DataFrame,
+    *,
+    expected_rows: int | None = None,
+) -> dict[str, float | None]:
     rates = {}
     for factor in _factor_columns(frame):
         values = (
@@ -169,20 +213,37 @@ def _factor_missing_rates(frame: pd.DataFrame) -> dict[str, float | None]:
             if isinstance(frame.columns, pd.MultiIndex)
             else frame[[factor]]
         )
-        rates[str(factor)] = _missing_rate(values)
+        rates[str(factor)] = _missing_rate(
+            values, expected_rows=expected_rows
+        )
     return rates
 
 
-def _missing_rate(frame: pd.DataFrame) -> float | None:
-    if frame.size == 0:
+def _missing_rate(
+    frame: pd.DataFrame,
+    *,
+    expected_rows: int | None = None,
+) -> float | None:
+    rows = frame.shape[0] if expected_rows is None else expected_rows
+    expected_values = rows * frame.shape[1]
+    if expected_values == 0:
         return None
-    return float(frame.isna().to_numpy().mean())
+    returned_values = int(frame.notna().to_numpy().sum())
+    return float(1 - min(returned_values, expected_values) / expected_values)
 
 
-def _missing_day_rate(frame: pd.DataFrame) -> float | None:
-    if frame.shape[0] == 0:
+def _missing_day_rate(
+    frame: pd.DataFrame,
+    *,
+    expected_rows: int | None = None,
+) -> float | None:
+    rows = frame.shape[0] if expected_rows is None else expected_rows
+    if rows == 0 or frame.shape[1] == 0:
         return None
-    return float(frame.isna().any(axis=1).mean())
+    represented_rows = min(frame.shape[0], rows)
+    absent_rows = rows - represented_rows
+    incomplete_returned_rows = int(frame.isna().any(axis=1).sum())
+    return float((absent_rows + incomplete_returned_rows) / rows)
 
 
 def _factor_completeness(

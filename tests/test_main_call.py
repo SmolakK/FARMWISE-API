@@ -440,3 +440,107 @@ async def test_read_data_persists_per_source_quality_report(monkeypatch, tmp_pat
     assert result["metadata"]["coverage_precheck"]["dispatched_sources"] == 1
     assert result["metadata"]["coverage_precheck"]["requests_avoided"] == 1
     assert result["metadata"]["dispatch"][0]["status"] == "success"
+
+
+@pytest.mark.asyncio
+async def test_read_data_can_skip_quality_assessment(monkeypatch):
+    from core import main_call
+
+    cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
+    frame = pd.DataFrame(
+        [[5.0]],
+        index=pd.to_datetime(["2024-01-01"]),
+        columns=pd.MultiIndex.from_tuples([("Temperature", cell)]),
+    )
+    module = MagicMock()
+    module.read_data = AsyncMock(return_value=frame)
+    monkeypatch.setattr(
+        main_call,
+        "API_PATH_RANGES",
+        {
+            "provider.adapter": [
+                (55, 49, 24, 14),
+                ("2020-01-01", "2030-01-01"),
+                ["temperature"],
+            ]
+        },
+    )
+    monkeypatch.setattr(main_call.importlib, "import_module", lambda _name: module)
+    monkeypatch.setattr(main_call, "extract_bbox", lambda _cells: (51, 51, 17, 17))
+    assess = MagicMock()
+    monkeypatch.setattr(main_call, "assess_data_quality", assess)
+
+    result = await main_call.read_data(
+        bounding_box=(55, 49, 24, 14),
+        level=10,
+        time_from="2024-01-01",
+        time_to="2024-01-02",
+        factors=["temperature"],
+        assess_quality=False,
+    )
+
+    assess.assert_not_called()
+    assert result["metadata"]["quality_reports"] == []
+    assert result["metadata"]["quality_assessment"] == {
+        "enabled": False,
+        "sources_assessed": 0,
+        "final_wait_seconds": pytest.approx(0, abs=0.01),
+    }
+
+
+@pytest.mark.asyncio
+async def test_source_quality_assessments_run_concurrently(monkeypatch):
+    from threading import Barrier
+    from core import main_call
+
+    cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
+    frame = pd.DataFrame(
+        [[5.0]],
+        index=pd.to_datetime(["2024-01-01"]),
+        columns=pd.MultiIndex.from_tuples([("Temperature", cell)]),
+    )
+    modules = {}
+    for source in ("provider.first", "provider.second"):
+        module = MagicMock()
+        module.read_data = AsyncMock(return_value=frame)
+        modules[source] = module
+    monkeypatch.setattr(
+        main_call,
+        "API_PATH_RANGES",
+        {
+            source: [
+                (55, 49, 24, 14),
+                ("2020-01-01", "2030-01-01"),
+                ["temperature"],
+            ]
+            for source in modules
+        },
+    )
+    monkeypatch.setattr(
+        main_call.importlib, "import_module", lambda name: modules[name]
+    )
+    monkeypatch.setattr(main_call, "extract_bbox", lambda _cells: (51, 51, 17, 17))
+    barrier = Barrier(2)
+
+    def assess(_frame, metadata, _ranges, _request):
+        barrier.wait(timeout=2)
+        return {"api_name": metadata["api_name"]}
+
+    monkeypatch.setattr(main_call, "assess_data_quality", assess)
+
+    result = await main_call.read_data(
+        bounding_box=(55, 49, 24, 14),
+        level=10,
+        time_from="2024-01-01",
+        time_to="2024-01-02",
+        factors=["temperature"],
+        persist_quality_reports=False,
+    )
+
+    assert {
+        report["api_name"] for report in result["metadata"]["quality_reports"]
+    } == {"first", "second"}
+    assert all(
+        report.get("status") != "error"
+        for report in result["metadata"]["quality_reports"]
+    )

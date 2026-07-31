@@ -20,6 +20,7 @@ def test_valid_read_data_request():
         "interpolation": False,
         "source_weights": {"provider.module": 2.0},
         "harmonization_methods": {"temperature": "weighted_mean"},
+        "assess_quality": False,
     }
     request = ReadDataRequest(**data)
     assert request.bounding_box == valid_bounding_box
@@ -31,6 +32,7 @@ def test_valid_read_data_request():
     assert request.harmonization_methods == {
         "temperature": "weighted_mean"
     }
+    assert request.assess_quality is False
 
 
 def test_invalid_date_format():

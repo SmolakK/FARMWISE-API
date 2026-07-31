@@ -53,6 +53,9 @@ result = await read_data(
 ```
 
 Set `persist_quality_reports=False` only when persistence is not wanted.
+For latency-sensitive production calls, set `assess_quality=False`; this skips
+both assessment and persistence. S2 coverings are cached, and enabled reports
+are evaluated concurrently with subsequent adapter calls.
 
 ## 2.2 Coverage pre-check
 
