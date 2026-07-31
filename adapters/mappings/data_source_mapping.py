@@ -205,6 +205,16 @@ API_PATH_RANGES = {
     )
 }
 
+# Sources retained for provenance but intentionally excluded from dispatch.
+# The CDS agroproductivity collection is still visible in the catalogue, but
+# its API now returns HTTP 403 because downloads have been permanently retired.
+DISABLED_API_SOURCES = {
+    'adapters.API_readers.cds.cds_vegetation': (
+        'The CDS sis-agroproductivity-indicators dataset is deprecated and '
+        'downloads are no longer supported.'
+    ),
+}
+
 # Relative confidence assigned to each source during cross-source
 # harmonization.  The values are deliberately neutral until they are
 # calibrated against reference datasets.  A missing future source also

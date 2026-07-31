@@ -2,7 +2,10 @@ import pytest
 from unittest.mock import patch, MagicMock
 import pandas as pd
 from datetime import datetime
-from adapters.API_readers.cds.cds_single_levels import read_data
+from adapters.API_readers.cds.cds_single_levels import (
+    _open_downloaded_dataset,
+    read_data,
+)
 
 
 @pytest.mark.asyncio
@@ -78,3 +81,24 @@ async def test_read_data(mock_prepare_coordinates, mock_open_dataset, mock_cds_c
     # Ensure the result is pivoted by Timestamp and S2CELL
     assert result.index.name == "Timestamp"
     assert "S2CELL" in result.columns.names
+
+
+def test_open_downloaded_dataset_extracts_zip_wrapped_netcdf(tmp_path):
+    import zipfile
+
+    archive_path = tmp_path / "era5.nc"
+    source_path = tmp_path / "data.nc"
+    source_path.write_bytes(b"netcdf-placeholder")
+    with zipfile.ZipFile(archive_path, "w") as archive:
+        archive.write(source_path, arcname="data.nc")
+
+    dataset = MagicMock()
+    with patch(
+        "adapters.API_readers.cds.cds_single_levels.xr.open_dataset",
+        return_value=dataset,
+    ) as open_dataset:
+        assert _open_downloaded_dataset(archive_path) is dataset
+
+    opened_path = open_dataset.call_args.args[0]
+    assert opened_path.name == "data.nc"
+    assert opened_path.parent.name == "extracted"

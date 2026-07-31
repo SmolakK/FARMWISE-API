@@ -31,7 +31,7 @@ dependencies = [
     "soilgrids",
     "tenacity",
     "tqdm",
-    "wetterdienst",
+    "wetterdienst>=0.109",
     "xarray",
 ]
 

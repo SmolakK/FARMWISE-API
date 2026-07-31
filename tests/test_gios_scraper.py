@@ -64,3 +64,27 @@ async def test_read_data(mock_read_csv, mock_prepare_coordinates, mock_scrape_po
     assert result is not None, "The returned DataFrame is None"
     assert isinstance(result, pd.DataFrame), "The returned result is not a DataFrame"
     assert "cell1" in result.columns.get_level_values(1), "S2CELL mapping failed"
+
+
+@pytest.mark.asyncio
+@patch("adapters.API_readers.gios.gios_scraper.extract_point_ids", return_value="")
+@patch("adapters.API_readers.gios.gios_scraper.prepare_coordinates")
+@patch("adapters.API_readers.gios.gios_scraper.pd.read_csv")
+async def test_read_data_returns_none_when_gios_has_no_point_ids(
+    mock_read_csv,
+    mock_prepare_coordinates,
+    _mock_extract_point_ids,
+):
+    coordinates = pd.DataFrame({"id": [123], "S2CELL": ["cell1"]})
+    mock_read_csv.return_value = coordinates
+    mock_prepare_coordinates.return_value = coordinates
+
+    with pytest.warns(UserWarning, match="no measurement points"):
+        result = await read_data(
+            (55, 49, 24, 14),
+            ("2020-01-01", "2020-12-31"),
+            ["soil"],
+            8,
+        )
+
+    assert result is None

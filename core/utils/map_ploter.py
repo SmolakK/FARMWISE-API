@@ -116,8 +116,8 @@ def raster_to_png_base64(raster, vmin, vmax, colormap='viridis', downsample=4):
         raster_normalized[valid_mask] = normalized.astype(np.uint8)
 
     # Map to RGBA using matplotlib
-    from matplotlib import cm as mpl_cm
-    cmap = mpl_cm.get_cmap(colormap)
+    from matplotlib import colormaps
+    cmap = colormaps.get_cmap(colormap)
     rgba_image = cmap(raster_normalized)
     rgba_image[~valid_mask] = [0, 0, 0, 0]  # transparent where NaN
 

@@ -103,7 +103,10 @@ async def read_data(spatial_range, time_range, data_range, level):
     time_from = datetime.strptime(time_from, '%Y-%m-%d').year
     time_to = datetime.strptime(time_to, '%Y-%m-%d').year
 
-    between_years = [(s, e) for s, e in avail_years if e >= time_from and s <= time_from]
+    between_years = [(s, e) for s, e in avail_years if e >= time_from and s <= time_to]
+    if not between_years:
+        warnings.warn("GIOS has no measurements in the requested time range")
+        return None
     lowest_range = min([x[0] for x in between_years])
     highest_range = max([x[1] for x in between_years])
 
@@ -126,9 +129,11 @@ async def read_data(spatial_range, time_range, data_range, level):
 
     # Keeping the same order for the parameters
     parameter_order = parameter_values.copy()
-    point_ids = point_ids.split(',')
-    point_ids = list(map(int, point_ids))
+    point_ids = [int(value) for value in point_ids.split(',') if value.strip().isdigit()]
     point_ids = list(set(point_ids).intersection(set(coordinates.id)))
+    if not point_ids:
+        warnings.warn("GIOS returned no measurement points for the requested area")
+        return None
 
     for point_id in tqdm(point_ids, total=len(point_ids)):
         df = await scrape_point_data(point_id, parameter_values, parameter_order)

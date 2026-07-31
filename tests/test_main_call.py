@@ -386,6 +386,29 @@ def test_plan_source_dispatch_records_each_precheck_reason():
     assert sum(not item["dispatched"] for item in plan) == 3
 
 
+def test_plan_source_dispatch_skips_disabled_source():
+    from core.main_call import plan_source_dispatch
+
+    source_ranges = {
+        "retired.source": [
+            (55, 49, 24, 14),
+            ("2020-01-01", "2030-01-01"),
+            ["temperature"],
+        ]
+    }
+    plan = plan_source_dispatch(
+        (55, 49, 24, 14),
+        "2024-01-01",
+        "2024-01-02",
+        ["temperature"],
+        source_ranges=source_ranges,
+        disabled_sources={"retired.source": "retired upstream"},
+    )
+
+    assert plan[0]["dispatched"] is False
+    assert plan[0]["disabled_reason"] == "retired upstream"
+
+
 @pytest.mark.asyncio
 async def test_read_data_persists_per_source_quality_report(monkeypatch, tmp_path):
     from core import main_call
@@ -428,6 +451,8 @@ async def test_read_data_persists_per_source_quality_report(monkeypatch, tmp_pat
         time_from="2024-01-01",
         time_to="2024-01-02",
         factors=["temperature"],
+        assess_quality=True,
+        persist_quality_reports=True,
         quality_report_dir=tmp_path,
     )
 
@@ -534,6 +559,7 @@ async def test_source_quality_assessments_run_concurrently(monkeypatch):
         time_from="2024-01-01",
         time_to="2024-01-02",
         factors=["temperature"],
+        assess_quality=True,
         persist_quality_reports=False,
     )
 

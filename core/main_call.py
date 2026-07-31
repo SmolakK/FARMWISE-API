@@ -2,6 +2,7 @@ from adapters.mappings.data_source_mapping import (
     API_PATH_RANGES,
     DATA_SOURCE_WEIGHTS,
     DATA_TYPE_HARMONIZATION_METHODS,
+    DISABLED_API_SOURCES,
 )
 from core.harmonization import (
     DEFAULT_SOURCE_WEIGHT,
@@ -75,13 +76,18 @@ def plan_source_dispatch(
     time_to,
     factors,
     source_ranges=None,
+    disabled_sources=None,
 ):
     """Evaluate the coverage pre-check for every configured source."""
-    source_ranges = API_PATH_RANGES if source_ranges is None else source_ranges
+    using_default_sources = source_ranges is None
+    source_ranges = API_PATH_RANGES if using_default_sources else source_ranges
+    if disabled_sources is None:
+        disabled_sources = DISABLED_API_SOURCES if using_default_sources else {}
     requested_factors = set(factors or [])
     plan = []
 
     for source, ranges in source_ranges.items():
+        disabled_reason = disabled_sources.get(source)
         spatial_overlap = spatial_ranges_overlap(bounding_box, ranges[0])
         temporal_overlap = time_ranges_overlap(
             (time_from, time_to), ranges[1]
@@ -93,8 +99,12 @@ def plan_source_dispatch(
                 "spatial_overlap": spatial_overlap,
                 "temporal_overlap": temporal_overlap,
                 "factor_overlap": factor_overlap,
+                "disabled_reason": disabled_reason,
                 "dispatched": bool(
-                    spatial_overlap and temporal_overlap and factor_overlap
+                    not disabled_reason
+                    and spatial_overlap
+                    and temporal_overlap
+                    and factor_overlap
                 ),
             }
         )
@@ -104,7 +114,7 @@ def plan_source_dispatch(
 async def read_data(bounding_box=None, country=None, level=None, time_from=None, time_to=None,
                     factors=None, separate_api=False, timeout=600, interpolation=False,
                     produce_map=False, source_weights=None, harmonization_methods=None,
-                    assess_quality=True, persist_quality_reports=True,
+                    assess_quality=False, persist_quality_reports=False,
                     quality_report_dir=None):
     """
     Main data reading call - combines different APIs which overlap with the requested area and time range.
@@ -418,8 +428,22 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
 
 # Example using bounding box
 if __name__ == "__main__":
+    # asyncio.run(read_data(
+    #     bounding_box=(71, 34, 45, -25),
+    #     level=10,
+    #     time_from='2010-01-10',
+    #     time_to='2010-02-10',
+    #     factors=[
+    #         'temperature', 'precipitation', 'potential evaporation',
+    #         'soil', 'surface water quantity', 'land cover',
+    #         'hydraulic conductivity', 'depth to watertable',
+    #         'groundwater quality', 'groundwater quantity',
+    #         'surface water quality',
+    #     ],
+    #     produce_map=True
+    # ))
     asyncio.run(read_data(
-        bounding_box=(71, 34, 45, -25),
+        country=['Austria'],
         level=10,
         time_from='2010-01-10',
         time_to='2010-02-10',
@@ -431,8 +455,6 @@ if __name__ == "__main__":
             'surface water quality',
         ],
     ))
-
-    # asyncio.run(read_data(country='Poland', level=10, time_from='2017-01-10', time_to='2017-01-12', factors=['temperature', 'precipitation'], produce_map=True))
 
 
 __all__ = ["plan_source_dispatch", "read_data"]
