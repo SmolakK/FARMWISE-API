@@ -211,12 +211,12 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.wetterdienst_dwd" />
       <item itemvalue="Python.CHMI_meteo" />
       <item itemvalue="Python.egdi_read_d10" />
       <item itemvalue="Python.hubeau_piezo_read" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.main_call" />
+      <item itemvalue="Python.wetterdienst_dwd" />
     </list>
     <recent_temporary>
       <list>
