@@ -8,6 +8,8 @@ from adapters.API_readers.gios.gios_mappings import gios_mapping
 from datetime import datetime
 import warnings
 from core.utils.coordinates_to_cells import prepare_coordinates
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 from core.utils.paths import adapter_data
 import asyncio
 
@@ -85,7 +87,8 @@ async def scrape_point_data(point_id, parameter_values, parameter_order):
     return pivot_table
 
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level,
+                    within_source_aggregation_methods=None):
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.
@@ -160,11 +163,13 @@ async def read_data(spatial_range, time_range, data_range, level):
     final_dataframe = pd.concat((final_dataframe.drop(constant_columns_numeric, axis=1), final_dataframe_numeric),
                                 axis=1)
 
-    # Average overlapping
-    original_size = final_dataframe.shape[0]
-    final_dataframe = final_dataframe.groupby(['S2CELL', 'year']).mean()
-    if original_size != final_dataframe.shape[0]:
-        warnings.warn("Some data were aggregated")
+    final_dataframe = aggregate_to_s2(
+        final_dataframe,
+        group_by=("S2CELL", "year"),
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+    )
     final_dataframe = final_dataframe.T.groupby(level=0).mean().T
 
     # Explode to days

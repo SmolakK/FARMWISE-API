@@ -5,12 +5,15 @@ import pandas as pd
 from datetime import datetime
 from core.utils.coordinates_to_cells import prepare_coordinates
 import warnings
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 import zipfile
 import glob
 from adapters.API_readers.cds.cds_mappings.cds_vegetation_mapping import GLOBAL_MAPPING, DATA_ALIASES
 
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level,
+                    within_source_aggregation_methods=None):
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.
@@ -102,11 +105,13 @@ async def read_data(spatial_range, time_range, data_range, level):
     # S2Cell Mapping
     df = prepare_coordinates(df, spatial_range, level)
 
-    # Average overlapping data
-    original_size = df.shape[0]
-    df = df.groupby(['S2CELL', 'Timestamp']).mean()
-    if original_size != df.shape[0]:
-        warnings.warn("Some data were aggregated due to overlapping cells.")
+    df = aggregate_to_s2(
+        df,
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_aggregations={"lat": "mean", "lon": "mean"},
+    )
 
     df = df.reset_index()
     df.drop(['lat', 'lon'], axis=1, inplace=True)

@@ -3,6 +3,7 @@ from adapters.mappings.data_source_mapping import (
     DATA_SOURCE_WEIGHTS,
     DATA_TYPE_HARMONIZATION_METHODS,
     DISABLED_API_SOURCES,
+    WITHIN_SOURCE_AGGREGATION_METHODS,
 )
 from core.harmonization import (
     DEFAULT_SOURCE_WEIGHT,
@@ -11,12 +12,14 @@ from core.harmonization import (
     validate_source_weights,
 )
 from core.quality_assess import assess_data_quality, persist_quality_report
+from core.within_source_aggregation import validate_within_source_methods
 from core.utils.overlap_checks import spatial_ranges_overlap, time_ranges_overlap
 from core.utils.interpolate_data import interpolate
 from core.utils.cells_to_coordinates import extract_bbox
 from core.utils.country_bboxes import return_country_bboxes
 from core.utils.merge_bboxes import merge_bounding_boxes
 import importlib
+import inspect
 import pandas as pd
 import logging
 import asyncio
@@ -114,6 +117,7 @@ def plan_source_dispatch(
 async def read_data(bounding_box=None, country=None, level=None, time_from=None, time_to=None,
                     factors=None, separate_api=False, timeout=600, interpolation=False,
                     produce_map=False, source_weights=None, harmonization_methods=None,
+                    within_source_aggregation_methods=None,
                     assess_quality=False, persist_quality_reports=False,
                     quality_report_dir=None):
     """
@@ -129,6 +133,10 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     :param harmonization_methods: Optional mapping of logical data types to
                                   harmonization methods. Values override
                                   DATA_TYPE_HARMONIZATION_METHODS.
+    :param within_source_aggregation_methods: Optional mapping of logical data
+                                              types to methods used when one
+                                              source has multiple records in
+                                              the same S2 cell and time.
     :param persist_quality_reports: Persist each per-source quality assessment
                                     as JSON when True.
     :param assess_quality: Run per-source quality assessment when True. Set to
@@ -158,6 +166,17 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     if harmonization_methods:
         effective_methods.update(harmonization_methods)
     effective_methods = validate_harmonization_methods(effective_methods)
+
+    effective_within_source_methods = dict(
+        WITHIN_SOURCE_AGGREGATION_METHODS
+    )
+    if within_source_aggregation_methods:
+        effective_within_source_methods.update(
+            within_source_aggregation_methods
+        )
+    effective_within_source_methods = validate_within_source_methods(
+        effective_within_source_methods
+    )
 
     data_storage = []  # (source path, DataFrame, matching logical data types)
     api_metadata = []
@@ -200,13 +219,20 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
 
         try:
             module = importlib.import_module(api_name)
+            adapter_kwargs = {
+                "spatial_range": bounding_box,
+                "time_range": (time_from, time_to),
+                "data_range": factors,
+                "level": level,
+            }
+            if "within_source_aggregation_methods" in inspect.signature(
+                module.read_data
+            ).parameters:
+                adapter_kwargs["within_source_aggregation_methods"] = (
+                    effective_within_source_methods
+                )
             api_response_data = await asyncio.wait_for(
-                module.read_data(
-                    spatial_range=bounding_box,
-                    time_range=(time_from, time_to),
-                    data_range=factors,
-                    level=level,
-                ),
+                module.read_data(**adapter_kwargs),
                 timeout=timeout,
             )
             if not isinstance(api_response_data, pd.DataFrame):
@@ -342,6 +368,9 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                                 for source, _data, _types in data_storage
                             },
                             "methods": effective_methods,
+                        },
+                        "within_source_aggregation": {
+                            "methods": effective_within_source_methods,
                         },
                     }
                     }

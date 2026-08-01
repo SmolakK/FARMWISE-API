@@ -5,6 +5,8 @@ import warnings
 import asyncio
 import datetime as dt
 from adapters.API_readers.wetterdienst.wetterdienst_mapping.dwd_mapping import DATA_ALIASES, GLOBAL_MAPPING
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 
 
 async def fetch_data(request):
@@ -22,7 +24,8 @@ def _to_pandas(frame):
     return pd.DataFrame(frame)
 
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level,
+                    within_source_aggregation_methods=None):
     """
     Reads meteorological data from DWD using wetterdienst.
 
@@ -87,12 +90,13 @@ async def read_data(spatial_range, time_range, data_range, level):
     # Assign S2 cells
     df = prepare_coordinates(df, spatial_range, level)
 
-    # Group by S2CELL, Timestamp, and Parameter
-    original_size = df.shape[0]
-    df = df.groupby(['S2CELL', 'Timestamp']+data_requested).mean().reset_index()
-
-    if original_size != df.shape[0]:
-        warnings.warn("Some data were aggregated")
+    df = aggregate_to_s2(
+        df,
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_aggregations={"lat": "mean", "lon": "mean"},
+    ).reset_index()
 
     # Resample to daily intervals
     df['Timestamp'] = pd.to_datetime(df['Timestamp'])

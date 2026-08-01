@@ -254,3 +254,26 @@ DATA_TYPE_HARMONIZATION_METHODS = {
     "agricultural structure": "weighted_mean",
     "environmental data (EEA)": "weighted_mean",
 }
+
+
+# Aggregation used inside an individual adapter when several source records,
+# stations, or raster pixels fall into the same S2 cell and time period. This
+# policy is deliberately independent from cross-source harmonization above.
+WITHIN_SOURCE_AGGREGATION_METHODS = {
+    "default": "mean",
+    "temperature": "mean",
+    "precipitation": "mean",
+    "soil": "mean",
+    "soil humidity": "mean",
+    "potential evaporation": "mean",
+    "surface water quantity": "mean",
+    "land cover": "mode",
+    "hydraulic conductivity": "mean",
+    "depth to watertable": "mean",
+    "groundwater quality": "mean",
+    "groundwater quantity": "mean",
+    "surface water quality": "mean",
+    "livestock pressure": "mean",
+    "agricultural structure": "mean",
+    "environmental data (EEA)": "mean",
+}

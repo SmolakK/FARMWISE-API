@@ -1,6 +1,8 @@
 import httpx
 import pandas as pd
 import warnings
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import re
@@ -17,7 +19,8 @@ URL = "https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteo
 SPACE_TIME_COLUMNS = ['Station code', 'Year', 'Month', 'Day', 'Code', 'lat', 'lon', 'Name']
 
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level,
+                    within_source_aggregation_methods=None):
     """
     Read data from the IMGW-API for the specified spatial and time range, and data types.
 
@@ -133,11 +136,13 @@ async def read_data(spatial_range, time_range, data_range, level):
                                                                                         '%Y-%m-%d').date()
     s_d_merged = s_d_merged[(s_d_merged.Timestamp >= start) & (s_d_merged.Timestamp <= end)]
 
-    # Average overlapping records
-    original_size = s_d_merged.shape[0]
-    s_d_merged = s_d_merged.groupby(['S2CELL', 'Timestamp']).mean()
-    if original_size != s_d_merged.shape[0]:
-        warnings.warn("Some data were aggregated")
+    s_d_merged = aggregate_to_s2(
+        s_d_merged,
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_aggregations={"lat": "mean", "lon": "mean"},
+    )
 
     # Pivot the DataFrame asynchronously
     s_d_pivot = s_d_merged.pivot_table(index='Timestamp', columns='S2CELL')

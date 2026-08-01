@@ -2,6 +2,8 @@ import pandas as pd
 from adapters.API_readers.hubeau.hubeau_mappings.hubeau_mapping_piezo import MAPPING
 from core.utils.coordinates_to_cells import prepare_coordinates
 import warnings
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 import asyncio
 
 # Important reminder: "hubeaupyutils" is a library that must be installed running/using this API reader,
@@ -51,7 +53,8 @@ async def fetch_data(api, pt_id, he_period_bounds, data_requested_varnames, verb
         return None
 
 
-async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None, verbose_level=0):
+async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
+                    verbose_level=0, within_source_aggregation_methods=None):
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range. 2 text dates (str) of format YYYY-mm-dd
@@ -257,9 +260,13 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     # To S2CELLs
     # (This adds a column 'S2CELL' to df.)
     df = prepare_coordinates(df, spatial_range, level)
-    original_size = df.shape[0]
-
-    df = df[['S2CELL', 'Timestamp', 'Groundwater Level [cm]', 'lon', 'lat']].groupby(['S2CELL', 'Timestamp']).mean()
+    df = aggregate_to_s2(
+        df[['S2CELL', 'Timestamp', 'Groundwater Level [cm]', 'lon', 'lat']],
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_aggregations={"lat": "mean", "lon": "mean"},
+    )
     # Ok, mean of GWL is acceptable, although a bit too simple in case of large cell size
     # And mean will be consisdered ok for lon and lat coordinates too:
     # - only 1 unique value of each (lat, lon) per point...
@@ -269,9 +276,6 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     # But that is not an issue, since those lon,lat coordinates are dropped in the output:
     df = df.drop(['lat', 'lon'], axis=1)
     # TODO Maybe this drop() could be applied sooner, before the .groupby(), since the aggregated mean coordinates are not used.
-
-    if original_size != df.shape[0]:
-        warnings.warn("Some data were aggregated")
 
     # Resample days
     df.reset_index(inplace=True)

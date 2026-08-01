@@ -5,6 +5,8 @@ from core.utils.coordinates_to_cells import prepare_coordinates
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from adapters.API_readers.geosphere.geosphere_mapping.geosphere_mapping import GLOBAL_MAPPING, DATA_ALIASES
 import warnings
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 from datetime import datetime
 
 
@@ -46,7 +48,8 @@ async def fetch_station_data(resource_id, station_ids, time_range, parameters):
     return data
 
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level,
+                    within_source_aggregation_methods=None):
     """
     Fetch `klima-v2-1d` data by bounding box.
     :param spatial_range: Tuple containing the bounding box (south, west, north, east) in EPSG:4326.
@@ -112,11 +115,13 @@ async def read_data(spatial_range, time_range, data_range, level):
     # Temporal cut
     data_df = data_df[(data_df['Timestamp'] >= start) & (data_df['Timestamp'] <= end)]
 
-    # Average overlapping
-    original_size = data_df.shape[0]
-    data_df = data_df.groupby(['S2CELL', 'Timestamp']).mean()
-    if original_size != data_df.shape[0]:
-        warnings.warn("Some data were aggregated")
+    data_df = aggregate_to_s2(
+        data_df,
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_aggregations={"lat": "mean", "lon": "mean"},
+    )
 
     data_df = data_df.pivot_table(index='Timestamp', columns='S2CELL')
     return data_df

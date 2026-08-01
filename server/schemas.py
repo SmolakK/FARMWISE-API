@@ -6,6 +6,7 @@ from core.harmonization import (
     validate_harmonization_methods,
     validate_source_weights,
 )
+from core.within_source_aggregation import validate_within_source_methods
 
 # Dynamically extract all unique factors from API_PATH_RANGES
 valid_factors = set(
@@ -72,6 +73,13 @@ class ReadDataRequest(BaseModel):
         True,
         description="Persist a quality report for each successful source."
     )
+    within_source_aggregation_methods: Optional[Dict[str, str]] = Field(
+        None,
+        description=(
+            "Optional within-source S2 aggregation method overrides keyed "
+            "by logical data type."
+        )
+    )
     assess_quality: Optional[bool] = Field(
         True,
         description=(
@@ -111,6 +119,14 @@ class ReadDataRequest(BaseModel):
     def check_harmonization_methods(cls, value):
         return (
             validate_harmonization_methods(value)
+            if value is not None
+            else value
+        )
+
+    @field_validator("within_source_aggregation_methods")
+    def check_within_source_aggregation_methods(cls, value):
+        return (
+            validate_within_source_methods(value)
             if value is not None
             else value
         )

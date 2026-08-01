@@ -7,9 +7,12 @@ from adapters.API_readers.cds.cds_mappings.cds_single_levels_mapping import DATA
 from core.utils.coordinates_to_cells import prepare_coordinates
 from core.utils.interpolate_data import interpolate
 import warnings
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 
 
-def cds_read_data(spatial_range, time_range, data_range, level, dataset):
+def cds_read_data(spatial_range, time_range, data_range, level, dataset,
+                  within_source_aggregation_methods=None):
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.
@@ -90,11 +93,13 @@ def cds_read_data(spatial_range, time_range, data_range, level, dataset):
     # S2Cell Mapping
     df = prepare_coordinates(df,spatial_range,level)
 
-    # Average overlapping
-    original_size = df.shape[0]
-    df = df.groupby(['S2CELL', 'Timestamp']).mean()
-    if original_size != df.shape[0]:
-        warnings.warn("Some data were aggregated")
+    df = aggregate_to_s2(
+        df,
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_aggregations={"lat": "mean", "lon": "mean"},
+    )
 
     # Recalculate temperature te Celsius
     if "Temperature [°C]" in df.columns:

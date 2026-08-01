@@ -6,14 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="e861ba43-0096-452f-bd7e-8db19b445a06" name="Changes" comment="new sources added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/adapters/API_readers/cds/cds_single_levels.py" beforeDir="false" afterPath="$PROJECT_DIR$/adapters/API_readers/cds/cds_single_levels.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/adapters/API_readers/gios/gios_scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/adapters/API_readers/gios/gios_scraper.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/adapters/mappings/data_source_mapping.py" beforeDir="false" afterPath="$PROJECT_DIR$/adapters/mappings/data_source_mapping.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/main_call.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/main_call.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_cds_single_levels.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_cds_single_levels.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_gios_scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_gios_scraper.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_main_call.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_main_call.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,20 +41,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.main.executor": "Run",
-    "Python.main_call.executor": "Debug",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "D:/GitHub/FARMWISE",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main_call.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/GitHub/FARMWISE&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers\UA_sw_quality" />
@@ -79,7 +71,7 @@
       <recent name="D:\GitHub\FARMWISE\API_readers\cds" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.wetterdienst_dwd">
     <configuration name="CHMI_meteo" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="ENV_FILES" value="" />
@@ -277,6 +269,7 @@
       <workItem from="1778233807942" duration="166000" />
       <workItem from="1785309190529" duration="5689000" />
       <workItem from="1785335987433" duration="382000" />
+      <workItem from="1785568820015" duration="669000" />
     </task>
     <task id="LOCAL-00001" summary="new sources added">
       <option name="closed" value="true" />
@@ -347,6 +340,11 @@
           <line>298</line>
           <option name="timeStamp" value="578" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/core/main_call.py</url>
+          <line>202</line>
+          <option name="timeStamp" value="579" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -359,6 +357,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/FARMWISE$main.coverage" NAME="main Coverage Results" MODIFIED="1785480620142" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/FARMWISE$main_call.coverage" NAME="main_call Coverage Results" MODIFIED="1785491282663" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/core" />
+    <SUITE FILE_PATH="coverage/FARMWISE$main_call.coverage" NAME="main_call Coverage Results" MODIFIED="1785569208560" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/core" />
   </component>
 </project>

@@ -410,6 +410,61 @@ def test_plan_source_dispatch_skips_disabled_source():
 
 
 @pytest.mark.asyncio
+async def test_read_data_passes_within_source_policy_to_supported_adapter(
+    monkeypatch,
+):
+    from core import main_call
+
+    cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
+    frame = pd.DataFrame(
+        [[5.0]],
+        index=pd.to_datetime(["2024-01-01"]),
+        columns=pd.MultiIndex.from_tuples([("Temperature", cell)]),
+    )
+    received = {}
+
+    class Adapter:
+        @staticmethod
+        async def read_data(
+            spatial_range,
+            time_range,
+            data_range,
+            level,
+            within_source_aggregation_methods=None,
+        ):
+            received.update(within_source_aggregation_methods)
+            return frame
+
+    monkeypatch.setattr(
+        main_call,
+        "API_PATH_RANGES",
+        {
+            "provider.adapter": [
+                (55, 49, 24, 14),
+                ("2020-01-01", "2030-01-01"),
+                ["temperature"],
+            ]
+        },
+    )
+    monkeypatch.setattr(main_call.importlib, "import_module", lambda _name: Adapter)
+    monkeypatch.setattr(main_call, "extract_bbox", lambda _cells: (51, 51, 17, 17))
+
+    result = await main_call.read_data(
+        bounding_box=(55, 49, 24, 14),
+        level=10,
+        time_from="2024-01-01",
+        time_to="2024-01-02",
+        factors=["temperature"],
+        within_source_aggregation_methods={"temperature": "median"},
+    )
+
+    assert received["temperature"] == "median"
+    assert result["metadata"]["within_source_aggregation"]["methods"][
+        "temperature"
+    ] == "median"
+
+
+@pytest.mark.asyncio
 async def test_read_data_persists_per_source_quality_report(monkeypatch, tmp_path):
     from core import main_call
 

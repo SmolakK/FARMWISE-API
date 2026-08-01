@@ -4,12 +4,15 @@ from core.utils.coordinates_to_cells import prepare_coordinates
 import rasterio
 from rasterio.windows import from_bounds
 import asyncio
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 from core.utils.paths import adapter_data
 
 EGDI_FILE = adapter_data("egdi", "data", "gewp7_peu7_4326.tif")
 
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level,
+                    within_source_aggregation_methods=None):
     """
     N = 51.2
     S = 49.0
@@ -67,8 +70,14 @@ async def read_data(spatial_range, time_range, data_range, level):
         'Hydraulic Conductivity DRASTIC': flat_data
     })
     df = prepare_coordinates(df, spatial_range, level)
-    df = df.set_index('S2CELL')
-    df = df.groupby(level=0).mean().reset_index()
+    df = aggregate_to_s2(
+        df,
+        group_by=("S2CELL",),
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_aggregations={"lat": "mean", "lon": "mean"},
+    ).reset_index()
 
     # Explode to days
     days = pd.date_range(time_range[0], time_range[1], freq='D')

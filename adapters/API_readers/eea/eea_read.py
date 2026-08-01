@@ -16,9 +16,12 @@ from rasterio.warp import (
 
 from adapters.API_readers.eea.eea_mappings.eea_mappings import GLOBAL_MAPPING
 from core.utils.paths import adapter_data
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 
 async def read_data(
-        spatial_range:tuple, time_range:tuple, data_range:list, level:int
+        spatial_range:tuple, time_range:tuple, data_range:list, level:int,
+        within_source_aggregation_methods=None,
     )->pd.DataFrame:
     """
     Asynchronously reads environmental raster data from an EEA dataset
@@ -111,10 +114,14 @@ async def read_data(
 
     # Assign S2 cells
     df = prepare_coordinates(df, spatial_range, level)
-    df = df.set_index("S2CELL")
-
-    # Aggregate per cell
-    df = df.groupby(level=0).mean().reset_index()
+    df = aggregate_to_s2(
+        df,
+        group_by=("S2CELL",),
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_aggregations={"lat": "mean", "lon": "mean"},
+    ).reset_index()
     df = df.drop(['lat', 'lon'], axis=1)
     df.value = round(df.value,0)
     df["Timestamp"] = pd.to_datetime('2018-01-01').floor("D")

@@ -1,6 +1,8 @@
 import httpx
 import pandas as pd
 import warnings
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import re
@@ -17,7 +19,8 @@ URL = r'https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_hydr
 SPACE_TIME_COLUMNS = ['Station code', 'Hydrological year', 'Day', 'Calendar month']
 
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level,
+                    within_source_aggregation_methods=None):
     """
 
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
@@ -111,11 +114,12 @@ async def read_data(spatial_range, time_range, data_range, level):
     start, end = pd.to_datetime(start), pd.to_datetime(end)
     water_files = water_files[(water_files['Timestamp'] >= start) & (water_files['Timestamp'] <= end)]
 
-    # Average overlapping
-    original_size = water_files.shape[0]
-    s_d_merged = water_files.groupby(['S2CELL', 'Timestamp']).mean()
-    if original_size != s_d_merged.shape[0]:
-        warnings.warn("Some data were aggregated")
+    water_files = aggregate_to_s2(
+        water_files,
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+    ).reset_index()
 
     # Get dates only
     water_files['Timestamp'] = water_files['Timestamp'].apply(lambda x: x.date())

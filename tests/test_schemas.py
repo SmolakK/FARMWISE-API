@@ -20,6 +20,7 @@ def test_valid_read_data_request():
         "interpolation": False,
         "source_weights": {"provider.module": 2.0},
         "harmonization_methods": {"temperature": "weighted_mean"},
+        "within_source_aggregation_methods": {"temperature": "median"},
         "assess_quality": False,
     }
     request = ReadDataRequest(**data)
@@ -31,6 +32,9 @@ def test_valid_read_data_request():
     assert request.source_weights == {"provider.module": 2.0}
     assert request.harmonization_methods == {
         "temperature": "weighted_mean"
+    }
+    assert request.within_source_aggregation_methods == {
+        "temperature": "median"
     }
     assert request.assess_quality is False
 
@@ -85,6 +89,11 @@ def test_invalid_factors():
             "harmonization_methods",
             {"temperature": "random"},
             "Unknown harmonization method",
+        ),
+        (
+            "within_source_aggregation_methods",
+            {"temperature": "weighted_mean"},
+            "Unknown within-source aggregation",
         ),
     ],
 )

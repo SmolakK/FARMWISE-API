@@ -5,6 +5,7 @@ from adapters.mappings.data_source_mapping import (
     API_PATH_RANGES,
     DATA_SOURCE_WEIGHTS,
     DATA_TYPE_HARMONIZATION_METHODS,
+    WITHIN_SOURCE_AGGREGATION_METHODS,
 )
 from core.harmonization import (
     harmonize_data,
@@ -24,6 +25,8 @@ def test_mapping_configures_every_current_source_and_data_type():
     assert set(DATA_SOURCE_WEIGHTS) == set(API_PATH_RANGES)
     assert configured_types <= set(DATA_TYPE_HARMONIZATION_METHODS)
     assert "default" in DATA_TYPE_HARMONIZATION_METHODS
+    assert configured_types <= set(WITHIN_SOURCE_AGGREGATION_METHODS)
+    assert "default" in WITHIN_SOURCE_AGGREGATION_METHODS
 
 
 def _frame(values, columns, dates=("2024-01-01",)):

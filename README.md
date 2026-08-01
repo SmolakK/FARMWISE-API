@@ -145,8 +145,18 @@ result = await read_data(
         "temperature": "weighted_mean",
         "precipitation": "weighted_median",
     },
+    within_source_aggregation_methods={
+        "temperature": "mean",
+        "precipitation": "median",
+    },
 )
 ```
+
+`within_source_aggregation_methods` controls how multiple observations from a
+single adapter are reduced to one value per S2 cell and time. It is independent
+from `harmonization_methods`, which combines already aggregated values across
+different adapters. Supported within-source methods are `mean`, `median`,
+`mode`, `min`, `max`, `sum`, `first`, `last`, and `nunique`.
 
 Supported methods are `weighted_mean`, `mean`, `weighted_median`, `median`,
 `weighted_mode`, `mode`, `priority`, `min`, `max`, and `sum`. The effective

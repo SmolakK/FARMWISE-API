@@ -2,6 +2,8 @@ import pandas as pd
 from adapters.API_readers.hubeau.hubeau_mappings.hubeau_mapping_wq import MAPPING, PARAMETERS_MAPPING
 from core.utils.coordinates_to_cells import prepare_coordinates
 import warnings
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 from core.utils.data_operators import flatten_list
 from core.utils.paths import adapter_data
 import asyncio
@@ -41,7 +43,8 @@ async def fetch_data(api, pt_id, he_period_bounds, data_requested_codes, verbose
         return None
 
 
-async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None, verbose_level=0):
+async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
+                    verbose_level=0, within_source_aggregation_methods=None):
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range. 2 text dates (str) of format YYYY-mm-dd
@@ -290,20 +293,17 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     df = pd.merge(df, tmp_prep_coords_df, on='point_id', how='left')
 
     # Spatial aggregation of the measured values, by S2CELL (of the level specified in function's arguments)
-    original_size = df.shape[0]  # for later diagnostic info display
-    df = df.groupby(['S2CELL', 'Timestamp']).agg({
-        'point_id': lambda x: x.nunique(),
-        # to help understand the degree of upscaling (averaging) that took place (if a coarse S2CELL level is used)
-        'lat': 'mean',  # average point coordinates if >1 points in that S2CELL
-        'lon': 'mean',  # ...
-        **{col: 'mean' for col in df.columns if col not in ['point_id', 'Timestamp', 'lat', 'lon', 'S2CELL']}
-        # mean value for each parameter (column of data)
-    }).rename({'point_id': 'nb_points'}, axis=1)
-
-    # Diagnostic message:
-    if (verbose_level >= 0):  # (show it whatever the verbose_level is, because it is an important User Warning)
-        if original_size != df.shape[0]:
-            warnings.warn("Some data were aggregated")
+    df = aggregate_to_s2(
+        df,
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_aggregations={
+            "point_id": "nunique",
+            "lat": "mean",
+            "lon": "mean",
+        },
+    ).rename({'point_id': 'nb_points'}, axis=1)
 
     # Resample days
     df.reset_index(inplace=True)

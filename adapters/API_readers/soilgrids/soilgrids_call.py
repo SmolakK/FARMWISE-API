@@ -6,6 +6,8 @@ from core.utils.coordinates_to_cells import prepare_coordinates
 from adapters.API_readers.soilgrids.soilgrids_mappings.soilgrids_mapping import GLOBAL_MAPPING, DATA_ALIASES, DEPTH_MAPPING
 import warnings
 from core.utils.paths import scratch_file
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 
 
 def fetch_soil_data(soilgrids, soil_property, west, south, east, north, size_lon, size_lat):
@@ -25,7 +27,8 @@ def fetch_soil_data(soilgrids, soil_property, west, south, east, north, size_lon
     return np.array(data)
 
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level,
+                    within_source_aggregation_methods=None):
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.
@@ -70,16 +73,15 @@ async def read_data(spatial_range, time_range, data_range, level):
 
     # Prepare coordinates and downgrade to S2 cells
     df = prepare_coordinates(df, spatial_range, level)
-    df = df.set_index('S2CELL')
-    df = df.groupby(level=0).mean().reset_index()
-
     df = df.rename(GLOBAL_MAPPING, axis=1)
-
-    # Average overlapping
-    original_size = df.shape[0]
-    df = df.groupby(['S2CELL']).mean()
-    if original_size != df.shape[0]:
-        warnings.warn("Some data were aggregated")
+    df = aggregate_to_s2(
+        df,
+        group_by=("S2CELL",),
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_aggregations={"lat": "mean", "lon": "mean"},
+    )
 
     # Explode to days
     days = pd.date_range(time_range[0], time_range[1], freq='D')
