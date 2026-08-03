@@ -1,8 +1,11 @@
 import asyncio
+import importlib.util
 import httpx
 import pandas as pd
 import logging
 import nest_asyncio
+import re
+from functools import partial
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from io import BytesIO
@@ -20,6 +23,41 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # Initialize transformer for coordinate conversion
 transformer = Transformer.from_crs("EPSG:2180", "EPSG:4326", always_xy=True)
 URL = 'https://mjwp.gios.gov.pl/wyniki-badan/wyniki-badan-2023.html'
+YEAR_PATTERN = re.compile(r"(?<!\d)(?:19|20)\d{2}(?!\d)")
+
+
+def _unique_by_url(links):
+    """Return links once, preserving the order in which they were discovered."""
+    unique = []
+    seen = set()
+    for link in links:
+        url = link[0] if isinstance(link, tuple) else link
+        if url not in seen:
+            seen.add(url)
+            unique.append(link)
+    return unique
+
+
+def _filter_links_by_time_range(links, time_range):
+    """Keep undated links and pages whose advertised years overlap the request."""
+    requested_start = pd.to_datetime(time_range[0]).year
+    requested_end = pd.to_datetime(time_range[1]).year
+    matching = []
+    for link in links:
+        searchable = " ".join(map(str, link)) if isinstance(link, tuple) else str(link)
+        years = [int(year) for year in YEAR_PATTERN.findall(searchable)]
+        if not years or min(years) <= requested_end and max(years) >= requested_start:
+            matching.append(link)
+    return matching
+
+
+def _require_excel_reader() -> None:
+    """Fail before issuing HTTP requests when XLSX support is unavailable."""
+    if importlib.util.find_spec("openpyxl") is None:
+        raise RuntimeError(
+            "GIOS groundwater data requires openpyxl. Reinstall farmwise-api "
+            "or run 'python -m pip install openpyxl'."
+        )
 
 
 async def find_subpage_links(url: str, client: httpx.AsyncClient) -> list:
@@ -28,8 +66,10 @@ async def find_subpage_links(url: str, client: httpx.AsyncClient) -> list:
         response = await client.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
-        links = [urljoin(url, link.get('href')) for link in
-                 soup.find_all('a', href=lambda href: href and 'wyniki-badan' in href)]
+        links = _unique_by_url([
+            urljoin(url, link.get('href')) for link in
+            soup.find_all('a', href=lambda href: href and 'wyniki-badan' in href)
+        ])
         logging.info(f"Found {len(links)} subpage links on main page.")
         return links
     except httpx.RequestError as e:
@@ -43,8 +83,10 @@ async def find_xlsx_links(url: str, client: httpx.AsyncClient) -> list:
         response = await client.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
-        links = [(urljoin(url, link.get('href')), link.get_text(strip=True).replace('/', '-'))
-                 for link in soup.find_all('a', href=lambda href: href and href.lower().endswith('.xlsx'))]
+        links = _unique_by_url([
+            (urljoin(url, link.get('href')), link.get_text(strip=True).replace('/', '-'))
+            for link in soup.find_all('a', href=lambda href: href and href.lower().endswith('.xlsx'))
+        ])
         logging.info(f"Found {len(links)} xlsx links on subpage {url}.")
         return links
     except httpx.RequestError as e:
@@ -58,7 +100,12 @@ async def process_xlsx(url: str, client: httpx.AsyncClient) -> pd.DataFrame:
         response = await client.get(url)
         response.raise_for_status()
         loop = asyncio.get_running_loop()
-        df = await loop.run_in_executor(None, pd.read_excel, BytesIO(response.content))
+        read_excel = partial(
+            pd.read_excel,
+            BytesIO(response.content),
+            engine="openpyxl",
+        )
+        df = await loop.run_in_executor(None, read_excel)
         logging.info(f"Processed file from {url} with shape {df.shape}.")
         return df
     except httpx.RequestError as e:
@@ -121,16 +168,22 @@ async def read_data(spatial_range, time_range, data_range, level):
     :param level: S2Cell level for spatial aggregation.
     :return: DataFrame with MultiIndex ['date', 'S2CELL'] and numeric measurement columns.
     """
+    _require_excel_reader()
     print("DOWNLOADING: GIOS groundwater q&q data")
     async with httpx.AsyncClient(timeout=30) as client:
-        subpage_links = await find_subpage_links(URL, client)
+        subpage_links = _filter_links_by_time_range(
+            await find_subpage_links(URL, client),
+            time_range,
+        )
         if not subpage_links:
             logging.warning("No subpage links found.")
             return pd.DataFrame()
 
-        xlsx_links = [item for sublist in
-                      await asyncio.gather(*[find_xlsx_links(subpage, client) for subpage in subpage_links])
-                      for item in sublist]
+        xlsx_links = _unique_by_url([
+            item for sublist in
+            await asyncio.gather(*[find_xlsx_links(subpage, client) for subpage in subpage_links])
+            for item in sublist
+        ])
         if not xlsx_links:
             logging.warning("No xlsx links found.")
             return pd.DataFrame()

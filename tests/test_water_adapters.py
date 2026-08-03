@@ -129,9 +129,15 @@ async def test_epa_read_data_filters_and_converts_depth_to_cm(monkeypatch):
 @pytest.mark.asyncio
 async def test_gios_groundwater_link_extractors(monkeypatch):
     main_response = MagicMock()
-    main_response.text = '<a href="/wyniki-badan/a.html">A</a>'
+    main_response.text = (
+        '<a href="/wyniki-badan/a.html">A</a>'
+        '<a href="/wyniki-badan/a.html">A duplicate</a>'
+    )
     xlsx_response = MagicMock()
-    xlsx_response.text = '<a href="/files/data.xlsx">Data / 2024</a>'
+    xlsx_response.text = (
+        '<a href="/files/data.xlsx">Data / 2024</a>'
+        '<a href="/files/data.xlsx">Duplicate</a>'
+    )
     client = SimpleNamespace(
         get=AsyncMock(side_effect=[main_response, xlsx_response])
     )
@@ -141,6 +147,58 @@ async def test_gios_groundwater_link_extractors(monkeypatch):
 
     assert pages == ["https://example.test/wyniki-badan/a.html"]
     assert files == [("https://example.test/files/data.xlsx", "Data - 2024")]
+
+
+@pytest.mark.asyncio
+async def test_gios_groundwater_fails_before_network_without_xlsx_reader(monkeypatch):
+    client = MagicMock()
+    monkeypatch.setattr(gios_gw.importlib.util, "find_spec", lambda _name: None)
+    monkeypatch.setattr(gios_gw.httpx, "AsyncClient", client)
+
+    with pytest.raises(RuntimeError, match="openpyxl"):
+        await gios_gw.read_data(
+            (55.0, 49.0, 24.0, 14.0),
+            ("2024-01-01", "2024-01-02"),
+            ["groundwater quality"],
+            10,
+        )
+
+    client.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_gios_groundwater_deduplicates_files_across_pages(monkeypatch):
+    class Client:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *_args):
+            return False
+
+    monkeypatch.setattr(gios_gw, "_require_excel_reader", lambda: None)
+    monkeypatch.setattr(gios_gw.httpx, "AsyncClient", lambda **_kwargs: Client())
+    monkeypatch.setattr(
+        gios_gw,
+        "find_subpage_links",
+        AsyncMock(return_value=["page-a", "page-b"]),
+    )
+    monkeypatch.setattr(
+        gios_gw,
+        "find_xlsx_links",
+        AsyncMock(return_value=[("same.xlsx", "Same")]),
+    )
+    process = AsyncMock(return_value=pd.DataFrame())
+    monkeypatch.setattr(gios_gw, "process_xlsx", process)
+
+    result = await gios_gw.read_data(
+        (55.0, 49.0, 24.0, 14.0),
+        ("2024-01-01", "2024-01-02"),
+        ["groundwater quality"],
+        10,
+    )
+
+    assert result.empty
+    process.assert_awaited_once()
 
 
 @pytest.mark.asyncio
@@ -182,6 +240,22 @@ def test_gios_groundwater_standardizes_coordinates_numbers_and_dates(monkeypatch
     assert result.loc[0, "Depth"] == 2.5
     assert result.loc[0, "lat"] == 50.0
     assert result.loc[0, "lon"] == 17.0
+
+
+def test_gios_groundwater_filters_pages_to_requested_years():
+    links = [
+        "https://example.test/wyniki-badan-2004-2007.html",
+        "https://example.test/wyniki-badan-2023.html",
+        "https://example.test/wyniki-badan-2024.html",
+        "https://example.test/undated.html",
+    ]
+
+    result = gios_gw._filter_links_by_time_range(
+        links,
+        ("2006-01-01", "2006-12-31"),
+    )
+
+    assert result == [links[0], links[3]]
 
 
 @pytest.mark.asyncio

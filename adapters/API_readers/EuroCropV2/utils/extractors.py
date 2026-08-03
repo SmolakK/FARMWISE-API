@@ -34,13 +34,18 @@ def extract_data_by_bbox(path:str, spatial_range:tuple) -> pd.DataFrame:
     north, south, east, west = spatial_range
 
     with duckdb.connect() as con:
-        query = f"""
-        SELECT *
-        FROM read_csv('{path}')
-        WHERE lat BETWEEN {south} AND {north}
-          AND lon BETWEEN {west} AND {east}
-        """
-        result = con.execute(query).df()
+        # A small number of source rows can be truncated. Skipping only those
+        # malformed records keeps a multi-gigabyte import usable without
+        # padding corrupt values into the scientific columns.
+        source = con.read_csv(
+            path,
+            strict_mode=False,
+            ignore_errors=True,
+        )
+        result = source.filter(
+            f"lat BETWEEN {float(south)!r} AND {float(north)!r} "
+            f"AND lon BETWEEN {float(west)!r} AND {float(east)!r}"
+        ).df()
 
     return result
 

@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e861ba43-0096-452f-bd7e-8db19b445a06" name="Changes" comment="new sources added">
+      <change beforePath="$PROJECT_DIR$/.idea/FARMWISE.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/FARMWISE.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/adapters/API_readers/wetterdienst/wetterdienst_dwd.py" beforeDir="false" afterPath="$PROJECT_DIR$/adapters/API_readers/wetterdienst/wetterdienst_dwd.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_wetterdienst_dwd.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_wetterdienst_dwd.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,6 +21,17 @@
       <list>
         <option value="Python Script" />
       </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
     </option>
   </component>
   <component name="Git.Settings">
@@ -41,20 +56,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main_call.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/GitHub/FARMWISE&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.main.executor": "Run",
+    "Python.main_call.executor": "Debug",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "D:/GitHub/FARMWISE",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\JakubM\Documents\GitHub\FARMWISE\API_readers\UA_sw_quality" />
@@ -71,7 +87,7 @@
       <recent name="D:\GitHub\FARMWISE\API_readers\cds" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.wetterdienst_dwd">
+  <component name="RunManager">
     <configuration name="CHMI_meteo" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FARMWISE" />
       <option name="ENV_FILES" value="" />
@@ -269,7 +285,8 @@
       <workItem from="1778233807942" duration="166000" />
       <workItem from="1785309190529" duration="5689000" />
       <workItem from="1785335987433" duration="382000" />
-      <workItem from="1785568820015" duration="669000" />
+      <workItem from="1785568820015" duration="1499000" />
+      <workItem from="1785755943367" duration="3772000" />
     </task>
     <task id="LOCAL-00001" summary="new sources added">
       <option name="closed" value="true" />
@@ -322,7 +339,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/adapters/API_readers/cds/cds_utils/cds_data_read.py</url>
-          <line>65</line>
+          <line>68</line>
           <option name="timeStamp" value="412" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -337,13 +354,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/core/main_call.py</url>
-          <line>298</line>
+          <line>324</line>
           <option name="timeStamp" value="578" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/core/main_call.py</url>
-          <line>202</line>
-          <option name="timeStamp" value="579" />
+          <url>file://$PROJECT_DIR$/adapters/API_readers/wetterdienst/wetterdienst_dwd.py</url>
+          <line>113</line>
+          <option name="timeStamp" value="589" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -357,6 +374,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/FARMWISE$main.coverage" NAME="main Coverage Results" MODIFIED="1785480620142" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/FARMWISE$main_call.coverage" NAME="main_call Coverage Results" MODIFIED="1785569208560" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/core" />
+    <SUITE FILE_PATH="coverage/FARMWISE$main_call.coverage" NAME="main_call Coverage Results" MODIFIED="1785759633982" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/core" />
   </component>
 </project>

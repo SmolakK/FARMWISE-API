@@ -31,6 +31,24 @@ def test_eurocrop_extract_data_by_bbox(tmp_path):
     assert result["c2024"].tolist() == [1]
 
 
+def test_eurocrop_extract_data_by_bbox_skips_truncated_rows(tmp_path):
+    csv_path = tmp_path / "points.csv"
+    csv_path.write_text(
+        "id,area,lon,lat,c2024\n"
+        "1,3.0,17.0,50.0,4\n"
+        "2,,17.0\n"
+        "3,5.0,30.0,60.0,8\n",
+        encoding="utf-8",
+    )
+
+    result = euro_extractors.extract_data_by_bbox(
+        str(csv_path), (51.0, 49.0, 18.0, 16.0)
+    )
+
+    assert result["id"].tolist() == [1]
+    assert result["c2024"].tolist() == [4]
+
+
 def test_eurocrop_extract_years_selects_requested_columns_and_nan():
     frame = pd.DataFrame(
         {

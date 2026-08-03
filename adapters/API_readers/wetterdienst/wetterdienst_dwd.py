@@ -1,20 +1,79 @@
 from wetterdienst.provider.dwd.observation import DwdObservationRequest
+from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
 from core.utils.coordinates_to_cells import prepare_coordinates
 import warnings
 import asyncio
 import datetime as dt
+from threading import Event
 from adapters.API_readers.wetterdienst.wetterdienst_mapping.dwd_mapping import DATA_ALIASES, GLOBAL_MAPPING
 from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
 from core.within_source_aggregation import aggregate_to_s2
 
 
+class _DwdFetchCancelled(Exception):
+    """Internal signal used to stop between station downloads."""
+
+
+def _collect_request(request, cancel_event):
+    """Collect DWD values synchronously while honoring station boundaries."""
+    values_api = request.values
+    query_method = getattr(type(values_api), "query", None)
+
+    if callable(query_method):
+        frames = []
+        results = iter(values_api.query())
+        try:
+            while True:
+                if cancel_event.is_set():
+                    raise _DwdFetchCancelled
+                try:
+                    result = next(results)
+                except StopIteration:
+                    break
+                if cancel_event.is_set():
+                    raise _DwdFetchCancelled
+                frames.append(_to_pandas(result.df))
+        finally:
+            close = getattr(results, "close", None)
+            if callable(close):
+                close()
+        return (
+            pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(),
+            _to_pandas(request.df),
+        )
+
+    # Compatibility with older Wetterdienst releases.
+    values_result = values_api.all()
+    if hasattr(values_result, "to_dict"):
+        values = values_result.to_dict(
+            with_metadata=False,
+            with_stations=True,
+        )
+        return (
+            pd.DataFrame.from_dict(values["values"]),
+            pd.DataFrame.from_dict(values["stations"]),
+        )
+    return _to_pandas(values_result.df), _to_pandas(request.df)
+
+
 async def fetch_data(request):
-    """
-    Fetch data asynchronously using Wetterdienst's DwdObservationRequest.
-    """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(None, request.values.all)
+    """Fetch DWD data without leaving a worker alive after cancellation."""
+    cancel_event = Event()
+    executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="farmwise-dwd")
+    concurrent_future = executor.submit(_collect_request, request, cancel_event)
+    future = asyncio.wrap_future(concurrent_future)
+    try:
+        return await asyncio.shield(future)
+    except asyncio.CancelledError:
+        cancel_event.set()
+        try:
+            await asyncio.shield(future)
+        except (Exception, asyncio.CancelledError):
+            pass
+        raise
+    finally:
+        executor.shutdown(wait=True, cancel_futures=True)
 
 
 def _to_pandas(frame):
@@ -52,19 +111,7 @@ async def read_data(spatial_range, time_range, data_range, level,
     ).filter_by_bbox(west, south, east, north)
 
     # Fetch data asynchronously
-    values_result = await fetch_data(requests)
-    if hasattr(values_result, "to_dict"):
-        # Compatibility with Wetterdienst versions that returned both values
-        # and station metadata from ``to_dict``.
-        values = values_result.to_dict(
-            with_metadata=False,
-            with_stations=True,
-        )
-        df = pd.DataFrame.from_dict(values["values"])
-        df_stations = pd.DataFrame.from_dict(values["stations"])
-    else:
-        df = _to_pandas(values_result.df)
-        df_stations = _to_pandas(requests.df)
+    df, df_stations = await fetch_data(requests)
 
     if df.empty:
         warnings.warn("No stations found in the specified bounding box.")

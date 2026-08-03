@@ -1,7 +1,14 @@
 import pytest
+import asyncio
 from unittest.mock import patch, MagicMock
 import pandas as pd
-from adapters.API_readers.wetterdienst.wetterdienst_dwd import read_data
+from threading import Event, enumerate as enumerate_threads
+from adapters.API_readers.wetterdienst.wetterdienst_dwd import (
+    _DwdFetchCancelled,
+    _collect_request,
+    fetch_data,
+    read_data,
+)
 
 
 @pytest.mark.asyncio
@@ -14,6 +21,7 @@ async def test_read_data(mock_dwd_request, mock_prepare_coordinates):
 
     # Mock the request.filter_by_bbox method to return the same mock instance
     mock_request_instance.filter_by_bbox.return_value = mock_request_instance
+    mock_request_instance.values.query = None
 
     # Mock the to_dict method
     mock_request_instance.values.all.return_value.to_dict.return_value = {
@@ -109,3 +117,55 @@ async def test_read_data(mock_dwd_request, mock_prepare_coordinates):
     assert "cell1" in result.columns.levels[1]
     mock_prepare_coordinates.assert_called_once()
     assert result['Temperature [°C]'].values[0][0] == pytest.approx(-5.2)  # validate temperature convertion
+
+
+def test_collect_request_stops_between_station_downloads():
+    first_result = MagicMock()
+    first_result.df = pd.DataFrame({"value": [1.0]})
+    second_result = MagicMock()
+    second_result.df = pd.DataFrame({"value": [2.0]})
+    cancel_event = Event()
+
+    class Values:
+        def query(self):
+            yield first_result
+            cancel_event.set()
+            yield second_result
+
+    request = MagicMock()
+    request.values = Values()
+
+    with pytest.raises(_DwdFetchCancelled):
+        _collect_request(request, cancel_event)
+
+
+@pytest.mark.asyncio
+async def test_fetch_data_closes_worker_after_cancellation():
+    entered = Event()
+    release = Event()
+    result = MagicMock()
+    result.df = pd.DataFrame({"value": [1.0]})
+
+    class Values:
+        def query(self):
+            entered.set()
+            release.wait(timeout=2)
+            yield result
+
+    request = MagicMock()
+    request.values = Values()
+    request.df = pd.DataFrame({"station_id": ["1"]})
+
+    task = asyncio.create_task(fetch_data(request))
+    assert await asyncio.to_thread(entered.wait, 1)
+    task.cancel()
+    await asyncio.sleep(0)
+    release.set()
+
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert not any(
+        thread.name.startswith("farmwise-dwd")
+        for thread in enumerate_threads()
+    )
