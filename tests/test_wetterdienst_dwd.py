@@ -10,6 +10,7 @@ from adapters.API_readers.gios_gw import gios_gw
 from adapters.API_readers.wetterdienst.wetterdienst_dwd import (
     _DwdFetchCancelled,
     _collect_request,
+    _reject_incompatible_pydevd_asyncio_patch,
     fetch_data,
     read_data,
 )
@@ -121,6 +122,7 @@ async def test_read_data(mock_dwd_request, mock_prepare_coordinates):
     assert "cell1" in result.columns.levels[1]
     mock_prepare_coordinates.assert_called_once()
     assert result['Temperature [°C]'].values[0][0] == pytest.approx(-5.2)  # validate temperature convertion
+    assert isinstance(result.index, pd.DatetimeIndex)
 
 
 def test_collect_request_stops_between_station_downloads():
@@ -213,3 +215,16 @@ async def test_fetch_data_builds_request_outside_event_loop_thread():
 def test_importing_gios_does_not_patch_asyncio_tasks():
     assert "nest_asyncio" not in gios_gw.__dict__
     assert asyncio.Task is ORIGINAL_ASYNCIO_TASK
+
+
+def test_incompatible_pydevd_task_patch_has_actionable_error(monkeypatch):
+    class PyCharmTask:
+        _pydevd_nest_patched = True
+
+        def __init__(self, coro, loop=None, name=None, context=None):
+            pass
+
+    monkeypatch.setattr(asyncio, "Task", PyCharmTask)
+
+    with pytest.raises(RuntimeError, match="python.debug.asyncio.repl"):
+        _reject_incompatible_pydevd_asyncio_patch()

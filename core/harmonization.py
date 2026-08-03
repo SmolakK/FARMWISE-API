@@ -35,6 +35,27 @@ SUPPORTED_HARMONIZATION_METHODS = frozenset(
 )
 
 
+def normalize_temporal_index(frame: pd.DataFrame) -> pd.DataFrame:
+    """Return a shallow copy with one timezone-neutral DatetimeIndex.
+
+    Adapters historically returned a mixture of ``datetime.date``, naive
+    ``Timestamp`` and timezone-aware values. Pandas cannot reliably align or
+    sort a mixed object index, so source boundaries normalize timestamps to
+    UTC and then remove the timezone before concatenation.
+    """
+    if isinstance(frame.index, pd.MultiIndex):
+        raise ValueError("Source data must use a single temporal index.")
+    normalized = frame.copy(deep=False)
+    index_name = frame.index.name
+    normalized.index = pd.to_datetime(
+        frame.index,
+        errors="raise",
+        utc=True,
+    ).tz_convert(None)
+    normalized.index.name = index_name
+    return normalized
+
+
 def normalize_method_name(method: str) -> str:
     """Return the canonical spelling of a harmonization method."""
     if not isinstance(method, str):
@@ -89,6 +110,10 @@ def harmonize_data(
     if not source_frames:
         return pd.DataFrame()
 
+    source_frames = [
+        (source, normalize_temporal_index(frame), logical_types)
+        for source, frame, logical_types in source_frames
+    ]
     weights = validate_source_weights(source_weights)
     methods = validate_harmonization_methods(data_type_methods)
     default_method = methods.get("default", "weighted_mean")

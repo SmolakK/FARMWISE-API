@@ -1,5 +1,6 @@
 from wetterdienst.provider.dwd.observation import DwdObservationRequest
 from concurrent.futures import ThreadPoolExecutor
+import inspect
 import pandas as pd
 from core.utils.coordinates_to_cells import prepare_coordinates
 import warnings
@@ -13,6 +14,29 @@ from core.within_source_aggregation import aggregate_to_s2
 
 class _DwdFetchCancelled(Exception):
     """Internal signal used to stop between station downloads."""
+
+
+def _reject_incompatible_pydevd_asyncio_patch():
+    """Reject PyCharm's Python 3.12-incompatible asyncio REPL patch."""
+    task_class = asyncio.Task
+    try:
+        supports_eager_start = (
+            "eager_start" in inspect.signature(task_class.__init__).parameters
+        )
+    except (TypeError, ValueError):
+        supports_eager_start = True
+
+    if (
+        getattr(task_class, "_pydevd_nest_patched", False)
+        and not supports_eager_start
+    ):
+        raise RuntimeError(
+            "PyCharm's asyncio debugger is incompatible with Python 3.12 "
+            "and aiohttp used by Wetterdienst. In PyCharm open Help > Find "
+            "Action > Registry, disable 'python.debug.asyncio.repl', then "
+            "restart the debug session (JetBrains issue PY-71488). Running "
+            "without the debugger is unaffected."
+        )
 
 
 def _collect_request(request, cancel_event):
@@ -83,6 +107,7 @@ def _build_and_collect_request(
 
 async def fetch_data(data_requested, start_date, end_date, bbox):
     """Run all blocking Wetterdienst operations outside the asyncio loop."""
+    _reject_incompatible_pydevd_asyncio_patch()
     cancel_event = Event()
     executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="farmwise-dwd")
     concurrent_future = executor.submit(
@@ -173,7 +198,10 @@ async def read_data(spatial_range, time_range, data_range, level,
     ).reset_index()
 
     # Resample to daily intervals
-    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+    df['Timestamp'] = pd.to_datetime(
+        df['Timestamp'],
+        utc=True,
+    ).dt.tz_convert(None)
 
     df.set_index('Timestamp', inplace=True)
     df = (
@@ -182,8 +210,10 @@ async def read_data(spatial_range, time_range, data_range, level,
             .mean()
             .reset_index()
     )
-    df['Timestamp'] = df['Timestamp'].dt.date
-    df = df[(df['Timestamp'] >= start_date.date()) & (df['Timestamp'] <= end_date.date())]
+    df = df[
+        (df['Timestamp'] >= pd.Timestamp(start_date))
+        & (df['Timestamp'] <= pd.Timestamp(end_date))
+    ]
 
     df = df.drop(['lat', 'lon'], axis=1)
     df = df.rename(GLOBAL_MAPPING, axis=1)

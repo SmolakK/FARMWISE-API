@@ -1,3 +1,5 @@
+from datetime import date
+
 import pandas as pd
 import pytest
 
@@ -82,6 +84,31 @@ def test_weighted_mean_renormalizes_weights_for_missing_values():
 
     assert result.iloc[0, 0] == 12.5
     assert result.iloc[1, 0] == 20.0
+
+
+def test_harmonize_data_normalizes_date_and_timestamp_indexes():
+    columns = [("Temperature [C]", "cell-1")]
+    timestamp_frame = _frame([[10.0]], columns, ("2024-01-01",))
+    date_frame = pd.DataFrame(
+        [[20.0]],
+        index=pd.Index([date(2024, 1, 2)], name="Timestamp"),
+        columns=pd.MultiIndex.from_tuples(columns),
+    )
+
+    result = harmonize_data(
+        [
+            ("source.timestamp", timestamp_frame, ("temperature",)),
+            ("source.date", date_frame, ("temperature",)),
+        ],
+        source_weights={},
+        data_type_methods={"temperature": "mean"},
+    )
+
+    assert isinstance(result.index, pd.DatetimeIndex)
+    assert result.index.tolist() == [
+        pd.Timestamp("2024-01-01"),
+        pd.Timestamp("2024-01-02"),
+    ]
 
 
 @pytest.mark.parametrize(

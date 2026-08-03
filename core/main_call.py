@@ -8,6 +8,7 @@ from adapters.mappings.data_source_mapping import (
 from core.harmonization import (
     DEFAULT_SOURCE_WEIGHT,
     harmonize_data,
+    normalize_temporal_index,
     validate_harmonization_methods,
     validate_source_weights,
 )
@@ -241,6 +242,7 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
             if api_response_data.empty:
                 dispatch_status = "empty"
                 continue
+            api_response_data = normalize_temporal_index(api_response_data)
 
             api_columns = list(
                 api_response_data.columns.get_level_values(0).unique()
