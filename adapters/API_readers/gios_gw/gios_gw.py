@@ -3,7 +3,6 @@ import importlib.util
 import httpx
 import pandas as pd
 import logging
-import nest_asyncio
 import re
 from functools import partial
 from bs4 import BeautifulSoup
@@ -13,9 +12,6 @@ from tqdm.asyncio import tqdm
 from pyproj import Transformer
 from adapters.API_readers.gios_gw.gios_gw_mappings.gios_gw_mapping import selected_columns, DATA_ALIASES, schema
 from core.utils.coordinates_to_cells import prepare_coordinates
-
-# Apply nest_asyncio for interactive environments
-nest_asyncio.apply()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

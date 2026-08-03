@@ -18,7 +18,6 @@ dependencies = [
     "geopy",
     "geopandas",
     "httpx",
-    "nest-asyncio",
     "numpy",
     "openpyxl",
     "pandas",

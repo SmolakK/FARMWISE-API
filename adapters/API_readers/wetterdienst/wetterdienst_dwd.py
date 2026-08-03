@@ -57,11 +57,42 @@ def _collect_request(request, cancel_event):
     return _to_pandas(values_result.df), _to_pandas(request.df)
 
 
-async def fetch_data(request):
-    """Fetch DWD data without leaving a worker alive after cancellation."""
+def _build_and_collect_request(
+    data_requested,
+    start_date,
+    end_date,
+    bbox,
+    cancel_event,
+):
+    """Build, spatially filter, and collect DWD data in one worker thread."""
+    if cancel_event.is_set():
+        raise _DwdFetchCancelled
+    west, south, east, north = bbox
+    request = DwdObservationRequest(
+        parameters=[
+            ("daily", "climate_summary", parameter)
+            for parameter in data_requested
+        ],
+        start_date=start_date,
+        end_date=end_date,
+    ).filter_by_bbox(west, south, east, north)
+    if cancel_event.is_set():
+        raise _DwdFetchCancelled
+    return _collect_request(request, cancel_event)
+
+
+async def fetch_data(data_requested, start_date, end_date, bbox):
+    """Run all blocking Wetterdienst operations outside the asyncio loop."""
     cancel_event = Event()
     executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="farmwise-dwd")
-    concurrent_future = executor.submit(_collect_request, request, cancel_event)
+    concurrent_future = executor.submit(
+        _build_and_collect_request,
+        data_requested,
+        start_date,
+        end_date,
+        bbox,
+        cancel_event,
+    )
     future = asyncio.wrap_future(concurrent_future)
     try:
         return await asyncio.shield(future)
@@ -100,18 +131,14 @@ async def read_data(spatial_range, time_range, data_range, level,
     end_date = dt.datetime.strptime(end_date, '%Y-%m-%d')
     data_requested = list([k for k, v in DATA_ALIASES.items() if v in data_range])
 
-    # Create a request object
-    requests = DwdObservationRequest(
-        parameters=[
-            ("daily", "climate_summary", parameter)
-            for parameter in data_requested
-        ],
-        start_date=start_date,
-        end_date=end_date
-    ).filter_by_bbox(west, south, east, north)
-
-    # Fetch data asynchronously
-    df, df_stations = await fetch_data(requests)
+    # Wetterdienst performs synchronous network I/O while constructing and
+    # filtering a request, so the whole operation runs in the worker.
+    df, df_stations = await fetch_data(
+        data_requested,
+        start_date,
+        end_date,
+        (west, south, east, north),
+    )
 
     if df.empty:
         warnings.warn("No stations found in the specified bounding box.")

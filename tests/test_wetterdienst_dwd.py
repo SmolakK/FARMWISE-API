@@ -2,7 +2,11 @@ import pytest
 import asyncio
 from unittest.mock import patch, MagicMock
 import pandas as pd
-from threading import Event, enumerate as enumerate_threads
+from threading import Event, current_thread, enumerate as enumerate_threads
+
+ORIGINAL_ASYNCIO_TASK = asyncio.Task
+
+from adapters.API_readers.gios_gw import gios_gw
 from adapters.API_readers.wetterdienst.wetterdienst_dwd import (
     _DwdFetchCancelled,
     _collect_request,
@@ -156,16 +160,56 @@ async def test_fetch_data_closes_worker_after_cancellation():
     request.values = Values()
     request.df = pd.DataFrame({"station_id": ["1"]})
 
-    task = asyncio.create_task(fetch_data(request))
-    assert await asyncio.to_thread(entered.wait, 1)
-    task.cancel()
-    await asyncio.sleep(0)
-    release.set()
+    with patch(
+        "adapters.API_readers.wetterdienst.wetterdienst_dwd.DwdObservationRequest",
+        return_value=MagicMock(filter_by_bbox=MagicMock(return_value=request)),
+    ):
+        task = asyncio.create_task(
+            fetch_data(["precipitation_height"], None, None, (9, 49, 12, 51))
+        )
+        assert await asyncio.to_thread(entered.wait, 1)
+        task.cancel()
+        await asyncio.sleep(0)
+        release.set()
 
-    with pytest.raises(asyncio.CancelledError):
-        await task
+        with pytest.raises(asyncio.CancelledError):
+            await task
 
     assert not any(
         thread.name.startswith("farmwise-dwd")
         for thread in enumerate_threads()
     )
+
+
+@pytest.mark.asyncio
+async def test_fetch_data_builds_request_outside_event_loop_thread():
+    worker_name = None
+    request = MagicMock()
+    request.values.query = None
+    request.values.all.return_value.to_dict.return_value = {
+        "values": [],
+        "stations": [],
+    }
+
+    def build_request(*_args, **_kwargs):
+        nonlocal worker_name
+        worker_name = current_thread().name
+        return MagicMock(filter_by_bbox=MagicMock(return_value=request))
+
+    with patch(
+        "adapters.API_readers.wetterdienst.wetterdienst_dwd.DwdObservationRequest",
+        side_effect=build_request,
+    ):
+        await fetch_data(
+            ["precipitation_height"],
+            None,
+            None,
+            (9, 49, 12, 51),
+        )
+
+    assert worker_name.startswith("farmwise-dwd")
+
+
+def test_importing_gios_does_not_patch_asyncio_tasks():
+    assert "nest_asyncio" not in gios_gw.__dict__
+    assert asyncio.Task is ORIGINAL_ASYNCIO_TASK
