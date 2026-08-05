@@ -102,6 +102,12 @@ memory in two panels; the CSV retains the actual input values and cell counts.
 
 ## 2.4 Cross-source agreement
 
+Live collection includes ERA5 and therefore requires an ECMWF/CDS account,
+manual acceptance of the ERA5 dataset terms, and a personal API token in
+`.cdsapirc`. Configure it using the
+[official CDS API instructions](https://cds.climate.copernicus.eu/how-to-api)
+before running the collector. The FARMWISE server login is not a CDS login.
+
 Collect live overlapping data without harmonization:
 
 ```powershell

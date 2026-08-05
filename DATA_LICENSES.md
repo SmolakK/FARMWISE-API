@@ -77,10 +77,23 @@ licence, access date, and modification notices listed below.
 - **Source:** <https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels>
 - **DOI:** <https://doi.org/10.24381/cds.adbb2d47>
 - **Licence:** CC-BY licence displayed by the dataset catalogue.
+- **Access control:** retrieval is not anonymous. The retrieving user or
+  server operator must have an ECMWF/CDS account, sign in, manually accept the
+  ERA5 dataset terms, and configure their personal API token in `.cdsapirc` as
+  described by the [official CDS API setup](https://cds.climate.copernicus.eu/how-to-api).
+  A FARMWISE account does not satisfy these requirements.
 - **Required attribution:** identify the Copernicus Climate Change Service,
   cite the DOI and access date, link the applicable licence, and state that
   FARMWISE converted units and aggregated hourly data to daily S2-cell output.
-- **Redistribution status:** **Allowed**.
+- **Credential handling:** never store a CDS token in the repository, package,
+  container image, application database, request payload, log, or export. In
+  server mode the current adapter uses the credentials of the operating-system
+  account running FARMWISE, not the authenticated FARMWISE API caller.
+- **Redistribution status:** **Allowed** when the licence and attribution
+  conditions are met; authenticated upstream retrieval and prior acceptance
+  of the dataset terms are still required. A deployment requiring acceptance
+  by each end user must not dispatch ERA5 until secure per-user credential
+  delegation is implemented.
 
 ### CDS satellite land cover
 
@@ -99,18 +112,6 @@ licence, access date, and modification notices listed below.
 - **Redistribution status:** **Conditional**. Do not mirror a downloaded
   archive under a generic CC BY label; record the exact licences accompanying
   that archive first.
-
-### Deprecated CDS agroproductivity indicators
-
-- **Adapter:** `adapters.API_readers.cds.cds_vegetation`
-- **Dataset/resource:** `sis-agroproductivity-indicators`
-- **Local persistence:** historical ZIP/NetCDF cache files may exist under
-  `adapters/API_readers/cds/temp_storage/`.
-- **State:** downloads have been permanently retired and the adapter is listed
-  in `DISABLED_API_SOURCES`.
-- **Redistribution status:** **Disabled**. Do not publish an old cached copy
-  unless its original dataset-specific licence and attribution record were
-  retained with it.
 
 ### IMGW-PIB meteorological and hydrological observations
 

@@ -90,6 +90,25 @@ dispatch entries are therefore absent from public pip packages. A private
 source checkout can use a lawfully obtained local copy through
 `FARMWISE_DATA_DIR`, but FARMWISE must not expose it through the public API.
 
+### ERA5/CDS authentication
+
+ERA5 is not an anonymous upstream source. Before the ERA5 adapter can retrieve
+data, the operator must:
+
+1. register and sign in to the ECMWF Climate Data Store;
+2. manually accept the terms shown on the ERA5 dataset page; and
+3. place their personal CDS API token in `%USERPROFILE%\.cdsapirc` on Windows
+   or `$HOME/.cdsapirc` on Linux/macOS, following the
+   [official CDS API setup](https://cds.climate.copernicus.eu/how-to-api).
+
+The FARMWISE application login is unrelated to the CDS account and does not
+grant ERA5 access. In server mode, `cdsapi.Client()` uses the credentials of
+the operating-system account running FARMWISE; API callers must never submit
+CDS passwords or tokens as request parameters. Do not commit `.cdsapirc`, copy
+it into a wheel/container image, or write its token to logs. A public
+deployment that requires every caller to accept CDS terms must disable ERA5
+until it provides secure per-user credential delegation.
+
 Writable cache files and the default SQLite database are stored under
 `FARMWISE_CACHE_DIR` (by default the user's `.cache/farmwise` directory).
 Set `FARMWISE_DATABASE_URL` to use another SQLAlchemy database URL.
