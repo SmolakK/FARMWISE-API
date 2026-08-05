@@ -1,4 +1,8 @@
 __pycache__
+build/
+dist/
+.codex-package-audit*/
+.codex-pytest*/
 .idea/workspace.xml
 .idea/FARMWISE.iml
 .idea/FARMWISE.iml

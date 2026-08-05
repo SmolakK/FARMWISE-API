@@ -37,3 +37,5 @@ def test_sdist_manifest_prunes_private_and_large_data():
         "prune adapters/API_readers/IFSGRID/data",
     }
     assert required_prunes <= set(manifest.splitlines())
+    assert "exclude tests/test_egdi_read_d10.py" in manifest
+    assert "exclude tests/test_egdi_read_hc.py" in manifest

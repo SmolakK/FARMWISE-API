@@ -27,5 +27,7 @@ global-exclude *.zip
 
 exclude server.log
 exclude server/server.log
+exclude tests/test_egdi_read_d10.py
+exclude tests/test_egdi_read_hc.py
 exclude user_storage.db
 exclude server/user_storage.db
