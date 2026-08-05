@@ -86,22 +86,6 @@ API_PATH_RANGES = {
          2,
          1)
     ),
-    'adapters.API_readers.egdi.egdi_read_hc': (
-        ((71, 34, 45, -25),
-         ('1950-01-01', CURRENT_DAY),
-         ['hydraulic conductivity'],
-         'none',
-         2,
-         1)
-    ),
-    'adapters.API_readers.egdi.egdi_read_d10': (
-        ((71, 34, 30, -10),
-         ('1950-01-01', CURRENT_DAY),
-         ['depth to watertable'],
-         'none',
-         2,
-         1)
-    ),
     'adapters.API_readers.hubeau.hubeau_wq_read': (
         ((51.09, 41.33, 9.56, -5.14),
          ('1969-01-01', CURRENT_DAY),
@@ -213,11 +197,19 @@ DISABLED_API_SOURCES = {
         'The CDS sis-agroproductivity-indicators dataset is deprecated and '
         'downloads are no longer supported.'
     ),
+    'adapters.API_readers.egdi.egdi_read_hc': (
+        'EGDI HOVER WP7 data is not licensed for redistribution. The adapter '
+        'is excluded from public packages and dispatch.'
+    ),
+    'adapters.API_readers.egdi.egdi_read_d10': (
+        'EGDI HOVER WP7 data is not licensed for redistribution. The adapter '
+        'is excluded from public packages and dispatch.'
+    ),
 }
 
 # Relative confidence assigned to each source during cross-source
-# harmonization.  The values are deliberately neutral until they are
-# calibrated against reference datasets.  A missing future source also
+# harmonization. The values are deliberately neutral until they are
+# calibrated against reference datasets. A missing future source also
 # receives a weight of 1.0 in the harmonization layer.
 #
 # Keep this dictionary separate from ``API_PATH_RANGES`` so the established
@@ -228,8 +220,8 @@ DATA_SOURCE_WEIGHTS = {
 }
 
 
-# Harmonization method selected for each logical data type.  New data types
-# can be added here without changing the aggregation code.  A caller can also
+# Harmonization method selected for each logical data type. New data types
+# can be added here without changing the aggregation code. A caller can also
 # override these values for a single ``read_data`` call.
 #
 # Available methods:
@@ -258,7 +250,7 @@ DATA_TYPE_HARMONIZATION_METHODS = {
 
 # Aggregation used inside an individual adapter when several source records,
 # stations, or raster pixels fall into the same S2 cell and time period. This
-# policy is deliberately independent from cross-source harmonization above.
+# policy is deliberately independent of cross-source harmonization above.
 WITHIN_SOURCE_AGGREGATION_METHODS = {
     "default": "mean",
     "temperature": "mean",

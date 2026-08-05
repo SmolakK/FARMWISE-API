@@ -7,6 +7,7 @@ from adapters.mappings.data_source_mapping import (
     API_PATH_RANGES,
     DATA_SOURCE_WEIGHTS,
     DATA_TYPE_HARMONIZATION_METHODS,
+    DISABLED_API_SOURCES,
     WITHIN_SOURCE_AGGREGATION_METHODS,
 )
 from core.harmonization import (
@@ -29,6 +30,16 @@ def test_mapping_configures_every_current_source_and_data_type():
     assert "default" in DATA_TYPE_HARMONIZATION_METHODS
     assert configured_types <= set(WITHIN_SOURCE_AGGREGATION_METHODS)
     assert "default" in WITHIN_SOURCE_AGGREGATION_METHODS
+
+
+def test_egdi_is_excluded_from_public_dispatch():
+    egdi_sources = {
+        "adapters.API_readers.egdi.egdi_read_hc",
+        "adapters.API_readers.egdi.egdi_read_d10",
+    }
+
+    assert egdi_sources.isdisjoint(API_PATH_RANGES)
+    assert egdi_sources <= set(DISABLED_API_SOURCES)
 
 
 def _frame(values, columns, dates=("2024-01-01",)):

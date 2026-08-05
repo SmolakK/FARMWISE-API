@@ -78,14 +78,17 @@ Copy-Item public_host.env.example public_host.env
 email delivery is used. `PUBLIC_BASE_URL` should contain a host and optional
 port without a URL scheme, for example `localhost:8000`.
 
-Large adapter datasets may be supplied under `adapters/API_readers` or through
-`FARMWISE_DATA_DIR`. Remote prefetching is disabled by default; enable it with
-`FARMWISE_PREFETCH_DATA=true` after replacing placeholder entries in
-`core/utils/data_manifest.py` with real URLs and checksums.
+Large adapter datasets are intentionally excluded from both pip wheels and
+source distributions. This includes EuroCropV2, CORRECTIV, EEA and IFSGRID
+data. Supply them through `FARMWISE_DATA_DIR`, or configure a licence-compliant
+remote source with a real URL and checksum in `core/utils/data_manifest.py`.
+Remote prefetching is disabled by default; enable it with
+`FARMWISE_PREFETCH_DATA=true` only after configuring that manifest.
 
-The multi-gigabyte EuroCropV2 `points.csv` dataset is intentionally excluded
-from the pip distribution. Provide it through `FARMWISE_DATA_DIR`, or configure
-its remote source in the data manifest before using that adapter.
+EGDI HOVER WP7 is not licensed for redistribution. Its data, adapter and
+dispatch entries are therefore absent from public pip packages. A private
+source checkout can use a lawfully obtained local copy through
+`FARMWISE_DATA_DIR`, but FARMWISE must not expose it through the public API.
 
 Writable cache files and the default SQLite database are stored under
 `FARMWISE_CACHE_DIR` (by default the user's `.cache/farmwise` directory).
@@ -228,3 +231,11 @@ python -m evaluation.run_all
 The committed logs and figures are explicitly labelled synthetic controls.
 Use `evaluation.collect_cross_source` and observed dispatch latencies before
 reporting the results as empirical or publication-ready.
+
+## License
+
+The FARMWISE source code is licensed under the
+[Apache License 2.0](LICENSE). Third-party datasets accessed or processed by
+FARMWISE remain subject to their respective licences and are not relicensed
+under Apache-2.0. See the [data licensing and attribution
+register](DATA_LICENSES.md) for source-specific terms.

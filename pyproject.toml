@@ -7,6 +7,7 @@ name = "farmwise-api"
 version = "0.1.0"
 description = "European agricultural and environmental data aggregation API"
 readme = "README.md"
+license = { file = "LICENSE" }
 requires-python = ">=3.10"
 dependencies = [
     "aiofiles",
@@ -65,27 +66,38 @@ farmwise-api = "main:run"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["adapters*", "core*", "server*", "evaluation*"]
-exclude = ["tests*", "internal-lib*"]
+exclude = ["tests*", "internal-lib*", "adapters.API_readers.egdi*"]
 
 [tool.setuptools]
 py-modules = ["main", "main_call", "quality_assess"]
+include-package-data = false
 
 [tool.setuptools.package-data]
-"adapters.API_readers" = [
-    "**/*.csv",
-    "**/*.json",
-    "**/*.md",
-    "**/*.parquet",
-    "**/*.tif",
-    "**/*.txt",
-    "**/*.xml",
-]
+"adapters.API_readers.epa_ireland" = ["constants/EPA_coordinates.csv"]
+"adapters.API_readers.gios" = ["constants/gios_coordinates.csv"]
+"adapters.API_readers.hubeau" = ["constants/*.csv"]
+"adapters.API_readers.IFSGRID.utils" = ["definitions.json"]
+"adapters.API_readers.imgw" = ["constants/imgw_coordinates.csv"]
+"adapters.API_readers.imgw_hydro" = ["constants/imgw_coordinates.csv"]
+"adapters.API_readers.irish_meteo" = ["EPA_ireland_stations.csv"]
 "core.utils" = ["country_codes"]
 "server" = ["static/*"]
 
 [tool.setuptools.exclude-package-data]
-"adapters.API_readers" = [
-    "EuroCropV2/data/points.csv",
+"*" = [
+    "**/data/*",
+    "**/data/**/*",
+    "**/eea_data/*",
+    "**/eea_data/**/*",
+    "**/temp_storage/*",
+    "**/temp_storage/**/*",
+    "*.db",
+    "*.nc",
+    "*.parquet",
+    "*.sqlite",
+    "*.sqlite3",
+    "*.tif",
+    "*.tiff",
 ]
 
 [tool.pytest.ini_options]

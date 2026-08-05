@@ -8,7 +8,7 @@ from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METH
 from core.within_source_aggregation import aggregate_to_s2
 from core.utils.paths import adapter_data
 
-EGDI_FILE = adapter_data("egdi", "data", "gewp7_peu1_d10km_4326.tif")
+EGDI_RESOURCE = ("egdi", "data", "gewp7_peu1_d10km_4326.tif")
 
 
 async def read_data(spatial_range, time_range, data_range, level,
@@ -36,7 +36,9 @@ async def read_data(spatial_range, time_range, data_range, level,
 
     # Load and process the raster file asynchronously using a synchronous context manager in a thread
     def load_raster_data():
-        with rasterio.open(EGDI_FILE) as dataset:
+        # EGDI files are intentionally not distributed with FARMWISE. A local
+        # user must provide a lawfully obtained copy through FARMWISE_DATA_DIR.
+        with rasterio.open(adapter_data(*EGDI_RESOURCE)) as dataset:
             window = from_bounds(left=west, bottom=south, right=east, top=north, transform=dataset.transform)
             win_transform = rasterio.windows.transform(window, dataset.transform)
 

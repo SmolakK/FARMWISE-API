@@ -168,16 +168,10 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
         effective_methods.update(harmonization_methods)
     effective_methods = validate_harmonization_methods(effective_methods)
 
-    effective_within_source_methods = dict(
-        WITHIN_SOURCE_AGGREGATION_METHODS
-    )
+    effective_within_source_methods = dict(WITHIN_SOURCE_AGGREGATION_METHODS)
     if within_source_aggregation_methods:
-        effective_within_source_methods.update(
-            within_source_aggregation_methods
-        )
-    effective_within_source_methods = validate_within_source_methods(
-        effective_within_source_methods
-    )
+        effective_within_source_methods.update(within_source_aggregation_methods)
+    effective_within_source_methods = validate_within_source_methods(effective_within_source_methods)
 
     data_storage = []  # (source path, DataFrame, matching logical data types)
     api_metadata = []
@@ -185,6 +179,7 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     quality_tasks = []
     dispatch_metrics = []
     request_id = uuid4().hex
+
     if country is not None:
         if isinstance(country, str):
             country = [country]  # Support single country input
@@ -458,7 +453,7 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
 #     asyncio.run(read_data(**case))
 
 # Example using bounding box
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # asyncio.run(read_data(
     #     bounding_box=(71, 34, 45, -25),
     #     level=10,
@@ -473,19 +468,15 @@ if __name__ == "__main__":
     #     ],
     #     produce_map=True
     # ))
-    asyncio.run(read_data(
-        country=['Austria'],
-        level=10,
-        time_from='2010-01-10',
-        time_to='2010-02-10',
-        factors=[
-            'temperature', 'precipitation', 'potential evaporation',
-            'soil', 'surface water quantity', 'land cover',
-            'hydraulic conductivity', 'depth to watertable',
-            'groundwater quality', 'groundwater quantity',
-            'surface water quality',
-        ],
-    ))
+    # asyncio.run(read_data(
+    #     country=['Andorra'],
+    #     level=10,
+    #     time_from='2010-01-10',
+    #     time_to='2010-02-10',
+    #     factors=[
+    #         'temperature', 'precipitation'
+    #     ],
+    # ))
 
 
 __all__ = ["plan_source_dispatch", "read_data"]

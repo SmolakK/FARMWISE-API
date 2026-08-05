@@ -27,7 +27,7 @@ async def extract_point_ids(url):
     :return: A comma-separated string of point IDs extracted from the links on the page.
     """
     async with httpx.AsyncClient() as client:
-        page = await client.get(url)
+        page = await client.get(url, follow_redirects=True)
     soup = BeautifulSoup(page.text, "html.parser")
     links = soup.find_all('a')
     point_ids = [re.findall(r'p=(\d+)', link.get('href', '')) for link in links]

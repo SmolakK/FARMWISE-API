@@ -43,4 +43,5 @@ server/routers/__pycache__/data_call.cpython-39.pyc
 temp_files/
 .idea/workspace.xml
 adapters/API_readers/IFSGRID/data/IFSGRID/*
+adapters/API_readers/egdi/data/*
 eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif
