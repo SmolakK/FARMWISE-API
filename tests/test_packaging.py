@@ -103,13 +103,20 @@ def test_built_wheel_installs_and_exposes_local_api(built_wheel, tmp_path):
     assert smoke_test.returncode == 0, smoke_test.stdout + smoke_test.stderr
 
 
-def test_built_wheel_declares_server_extra(built_wheel):
+def test_built_wheel_declares_runtime_and_server_dependencies(built_wheel):
     with ZipFile(built_wheel) as wheel:
         names = set(wheel.namelist())
         metadata_name = next(
             name for name in names if name.endswith(".dist-info/METADATA")
         )
         metadata = BytesParser().parsebytes(wheel.read(metadata_name))
+
+    base_requirements = [
+        requirement
+        for requirement in metadata.get_all("Requires-Dist", [])
+        if "extra ==" not in requirement
+    ]
+    assert "hubeaupyutils==0.1.0" in base_requirements
 
     assert "server" in metadata.get_all("Provides-Extra", [])
     server_requirements = [

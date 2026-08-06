@@ -20,6 +20,7 @@ dependencies = [
     "geopy",
     "geopandas",
     "httpx",
+    "hubeaupyutils==0.1.0",
     "numpy",
     "openpyxl",
     "pandas",

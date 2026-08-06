@@ -58,7 +58,10 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[server,dev]"
 ```
 
-The Hub'Eau adapters use the bundled helper library:
+The Hub'Eau adapters declare `hubeaupyutils==0.1.0` as a runtime dependency.
+Until that distribution is published in the package index used for FARMWISE,
+install its repository copy before installing FARMWISE in a development
+environment:
 
 ```powershell
 python -m pip install -e .\internal-lib\hubeaupyutils\hubeaupyutils-main
