@@ -5,10 +5,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e861ba43-0096-452f-bd7e-8db19b445a06" name="Changes" comment="new sources added">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/adapters/API_readers/gios/gios_scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/adapters/API_readers/gios/gios_scraper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DATA_LICENSES.md" beforeDir="false" afterPath="$PROJECT_DIR$/DATA_LICENSES.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MANIFEST.in" beforeDir="false" afterPath="$PROJECT_DIR$/MANIFEST.in" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/adapters/API_readers/imgw/imgw_api_stations.py" beforeDir="false" afterPath="$PROJECT_DIR$/adapters/API_readers/imgw/imgw_api_stations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/adapters/API_readers/imgw/imgw_api_synop_daily.py" beforeDir="false" afterPath="$PROJECT_DIR$/adapters/API_readers/imgw/imgw_api_synop_daily.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/adapters/API_readers/imgw_hydro/imgw_api_hydro_daily.py" beforeDir="false" afterPath="$PROJECT_DIR$/adapters/API_readers/imgw_hydro/imgw_api_hydro_daily.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/adapters/API_readers/imgw_hydro/imgw_hydro_stations_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/adapters/API_readers/imgw_hydro/imgw_hydro_stations_api.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/adapters/mappings/data_source_mapping.py" beforeDir="false" afterPath="$PROJECT_DIR$/adapters/mappings/data_source_mapping.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/main_call.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/main_call.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/utils/data_manifest.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/data_manifest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/utils/fetch_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/fetch_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/utils/paths.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/paths.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routers/frontpage.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/routers/frontpage.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_harmonization.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_harmonization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_imgw_api_hydro_daily.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_imgw_api_hydro_daily.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_imgw_api_synop_daily.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_imgw_api_synop_daily.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_packaging.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_packaging.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_station_builders.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_station_builders.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -289,6 +308,7 @@
       <workItem from="1785568820015" duration="1499000" />
       <workItem from="1785755943367" duration="10937000" />
       <workItem from="1785823008493" duration="13454000" />
+      <workItem from="1785935271698" duration="897000" />
     </task>
     <task id="LOCAL-00001" summary="new sources added">
       <option name="closed" value="true" />
@@ -336,7 +356,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/adapters/API_readers/imgw_hydro/imgw_hydro_stations_api.py</url>
-          <line>43</line>
+          <line>45</line>
           <option name="timeStamp" value="325" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -366,7 +386,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/core/main_call.py</url>
-          <line>321</line>
+          <line>331</line>
           <option name="timeStamp" value="604" />
         </line-breakpoint>
       </breakpoints>

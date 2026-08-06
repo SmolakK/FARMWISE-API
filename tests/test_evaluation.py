@@ -3,7 +3,11 @@ import math
 import pandas as pd
 import pytest
 
-from evaluation.collect_cross_source import separate_frame_to_observations
+from evaluation import collect_cross_source as live_collector
+from evaluation.collect_cross_source import (
+    separate_frame_to_observations,
+    validate_private_output,
+)
 from evaluation.coverage_precheck import benchmark_coverage_precheck
 from evaluation.cross_source_agreement import (
     compute_agreement_metrics,
@@ -109,6 +113,21 @@ def test_separate_frame_conversion_extracts_source_and_logical_variable():
 
     assert set(result["source"]) == {"ERA5", "DWD"}
     assert set(result["variable"]) == {"temperature", "precipitation"}
+
+
+def test_live_imgw_output_is_rejected_inside_repository(monkeypatch, tmp_path):
+    monkeypatch.setattr(live_collector, "PROJECT_ROOT", tmp_path)
+    observations = pd.DataFrame({"source": ["IMGW"], "value": [1.0]})
+
+    with pytest.raises(PermissionError, match="outside the repository"):
+        validate_private_output(tmp_path / "evaluation" / "live.csv", observations)
+
+
+def test_non_imgw_live_output_may_remain_in_repository(monkeypatch, tmp_path):
+    monkeypatch.setattr(live_collector, "PROJECT_ROOT", tmp_path)
+    observations = pd.DataFrame({"source": ["ERA5"], "value": [1.0]})
+
+    assert validate_private_output(tmp_path / "evaluation" / "live.csv", observations) is None
 
 
 def test_quality_control_detects_implausible_value_across_multiple_cells():

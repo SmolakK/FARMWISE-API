@@ -79,11 +79,36 @@ email delivery is used. `PUBLIC_BASE_URL` should contain a host and optional
 port without a URL scheme, for example `localhost:8000`.
 
 Large adapter datasets are intentionally excluded from both pip wheels and
-source distributions. This includes EuroCropV2, CORRECTIV, EEA and IFSGRID
-data. Supply them through `FARMWISE_DATA_DIR`, or configure a licence-compliant
-remote source with a real URL and checksum in `core/utils/data_manifest.py`.
+source distributions. This includes EuroCropV2, EEA and IFSGRID data. Supply
+redistributable datasets through `FARMWISE_DATA_DIR`, or configure a
+licence-compliant remote source with a real URL and checksum in
+`core/utils/data_manifest.py`.
 Remote prefetching is disabled by default; enable it with
 `FARMWISE_PREFETCH_DATA=true` only after configuring that manifest.
+
+CORRECTIV.Lokal data is treated as protected: its Parquet file is absent from
+the repository, packages and remote-data manifest, and its adapter is disabled
+from dispatch. Do not publish or mirror source or derived row-level data
+without explicit written permission covering the exact dataset and use.
+
+IMGW-PIB data is enabled only for private, non-commercial local use. It is
+blocked by every server entry point and its station files are not distributed
+in pip packages. A permitted local user must privately populate
+`FARMWISE_DATA_DIR` and explicitly acknowledge the restriction before use:
+
+```powershell
+$env:FARMWISE_ENABLE_PRIVATE_IMGW = "1"
+```
+
+Do not set this variable on a public or commercial deployment. IMGW source or
+derived data must not be written to public exports, evaluation outputs, shared
+caches, GitHub, PyPI, Zenodo, or container images.
+
+Keep private datasets outside the repository, preferably in a directory
+mounted through `FARMWISE_DATA_DIR`. Local data directories, credentials,
+databases, archives, GIS files, rasters and columnar datasets are covered by
+`.gitignore` and distribution-manifest exclusions. These rules protect new
+files; they do not erase files already present in Git history.
 
 EGDI HOVER WP7 is not licensed for redistribution. Its data, adapter and
 dispatch entries are therefore absent from public pip packages. A private

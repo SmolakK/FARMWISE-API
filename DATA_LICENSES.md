@@ -117,23 +117,25 @@ licence, access date, and modification notices listed below.
 
 - **Adapters:** `adapters.API_readers.imgw.imgw_api_synop_daily` and
   `adapters.API_readers.imgw_hydro.imgw_api_hydro_daily`
-- **Local resources:**
-  `adapters/API_readers/imgw/constants/imgw_coordinates.csv`,
-  `adapters/API_readers/imgw/constants/imgw_raw.csv`, and
-  `adapters/API_readers/imgw_hydro/constants/imgw_coordinates.csv`.
+- **Local resources:** protected station-coordinate files are not bundled or
+  distributed. A permitted local user must supply them privately through
+  `FARMWISE_DATA_DIR`.
 - **Provider:** Instytut Meteorologii i Gospodarki Wodnej — Państwowy Instytut
   Badawczy (IMGW-PIB)
 - **Source and terms:** <https://danepubliczne.imgw.pl/datastore>
+- **Permitted purpose in FARMWISE:** **private, non-commercial local use
+  only**. The adapter is disabled in all public server entry points. Local use
+  additionally requires the explicit acknowledgement
+  `FARMWISE_ENABLE_PRIVATE_IMGW=1`.
 - **Required attribution:** include the exact statement
   `Źródłem pochodzenia danych jest Instytut Meteorologii i Gospodarki Wodnej – Państwowy Instytut Badawczy`.
   For processed data also include
   `Dane Instytutu Meteorologii i Gospodarki Wodnej – Państwowego Instytutu Badawczego zostały przetworzone`.
-- **Redistribution status:** **Conditional**. The published terms allow reuse
-  with attribution, but also require an agreement for specified business and
-  agricultural-support uses unless the particular dataset is a high-value
-  dataset. Obtain written confirmation from IMGW-PIB for a commercial or
-  agriculture-facing hosted FARMWISE service. Until then, do not mirror full
-  IMGW datasets; keep access local/on demand.
+- **Redistribution status:** **Prohibited by FARMWISE policy**. Do not bundle,
+  mirror, publish, cache for sharing, expose through a hosted API, or include
+  IMGW source/derived data in GitHub, PyPI, Zenodo, containers, evaluation
+  logs, figures, or downloadable exports. Commercial or other non-private use
+  requires a separate agreement with IMGW-PIB and a subsequent policy review.
 
 ### GIOŚ soil monitoring and groundwater monitoring
 
@@ -272,22 +274,18 @@ licence, access date, and modification notices listed below.
 ### CORRECTIV.Lokal groundwater data
 
 - **Adapter:** `adapters.API_readers.correctiv.correctiv_read`
-- **Local resource:**
-  `adapters/API_readers/correctiv/data/data_points.parquet`.
+- **Local resource:** protected Parquet data is not bundled, mirrored, or
+  listed in the remote-data manifest.
 - **Source:** <https://github.com/correctiv/grundwasser-data>
-- **Declared repository licence:** GNU General Public License v3.0
-- **Additional requirement:** the source README requires compliance with the
-  linked rules for naming CORRECTIV.Lokal.
-- **Required attribution:** identify CORRECTIV.Lokal and the original
-  repository, preserve the GPL-3.0 notice, provide the preferred/source form
-  or reproducible conversion script, and prominently state changes that
-  produced the FARMWISE Parquet file.
-- **Redistribution status:** **Conditional**. The repository contains a GPL-3.0
-  file but does not explicitly separate the licensing of the compiled dataset
-  from code, and the observations originate from multiple German authorities.
-  Obtain written confirmation from CORRECTIV that the licence covers data
-  redistribution before FARMWISE mirrors the Parquet file. Until then,
-  distribute only a transformation script and fetch from the official source.
+- **Rights status:** **protected**. A code licence in a repository must not be
+  treated as permission to redistribute the compiled research dataset or its
+  authority-supplied observations. CORRECTIV.Lokal also provides research
+  material under cooperation and naming conditions.
+- **Redistribution status:** **Prohibited** without explicit written
+  permission covering this exact dataset and intended use. The adapter is
+  excluded from dispatch. Do not place the Parquet file or derived row-level
+  data in GitHub, PyPI, Zenodo, containers, caches shared between users,
+  evaluation outputs, API responses, or remote-download manifests.
 
 ### IFSGRID agricultural census data
 

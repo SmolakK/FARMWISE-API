@@ -3,12 +3,12 @@ from fastapi.responses import HTMLResponse
 from fastapi import Depends
 from server.security import get_current_active_user
 from server.schemas import User
-from adapters.mappings.data_source_mapping import API_PATH_RANGES
+from adapters.mappings.data_source_mapping import PUBLIC_SERVER_API_PATH_RANGES
 from core.utils.country_bboxes import return_country_bboxes
 
 available_countries = list(return_country_bboxes().keys())
 available_factors = []
-for x in API_PATH_RANGES.values():
+for x in PUBLIC_SERVER_API_PATH_RANGES.values():
     available_factors += x[2]
 available_factors = list(set(available_factors))
 

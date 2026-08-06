@@ -10,6 +10,7 @@ from zipfile import ZipFile
 import io
 from core.utils.coordinates_to_cells import prepare_coordinates
 from core.utils.imgw_utils import create_timestamp_from_row, get_years_between_dates
+from core.utils.access_policy import require_private_noncommercial_imgw
 from core.utils.paths import adapter_data
 from tqdm import tqdm
 from adapters.API_readers.imgw_hydro.imgw_mappings.imgw_hydro_mappings import WATER_COLUMNS, WATER_SELECTED, DATA_ALIASES
@@ -31,6 +32,7 @@ async def read_data(spatial_range, time_range, data_range, level,
     :param level: S2Cell level.
     :return:
     """
+    require_private_noncommercial_imgw()
     print("DOWNLOADING: IMGW hydro data")
     # Load coordinates CSV asynchronously
     coors = await asyncio.to_thread(

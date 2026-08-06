@@ -216,7 +216,7 @@ def prefetch_all(sources: list[str] | None = None) -> None:
     surprise multi-minute download.
 
     ``sources``: optional list of substrings to filter which entries to
-    fetch (e.g. ["eea", "correctiv"]); None fetches everything.
+    fetch (e.g. ["eea", "EuroCropV2"]); None fetches everything.
     """
     for rel in REMOTE_DATA:
         if sources and not any(s in rel for s in sources):

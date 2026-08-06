@@ -158,14 +158,6 @@ API_PATH_RANGES = {
          1,
          1)
     ),
-    'adapters.API_readers.correctiv.correctiv_read': (
-        ((54.9015649769422183, 47.3985582099588498, 15.0265025546610858, 5.9905334858242725),
-         ('1990-01-01', '2021-12-31'),
-         ['groundwater quality'],
-         'monthly',
-         1,
-         1)
-    ),
     'adapters.API_readers.IFSGRID.IFSGRID_read': (
         ((80, -21.7, 55.97, -61.95),
         ('2020-01-01', CURRENT_DAY),
@@ -205,6 +197,31 @@ DISABLED_API_SOURCES = {
         'EGDI HOVER WP7 data is not licensed for redistribution. The adapter '
         'is excluded from public packages and dispatch.'
     ),
+    'adapters.API_readers.correctiv.correctiv_read': (
+        'CORRECTIV.Lokal research data is protected and has no confirmed '
+        'redistribution permission. The source is excluded from dispatch.'
+    ),
+}
+
+# Sources available only to an informed local, private, non-commercial user.
+# Server entry points always apply this mapping in addition to globally
+# disabled sources. This is deliberately not controlled by request payloads.
+PUBLIC_SERVER_DISABLED_SOURCES = {
+    **DISABLED_API_SOURCES,
+    'adapters.API_readers.imgw.imgw_api_synop_daily': (
+        'IMGW-PIB data is restricted to acknowledged private, '
+        'non-commercial local use.'
+    ),
+    'adapters.API_readers.imgw_hydro.imgw_api_hydro_daily': (
+        'IMGW-PIB data is restricted to acknowledged private, '
+        'non-commercial local use.'
+    ),
+}
+
+PUBLIC_SERVER_API_PATH_RANGES = {
+    source: ranges
+    for source, ranges in API_PATH_RANGES.items()
+    if source not in PUBLIC_SERVER_DISABLED_SOURCES
 }
 
 # Relative confidence assigned to each source during cross-source

@@ -118,11 +118,20 @@ python -m evaluation.collect_cross_source `
   --time-to 2018-03-31
 ```
 
+When IMGW is enabled for permitted private, non-commercial research, the live
+collector writes by default to
+`FARMWISE_CACHE_DIR/evaluation/cross_source_observations_live.csv`, outside the
+repository. It refuses to write live IMGW rows anywhere under the project
+root. Keep subsequent statistics and figures in the same private location;
+do not commit or publish them without a separate IMGW-PIB agreement.
+
 Then calculate aligned cell-day statistics and regenerate figures:
 
 ```powershell
 python -m evaluation.cross_source_agreement `
-  --input evaluation/logs/cross_source_observations_live.csv
+  --input <private-cache-path>/cross_source_observations_live.csv `
+  --output <private-cache-path>/cross_source_agreement.csv `
+  --differences-output <private-cache-path>/cross_source_differences.csv
 python -m evaluation.plots
 ```
 

@@ -8,6 +8,7 @@ import requests
 from tqdm import tqdm
 
 from core.utils.name_to_coordinates import get_coordinates
+from core.utils.access_policy import require_private_noncommercial_imgw
 
 URL = (
     "https://danepubliczne.imgw.pl/data/"
@@ -17,6 +18,7 @@ DEFAULT_OUTPUT = Path(__file__).resolve().parent / "constants" / "imgw_coordinat
 
 
 def build_station_file(output_path: Path = DEFAULT_OUTPUT) -> pd.DataFrame:
+    require_private_noncommercial_imgw()
     response = requests.get(URL, timeout=60)
     response.raise_for_status()
     response.encoding = "windows-1250"

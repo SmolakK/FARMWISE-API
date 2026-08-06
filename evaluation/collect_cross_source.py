@@ -10,7 +10,8 @@ import re
 import pandas as pd
 
 from core.main_call import read_data
-from evaluation.common import LOG_DIR, ensure_output_dirs
+from evaluation.common import ensure_output_dirs
+from core.utils.paths import CACHE_ROOT, PROJECT_ROOT
 
 
 SOURCE_NAMES = {
@@ -51,6 +52,20 @@ def separate_frame_to_observations(frame: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(records)
 
 
+def validate_private_output(path: Path, observations: pd.DataFrame) -> None:
+    """Prevent live IMGW rows from being written anywhere inside the repo."""
+    if "IMGW" not in set(observations.get("source", [])):
+        return
+    try:
+        path.resolve().relative_to(PROJECT_ROOT.resolve())
+    except ValueError:
+        return
+    raise PermissionError(
+        "Live IMGW observations must be written to a private path outside "
+        "the repository (the default FARMWISE cache path is safe)."
+    )
+
+
 async def collect(args):
     result = await read_data(
         country=args.country,
@@ -67,6 +82,7 @@ async def collect(args):
     observations = separate_frame_to_observations(result["data"])
     if observations.empty:
         raise RuntimeError("Returned columns could not be mapped to sources.")
+    validate_private_output(args.output, observations)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     observations.to_csv(args.output, index=False)
     print(f"Wrote {len(observations)} observations to {args.output}")
@@ -83,7 +99,7 @@ def main(argv=None):
     parser.add_argument(
         "--output",
         type=Path,
-        default=LOG_DIR / "cross_source_observations_live.csv",
+        default=CACHE_ROOT / "evaluation" / "cross_source_observations_live.csv",
     )
     args = parser.parse_args(argv)
     ensure_output_dirs()

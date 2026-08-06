@@ -1,0 +1,20 @@
+import pytest
+
+from core.utils.access_policy import (
+    IMGW_PRIVATE_USE_ENV,
+    require_private_noncommercial_imgw,
+)
+
+
+def test_imgw_access_is_denied_without_explicit_acknowledgement(monkeypatch):
+    monkeypatch.delenv(IMGW_PRIVATE_USE_ENV, raising=False)
+
+    with pytest.raises(PermissionError, match="private, non-commercial"):
+        require_private_noncommercial_imgw()
+
+
+@pytest.mark.parametrize("value", ["1", "true", "YES", "on"])
+def test_imgw_access_accepts_documented_truthy_values(monkeypatch, value):
+    monkeypatch.setenv(IMGW_PRIVATE_USE_ENV, value)
+
+    assert require_private_noncommercial_imgw() is None

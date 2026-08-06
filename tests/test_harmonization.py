@@ -8,6 +8,8 @@ from adapters.mappings.data_source_mapping import (
     DATA_SOURCE_WEIGHTS,
     DATA_TYPE_HARMONIZATION_METHODS,
     DISABLED_API_SOURCES,
+    PUBLIC_SERVER_API_PATH_RANGES,
+    PUBLIC_SERVER_DISABLED_SOURCES,
     WITHIN_SOURCE_AGGREGATION_METHODS,
 )
 from core.harmonization import (
@@ -40,6 +42,20 @@ def test_egdi_is_excluded_from_public_dispatch():
 
     assert egdi_sources.isdisjoint(API_PATH_RANGES)
     assert egdi_sources <= set(DISABLED_API_SOURCES)
+
+
+def test_protected_and_private_sources_are_restricted_by_context():
+    correctiv = "adapters.API_readers.correctiv.correctiv_read"
+    imgw_sources = {
+        "adapters.API_readers.imgw.imgw_api_synop_daily",
+        "adapters.API_readers.imgw_hydro.imgw_api_hydro_daily",
+    }
+
+    assert correctiv not in API_PATH_RANGES
+    assert correctiv in DISABLED_API_SOURCES
+    assert imgw_sources <= set(API_PATH_RANGES)
+    assert imgw_sources <= set(PUBLIC_SERVER_DISABLED_SOURCES)
+    assert imgw_sources.isdisjoint(PUBLIC_SERVER_API_PATH_RANGES)
 
 
 def _frame(values, columns, dates=("2024-01-01",)):

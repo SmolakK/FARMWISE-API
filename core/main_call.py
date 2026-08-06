@@ -120,7 +120,7 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                     produce_map=False, source_weights=None, harmonization_methods=None,
                     within_source_aggregation_methods=None,
                     assess_quality=False, persist_quality_reports=False,
-                    quality_report_dir=None):
+                    quality_report_dir=None, disabled_sources=None):
     """
     Main data reading call - combines different APIs which overlap with the requested area and time range.
 
@@ -144,6 +144,9 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                            False for latency-sensitive calls.
     :param quality_report_dir: Optional report directory override. By default
                                reports use the FARMWISE cache directory.
+    :param disabled_sources: Additional source paths to exclude from dispatch.
+                             Server entry points use this for sources whose
+                             terms permit local/private use only.
     :param bounding_box: A tuple containing the geographical coordinates (N, S, E, W) of the area for which data is requested.
                          Format: (North, South, East, West) in decimal degrees.
     :param level: S2Cell level.
@@ -196,8 +199,15 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
         raise ValueError("You must provide either a 'bounding_box' or a 'country' parameter.")
 
     precheck_started = perf_counter()
+    effective_disabled_sources = dict(DISABLED_API_SOURCES)
+    if disabled_sources:
+        effective_disabled_sources.update(disabled_sources)
     dispatch_plan = plan_source_dispatch(
-        bounding_box, time_from, time_to, factors
+        bounding_box,
+        time_from,
+        time_to,
+        factors,
+        disabled_sources=effective_disabled_sources,
     )
     precheck_seconds = perf_counter() - precheck_started
 

@@ -4,7 +4,7 @@ Eagerly fetch large/remote adapter data ahead of time.
 Usage
 -----
     python fetch_data.py --all
-    python fetch_data.py --source eea --source correctiv
+    python fetch_data.py --source eea --source EuroCropV2
 
 Run this in your Docker build or deployment startup script so a server's
 first *request* never triggers a surprise multi-minute download mid-response.

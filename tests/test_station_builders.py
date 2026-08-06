@@ -47,6 +47,7 @@ def test_gios_station_builder_does_not_write_empty_result(monkeypatch, tmp_path)
     ],
 )
 def test_imgw_station_builders(monkeypatch, tmp_path, module, csv_text, expected_code):
+    monkeypatch.setenv("FARMWISE_ENABLE_PRIVATE_IMGW", "1")
     response = MagicMock(text=csv_text)
     get = MagicMock(return_value=response)
     monkeypatch.setattr(module.requests, "get", get)

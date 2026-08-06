@@ -10,7 +10,14 @@ import zipfile
 @patch("adapters.API_readers.imgw.imgw_api_synop_daily.prepare_coordinates")
 @patch("adapters.API_readers.imgw.imgw_api_synop_daily.httpx.AsyncClient")
 @patch("adapters.API_readers.imgw.imgw_api_synop_daily.pd.read_csv")
-async def test_read_data(mock_read_csv, mock_httpx_client, mock_prepare_coordinates):
+async def test_read_data(
+    mock_read_csv, mock_httpx_client, mock_prepare_coordinates, monkeypatch
+):
+    monkeypatch.setenv("FARMWISE_ENABLE_PRIVATE_IMGW", "1")
+    monkeypatch.setattr(
+        "adapters.API_readers.imgw.imgw_api_synop_daily.adapter_data",
+        lambda *_parts: "private-imgw-coordinates.csv",
+    )
     # Mock the imgw_coordinates.csv file
     def mock_read_csv_side_effect(file, *args, **kwargs):
         if isinstance(file, zipfile.ZipExtFile):  # This handles reading from the mocked ZIP

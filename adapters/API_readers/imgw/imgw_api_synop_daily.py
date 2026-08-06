@@ -12,6 +12,7 @@ from adapters.API_readers.imgw.imgw_mappings.synop_mapping import s_d_COLUMNS, s
 from tqdm import tqdm
 from core.utils.coordinates_to_cells import prepare_coordinates
 from core.utils.imgw_utils import create_timestamp_from_row, expand_range, get_years_between_dates
+from core.utils.access_policy import require_private_noncommercial_imgw
 from core.utils.paths import adapter_data
 from datetime import datetime
 
@@ -32,6 +33,7 @@ async def read_data(spatial_range, time_range, data_range, level,
     :param level: S2Cell level.
     :return: A DataFrame containing the requested data pivoted by Timestamp and S2CELL.
     """
+    require_private_noncommercial_imgw()
     print("DOWNLOADING: IMGW synop data")
 
     # Load and process the coordinates CSV asynchronously

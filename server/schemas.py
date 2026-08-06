@@ -1,16 +1,18 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 from typing import Dict, List, Tuple, Optional
 from datetime import datetime
-from adapters.mappings.data_source_mapping import API_PATH_RANGES
+from adapters.mappings.data_source_mapping import PUBLIC_SERVER_API_PATH_RANGES
 from core.harmonization import (
     validate_harmonization_methods,
     validate_source_weights,
 )
 from core.within_source_aggregation import validate_within_source_methods
 
-# Dynamically extract all unique factors from API_PATH_RANGES
+# Dynamically extract factors available through the public server.
 valid_factors = set(
-    factor for api_params in API_PATH_RANGES.values() for factor in api_params[2]
+    factor
+    for api_params in PUBLIC_SERVER_API_PATH_RANGES.values()
+    for factor in api_params[2]
 )
 
 

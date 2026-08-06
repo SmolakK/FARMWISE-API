@@ -31,12 +31,6 @@ REMOTE_DATA: dict[str, dict] = {
         "sha256": "REPLACE_ME",
         "size_mb": 5,  # confirm from EEA source
     },
-    "correctiv/data/data_points.parquet": {
-        "kind": "file",
-        "url": "https://zenodo.org/records/REPLACE_ME/files/data_points.parquet",
-        "sha256": "REPLACE_ME",
-        "size_mb": 1,  # likely small enough to just commit instead -- check
-    },
     "EuroCropV2/data/points.csv": {
         "kind": "file",
         "url": "https://zenodo.org/records/REPLACE_ME/files/points.csv",
