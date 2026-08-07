@@ -1,5 +1,5 @@
+import os
 import pandas as pd
-from pathlib import Path
 from typing import Tuple, List
 
 from adapters.API_readers.EuroCropV2.utils.extractors import extract_data_by_bbox, extract_years
@@ -51,7 +51,7 @@ async def read_data(
     - `data_range` is currently unused but kept for API compatibility.
     """
 
-    data_path = _resolve_points_data()
+    data_path = adapter_data("EuroCropV2", "data", "points.csv")
 
     extracted_data = extract_data_by_bbox(data_path, spatial_range)
 
@@ -72,19 +72,3 @@ async def read_data(
     melted_data = data_melting(aggregated_data, time_range)
     melted_data = melted_data.rename(columns=GLOBAL_MAPPING, level=0)
     return melted_data
-
-
-def _resolve_points_data() -> Path:
-    """Prefer the published compressed derivative, retaining CSV compatibility."""
-    errors = []
-    for filename in ("points.csv.gz", "points.csv"):
-        try:
-            return adapter_data("EuroCropV2", "data", filename)
-        except FileNotFoundError as error:
-            errors.append(str(error))
-    raise FileNotFoundError(
-        "EuroCropV2 representative-point data is not installed. Expected "
-        "points.csv.gz (preferred) or points.csv below "
-        "FARMWISE_DATA_DIR/EuroCropV2/data. Build or publish it with "
-        "tools/eurocropv2.\n" + "\n".join(errors)
-    )

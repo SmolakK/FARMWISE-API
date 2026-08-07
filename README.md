@@ -56,14 +56,12 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -e .\internal-lib\hubeaupyutils\hubeaupyutils-main
-python -m pip install -e ".[server,dev,eurocrop-publish]"
+python -m pip install -e ".[server,dev]"
 ```
 
 The Hub'Eau adapters declare `hubeaupyutils==0.1.0` as a runtime dependency.
 Until that distribution is published in the package index used for FARMWISE,
-the repository copy must be installed first, as shown above. The
-`eurocrop-publish` extra adds the large-data build and Zenodo publication
-tooling; omit it when that workflow is not needed.
+the repository copy must be installed first, as shown above.
 
 ## Configuration
 
@@ -88,8 +86,6 @@ Remote prefetching is disabled by default; enable it with
 `FARMWISE_PREFETCH_DATA=true` only after configuring that manifest.
 QUADICA v1 additionally requires the prepared filenames and provenance
 described in `adapters/API_readers/quadica/DATA_SETUP.md`.
-The reproducible EuroCropsV2 point-data build, CC BY 4.0 attribution files,
-Zenodo metadata and upload workflow are in `tools/eurocropv2/README.md`.
 
 CORRECTIV.Lokal data is treated as protected: its Parquet file is absent from
 the repository, packages and remote-data manifest, and its adapter is disabled

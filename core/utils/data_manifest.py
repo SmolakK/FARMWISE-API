@@ -31,10 +31,12 @@ REMOTE_DATA: dict[str, dict] = {
         "sha256": "4587A4ACCEE9053D8F7E5779A924911545EF75795F18FE846E082A6B453DDCB6",
         "size_mb": 57.2,
     },
-    # EUROCROPV2_REMOTE_START
-    # Added after publishing with:
-    # python -m tools.eurocropv2.finalize_manifest --record-id ... --data-file ...
-    # EUROCROPV2_REMOTE_END
+    "EuroCropV2/data/points.csv": {
+        "kind": "file",
+        "url": "https://zenodo.org/records/REPLACE_ME/files/points.csv",
+        "sha256": "REPLACE_ME",
+        "size_mb": 1,  # likely small enough to just commit instead -- check
+    },
     "IFSGRID/data/IFSGRID/data": {
         "kind": "archive",
         "url": "http://ec.europa.eu/assets/estat/E/E4/gisco/farmstatistics/data.zip",

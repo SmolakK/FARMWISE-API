@@ -257,9 +257,7 @@ licence, access date, and modification notices listed below.
 ### EuroCropV2
 
 - **Adapter:** `adapters.API_readers.EuroCropV2.EuroCropV2_read`
-- **Local resource:** compressed
-  `adapters/API_readers/EuroCropV2/data/points.csv.gz` (preferred), with
-  uncompressed `points.csv` retained as a compatibility fallback.
+- **Local resource:** `adapters/API_readers/EuroCropV2/data/points.csv`.
 - **Provider:** European Commission, Joint Research Centre (JRC), with the
   contributors identified in the dataset catalogue.
 - **Source:** <https://data.jrc.ec.europa.eu/dataset/b9fb9e67-78a9-4327-9d59-39a928d812d3>
@@ -269,9 +267,6 @@ licence, access date, and modification notices listed below.
 - **Required attribution:** cite `European Commission, Joint Research Centre
   (2026): EuroCropsV2`, the DOI, source, and CC BY 4.0; state that parcel
   geometry/attributes were converted or reformatted into FARMWISE point data.
-- **Reproducible derivative and publication files:**
-  `tools/eurocropv2/README.md`. The Zenodo deposit must include its generated
-  `PROVENANCE.json`, `LICENSE.txt`, data dictionary and checksums.
 - **Redistribution status:** **Allowed**, but the multi-gigabyte derived file
   must be hosted as a separately licensed data artifact, not embedded in the
   Git repository or PyPI wheel.
