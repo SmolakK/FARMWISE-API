@@ -1,0 +1,35 @@
+FARMWISE EuroCropsV2.01 representative-point derivative
+========================================================
+
+SPDX-License-Identifier: CC-BY-4.0
+
+Source data copyright: European Union, 1995-2026.
+
+The source EuroCropsV2 dataset is made available under the Creative Commons
+Attribution 4.0 International licence (CC BY 4.0), including applicable
+copyright and sui generis database rights:
+
+https://creativecommons.org/licenses/by/4.0/
+
+Source attribution
+------------------
+
+European Commission, Joint Research Centre (2026): EuroCropsV2 [Dataset],
+source snapshot EuroCropsV2.01.
+DOI: https://doi.org/10.2905/b9fb9e67-78a9-4327-9d59-39a928d812d3
+
+Official data location:
+https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/DRLL/EuroCropsV2/
+
+Changes made in this derivative
+-------------------------------
+
+FARMWISE converted each source parcel polygon to an interior representative
+point, transformed coordinates from EPSG:3035 to EPSG:4326, concatenated the
+regional stack tables, retained the annual cYYYY and cfYYYY attributes, and
+serialized the result as CSV or compressed CSV.GZ. Invalid or empty geometries
+are omitted and counted in PROVENANCE.json.
+
+This derivative is distributed under CC BY 4.0. Users must retain the source
+attribution, link to the licence, and indicate any further changes. No
+endorsement by the European Commission or the Joint Research Centre is implied.

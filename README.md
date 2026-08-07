@@ -90,6 +90,8 @@ Remote prefetching is disabled by default; enable it with
 `FARMWISE_PREFETCH_DATA=true` only after configuring that manifest.
 QUADICA v1 additionally requires the prepared filenames and provenance
 described in `adapters/API_readers/quadica/DATA_SETUP.md`.
+The reproducible EuroCropsV2 point-data build, CC BY 4.0 attribution files,
+Zenodo metadata and upload workflow are in `tools/eurocropv2/README.md`.
 
 CORRECTIV.Lokal data is treated as protected: its Parquet file is absent from
 the repository, packages and remote-data manifest, and its adapter is disabled

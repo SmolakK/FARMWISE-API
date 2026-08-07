@@ -61,6 +61,9 @@ dev = [
 evaluation = [
     "matplotlib",
 ]
+eurocrop-publish = [
+    "pyarrow>=15",
+]
 
 [project.scripts]
 farmwise-api = "main:run"

@@ -1,0 +1,2 @@
+# Dependencies used only to build/publish the EuroCropsV2 data artifact.
+pyarrow>=15

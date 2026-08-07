@@ -27,21 +27,19 @@ from __future__ import annotations
 REMOTE_DATA: dict[str, dict] = {
     "eea/eea_data/eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif": {
         "kind": "file",
-        "url": "https://zenodo.org/records/REPLACE_ME/files/eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif",
-        "sha256": "REPLACE_ME",
-        "size_mb": 5,  # confirm from EEA source
+        "url": "https://sdi.eea.europa.eu/datastore/public?path=/eea_r_3035_1_km_env-zones_p_2018_v01_r00/#",
+        "sha256": "4587A4ACCEE9053D8F7E5779A924911545EF75795F18FE846E082A6B453DDCB6",
+        "size_mb": 57.2,
     },
-    "EuroCropV2/data/points.csv": {
-        "kind": "file",
-        "url": "https://zenodo.org/records/REPLACE_ME/files/points.csv",
-        "sha256": "REPLACE_ME",
-        "size_mb": 1,  # likely small enough to just commit instead -- check
-    },
+    # EUROCROPV2_REMOTE_START
+    # Added after publishing with:
+    # python -m tools.eurocropv2.finalize_manifest --record-id ... --data-file ...
+    # EUROCROPV2_REMOTE_END
     "IFSGRID/data/IFSGRID/data": {
         "kind": "archive",
-        "url": "https://zenodo.org/records/REPLACE_ME/files/ifsgrid_shapefiles.zip",
-        "sha256": "REPLACE_ME",
+        "url": "http://ec.europa.eu/assets/estat/E/E4/gisco/farmstatistics/data.zip",
+        "sha256": "0519EEBB3CA43C2FBC3FBFBD355C0CDF44252C021D4C8889AB0CE043C72581CA ",
         "extract_to": "IFSGRID/data/IFSGRID/data",
-        "size_mb": 50,  # confirm -- verify redistribution licence first
+        "size_mb": 300,
     },
 }
