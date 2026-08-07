@@ -1,6 +1,6 @@
 # FARMWISE data licensing and attribution register
 
-Last reviewed: 2026-08-05
+Last reviewed: 2026-08-07
 
 This register covers third-party datasets accessed, cached, transformed, or
 redistributed by FARMWISE. The Apache License 2.0 in [`LICENSE`](LICENSE)
@@ -321,6 +321,31 @@ licence, access date, and modification notices listed below.
   conversion, reprojection, clipping, and S2 aggregation performed by
   EEA/FARMWISE as applicable.
 - **Redistribution status:** **Allowed**.
+
+### QUADICA v1 water quality, discharge, and catchment drivers
+
+- **Adapter:** `adapters.API_readers.quadica.quadica_read`
+- **Dataset/resource:** QUADICA v1, HydroShare DOI
+  <https://doi.org/10.4211/hs.0ec5f43e43c349ff818a8d57699c0fe1>.
+- **Local resources:** prepared CSV derivatives under
+  `FARMWISE_DATA_DIR/quadica/data/`; they are excluded from Git and pip
+  distributions.
+- **Provider/authors:** Pia Ebeling, Rohini Kumar, Michael Weber, and Andreas
+  Musolff; Helmholtz Centre for Environmental Research (UFZ), distributed
+  through CUAHSI HydroShare.
+- **Licence:** [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/).
+- **Required attribution:** cite the HydroShare DOI and Ebeling et al. (2022),
+  <https://doi.org/10.5194/essd-14-3715-2022>; identify the access date and
+  state that coordinates were joined to source tables and that FARMWISE
+  filtered variables and aggregated stations into S2 cells.
+- **Derivative-file condition:** the `*_with_coords.csv` files are not the
+  untouched HydroShare tables. Their provenance record must identify the
+  coordinate source and confirm that its licence permits redistribution.
+- **Version boundary:** this entry covers QUADICA v1 only. QUADICA v2 must not
+  replace it without a separate schema and licensing review.
+- **Redistribution status:** **Allowed** for QUADICA v1 and compliant
+  derivatives when CC BY attribution and all coordinate-source obligations are
+  retained.
 
 ### Czech Hydrometeorological Institute historical daily observations
 

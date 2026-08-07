@@ -12,6 +12,7 @@ prune adapters/API_readers/imgw/constants
 prune adapters/API_readers/imgw_hydro/constants
 prune adapters/API_readers/eea/eea_data
 prune adapters/API_readers/IFSGRID/data
+prune adapters/API_readers/quadica/data
 prune adapters/API_readers/soilgrids/temp_storage
 prune downloaded_json
 prune temp_files

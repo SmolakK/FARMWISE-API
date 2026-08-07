@@ -178,7 +178,21 @@ API_PATH_RANGES = {
          'none',
          1,
          1)
-    )
+    ),
+    'adapters.API_readers.quadica.quadica_read': (
+        ((55.1, 47.3, 15, 6),
+         ('1950-01-01', '2015-12-31'),
+         [
+             'potential evaporation',
+             'temperature',
+             'precipitation',
+             'surface water quantity',
+             'surface water quality'
+         ],
+         'monthly/yearly',
+         1,
+         1)
+    ),
 }
 
 # Sources retained for provenance but intentionally excluded from dispatch.

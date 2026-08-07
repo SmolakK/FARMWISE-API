@@ -19,6 +19,7 @@ def built_wheel(tmp_path_factory):
     source_dir = tmp_path_factory.mktemp("farmwise-source")
     for filename in (
         "LICENSE",
+        "DATA_LICENSES.md",
         "MANIFEST.in",
         "README.md",
         "main.py",
@@ -129,6 +130,9 @@ def test_built_wheel_declares_runtime_and_server_dependencies(built_wheel):
 
     assert "main.py" in names
     assert "server/main.py" in names
+    assert any(
+        name.endswith(".dist-info/licenses/DATA_LICENSES.md") for name in names
+    )
 
 
 def test_public_package_excludes_egdi_and_large_adapter_data():
@@ -165,6 +169,7 @@ def test_sdist_manifest_prunes_private_and_large_data():
         "prune adapters/API_readers/imgw_hydro/constants",
         "prune adapters/API_readers/eea/eea_data",
         "prune adapters/API_readers/IFSGRID/data",
+        "prune adapters/API_readers/quadica/data",
     }
     assert required_prunes <= set(manifest.splitlines())
     assert "exclude tests/test_egdi_read_d10.py" in manifest

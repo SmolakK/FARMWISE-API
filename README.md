@@ -82,12 +82,14 @@ email delivery is used. `PUBLIC_BASE_URL` should contain a host and optional
 port without a URL scheme, for example `localhost:8000`.
 
 Large adapter datasets are intentionally excluded from both pip wheels and
-source distributions. This includes EuroCropV2, EEA and IFSGRID data. Supply
-redistributable datasets through `FARMWISE_DATA_DIR`, or configure a
+source distributions. This includes EuroCropV2, EEA, IFSGRID and QUADICA
+data. Supply redistributable datasets through `FARMWISE_DATA_DIR`, or configure a
 licence-compliant remote source with a real URL and checksum in
 `core/utils/data_manifest.py`.
 Remote prefetching is disabled by default; enable it with
 `FARMWISE_PREFETCH_DATA=true` only after configuring that manifest.
+QUADICA v1 additionally requires the prepared filenames and provenance
+described in `adapters/API_readers/quadica/DATA_SETUP.md`.
 
 CORRECTIV.Lokal data is treated as protected: its Parquet file is absent from
 the repository, packages and remote-data manifest, and its adapter is disabled

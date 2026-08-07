@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "European agricultural and environmental data aggregation API"
 readme = "README.md"
 license = "Apache-2.0"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "DATA_LICENSES.md"]
 requires-python = ">=3.10"
 dependencies = [
     "aiofiles",
@@ -80,6 +80,7 @@ include-package-data = false
 "adapters.API_readers.hubeau" = ["constants/*.csv"]
 "adapters.API_readers.IFSGRID.utils" = ["definitions.json"]
 "adapters.API_readers.irish_meteo" = ["EPA_ireland_stations.csv"]
+"adapters.API_readers.quadica" = ["DATA_SETUP.md", "mappings/quadica_table.html"]
 "core.utils" = ["country_codes"]
 "server" = ["static/*"]
 

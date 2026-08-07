@@ -51,6 +51,7 @@ adapters/API_readers/imgw_hydro/constants/*
 adapters/API_readers/eea/eea_data/*
 adapters/API_readers/EuroCropV2/data/*
 adapters/API_readers/IFSGRID/data/*
+adapters/API_readers/quadica/data/*
 *.env
 *.db
 *.dbf
