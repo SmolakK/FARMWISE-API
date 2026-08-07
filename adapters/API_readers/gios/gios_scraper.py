@@ -35,7 +35,12 @@ async def extract_point_ids(url):
     return ','.join(point_ids)
 
 
-async def scrape_point_data(point_id, parameter_values, parameter_order):
+async def scrape_point_data(
+    point_id,
+    parameter_values,
+    parameter_order,
+    aggregation_methods=None,
+):
     """
     Scrapes soil measurement data for a specified point ID from a GIOS webpage.
 
@@ -79,8 +84,17 @@ async def scrape_point_data(point_id, parameter_values, parameter_order):
     rows_df.replace("n.o.", np.nan, inplace=True)
 
     long_df = rows_df.melt(id_vars=['point_id', 'parameter'], var_name='year', value_name='value')
-    pivot_table = long_df.pivot_table(index=['point_id', 'year'], columns='parameter', values='value',
-                                      aggfunc='first').reset_index()
+    pivot_table = aggregate_to_s2(
+        long_df,
+        group_by=('point_id', 'year', 'parameter'),
+        logical_data_types=('soil',),
+        methods=aggregation_methods or WITHIN_SOURCE_AGGREGATION_METHODS,
+        column_data_types={'value': 'soil'},
+    ).reset_index().pivot(
+        index=['point_id', 'year'],
+        columns='parameter',
+        values='value',
+    ).reset_index()
     available_parameters = [param for param in parameter_order if param in pivot_table.columns]
     pivot_table = pivot_table[['point_id', 'year'] + available_parameters]
 
@@ -139,7 +153,12 @@ async def read_data(spatial_range, time_range, data_range, level,
         return None
 
     for point_id in tqdm(point_ids, total=len(point_ids)):
-        df = await scrape_point_data(point_id, parameter_values, parameter_order)
+        df = await scrape_point_data(
+            point_id,
+            parameter_values,
+            parameter_order,
+            within_source_aggregation_methods or WITHIN_SOURCE_AGGREGATION_METHODS,
+        )
         # Filter data layers
         columns_to_select = list(df.columns[:2]) + list(set(df.columns).intersection(set(parameter_selection)))
         df = df.loc[:, columns_to_select]
@@ -170,13 +189,16 @@ async def read_data(spatial_range, time_range, data_range, level,
         methods=(within_source_aggregation_methods
                  or WITHIN_SOURCE_AGGREGATION_METHODS),
     )
-    final_dataframe = final_dataframe.T.groupby(level=0).mean().T
-
     # Explode to days
     days = pd.date_range(time_range[0], time_range[1], freq='D')
     final_dataframe = pd.concat([final_dataframe.assign(Timestamp=date.date()) for date in days])
 
-    final_dataframe = final_dataframe.droplevel(1).reset_index().set_index(["Timestamp", 'S2CELL'])
+    final_dataframe = final_dataframe.reset_index().drop(columns="year")
+    final_dataframe = aggregate_to_s2(
+        final_dataframe,
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+    ).reset_index()
 
-    dataframe_pivot = final_dataframe.pivot_table(index='Timestamp', columns='S2CELL')
-    return dataframe_pivot
+    return final_dataframe.pivot(index='Timestamp', columns='S2CELL')

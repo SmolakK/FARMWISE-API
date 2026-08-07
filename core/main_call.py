@@ -344,11 +344,9 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                 )
             if interpolation:  # be aware this inserts values to NaNs
                 combined_data = interpolate(combined_data, bounding_box, level)
-            result = {"data": combined_data,  # The DataFrame containing the concatenated data
-                    "metadata": {
+            metadata = {
                         "request_id": request_id,
                         "apis": api_metadata,
-                        "quality_reports": api_reports,
                         "quality_assessment": {
                             "enabled": assess_quality,
                             "sources_assessed": len(api_reports),
@@ -380,7 +378,13 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                             "methods": effective_within_source_methods,
                         },
                     }
-                    }
+            if assess_quality:
+                metadata["quality_reports"] = api_reports
+
+            result = {
+                "data": combined_data,
+                "metadata": metadata,
+            }
             if produce_map:
                 from core.utils.map_ploter import create_folium_map
                 html_content = create_folium_map(combined_data,downsample_factor=1)
@@ -463,7 +467,7 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
 #     asyncio.run(read_data(**case))
 
 # Example using bounding box
-# if __name__ == "__main__":
+if __name__ == "__main__":
     # asyncio.run(read_data(
     #     bounding_box=(71, 34, 45, -25),
     #     level=10,
@@ -478,15 +482,15 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     #     ],
     #     produce_map=True
     # ))
-    # asyncio.run(read_data(
-    #     country=['Andorra'],
-    #     level=10,
-    #     time_from='2010-01-10',
-    #     time_to='2010-02-10',
-    #     factors=[
-    #         'temperature', 'precipitation'
-    #     ],
-    # ))
+    asyncio.run(read_data(
+        country=['Andorra'],
+        level=10,
+        time_from='2010-01-10',
+        time_to='2010-02-10',
+        factors=[
+            'temperature', 'precipitation'
+        ],
+    ))
 
 
 __all__ = ["plan_source_dispatch", "read_data"]

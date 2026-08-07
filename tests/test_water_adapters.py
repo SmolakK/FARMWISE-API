@@ -127,6 +127,41 @@ async def test_epa_read_data_filters_and_converts_depth_to_cm(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_epa_read_data_applies_groundwater_policy(monkeypatch):
+    downloaded = pd.DataFrame(
+        {
+            "timestamp": pd.to_datetime(["2024-01-01"] * 3),
+            "groundwater level [m]": [99.0, 97.0, 0.0],
+            "groundwater depth [m b.g.l]": [1.0, 3.0, 100.0],
+            "id": ["a", "b", "c"],
+            "lat": [50.0, 50.1, 50.2],
+            "lon": [17.0, 17.1, 17.2],
+        }
+    )
+    monkeypatch.setattr(
+        epa_gw, "fetch_all_data", AsyncMock(return_value=[downloaded])
+    )
+    monkeypatch.setattr(
+        epa_gw,
+        "prepare_coordinates",
+        lambda coordinates, **_kwargs: coordinates.assign(S2CELL="cell"),
+    )
+
+    result = await epa_gw.read_data(
+        (51.0, 49.0, 18.0, 16.0),
+        ("2024-01-01", "2024-01-02"),
+        ["groundwater quantity"],
+        10,
+        within_source_aggregation_methods={
+            "default": "mean",
+            "groundwater quantity": "median",
+        },
+    )
+
+    assert result.iloc[0, 0] == 300.0
+
+
+@pytest.mark.asyncio
 async def test_gios_groundwater_link_extractors(monkeypatch):
     main_response = MagicMock()
     main_response.text = (

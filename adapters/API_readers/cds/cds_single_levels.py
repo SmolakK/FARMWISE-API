@@ -118,7 +118,14 @@ async def read_data(spatial_range, time_range, data_range, level,
 
     # To daily
     df['day'] = df['Timestamp'].dt.date
-    df = df.groupby(['day', 'lat', 'lon']).mean().reset_index()
+    df = aggregate_to_s2(
+        df,
+        group_by=('day', 'lat', 'lon'),
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_aggregations={'Timestamp': 'first'},
+    ).reset_index()
     df = df.drop(['day'], axis=1)
 
     # Temporal cut
@@ -148,6 +155,6 @@ async def read_data(spatial_range, time_range, data_range, level,
     df = df.drop(['lat', 'lon'], axis=1)
 
     # Pivot the DataFrame
-    df = df.pivot_table(index='Timestamp', columns='S2CELL')
+    df = df.reset_index().pivot(index='Timestamp', columns='S2CELL')
 
     return df

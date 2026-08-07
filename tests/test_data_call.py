@@ -7,7 +7,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pandas as pd
 import pytest
-from fastapi import BackgroundTasks, HTTPException
+from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi.testclient import TestClient
 
 from server.routers import data_call
 
@@ -265,3 +266,17 @@ async def test_download_file_returns_404_when_file_is_missing(tmp_path):
         )
 
     assert exc_info.value.status_code == 404
+
+
+def test_download_route_allows_direct_link_without_authentication(tmp_path):
+    file_path = tmp_path / "result.csv"
+    file_path.write_text("value\n1\n", encoding="utf-8")
+    app = FastAPI()
+    app.state.temp_dir = str(tmp_path)
+    app.include_router(data_call.api_router)
+
+    response = TestClient(app).get(f"/download/{file_path.name}")
+
+    assert response.status_code == 200
+    assert response.content == file_path.read_bytes()
+    assert 'filename="result.csv"' in response.headers["content-disposition"]

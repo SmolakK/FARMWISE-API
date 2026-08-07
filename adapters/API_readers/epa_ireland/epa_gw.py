@@ -7,6 +7,8 @@ import logging
 from typing import Optional
 from core.utils.coordinates_to_cells import prepare_coordinates
 from adapters.API_readers.epa_ireland.epa_ireland_mappings.epa_ireland_mapping import DATA_ALIASES, GLOBAL_MAPPING
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 from core.utils.paths import adapter_data
 
 coordinates = adapter_data("epa_ireland", "constants", "EPA_coordinates.csv")
@@ -67,7 +69,13 @@ async def fetch_all_data():
         return results
 
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(
+    spatial_range,
+    time_range,
+    data_range,
+    level,
+    within_source_aggregation_methods=None,
+):
     print("DOWNLOADING: EPA GROUNDWATER QUANTITY DATA")
     results = await fetch_all_data()
     all_data = []
@@ -125,11 +133,18 @@ async def read_data(spatial_range, time_range, data_range, level):
 
     final_df.Timestamp = pd.to_datetime(final_df.Timestamp).dt.date
 
-    # Set index and pivot the DataFrame
-    final_df = final_df.set_index(['Timestamp', 'S2CELL'])
+    final_df = aggregate_to_s2(
+        final_df.drop(columns=['id']),
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_data_types=DATA_ALIASES,
+    )
     final_df = final_df.rename(GLOBAL_MAPPING, axis=1)
     final_df['Groundwater Depth [cm]'] *= 100
 
-    final_df_pivot = final_df.pivot_table(index='Timestamp', columns='S2CELL', values=['Groundwater Depth [cm]'])
-
-    return final_df_pivot
+    return final_df.reset_index().pivot(
+        index='Timestamp',
+        columns='S2CELL',
+        values=['Groundwater Depth [cm]'],
+    )

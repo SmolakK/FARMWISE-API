@@ -40,14 +40,17 @@ def aggregate_to_s2(
     group_by: Sequence[str] = ("S2CELL", "Timestamp"),
     logical_data_types: Sequence[str] = (),
     methods: Mapping[str, str],
+    column_data_types: Mapping[str, str] | None = None,
     column_aggregations: Mapping[str, str | Callable] | None = None,
     warn_on_aggregation: bool = True,
 ) -> pd.DataFrame:
     """Collapse records from one source according to a per-data-type policy.
 
     The returned grouping keys form the index, matching ``DataFrame.groupby``.
-    ``column_aggregations`` is intended for metadata columns such as latitude,
-    longitude, or a station count and takes precedence over the type policy.
+    ``column_data_types`` explicitly maps physical source columns to logical
+    data types. ``column_aggregations`` is intended for metadata columns such
+    as latitude, longitude, or a station count and takes precedence over the
+    type policy.
     """
     group_by = list(group_by)
     missing = [column for column in group_by if column not in frame.columns]
@@ -56,6 +59,7 @@ def aggregate_to_s2(
 
     validated_methods = validate_within_source_methods(methods)
     default_method = validated_methods.get("default", "mean")
+    explicit_data_types = dict(column_data_types or {})
     overrides = dict(column_aggregations or {})
     aggregations: dict[str, str | Callable] = {}
 
@@ -69,7 +73,9 @@ def aggregate_to_s2(
             aggregations[column] = aggregation
             continue
 
-        data_type = resolve_data_type(
+        data_type = _normalize_label(explicit_data_types[column]) if (
+            column in explicit_data_types
+        ) else resolve_data_type(
             column,
             logical_data_types,
             validated_methods,

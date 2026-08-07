@@ -1,6 +1,9 @@
 from datetime import datetime, date
 from shapely.geometry import box, Polygon
 import pandas as pd
+from adapters.API_readers.IFSGRID.mappings.IFSGRID_mappings import DATA_ALIASES
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 from core.utils.coordinates_to_cells import prepare_coordinates
 
 def check_overlap(period:tuple) -> tuple:
@@ -55,7 +58,8 @@ def build_bbox(spatial_range:tuple) -> Polygon:
 
 
 def aggregate_spatial(
-        df:pd.DataFrame, spatial_range:tuple, level:int
+        df:pd.DataFrame, spatial_range:tuple, level:int,
+        logical_data_types=(), methods=None,
     ) -> pd.DataFrame:
     """
     Aggregate spatial data into S2 cells at a given level.
@@ -76,14 +80,13 @@ def aggregate_spatial(
         computed per cell.
     """
     df = prepare_coordinates(df, spatial_range, level)
-    df = (
-        df.set_index("S2CELL")
-          .groupby(level=0)
-          .mean()
-          .drop(columns=["lat", "lon"], errors="ignore")
-          .reset_index()
-    )
-    return df
+    return aggregate_to_s2(
+        df.drop(columns=["lat", "lon"], errors="ignore"),
+        group_by=("S2CELL",),
+        logical_data_types=logical_data_types,
+        methods=methods or WITHIN_SOURCE_AGGREGATION_METHODS,
+        column_data_types=DATA_ALIASES,
+    ).reset_index()
 
 
 def expand_time_dimension(
@@ -110,4 +113,4 @@ def expand_time_dimension(
     dates = pd.date_range(start=start_date, end=end_date, freq="D")
     expanded = pd.concat([df.assign(Timestamp=d) for d in dates])
 
-    return expanded.pivot_table(index="Timestamp", columns="S2CELL")
+    return expanded.pivot(index="Timestamp", columns="S2CELL")

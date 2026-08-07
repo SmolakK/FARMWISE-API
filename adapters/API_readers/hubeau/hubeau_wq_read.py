@@ -247,13 +247,22 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
         print("\nPOINT COORDINATES ref. DataFrame df_ref_coords =")
         print(df_ref_coords)
 
-    # Aggregating the data by Point ID and by Date,
-    # with aggregated value = mean of raw values, and info on measurement units = first (heading) most frequent (mode) text info)
-    df = pd.pivot_table(df, index=['bss_id', 'date_debut_prelevement'],
-                        columns='nom_param',
-                        values=['resultat', 'symbole_unite'],
-                        aggfunc={'resultat': 'mean', 'symbole_unite': lambda x: x.mode().head(
-                            1)}).reset_index()  # (protected in case of symbole_unite all empty = None)
+    # Aggregate repeated laboratory results with the configured groundwater
+    # quality policy; units remain categorical metadata and use their mode.
+    df = aggregate_to_s2(
+        df[['bss_id', 'date_debut_prelevement', 'nom_param',
+            'resultat', 'symbole_unite']],
+        group_by=('bss_id', 'date_debut_prelevement', 'nom_param'),
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_data_types={'resultat': 'groundwater quality'},
+        column_aggregations={'symbole_unite': 'mode'},
+    ).reset_index().pivot(
+        index=['bss_id', 'date_debut_prelevement'],
+        columns='nom_param',
+        values=['resultat', 'symbole_unite'],
+    ).reset_index()
     df = df.rename({'bss_id': 'point_id', 'date_debut_prelevement': 'Timestamp'}, axis=1)
 
     # Reminder of the DataFrame format at this stage:
@@ -336,6 +345,6 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
 
     # Pivot the DataFrame (to return a DataFrame with distinct increasing Dates in Rows,
     # observed Parameter names as Column GROUPS, and S2CELLs (with some data for that paramter) as Columns in that group
-    df = df.pivot_table(index='Timestamp', columns='S2CELL')
+    df = df.pivot(index='Timestamp', columns='S2CELL')
 
     return df

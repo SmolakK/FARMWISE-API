@@ -5,13 +5,15 @@ from typing import Tuple, List
 from adapters.API_readers.EuroCropV2.utils.extractors import extract_data_by_bbox, extract_years
 from adapters.API_readers.EuroCropV2.utils.preparation import data_agregation, data_melting
 from adapters.API_readers.EuroCropV2.mappings.EuroCropV2_mappings import GLOBAL_MAPPING
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
 from core.utils.paths import adapter_data
 
 async def read_data(
     spatial_range: Tuple[float, float, float, float],
     time_range: Tuple[str, str],
     data_range: List[str],
-    level: int
+    level: int,
+    within_source_aggregation_methods=None,
 ) -> pd.DataFrame:
     """
     Read, filter, and transform EuroCropV2 data into a time-series format.
@@ -56,7 +58,13 @@ async def read_data(
     if extracted_data.empty:
         return pd.DataFrame()
     extracted_data = extract_years(extracted_data, time_range)
-    aggregated_data = data_agregation(extracted_data, spatial_range, level)
+    aggregated_data = data_agregation(
+        extracted_data,
+        spatial_range,
+        level,
+        data_range,
+        within_source_aggregation_methods or WITHIN_SOURCE_AGGREGATION_METHODS,
+    )
 
     if aggregated_data.empty:
         return pd.DataFrame()

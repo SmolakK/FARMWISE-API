@@ -6,6 +6,8 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from tqdm.asyncio import tqdm as async_tqdm
 from adapters.API_readers.UA_sw_quality.UA_sw_quality_mappings.UA_sw_quality_mapping import new_headers, DATA_ALIASES
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 from core.utils.coordinates_to_cells import prepare_coordinates
 
 
@@ -39,7 +41,13 @@ def load_and_clean_data(csv_content):
 
 
 # Async function to scrape the website, download CSV files, clean them, and return a combined DataFrame
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(
+    spatial_range,
+    time_range,
+    data_range,
+    level,
+    within_source_aggregation_methods=None,
+):
     """
         Read and process SURFACE WATER QUALITY data, filtering by spatial and time ranges, and return a MultiIndex DataFrame.
 
@@ -109,14 +117,17 @@ async def read_data(spatial_range, time_range, data_range, level):
     cols_to_convert = [col for col in new_headers if col != "date"]
     combined_df[cols_to_convert] = combined_df[cols_to_convert].apply(pd.to_numeric, errors='coerce')
 
-    final_df = combined_df[['point_id', 'date'] + new_headers]
-    final_df = final_df.loc[:, ~final_df.columns.duplicated()]
+    final_df = combined_df[['point_id', 'date'] + available_columns]
     final_df = final_df.merge(coordinates[['point_id', 'S2CELL']], on='point_id')
 
-    final_df = final_df[[x for x in final_df.columns if x not in ['lat','lon','point_id']]]
-    # Set MultiIndex
-    final_df = final_df.set_index(['date', 'S2CELL'])
+    final_df = final_df.drop(columns=['point_id'])
+    final_df = aggregate_to_s2(
+        final_df,
+        group_by=("date", "S2CELL"),
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_data_types=DATA_ALIASES,
+    ).reset_index()
 
-    # Pivot the DataFrame asynchronously
-    final_df_pivot = final_df.pivot_table(index='date', columns='S2CELL')
-    return final_df_pivot
+    return final_df.pivot(index='date', columns='S2CELL')

@@ -127,6 +127,8 @@ async def read_data(spatial_range, time_range, data_range, level,
     water_files['Timestamp'] = water_files['Timestamp'].apply(lambda x: x.date())
 
     # Pivot the DataFrame asynchronously
-    water_pivot = await asyncio.to_thread(lambda: water_files.pivot_table(index='Timestamp', columns='S2CELL'))
+    water_pivot = await asyncio.to_thread(
+        lambda: water_files.pivot(index='Timestamp', columns='S2CELL')
+    )
 
     return water_pivot

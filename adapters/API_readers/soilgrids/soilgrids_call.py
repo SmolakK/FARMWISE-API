@@ -90,6 +90,6 @@ async def read_data(spatial_range, time_range, data_range, level,
     df = df.drop(['lat', 'lon'], axis=1)
 
     # Pivot the DataFrame asynchronously
-    df = df.pivot_table(index='Timestamp', columns='S2CELL')
+    df = df.reset_index().pivot(index='Timestamp', columns='S2CELL')
 
     return df

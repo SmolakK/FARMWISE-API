@@ -155,6 +155,9 @@ async def read_data(spatial_range, time_range, data_range, level,
     start_date = dt.datetime.strptime(start_date, '%Y-%m-%d')
     end_date = dt.datetime.strptime(end_date, '%Y-%m-%d')
     data_requested = list([k for k, v in DATA_ALIASES.items() if v in data_range])
+    aggregation_methods = (
+        within_source_aggregation_methods or WITHIN_SOURCE_AGGREGATION_METHODS
+    )
 
     # Wetterdienst performs synchronous network I/O while constructing and
     # filtering a request, so the whole operation runs in the worker.
@@ -169,8 +172,25 @@ async def read_data(spatial_range, time_range, data_range, level,
         warnings.warn("No stations found in the specified bounding box.")
         return None
 
-    # cleaning
-    df = pd.pivot_table(df, index=['station_id','date'], columns='parameter', values='value').reset_index()
+    # Collapse duplicate observations before reshaping. Each parameter is
+    # aggregated with the policy of its own logical data type.
+    parameter_frames = []
+    for parameter, parameter_frame in df.groupby('parameter', sort=False):
+        data_type = DATA_ALIASES.get(parameter, "default")
+        parameter_frames.append(
+            aggregate_to_s2(
+                parameter_frame[['station_id', 'date', 'parameter', 'value']],
+                group_by=('station_id', 'date', 'parameter'),
+                logical_data_types=(data_type,),
+                methods=aggregation_methods,
+                column_data_types={'value': data_type},
+            ).reset_index()
+        )
+    df = pd.concat(parameter_frames, ignore_index=True).pivot(
+        index=['station_id', 'date'],
+        columns='parameter',
+        values='value',
+    ).reset_index()
     df = df[~df.isna().any(axis=1)]
 
     # get stations locations
@@ -192,24 +212,16 @@ async def read_data(spatial_range, time_range, data_range, level,
     df = aggregate_to_s2(
         df,
         logical_data_types=data_range,
-        methods=(within_source_aggregation_methods
-                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        methods=aggregation_methods,
         column_aggregations={"lat": "mean", "lon": "mean"},
     ).reset_index()
 
-    # Resample to daily intervals
+    # DWD climate summaries are already daily. Keep the unique rows produced
+    # by aggregate_to_s2 instead of performing another implicit mean.
     df['Timestamp'] = pd.to_datetime(
         df['Timestamp'],
         utc=True,
     ).dt.tz_convert(None)
-
-    df.set_index('Timestamp', inplace=True)
-    df = (
-        df.groupby(['S2CELL'] + data_requested)
-            .resample('1D')
-            .mean()
-            .reset_index()
-    )
     df = df[
         (df['Timestamp'] >= pd.Timestamp(start_date))
         & (df['Timestamp'] <= pd.Timestamp(end_date))
@@ -223,7 +235,7 @@ async def read_data(spatial_range, time_range, data_range, level,
         df["Temperature [°C]"] = df["Temperature [°C]"] - 273.15
 
     # Pivot the DataFrame
-    df_pivot = df.pivot_table(
+    df_pivot = df.pivot(
         index='Timestamp', columns='S2CELL')
 
     return df_pivot

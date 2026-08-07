@@ -58,6 +58,35 @@ def test_aggregate_to_s2_supports_column_metadata_overrides():
     }
 
 
+def test_aggregate_to_s2_uses_explicit_column_data_types():
+    frame = pd.DataFrame(
+        {
+            "S2CELL": ["cell"] * 3,
+            "Timestamp": pd.to_datetime(["2024-01-01"] * 3),
+            "opaque_numeric_code": [1.0, 3.0, 100.0],
+            "opaque_category_code": [2, 2, 7],
+        }
+    )
+
+    result = aggregate_to_s2(
+        frame,
+        logical_data_types=("temperature", "land cover"),
+        methods={
+            "default": "max",
+            "temperature": "median",
+            "land cover": "mode",
+        },
+        column_data_types={
+            "opaque_numeric_code": "temperature",
+            "opaque_category_code": "land cover",
+        },
+        warn_on_aggregation=False,
+    )
+
+    assert result.iloc[0]["opaque_numeric_code"] == 3.0
+    assert result.iloc[0]["opaque_category_code"] == 2
+
+
 def test_aggregate_to_s2_warns_only_when_rows_are_collapsed():
     frame = pd.DataFrame(
         {

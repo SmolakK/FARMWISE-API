@@ -128,7 +128,7 @@ async def read_data(
 
     dates = pd.date_range(start=start, end=end, freq='D')
     df_expanded = pd.concat([df.assign(Timestamp=d) for d in dates])
-    final_df = df_expanded.pivot_table(index="Timestamp", columns="S2CELL")
+    final_df = df_expanded.pivot(index="Timestamp", columns="S2CELL")
     final_df = final_df.rename(columns=GLOBAL_MAPPING, level=0)
     return final_df
 

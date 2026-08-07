@@ -123,5 +123,7 @@ async def read_data(spatial_range, time_range, data_range, level,
         column_aggregations={"lat": "mean", "lon": "mean"},
     )
 
-    data_df = data_df.pivot_table(index='Timestamp', columns='S2CELL')
+    data_df = data_df.reset_index().pivot(
+        index='Timestamp', columns='S2CELL'
+    )
     return data_df

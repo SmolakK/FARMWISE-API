@@ -110,7 +110,7 @@ async def read_data(spatial_range, time_range, data_range, level,
 
     # Concatenate and pivot data asynchronously
     final_df = pd.concat(stacked_df)
-    final_df = final_df.pivot_table(index='Timestamp', columns='S2CELL')
+    final_df = final_df.pivot(index='Timestamp', columns='S2CELL')
 
     return final_df
 

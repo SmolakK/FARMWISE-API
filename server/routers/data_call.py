@@ -236,7 +236,6 @@ async def download_file(file_name: str, background_tasks: BackgroundTasks, reque
     :param file_name: The name of the file to download, as specified in the URL.
     :param background_tasks: BackgroundTasks to handle file deletion after the response is sent.
     :param request: The HTTP request object, used to access the application state.
-    :param current_user: The current authenticated user, retrieved through dependency injection.
     :raises HTTPException: Raises an error if the file is not found or there is an unexpected error.
     :return: A FileResponse containing the requested file for download.
     """

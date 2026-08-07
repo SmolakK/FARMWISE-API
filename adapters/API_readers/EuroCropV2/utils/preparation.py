@@ -1,7 +1,15 @@
 import pandas as pd
 from core.utils.coordinates_to_cells import prepare_coordinates
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 
-def data_agregation(extracted_data, spatial_range, level):
+def data_agregation(
+    extracted_data,
+    spatial_range,
+    level,
+    logical_data_types=("land cover",),
+    methods=None,
+):
     """
     Aggregate spatial data into S2 cells and compute representative values.
 
@@ -31,13 +39,13 @@ def data_agregation(extracted_data, spatial_range, level):
     """
 
     df = prepare_coordinates(extracted_data, spatial_range, level)
-    df = (
-        df.set_index("S2CELL")
-        .groupby(level=0)
-        .agg(lambda x: x.mode().iloc[0] if not x.mode().empty else None)
+    return aggregate_to_s2(
+        df,
+        group_by=("S2CELL",),
+        logical_data_types=logical_data_types,
+        methods=methods or WITHIN_SOURCE_AGGREGATION_METHODS,
+        column_aggregations={"lat": "mean", "lon": "mean"},
     )
-
-    return df
 
 
 def data_melting(df, time_range):
@@ -119,9 +127,8 @@ def data_melting(df, time_range):
     )
 
     # --- pivot to final structure ---
-    return df_daily.pivot_table(
+    return df_daily.reset_index().pivot(
         index="Timestamp",
         columns="S2CELL",
         values=["c", "cf"],
-        aggfunc="first",
     )

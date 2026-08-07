@@ -89,6 +89,30 @@ def test_eurocrop_data_aggregation_uses_mode(monkeypatch):
     assert result.loc["cell", "c2024"] == 2
 
 
+def test_eurocrop_data_aggregation_accepts_policy_override(monkeypatch):
+    prepared = pd.DataFrame(
+        {
+            "S2CELL": ["cell", "cell", "cell"],
+            "lat": [50.0, 50.1, 50.2],
+            "lon": [17.0, 17.1, 17.2],
+            "c2024": [1.0, 3.0, 100.0],
+        }
+    )
+    monkeypatch.setattr(
+        euro_preparation, "prepare_coordinates", lambda *_args: prepared
+    )
+
+    result = euro_preparation.data_agregation(
+        pd.DataFrame(),
+        (51.0, 49.0, 18.0, 16.0),
+        10,
+        ("land cover",),
+        {"default": "mean", "land cover": "median"},
+    )
+
+    assert result.loc["cell", "c2024"] == 3.0
+
+
 def test_eurocrop_data_melting_expands_year_to_requested_days():
     frame = pd.DataFrame(
         {
@@ -196,6 +220,36 @@ def test_ifsgrid_aggregate_spatial_groups_cells(monkeypatch):
     assert result.loc[0, "S2CELL"] == "cell"
     assert result.loc[0, "UAA"] == 3.0
     assert "lat" not in result
+
+
+def test_ifsgrid_aggregate_spatial_resolves_method_from_column_type(monkeypatch):
+    prepared = pd.DataFrame(
+        {
+            "S2CELL": ["cell", "cell", "cell"],
+            "lat": [50.0, 50.1, 50.2],
+            "lon": [17.0, 17.1, 17.2],
+            "ARA": [1, 1, 9],
+            "LSU": [1.0, 3.0, 100.0],
+        }
+    )
+    monkeypatch.setattr(
+        ifs_preparation, "prepare_coordinates", lambda *_args: prepared
+    )
+
+    result = ifs_preparation.aggregate_spatial(
+        pd.DataFrame(),
+        (51.0, 49.0, 18.0, 16.0),
+        10,
+        ("land cover", "livestock pressure"),
+        {
+            "default": "max",
+            "land cover": "mode",
+            "livestock pressure": "median",
+        },
+    )
+
+    assert result.loc[0, "ARA"] == 1
+    assert result.loc[0, "LSU"] == 3.0
 
 
 def test_ifsgrid_expand_time_dimension_creates_daily_pivot():

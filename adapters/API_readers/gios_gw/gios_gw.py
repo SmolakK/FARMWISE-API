@@ -11,6 +11,8 @@ from io import BytesIO
 from tqdm.asyncio import tqdm
 from pyproj import Transformer
 from adapters.API_readers.gios_gw.gios_gw_mappings.gios_gw_mapping import selected_columns, DATA_ALIASES, schema
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 from core.utils.coordinates_to_cells import prepare_coordinates
 
 # Configure logging
@@ -154,7 +156,13 @@ def standardize_dataframe(df, schema):
     return df
 
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(
+    spatial_range,
+    time_range,
+    data_range,
+    level,
+    within_source_aggregation_methods=None,
+):
     """
     Read and process groundwater data, filtering by spatial and time ranges, and return a MultiIndex DataFrame.
 
@@ -232,9 +240,12 @@ async def read_data(spatial_range, time_range, data_range, level):
         final_df = final_df.merge(coordinates[['id', 'S2CELL']], on='id')
         final_df = final_df.rename({'date':'Timestamp'},axis=1)
 
-        # Set MultiIndex
-        final_df = final_df.set_index(['Timestamp', 'S2CELL'])
+        final_df = aggregate_to_s2(
+            final_df.drop(columns=['id']),
+            logical_data_types=data_range,
+            methods=(within_source_aggregation_methods
+                     or WITHIN_SOURCE_AGGREGATION_METHODS),
+            column_data_types=DATA_ALIASES,
+        ).reset_index()
 
-        # Pivot the DataFrame asynchronously
-        final_df_pivot = final_df.pivot_table(index='Timestamp', columns='S2CELL')
-        return final_df_pivot
+        return final_df.pivot(index='Timestamp', columns='S2CELL')

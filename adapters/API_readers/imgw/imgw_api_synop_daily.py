@@ -147,6 +147,8 @@ async def read_data(spatial_range, time_range, data_range, level,
     )
 
     # Pivot the DataFrame asynchronously
-    s_d_pivot = s_d_merged.pivot_table(index='Timestamp', columns='S2CELL')
+    s_d_pivot = s_d_merged.reset_index().pivot(
+        index='Timestamp', columns='S2CELL'
+    )
 
     return s_d_pivot

@@ -560,7 +560,7 @@ async def test_read_data_can_skip_quality_assessment(monkeypatch):
     )
 
     assess.assert_not_called()
-    assert result["metadata"]["quality_reports"] == []
+    assert "quality_reports" not in result["metadata"]
     assert result["metadata"]["quality_assessment"] == {
         "enabled": False,
         "sources_assessed": 0,

@@ -9,6 +9,9 @@ import re
 from tqdm.asyncio import tqdm
 from core.utils.coordinates_to_cells import prepare_coordinates
 from adapters.API_readers.irish_meteo.irish_meteo_mappings.irish_meteo_mapping import GLOBAL_MAPPING
+from adapters.API_readers.irish_meteo.irish_meteo_mappings.irish_meteo_mapping import DATA_ALIASES
+from adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from core.within_source_aggregation import aggregate_to_s2
 
 BASE_URL = "https://cli.fusio.net/cli/climate_data/webdata/dly{}.zip"
 
@@ -113,7 +116,13 @@ async def process_working_links(df: pd.DataFrame) -> pd.DataFrame:
     return pd.concat(valid_dfs, ignore_index=True) if valid_dfs else pd.DataFrame()
 
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(
+    spatial_range,
+    time_range,
+    data_range,
+    level,
+    within_source_aggregation_methods=None,
+):
     csv_file = adapter_data("irish_meteo", "EPA_ireland_stations.csv")
     df = generate_links(csv_file)
 
@@ -151,11 +160,16 @@ async def read_data(spatial_range, time_range, data_range, level):
     # Merge with coordinates to add S2CELL
     combined_df = combined_df.merge(coordinates[['id', 'S2CELL']], on='id')
 
-    # Pivot so final structure is aligned
-    combined_df = combined_df.set_index(['Timestamp', 'S2CELL'])
+    combined_df = aggregate_to_s2(
+        combined_df[['Timestamp', 'S2CELL', 'precipitation [mm]']],
+        logical_data_types=data_range,
+        methods=(within_source_aggregation_methods
+                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        column_data_types=DATA_ALIASES,
+    )
     combined_df = combined_df.rename(GLOBAL_MAPPING, axis=1)
-    combined_df = combined_df[['Precipitation total [mm]']]
 
-    final_df_pivot = combined_df.pivot_table(index='Timestamp', columns='S2CELL')
-
-    return final_df_pivot
+    return combined_df.reset_index().pivot(
+        index='Timestamp',
+        columns='S2CELL',
+    )
