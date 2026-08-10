@@ -1,106 +1,138 @@
-"""Run the offline FARMWISE evaluation suite and regenerate logs and figures."""
+"""Run the empirical FARMWISE evaluation from previously collected live data."""
 
 from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+from pathlib import Path
 import sys
 
 from tqdm import tqdm
 
-from evaluation.common import (
-    FIGURE_DIR,
-    LOG_DIR,
-    ensure_output_dirs,
-    write_json,
-    write_records,
-)
-from evaluation.coverage_precheck import benchmark_coverage_precheck
-from evaluation.cross_source_agreement import (
-    compute_agreement_metrics,
-    generate_synthetic_observations,
+from core.utils.paths import CACHE_ROOT
+from evaluation.collect_cross_source import validate_private_output
+from evaluation.common import write_json, write_records
+from evaluation.cross_source_agreement import compute_agreement_metrics
+from evaluation.empirical import (
+    empirical_coverage_records,
+    load_empirical_observations,
+    load_empirical_quality_reports,
+    load_empirical_runs,
 )
 from evaluation.plots import generate_all_figures
-from evaluation.quality_smoke import generate_quality_control_report
 from evaluation.scaling import benchmark_scaling
 
 
 def run_all(
     *,
-    scaling_repeats=2,
-    latency_scale=1.0,
-    show_progress: bool = False,
+    runs_path: Path,
+    observations_path: Path,
+    quality_reports_dir: Path,
+    output_dir: Path,
+    reference_source="ERA5",
+    scaling_repeats=5,
+    show_progress=False,
 ):
-    ensure_output_dirs()
+    """Generate empirical tables and figures without synthetic fallbacks."""
+    log_dir = output_dir / "logs"
+    figure_dir = output_dir / "figures"
 
     progress = tqdm(
         total=6,
-        desc="FARMWISE evaluation",
+        desc="FARMWISE empirical evaluation",
         unit="stage",
         disable=not show_progress,
         dynamic_ncols=True,
         file=sys.stdout,
     )
-    progress.set_postfix_str("coverage pre-check", refresh=True)
-    coverage = benchmark_coverage_precheck(
-        latency_scale=latency_scale,
-        show_progress=show_progress,
-        progress_position=1,
-        leave_progress=False,
-    )
-    write_records(coverage, LOG_DIR / "coverage_precheck.csv")
+    progress.set_postfix_str("validate live provenance", refresh=True)
+    runs = load_empirical_runs(runs_path)
+    observations = load_empirical_observations(observations_path)
+    quality_reports = load_empirical_quality_reports(quality_reports_dir)
+    validate_private_output(output_dir / "derived-results.csv", observations)
+    log_dir.mkdir(parents=True, exist_ok=True)
+    figure_dir.mkdir(parents=True, exist_ok=True)
     progress.update(1)
 
-    progress.set_postfix_str("scaling benchmark", refresh=True)
+    progress.set_postfix_str("observed coverage", refresh=True)
+    coverage = empirical_coverage_records(runs)
+    write_records(coverage, log_dir / "coverage_precheck.csv")
+    progress.update(1)
+
+    progress.set_postfix_str("measured scaling", refresh=True)
     scaling = benchmark_scaling(
         repeats=scaling_repeats,
         show_progress=show_progress,
         progress_position=1,
         leave_progress=False,
     )
-    write_records(scaling, LOG_DIR / "scaling.csv")
+    write_records(scaling, log_dir / "scaling.csv")
     progress.update(1)
 
-    progress.set_postfix_str("synthetic agreement control", refresh=True)
-    observations = generate_synthetic_observations()
-    metrics, differences = compute_agreement_metrics(observations)
-    observations.to_csv(
-        LOG_DIR / "cross_source_observations_synthetic.csv", index=False
+    progress.set_postfix_str("observed source agreement", refresh=True)
+    metrics, differences = compute_agreement_metrics(
+        observations, reference_source=reference_source
     )
-    metrics.to_csv(LOG_DIR / "cross_source_agreement.csv", index=False)
+    if metrics.empty or differences.empty:
+        raise ValueError(
+            "Live observations contain no aligned cell-day pairs for "
+            f"reference source {reference_source!r}."
+        )
+    metrics.to_csv(log_dir / "cross_source_agreement.csv", index=False)
     differences.to_csv(
-        LOG_DIR / "cross_source_differences.csv", index=False
+        log_dir / "cross_source_differences.csv", index=False
     )
     progress.update(1)
 
-    progress.set_postfix_str("figures", refresh=True)
-    figures = generate_all_figures()
-    progress.update(1)
-    progress.set_postfix_str("synthetic quality control", refresh=True)
-    write_json(
-        generate_quality_control_report(),
-        LOG_DIR / "quality_report_synthetic.json",
+    progress.set_postfix_str("empirical figures", refresh=True)
+    figures = generate_all_figures(
+        coverage_path=log_dir / "coverage_precheck.csv",
+        scaling_path=log_dir / "scaling.csv",
+        differences_path=log_dir / "cross_source_differences.csv",
+        figure_dir=figure_dir,
     )
     progress.update(1)
-    progress.set_postfix_str("manifest", refresh=True)
+
+    progress.set_postfix_str("provenance manifest", refresh=True)
+    latency_coverage = [
+        record["avoided_latency_coverage_rate"] for record in coverage
+    ]
     manifest = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "mode": "offline-smoke-test",
-        "publication_warning": (
-            "Coverage latency and cross-source observations are deterministic "
-            "synthetic controls. Replace them with live runs before using the "
-            "numbers in a publication."
-        ),
+        "mode": "empirical-live",
+        "inputs": {
+            "runs": str(runs_path.resolve()),
+            "observations": str(observations_path.resolve()),
+            "quality_reports": str(quality_reports_dir.resolve()),
+            "collected_at": runs["collected_at"],
+        },
+        "method_notes": {
+            "coverage_saved_time": (
+                "Lower-bound estimate using median dispatch times observed "
+                "for avoided sources in other live scenarios."
+            ),
+            "scaling": (
+                "Measured locally on a controlled generated workload; it is "
+                "not network end-to-end latency."
+            ),
+            "agreement": (
+                "Inner-aligned live observations by timestamp, S2 cell, and "
+                "variable."
+            ),
+        },
         "coverage_scenarios": len(coverage),
+        "mean_avoided_latency_coverage": (
+            sum(latency_coverage) / len(latency_coverage)
+            if latency_coverage
+            else 0.0
+        ),
         "scaling_cases": len(scaling),
         "agreement_pairs": len(metrics),
-        "figures": [
-            path.relative_to(FIGURE_DIR.parent).as_posix()
-            for path in figures
-        ],
-        "quality_reports": 1,
+        "agreement_observations": len(differences),
+        "quality_reports": len(quality_reports),
+        "figures": [str(path.resolve()) for path in figures],
     }
-    write_json(manifest, LOG_DIR / "manifest.json")
+    write_json(manifest, log_dir / "manifest.json")
     progress.update(1)
     progress.close()
     return manifest
@@ -108,24 +140,43 @@ def run_all(
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--scaling-repeats", type=int, default=2)
-    parser.add_argument("--latency-scale", type=float, default=1.0)
     parser.add_argument(
-        "--no-progress",
-        action="store_true",
-        help="Disable progress bars.",
+        "--input-dir",
+        type=Path,
+        default=CACHE_ROOT / "evaluation" / "empirical_input",
+        help="Directory produced by evaluation.collect_empirical.",
     )
+    parser.add_argument("--runs", type=Path)
+    parser.add_argument("--observations", type=Path)
+    parser.add_argument("--quality-reports", type=Path)
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=CACHE_ROOT / "evaluation" / "empirical_results",
+    )
+    parser.add_argument("--reference-source", default="ERA5")
+    parser.add_argument("--scaling-repeats", type=int, default=5)
+    parser.add_argument("--no-progress", action="store_true")
     args = parser.parse_args(argv)
+    runs_path = args.runs or args.input_dir / "empirical_runs.json"
+    observations_path = (
+        args.observations
+        or args.input_dir / "cross_source_observations_live.csv"
+    )
+    quality_reports_dir = args.quality_reports or args.input_dir / "quality"
     manifest = run_all(
+        runs_path=runs_path,
+        observations_path=observations_path,
+        quality_reports_dir=quality_reports_dir,
+        output_dir=args.output_dir,
+        reference_source=args.reference_source,
         scaling_repeats=args.scaling_repeats,
-        latency_scale=args.latency_scale,
         show_progress=not args.no_progress,
     )
     print(
-        f"Generated {manifest['coverage_scenarios']} coverage scenarios, "
-        f"{manifest['scaling_cases']} scaling cases, "
-        f"{manifest['agreement_pairs']} agreement pairs, and "
-        f"{len(manifest['figures'])} figures."
+        f"Generated empirical results from {manifest['coverage_scenarios']} "
+        f"live requests and {manifest['agreement_observations']} aligned "
+        f"observations in {args.output_dir}."
     )
 
 

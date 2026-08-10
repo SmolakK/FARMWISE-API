@@ -142,10 +142,16 @@ def main(argv=None):
         default=1.0,
         help="Scale deterministic simulated adapter latency.",
     )
-    parser.add_argument(
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument(
         "--latency-profile",
         type=Path,
-        help="Optional JSON mapping of full source paths to observed seconds.",
+        help="JSON mapping of full source paths to observed seconds.",
+    )
+    mode.add_argument(
+        "--synthetic-smoke",
+        action="store_true",
+        help="Explicitly run the deterministic simulated-latency control.",
     )
     parser.add_argument(
         "--no-progress",

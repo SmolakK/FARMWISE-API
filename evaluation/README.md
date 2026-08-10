@@ -8,15 +8,52 @@ plotting dependency with:
 python -m pip install -e ".[evaluation]"
 ```
 
-## Reproduce the included offline controls
+## Empirical evaluation
+
+The default evaluation is deliberately split into collection and analysis.
+Collection calls the enabled live adapters, persists per-source quality
+reports, and records the real dispatch metadata used by the analysis:
 
 ```powershell
-python -m evaluation.run_all
+python -m evaluation.collect_empirical
+python -m evaluation.run_all --scaling-repeats 5
+```
+
+Both commands use the private FARMWISE cache by default. This is required when
+IMGW observations are present and keeps downloaded or derived restricted data
+out of the repository. `run_all` has no synthetic fallback: it fails if the
+live run bundle, overlapping observations, or quality reports are missing.
+Configure the CDS/ERA5 credentials described in section 2.4 before collection;
+otherwise there may be no ERA5 reference pairs and the analysis will stop.
+IMGW remains optional and may be enabled only for acknowledged private,
+non-commercial local use.
+
+To start with a smaller live collection, select scenarios explicitly:
+
+```powershell
+python -m evaluation.collect_empirical `
+  --scenario poland-temperature `
+  --scenario germany-meteo
 ```
 
 The command displays an overall stage bar plus request-level and scaling-case
 bars in terminals such as the PyCharm Run console. Pass `--no-progress` when
 machine-readable or CI logs should not contain progress output.
+
+The resulting manifest is labelled `empirical-live`. Coverage time saved is a
+conservative lower-bound estimate based only on median source dispatch times
+actually observed in other collected scenarios; its latency coverage is
+reported explicitly. Scaling values are measured locally on a controlled
+generated workload and are not presented as end-to-end network latency.
+
+## Offline smoke controls
+
+Synthetic data remain useful for verifying the evaluation code itself, but
+they are now behind an explicitly named command:
+
+```powershell
+python -m evaluation.run_smoke
+```
 
 This regenerates CSV/JSON logs under `evaluation/logs/` and four PNG figures
 under `evaluation/figures/`:
@@ -73,15 +110,9 @@ metadata.coverage_precheck.precheck_seconds
 metadata.dispatch[*].wall_seconds
 ```
 
-The offline benchmark varies country, S2 level, factor set, and time window:
-
-```powershell
-python -m evaluation.coverage_precheck
-```
-
-It executes deterministic wait profiles for the filtered and unfiltered
-counterfactual. For paper results, replace the simulated latency dictionary
-with repeated observed adapter latencies from `metadata.dispatch`:
+The empirical collector varies country, S2 level, factor set, and time window
+and records real `metadata.dispatch[*].wall_seconds` values. The standalone
+projection command requires an observed latency profile:
 
 ```powershell
 python -m evaluation.coverage_precheck `
@@ -89,8 +120,9 @@ python -m evaluation.coverage_precheck `
 ```
 
 The profile is a JSON object keyed by the full adapter module path, with median
-latency in seconds as its value. Profile-based runs calculate a projection and
-do not repeat the waits.
+observed latency in seconds as its value. Profile-based runs calculate a
+projection and do not repeat waits. A simulated control is possible only with
+the explicit `--synthetic-smoke` flag.
 
 ## 2.3 Scaling behaviour
 
@@ -138,6 +170,9 @@ python -m evaluation.cross_source_agreement `
   --differences-output <private-cache-path>/cross_source_differences.csv
 python -m evaluation.plots
 ```
+
+Omitting `--input` is no longer allowed unless `--synthetic-smoke` is supplied
+explicitly.
 
 Agreement is calculated only after an inner join on timestamp, S2 cell, and
 logical variable. The output reports sample count, bias, MAE, RMSE, and Pearson

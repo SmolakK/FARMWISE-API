@@ -155,10 +155,16 @@ def compute_agreement_metrics(
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument(
         "--input",
         type=Path,
-        help="Canonical long CSV. Omit for deterministic smoke-test data.",
+        help="Canonical long CSV containing observed source values.",
+    )
+    mode.add_argument(
+        "--synthetic-smoke",
+        action="store_true",
+        help="Explicitly use deterministic smoke-test observations.",
     )
     parser.add_argument(
         "--metrics-output",

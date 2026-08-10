@@ -75,6 +75,7 @@ async def collect(args):
         time_to=args.time_to,
         factors=["temperature", "precipitation"],
         separate_api=True,
+        assess_quality=True,
         persist_quality_reports=True,
     )
     if not isinstance(result, dict) or result["data"].empty:
