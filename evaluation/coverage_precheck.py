@@ -6,7 +6,10 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import sys
 from time import perf_counter, sleep
+
+from tqdm import tqdm
 
 from adapters.mappings.data_source_mapping import API_PATH_RANGES
 from core.main_call import plan_source_dispatch
@@ -35,6 +38,9 @@ def benchmark_coverage_precheck(
     source_latencies=None,
     latency_scale: float = 1.0,
     execute_waits: bool = True,
+    show_progress: bool = False,
+    progress_position: int = 0,
+    leave_progress: bool = True,
 ):
     """Run the pre-check batch and return one metrics record per request."""
     source_ranges = API_PATH_RANGES if source_ranges is None else source_ranges
@@ -49,7 +55,20 @@ def benchmark_coverage_precheck(
     )
     records = []
 
-    for request in scenarios:
+    requests = list(scenarios)
+    progress = tqdm(
+        requests,
+        desc="Coverage pre-check",
+        unit="request",
+        total=len(requests),
+        disable=not show_progress,
+        dynamic_ncols=True,
+        file=sys.stdout,
+        position=progress_position,
+        leave=leave_progress,
+    )
+    for request in progress:
+        progress.set_postfix_str(request["scenario"], refresh=False)
         precheck_started = perf_counter()
         plan = plan_source_dispatch(
             request["bounding_box"],
@@ -128,6 +147,11 @@ def main(argv=None):
         type=Path,
         help="Optional JSON mapping of full source paths to observed seconds.",
     )
+    parser.add_argument(
+        "--no-progress",
+        action="store_true",
+        help="Disable the progress bar.",
+    )
     args = parser.parse_args(argv)
     ensure_output_dirs()
     latency_profile = (
@@ -139,6 +163,7 @@ def main(argv=None):
         latency_scale=args.latency_scale,
         source_latencies=latency_profile,
         execute_waits=latency_profile is None,
+        show_progress=not args.no_progress,
     )
     write_records(records, args.output)
     print(f"Wrote {len(records)} scenarios to {args.output}")

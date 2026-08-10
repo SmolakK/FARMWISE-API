@@ -33,9 +33,9 @@ REMOTE_DATA: dict[str, dict] = {
     },
     "EuroCropV2/data/points.csv": {
         "kind": "file",
-        "url": "https://zenodo.org/records/REPLACE_ME/files/points.csv",
-        "sha256": "REPLACE_ME",
-        "size_mb": 1,  # likely small enough to just commit instead -- check
+        "url": "https://doi.org/10.5281/zenodo.21871068",
+        "sha256": "D0E40DCAB9EDC7D653B7B40FF308C87B5F6C983F6A504BF5A6A20D34E8939987",
+        "size_mb": 7_000_000,
     },
     "IFSGRID/data/IFSGRID/data": {
         "kind": "archive",

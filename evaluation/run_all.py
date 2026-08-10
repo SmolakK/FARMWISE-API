@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import sys
+
+from tqdm import tqdm
 
 from evaluation.common import (
     FIGURE_DIR,
@@ -22,17 +25,43 @@ from evaluation.quality_smoke import generate_quality_control_report
 from evaluation.scaling import benchmark_scaling
 
 
-def run_all(*, scaling_repeats=2, latency_scale=1.0):
+def run_all(
+    *,
+    scaling_repeats=2,
+    latency_scale=1.0,
+    show_progress: bool = False,
+):
     ensure_output_dirs()
 
+    progress = tqdm(
+        total=6,
+        desc="FARMWISE evaluation",
+        unit="stage",
+        disable=not show_progress,
+        dynamic_ncols=True,
+        file=sys.stdout,
+    )
+    progress.set_postfix_str("coverage pre-check", refresh=True)
     coverage = benchmark_coverage_precheck(
-        latency_scale=latency_scale
+        latency_scale=latency_scale,
+        show_progress=show_progress,
+        progress_position=1,
+        leave_progress=False,
     )
     write_records(coverage, LOG_DIR / "coverage_precheck.csv")
+    progress.update(1)
 
-    scaling = benchmark_scaling(repeats=scaling_repeats)
+    progress.set_postfix_str("scaling benchmark", refresh=True)
+    scaling = benchmark_scaling(
+        repeats=scaling_repeats,
+        show_progress=show_progress,
+        progress_position=1,
+        leave_progress=False,
+    )
     write_records(scaling, LOG_DIR / "scaling.csv")
+    progress.update(1)
 
+    progress.set_postfix_str("synthetic agreement control", refresh=True)
     observations = generate_synthetic_observations()
     metrics, differences = compute_agreement_metrics(observations)
     observations.to_csv(
@@ -42,12 +71,18 @@ def run_all(*, scaling_repeats=2, latency_scale=1.0):
     differences.to_csv(
         LOG_DIR / "cross_source_differences.csv", index=False
     )
+    progress.update(1)
 
+    progress.set_postfix_str("figures", refresh=True)
     figures = generate_all_figures()
+    progress.update(1)
+    progress.set_postfix_str("synthetic quality control", refresh=True)
     write_json(
         generate_quality_control_report(),
         LOG_DIR / "quality_report_synthetic.json",
     )
+    progress.update(1)
+    progress.set_postfix_str("manifest", refresh=True)
     manifest = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "mode": "offline-smoke-test",
@@ -66,6 +101,8 @@ def run_all(*, scaling_repeats=2, latency_scale=1.0):
         "quality_reports": 1,
     }
     write_json(manifest, LOG_DIR / "manifest.json")
+    progress.update(1)
+    progress.close()
     return manifest
 
 
@@ -73,10 +110,16 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--scaling-repeats", type=int, default=2)
     parser.add_argument("--latency-scale", type=float, default=1.0)
+    parser.add_argument(
+        "--no-progress",
+        action="store_true",
+        help="Disable progress bars.",
+    )
     args = parser.parse_args(argv)
     manifest = run_all(
         scaling_repeats=args.scaling_repeats,
         latency_scale=args.latency_scale,
+        show_progress=not args.no_progress,
     )
     print(
         f"Generated {manifest['coverage_scenarios']} coverage scenarios, "

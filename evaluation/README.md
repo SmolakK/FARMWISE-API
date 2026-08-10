@@ -14,6 +14,10 @@ python -m pip install -e ".[evaluation]"
 python -m evaluation.run_all
 ```
 
+The command displays an overall stage bar plus request-level and scaling-case
+bars in terminals such as the PyCharm Run console. Pass `--no-progress` when
+machine-readable or CI logs should not contain progress output.
+
 This regenerates CSV/JSON logs under `evaluation/logs/` and four PNG figures
 under `evaluation/figures/`:
 

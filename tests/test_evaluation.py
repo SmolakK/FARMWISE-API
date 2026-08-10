@@ -14,7 +14,8 @@ from evaluation.cross_source_agreement import (
     validate_observations,
 )
 from evaluation.quality_smoke import generate_quality_control_report
-from evaluation.scaling import measure_scaling_case
+from evaluation import scaling
+from evaluation.scaling import benchmark_scaling, measure_scaling_case
 
 
 def test_coverage_benchmark_counts_avoided_requests_without_waiting():
@@ -54,6 +55,27 @@ def test_coverage_benchmark_counts_avoided_requests_without_waiting():
     assert result[0]["wall_seconds_saved"] > 0
 
 
+def test_coverage_benchmark_can_report_progress(capsys):
+    benchmark_coverage_precheck(
+        [
+            {
+                "scenario": "visible-progress",
+                "country": "Poland",
+                "bounding_box": (55, 49, 24, 14),
+                "level": 10,
+                "time_from": "2024-01-01",
+                "time_to": "2024-01-02",
+                "factors": ["temperature"],
+            }
+        ],
+        source_ranges={},
+        execute_waits=False,
+        show_progress=True,
+    )
+
+    assert "Coverage pre-check" in capsys.readouterr().out
+
+
 def test_scaling_case_records_latency_memory_and_problem_size():
     result = measure_scaling_case(
         bounding_box=(51.05, 50.95, 17.05, 16.95),
@@ -67,6 +89,27 @@ def test_scaling_case_records_latency_memory_and_problem_size():
     assert result["value_count"] == result["cell_count"] * 4
     assert result["latency_seconds"] > 0
     assert result["peak_memory_mb"] > 0
+
+
+def test_scaling_benchmark_can_report_case_progress(monkeypatch, capsys):
+    monkeypatch.setattr(
+        scaling,
+        "measure_scaling_case",
+        lambda **_kwargs: {
+            "level": 10,
+            "factor_count": 1,
+            "bbox_area_degrees2": 1.0,
+            "cell_count": 1,
+            "value_count": 1,
+            "latency_seconds": 0.1,
+            "peak_memory_mb": 0.1,
+        },
+    )
+
+    records = benchmark_scaling(repeats=1, show_progress=True)
+
+    assert len(records) == 17
+    assert "Scaling benchmark" in capsys.readouterr().out
 
 
 def test_cross_source_metrics_align_by_timestamp_cell_and_variable():

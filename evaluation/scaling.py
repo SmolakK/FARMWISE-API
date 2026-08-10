@@ -5,11 +5,13 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 from statistics import median
+import sys
 from time import perf_counter
 import tracemalloc
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 from core.harmonization import harmonize_data
 from core.utils.coordinates_to_cells import get_s2_cells
@@ -89,22 +91,25 @@ def measure_scaling_case(
     }
 
 
-def benchmark_scaling(*, repeats=2):
+def benchmark_scaling(
+    *,
+    repeats=2,
+    show_progress: bool = False,
+    progress_position: int = 0,
+    leave_progress: bool = True,
+):
     """Run level, bounding-box-area, and factor-count scaling sweeps."""
-    cases = []
+    case_specs = []
     base_bbox = (51.25, 50.75, 17.35, 16.65)
 
     for level in range(6, 13):
-        cases.append(
+        case_specs.append(
             (
                 "S2 level",
                 level,
-                measure_scaling_case(
-                    bounding_box=base_bbox,
-                    level=level,
-                    factor_count=2,
-                    repeats=repeats,
-                ),
+                base_bbox,
+                level,
+                2,
             )
         )
 
@@ -116,35 +121,50 @@ def benchmark_scaling(*, repeats=2):
             center_lon + width / 2,
             center_lon - width / 2,
         )
-        cases.append(
+        case_specs.append(
             (
                 "Bounding-box area",
                 width * width,
-                measure_scaling_case(
-                    bounding_box=bbox,
-                    level=10,
-                    factor_count=2,
-                    repeats=repeats,
-                ),
+                bbox,
+                10,
+                2,
             )
         )
 
     for factor_count in (1, 2, 3, 4, 6):
-        cases.append(
+        case_specs.append(
             (
                 "Factor count",
                 factor_count,
-                measure_scaling_case(
-                    bounding_box=base_bbox,
-                    level=10,
-                    factor_count=factor_count,
-                    repeats=repeats,
-                ),
+                base_bbox,
+                10,
+                factor_count,
             )
         )
 
     records = []
-    for dimension, value, metrics in cases:
+    progress = tqdm(
+        case_specs,
+        desc="Scaling benchmark",
+        unit="case",
+        total=len(case_specs),
+        disable=not show_progress,
+        dynamic_ncols=True,
+        file=sys.stdout,
+        position=progress_position,
+        leave=leave_progress,
+    )
+    for dimension, value, bounding_box, level, factor_count in progress:
+        progress.set_postfix_str(
+            f"{dimension}={value}, repeats={repeats}",
+            refresh=False,
+        )
+        metrics = measure_scaling_case(
+            bounding_box=bounding_box,
+            level=level,
+            factor_count=factor_count,
+            repeats=repeats,
+        )
         records.append(
             {
                 "dimension": dimension,
@@ -176,9 +196,17 @@ def main(argv=None):
         default=LOG_DIR / "scaling.csv",
     )
     parser.add_argument("--repeats", type=int, default=2)
+    parser.add_argument(
+        "--no-progress",
+        action="store_true",
+        help="Disable the progress bar.",
+    )
     args = parser.parse_args(argv)
     ensure_output_dirs()
-    records = benchmark_scaling(repeats=args.repeats)
+    records = benchmark_scaling(
+        repeats=args.repeats,
+        show_progress=not args.no_progress,
+    )
     write_records(records, args.output)
     print(f"Wrote {len(records)} scaling measurements to {args.output}")
 
