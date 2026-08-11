@@ -209,7 +209,6 @@ async def collect(args) -> dict:
     observations.to_csv(observations_path, index=False)
 
     payload = {
-        "schema_version": EMPIRICAL_RUN_SCHEMA_VERSION,
         "mode": "empirical-live",
         "collected_at": datetime.now(timezone.utc).isoformat(),
         "live_scaling_repeats": (

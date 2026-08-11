@@ -72,18 +72,18 @@ def run_all(
     figure_dir.mkdir(parents=True, exist_ok=True)
     progress.update(1)
 
-    # Measure coverage
+    # Measure coverage, latency, wall times, skipped sources, used sources
     progress.set_postfix_str("observed coverage", refresh=True)
     coverage = empirical_coverage_records(runs)
     write_records(coverage, log_dir / "coverage_precheck.csv")
     progress.update(1)
 
-    # Measure scaling on empirical records
+    # Measure scaling on empirical records, times taken to process, memory used
     progress.set_postfix_str("live end-to-end scaling", refresh=True)
     live_scaling = empirical_live_scaling_records(runs)
     write_records(live_scaling, log_dir / "scaling_live.csv")
     progress.update(1)
-
+    # Run benchmark on controlled S2 scaling to see how this impact the wall times
     progress.set_postfix_str("controlled algorithmic scaling", refresh=True)
     controlled_scaling = benchmark_controlled_scaling(
         repeats=controlled_scaling_repeats,
@@ -93,7 +93,7 @@ def run_all(
     )
     write_records(controlled_scaling, log_dir / "scaling_controlled.csv")
     progress.update(1)
-
+    # Run tests on how values for the same factor and area agree between each other
     progress.set_postfix_str("observed source agreement", refresh=True)
     metrics, differences = compute_agreement_metrics(
         observations, reference_source=reference_source
@@ -108,7 +108,7 @@ def run_all(
         log_dir / "cross_source_differences.csv", index=False
     )
     progress.update(1)
-
+    # Generate figures for the paper
     progress.set_postfix_str("live and controlled figures", refresh=True)
     figures = generate_all_figures(
         coverage_path=log_dir / "coverage_precheck.csv",
