@@ -1,10 +1,12 @@
 import json
 import math
+from types import SimpleNamespace
 
 import pandas as pd
 import pytest
 
 from evaluation import collect_cross_source as live_collector
+from evaluation import collect_empirical as empirical_collector
 from evaluation import run_all as empirical_runner
 from evaluation.collect_cross_source import (
     separate_frame_to_observations,
@@ -17,13 +19,18 @@ from evaluation.cross_source_agreement import (
 )
 from evaluation.empirical import (
     empirical_coverage_records,
+    empirical_live_scaling_records,
     load_empirical_observations,
     load_empirical_quality_reports,
     load_empirical_runs,
 )
 from evaluation.quality_smoke import generate_quality_control_report
+from evaluation.plots import plot_scaling
 from evaluation import scaling
-from evaluation.scaling import benchmark_scaling, measure_scaling_case
+from evaluation.scaling import (
+    benchmark_controlled_scaling,
+    measure_controlled_scaling_case,
+)
 
 
 def test_coverage_benchmark_counts_avoided_requests_without_waiting():
@@ -84,8 +91,8 @@ def test_coverage_benchmark_can_report_progress(capsys):
     assert "Coverage pre-check" in capsys.readouterr().out
 
 
-def test_scaling_case_records_latency_memory_and_problem_size():
-    result = measure_scaling_case(
+def test_controlled_scaling_case_records_latency_memory_and_problem_size():
+    result = measure_controlled_scaling_case(
         bounding_box=(51.05, 50.95, 17.05, 16.95),
         level=6,
         factor_count=1,
@@ -97,12 +104,13 @@ def test_scaling_case_records_latency_memory_and_problem_size():
     assert result["value_count"] == result["cell_count"] * 4
     assert result["latency_seconds"] > 0
     assert result["peak_memory_mb"] > 0
+    assert result["measurement_mode"] == "controlled-generated-workload"
 
 
 def test_scaling_benchmark_can_report_case_progress(monkeypatch, capsys):
     monkeypatch.setattr(
         scaling,
-        "measure_scaling_case",
+        "measure_controlled_scaling_case",
         lambda **_kwargs: {
             "level": 10,
             "factor_count": 1,
@@ -114,10 +122,132 @@ def test_scaling_benchmark_can_report_case_progress(monkeypatch, capsys):
         },
     )
 
-    records = benchmark_scaling(repeats=1, show_progress=True)
+    records = benchmark_controlled_scaling(repeats=1, show_progress=True)
 
     assert len(records) == 17
-    assert "Scaling benchmark" in capsys.readouterr().out
+    assert "Controlled scaling" in capsys.readouterr().out
+
+
+def test_live_scaling_plot_renders_latency_and_memory_iqr(tmp_path):
+    rows = []
+    for dimension in ("S2 level", "Bounding-box area", "Factor count"):
+        for value in (0.0, 1.0):
+            rows.append(
+                {
+                    "dimension": dimension,
+                    "normalized_scale": value,
+                    "latency_seconds": 1.0 + value,
+                    "latency_p25_seconds": 0.9 + value,
+                    "latency_p75_seconds": 1.1 + value,
+                    "peak_memory_mb": 2.0 + value,
+                    "peak_memory_p25_mb": 1.8 + value,
+                    "peak_memory_p75_mb": 2.2 + value,
+                }
+            )
+
+    output = plot_scaling(
+        pd.DataFrame(rows),
+        tmp_path / "live-scaling.png",
+        title="Live scaling",
+    )
+
+    assert output.is_file()
+    assert output.stat().st_size > 0
+
+
+@pytest.mark.asyncio
+async def test_empirical_collector_separates_coverage_and_live_scaling(
+    monkeypatch, tmp_path
+):
+    scaling_cases = [
+        {
+            "scenario": f"case-{number}",
+            "country": "Germany",
+            "dimension": dimension,
+            "input_value": number,
+            "bounding_box": (51.1, 50.9, 10.1, 9.9),
+            "level": 10,
+            "time_from": "2024-01-01",
+            "time_to": "2024-01-02",
+            "factors": ["temperature"],
+        }
+        for number, dimension in enumerate(
+            ("S2 level", "Bounding-box area", "Factor count"), start=1
+        )
+    ]
+    separate_api_values = []
+
+    async def fake_read_data(**kwargs):
+        separate_api_values.append(kwargs["separate_api"])
+        factor = (
+            "Temperature [C] (fake_source)"
+            if kwargs["separate_api"]
+            else "Temperature [C]"
+        )
+        frame = pd.DataFrame(
+            [[1.0]],
+            index=pd.to_datetime(["2024-01-01"]),
+            columns=pd.MultiIndex.from_tuples([(factor, "cell")]),
+        )
+        return {
+            "data": frame,
+            "metadata": {
+                "coverage_precheck": {
+                    "candidate_sources": 1,
+                    "dispatched_sources": 1,
+                    "requests_avoided": 0,
+                    "precheck_seconds": 0.01,
+                    "sources": [
+                        {"source": "fake.source", "dispatched": True}
+                    ],
+                },
+                "dispatch": [
+                    {
+                        "source": "fake.source",
+                        "status": "success",
+                        "wall_seconds": 0.02,
+                    }
+                ],
+                "quality_reports": [],
+            },
+        }
+
+    monkeypatch.setattr(empirical_collector, "read_data", fake_read_data)
+    monkeypatch.setattr(
+        empirical_collector,
+        "plan_source_dispatch",
+        lambda *_args, **_kwargs: [
+            {"source": "fake.source", "dispatched": True}
+        ],
+    )
+    monkeypatch.setattr(
+        empirical_collector, "LIVE_SCALING_SCENARIOS", scaling_cases
+    )
+    monkeypatch.setattr(empirical_collector, "PROJECT_ROOT", tmp_path / "repo")
+    output_dir = tmp_path / "cache"
+
+    result = await empirical_collector.collect(
+        SimpleNamespace(
+            scenario=["poland-temperature"],
+            output_dir=output_dir,
+            skip_live_scaling=False,
+            live_scaling_repeats=1,
+            timeout=1,
+            fail_fast=True,
+            no_progress=True,
+        )
+    )
+
+    payload = json.loads(result["runs"].read_text(encoding="utf-8"))
+    assert payload["schema_version"] == 2
+    assert [run["run_kind"] for run in payload["runs"]].count("coverage") == 1
+    assert [run["run_kind"] for run in payload["runs"]].count("live-scaling") == 3
+    assert separate_api_values.count(True) == 1
+    assert separate_api_values.count(False) == 3
+    assert all(
+        isinstance(run["peak_traced_memory_mb"], float)
+        for run in payload["runs"]
+    )
 
 
 def test_cross_source_metrics_align_by_timestamp_cell_and_variable():
@@ -254,7 +384,7 @@ def test_empirical_inputs_reject_synthetic_fallbacks(tmp_path):
     runs_path.write_text(
         json.dumps(
             {
-                "schema_version": 1,
+                "schema_version": 2,
                 "mode": "offline-smoke-test",
                 "runs": [{"scenario": "fake"}],
             }
@@ -303,7 +433,7 @@ def test_empirical_runner_consumes_live_artifacts_without_fallback(
     runs_path.write_text(
         json.dumps(
             {
-                "schema_version": 1,
+                "schema_version": 2,
                 "mode": "empirical-live",
                 "collected_at": "2026-08-10T10:00:00+00:00",
                 "runs": [
@@ -329,7 +459,86 @@ def test_empirical_runner_consumes_live_artifacts_without_fallback(
                         "dispatch": [
                             {"source": "source.live", "wall_seconds": 0.4}
                         ],
-                    }
+                    },
+                    {
+                        "request": {
+                            "scenario": "live-level-10",
+                            "country": "Germany",
+                            "dimension": "S2 level",
+                            "input_value": 10,
+                            "bounding_box": [51.5, 50.5, 10.5, 9.5],
+                            "level": 10,
+                            "factors": ["temperature"],
+                            "time_from": "2024-01-01",
+                            "time_to": "2024-01-02",
+                        },
+                        "run_kind": "live-scaling",
+                        "repeat": 1,
+                        "status": "success",
+                        "request_wall_seconds": 0.6,
+                        "peak_traced_memory_mb": 2.0,
+                        "returned_cell_count": 4,
+                        "non_null_value_count": 8,
+                        "coverage_precheck": {
+                            "candidate_sources": 1,
+                            "dispatched_sources": 1,
+                            "precheck_seconds": 0.01,
+                            "sources": [
+                                {"source": "source.live", "dispatched": True}
+                            ],
+                        },
+                        "dispatch": [
+                            {
+                                "source": "source.live",
+                                "status": "success",
+                                "wall_seconds": 0.5,
+                            }
+                        ],
+                    },
+                    {
+                        "request": {
+                            "scenario": "live-area-1",
+                            "country": "Germany",
+                            "dimension": "Bounding-box area",
+                            "input_value": 1.0,
+                            "bounding_box": [51.5, 50.5, 10.5, 9.5],
+                            "level": 10,
+                            "factors": ["temperature"],
+                            "time_from": "2024-01-01",
+                            "time_to": "2024-01-02",
+                        },
+                        "run_kind": "live-scaling",
+                        "status": "success",
+                        "request_wall_seconds": 0.7,
+                        "peak_traced_memory_mb": 2.1,
+                        "returned_cell_count": 4,
+                        "non_null_value_count": 8,
+                        "dispatch": [
+                            {"status": "success", "wall_seconds": 0.6}
+                        ],
+                    },
+                    {
+                        "request": {
+                            "scenario": "live-factors-1",
+                            "country": "Germany",
+                            "dimension": "Factor count",
+                            "input_value": 1,
+                            "bounding_box": [51.5, 50.5, 10.5, 9.5],
+                            "level": 10,
+                            "factors": ["temperature"],
+                            "time_from": "2024-01-01",
+                            "time_to": "2024-01-02",
+                        },
+                        "run_kind": "live-scaling",
+                        "status": "success",
+                        "request_wall_seconds": 0.8,
+                        "peak_traced_memory_mb": 2.2,
+                        "returned_cell_count": 4,
+                        "non_null_value_count": 8,
+                        "dispatch": [
+                            {"status": "success", "wall_seconds": 0.7}
+                        ],
+                    },
                 ],
             }
         ),
@@ -361,7 +570,7 @@ def test_empirical_runner_consumes_live_artifacts_without_fallback(
     )
     monkeypatch.setattr(
         empirical_runner,
-        "benchmark_scaling",
+        "benchmark_controlled_scaling",
         lambda **_kwargs: [
             {
                 "dimension": "S2 level",
@@ -386,9 +595,10 @@ def test_empirical_runner_consumes_live_artifacts_without_fallback(
         observations_path=observations_path,
         quality_reports_dir=quality_dir,
         output_dir=tmp_path / "results",
-        scaling_repeats=1,
+        controlled_scaling_repeats=1,
     )
 
-    assert manifest["mode"] == "empirical-live"
+    assert manifest["mode"] == "empirical-live-with-controlled-supplement"
+    assert manifest["live_scaling_cases"] == 3
     assert manifest["agreement_observations"] == 2
     assert manifest["quality_reports"] == 1

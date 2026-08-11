@@ -16,8 +16,12 @@ reports, and records the real dispatch metadata used by the analysis:
 
 ```powershell
 python -m evaluation.collect_empirical
-python -m evaluation.run_all --scaling-repeats 5
+python -m evaluation.run_all --controlled-scaling-repeats 5
 ```
+
+In PyCharm, one Run configuration can execute `evaluation/run_all.py` with
+the script parameter `--collect`. The first run collects live inputs and then
+analyses them; later runs may omit `--collect` to reuse those inputs.
 
 Both commands use the private FARMWISE cache by default. This is required when
 IMGW observations are present and keeps downloaded or derived restricted data
@@ -40,11 +44,11 @@ The command displays an overall stage bar plus request-level and scaling-case
 bars in terminals such as the PyCharm Run console. Pass `--no-progress` when
 machine-readable or CI logs should not contain progress output.
 
-The resulting manifest is labelled `empirical-live`. Coverage time saved is a
+The resulting manifest is labelled
+`empirical-live-with-controlled-supplement`. Coverage time saved is a
 conservative lower-bound estimate based only on median source dispatch times
 actually observed in other collected scenarios; its latency coverage is
-reported explicitly. Scaling values are measured locally on a controlled
-generated workload and are not presented as end-to-end network latency.
+reported explicitly.
 
 ## Offline smoke controls
 
@@ -126,15 +130,30 @@ the explicit `--synthetic-smoke` flag.
 
 ## 2.3 Scaling behaviour
 
+The empirical collector runs 12 live scaling cases for each repeat: four S2
+levels, four bounding-box areas, and four factor counts. Only the declared
+dimension changes within each sweep. Configure repeat count during collection:
+
 ```powershell
-python -m evaluation.scaling --repeats 5
-python -m evaluation.plots
+python -m evaluation.collect_empirical --live-scaling-repeats 5
+python -m evaluation.run_all
 ```
 
-The workload includes S2 covering, construction of two overlapping source
-frames, and harmonization. It separately sweeps S2 levels 6-12, bounding-box
-area, and factor count. `scaling_behaviour.png` presents latency and peak traced
-memory in two panels; the CSV retains the actual input values and cell counts.
+`logs/scaling_live.csv` contains end-to-end `read_data` wall time, dispatch
+time, returned cells and values, successful source count, latency quartiles,
+and peak traced memory. `figures/scaling_behaviour.png` is generated from this
+live table.
+
+The controlled algorithmic microbenchmark remains available separately:
+
+```powershell
+python -m evaluation.scaling --repeats 5
+```
+
+It performs a warm-up and then measures S2 covering, construction of two dense
+controlled source frames, and harmonization. Its output is explicitly named
+`scaling_controlled.csv`; the empirical runner includes it only as a separately
+labelled supplement and writes `figures/scaling_controlled.png`.
 
 ## 2.4 Cross-source agreement
 

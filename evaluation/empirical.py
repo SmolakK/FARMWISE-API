@@ -12,18 +12,9 @@ import pandas as pd
 
 from evaluation.cross_source_agreement import validate_observations
 
-
-EMPIRICAL_RUN_SCHEMA_VERSION = 1
-
-
 def load_empirical_runs(path: Path) -> dict[str, Any]:
     """Load a collector bundle and reject synthetic or incomplete provenance."""
     payload = json.loads(path.read_text(encoding="utf-8"))
-    if payload.get("schema_version") != EMPIRICAL_RUN_SCHEMA_VERSION:
-        raise ValueError(
-            "Unsupported empirical run schema: "
-            f"{payload.get('schema_version')!r}"
-        )
     if payload.get("mode") != "empirical-live":
         raise ValueError("Dispatch bundle is not labelled empirical-live.")
     runs = payload.get("runs")
@@ -105,6 +96,8 @@ def empirical_coverage_records(payload: dict[str, Any]) -> list[dict[str, Any]]:
     """
     durations: dict[str, list[float]] = defaultdict(list)
     for run in payload["runs"]:
+        if run.get("run_kind", "coverage") != "coverage":
+            continue
         for dispatch in run.get("dispatch", []):
             source = dispatch.get("source")
             duration = dispatch.get("wall_seconds")
@@ -116,6 +109,8 @@ def empirical_coverage_records(payload: dict[str, Any]) -> list[dict[str, Any]]:
 
     records = []
     for run in payload["runs"]:
+        if run.get("run_kind", "coverage") != "coverage":
+            continue
         coverage = run.get("coverage_precheck")
         request = run.get("request")
         if not isinstance(coverage, dict) or not isinstance(request, dict):
@@ -186,3 +181,135 @@ def empirical_coverage_records(payload: dict[str, Any]) -> list[dict[str, Any]]:
             }
         )
     return records
+
+
+def empirical_live_scaling_records(
+    payload: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Aggregate repeated end-to-end live scaling requests by case."""
+    scaling_runs = [
+        run
+        for run in payload["runs"]
+        if run.get("run_kind") == "live-scaling"
+    ]
+    if not scaling_runs:
+        raise ValueError(
+            "The empirical bundle contains no live scaling runs. Recollect "
+            "inputs with evaluation.collect_empirical."
+        )
+
+    dimensions = {
+        str(run.get("request", {}).get("dimension")) for run in scaling_runs
+    }
+    required_dimensions = {"S2 level", "Bounding-box area", "Factor count"}
+    missing_dimensions = required_dimensions.difference(dimensions)
+    if missing_dimensions:
+        raise ValueError(
+            "Live scaling bundle is incomplete; missing dimensions: "
+            f"{sorted(missing_dimensions)}. Recollect empirical inputs."
+        )
+
+    grouped: dict[tuple[str, float], list[dict[str, Any]]] = defaultdict(list)
+    for run in scaling_runs:
+        request = run.get("request", {})
+        dimension = request.get("dimension")
+        input_value = request.get("input_value")
+        if dimension is None or input_value is None:
+            raise ValueError(
+                "A live scaling run is missing dimension or input_value."
+            )
+        grouped[(str(dimension), float(input_value))].append(run)
+
+    records = []
+    for (dimension, input_value), runs in grouped.items():
+        successful = [run for run in runs if run.get("status") == "success"]
+        if not successful:
+            raise ValueError(
+                f"No successful live repeats for {dimension}={input_value}."
+            )
+        if any(
+            not isinstance(run.get("peak_traced_memory_mb"), (int, float))
+            for run in successful
+        ):
+            raise ValueError(
+                "Live scaling runs lack peak memory measurements; recollect "
+                "the empirical inputs with the current collector."
+            )
+        latencies = pd.Series(
+            [run["request_wall_seconds"] for run in successful], dtype=float
+        )
+        peaks = pd.Series(
+            [run["peak_traced_memory_mb"] for run in successful], dtype=float
+        )
+        request = successful[0]["request"]
+        north, south, east, west = request["bounding_box"]
+        records.append(
+            {
+                "dimension": dimension,
+                "input_value": input_value,
+                "measurement_mode": "empirical-live-end-to-end",
+                "level": request["level"],
+                "factor_count": len(request["factors"]),
+                "bbox_area_degrees2": (north - south) * (east - west),
+                "repeat_count": len(runs),
+                "successful_repeats": len(successful),
+                "failed_repeats": len(runs) - len(successful),
+                "latency_seconds": float(latencies.median()),
+                "latency_p25_seconds": float(latencies.quantile(0.25)),
+                "latency_p75_seconds": float(latencies.quantile(0.75)),
+                "peak_memory_mb": float(peaks.median()),
+                "peak_memory_p25_mb": float(peaks.quantile(0.25)),
+                "peak_memory_p75_mb": float(peaks.quantile(0.75)),
+                "max_peak_memory_mb": float(peaks.max()),
+                "cell_count": int(
+                    median(
+                        float(run.get("returned_cell_count", 0))
+                        for run in successful
+                    )
+                ),
+                "value_count": int(
+                    median(
+                        float(run.get("non_null_value_count", 0))
+                        for run in successful
+                    )
+                ),
+                "median_returned_factor_count": float(
+                    median(
+                        float(run.get("returned_factor_count", 0))
+                        for run in successful
+                    )
+                ),
+                "median_dispatch_seconds": float(
+                    median(
+                        sum(
+                            float(item.get("wall_seconds", 0.0))
+                            for item in run.get("dispatch", [])
+                        )
+                        for run in successful
+                    )
+                ),
+                "median_successful_sources": float(
+                    median(
+                        sum(
+                            item.get("status") == "success"
+                            for item in run.get("dispatch", [])
+                        )
+                        for run in successful
+                    )
+                ),
+            }
+        )
+
+    for dimension in {record["dimension"] for record in records}:
+        subset = [
+            record for record in records if record["dimension"] == dimension
+        ]
+        values = [float(record["input_value"]) for record in subset]
+        low, high = min(values), max(values)
+        for record in subset:
+            record["normalized_scale"] = (
+                (float(record["input_value"]) - low) / (high - low)
+                if high > low
+                else 0.0
+            )
+    return sorted(records, key=lambda row: (row["dimension"], row["input_value"]))

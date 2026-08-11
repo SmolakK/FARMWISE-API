@@ -76,7 +76,7 @@ async def read_data(spatial_range, time_range, data_range, level,
         ]
 
     if filtered_stations.empty:
-        print("No stations found within the specified bounding box.")
+        print("Geosphere: No stations found within the specified bounding box.")
         return None
 
     station_ids = filtered_stations["id"].tolist()

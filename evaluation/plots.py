@@ -59,7 +59,12 @@ def plot_coverage_precheck(data: pd.DataFrame, output: Path) -> Path:
     return output
 
 
-def plot_scaling(data: pd.DataFrame, output: Path) -> Path:
+def plot_scaling(
+    data: pd.DataFrame,
+    output: Path,
+    *,
+    title="FARMWISE scaling behaviour",
+) -> Path:
     fig, axes = plt.subplots(
         1, 2, figsize=(11, 4.8), sharex=True, constrained_layout=True
     )
@@ -78,6 +83,17 @@ def plot_scaling(data: pd.DataFrame, output: Path) -> Path:
             marker=marker,
             label=dimension,
         )
+        if {
+            "latency_p25_seconds",
+            "latency_p75_seconds",
+        }.issubset(subset.columns):
+            axes[0].fill_between(
+                subset["normalized_scale"],
+                subset["latency_p25_seconds"] * 1000,
+                subset["latency_p75_seconds"] * 1000,
+                color=color,
+                alpha=0.14,
+            )
         axes[1].plot(
             subset["normalized_scale"],
             subset["peak_memory_mb"],
@@ -85,6 +101,17 @@ def plot_scaling(data: pd.DataFrame, output: Path) -> Path:
             marker=marker,
             label=dimension,
         )
+        if {
+            "peak_memory_p25_mb",
+            "peak_memory_p75_mb",
+        }.issubset(subset.columns):
+            axes[1].fill_between(
+                subset["normalized_scale"],
+                subset["peak_memory_p25_mb"],
+                subset["peak_memory_p75_mb"],
+                color=color,
+                alpha=0.14,
+            )
 
     axes[0].set_ylabel("Median latency [ms]")
     axes[1].set_ylabel("Peak traced memory [MiB]")
@@ -93,7 +120,7 @@ def plot_scaling(data: pd.DataFrame, output: Path) -> Path:
         axis.set_xlabel("Normalized input scale (minimum → maximum)")
         axis.grid(alpha=0.25)
     axes[0].legend()
-    fig.suptitle("FARMWISE scaling behaviour")
+    fig.suptitle(title)
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output, dpi=180)
     plt.close(fig)
@@ -191,19 +218,33 @@ def plot_disagreement_distribution(data: pd.DataFrame, output: Path) -> Path:
 def generate_all_figures(
     *,
     coverage_path=LOG_DIR / "coverage_precheck.csv",
-    scaling_path=LOG_DIR / "scaling.csv",
+    scaling_path=LOG_DIR / "scaling_controlled.csv",
+    controlled_scaling_path=None,
     differences_path=LOG_DIR / "cross_source_differences.csv",
     figure_dir=FIGURE_DIR,
 ) -> list[Path]:
     ensure_output_dirs()
     coverage = pd.read_csv(coverage_path)
     scaling = pd.read_csv(scaling_path)
+    controlled_scaling = (
+        pd.read_csv(controlled_scaling_path)
+        if controlled_scaling_path is not None
+        else None
+    )
     differences = pd.read_csv(differences_path)
-    return [
+    paths = [
         plot_coverage_precheck(
             coverage, figure_dir / "coverage_precheck.png"
         ),
-        plot_scaling(scaling, figure_dir / "scaling_behaviour.png"),
+        plot_scaling(
+            scaling,
+            figure_dir / "scaling_behaviour.png",
+            title=(
+                "FARMWISE live end-to-end scaling"
+                if controlled_scaling is not None
+                else "FARMWISE controlled scaling"
+            ),
+        ),
         plot_agreement_scatter(
             differences, figure_dir / "cross_source_agreement.png"
         ),
@@ -211,12 +252,26 @@ def generate_all_figures(
             differences, figure_dir / "cross_source_disagreement.png"
         ),
     ]
+    if controlled_scaling is not None:
+        paths.insert(
+            2,
+            plot_scaling(
+                controlled_scaling,
+                figure_dir / "scaling_controlled.png",
+                title="FARMWISE controlled algorithmic scaling",
+            ),
+        )
+    return paths
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--coverage", type=Path, default=LOG_DIR / "coverage_precheck.csv")
-    parser.add_argument("--scaling", type=Path, default=LOG_DIR / "scaling.csv")
+    parser.add_argument(
+        "--scaling",
+        type=Path,
+        default=LOG_DIR / "scaling_controlled.csv",
+    )
     parser.add_argument(
         "--differences",
         type=Path,

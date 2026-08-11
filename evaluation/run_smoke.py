@@ -16,7 +16,7 @@ from evaluation.cross_source_agreement import (
 )
 from evaluation.plots import generate_all_figures
 from evaluation.quality_smoke import generate_quality_control_report
-from evaluation.scaling import benchmark_scaling
+from evaluation.scaling import benchmark_controlled_scaling
 
 
 def run_smoke(*, scaling_repeats=2, latency_scale=1.0, show_progress=False):
@@ -41,13 +41,13 @@ def run_smoke(*, scaling_repeats=2, latency_scale=1.0, show_progress=False):
     progress.update(1)
 
     progress.set_postfix_str("controlled scaling workload", refresh=True)
-    scaling = benchmark_scaling(
+    scaling = benchmark_controlled_scaling(
         repeats=scaling_repeats,
         show_progress=show_progress,
         progress_position=1,
         leave_progress=False,
     )
-    write_records(scaling, LOG_DIR / "scaling.csv")
+    write_records(scaling, LOG_DIR / "scaling_controlled.csv")
     progress.update(1)
 
     progress.set_postfix_str("synthetic agreement", refresh=True)
@@ -61,7 +61,9 @@ def run_smoke(*, scaling_repeats=2, latency_scale=1.0, show_progress=False):
     progress.update(1)
 
     progress.set_postfix_str("control figures", refresh=True)
-    figures = generate_all_figures()
+    figures = generate_all_figures(
+        scaling_path=LOG_DIR / "scaling_controlled.csv"
+    )
     progress.update(1)
     progress.set_postfix_str("synthetic quality", refresh=True)
     write_json(
