@@ -5,11 +5,8 @@ message: >-
 title: FARMWISE-API
 type: software
 authors:
-  - family-names: "REPLACE WITH FAMILY NAME"
-    given-names: "REPLACE WITH GIVEN NAMES"
-    email: "replace-author@example.com"
-    # Add an ORCID after the author has confirmed it, for example:
-    # orcid: "https://orcid.org/0000-0000-0000-0000"
+  - names: "Kamil Smolak, Dominik Teodorczyk, Jakub Misiewicz, Marc Laurencelle, Wiesław Fiałkiewicz, Arkadiusz Głogowski"
+    email: "kamil.smolak@upwr.edu.pl"
 version: 0.1.0
 repository-code: "https://github.com/SmolakK/FARMWISE-API"
 url: "https://github.com/SmolakK/FARMWISE-API"
@@ -24,6 +21,5 @@ keywords:
   - geospatial data
   - S2 geometry
   - data harmonisation
-# After archiving the release, add its publication date and Zenodo DOI:
 # date-released: "YYYY-MM-DD"
 # doi: "10.5281/zenodo.REPLACE_WITH_RECORD_ID"

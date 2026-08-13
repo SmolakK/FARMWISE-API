@@ -8,12 +8,11 @@ version = "0.1.0"
 description = "European agricultural and environmental data aggregation API"
 readme = "README.md"
 license = "Apache-2.0"
-# TODO: replace these placeholder identities before publishing version 0.1.0.
 authors = [
-    { name = "REPLACE WITH AUTHOR NAME", email = "replace-author@example.com" },
+    { name = "Kamil Smolak, Dominik Teodorczyk, Jakub Misiewicz, Marc Laurencelle, Wiesław Fiałkiewicz, Arkadiusz Głogowski", email = "kamil.smolak@upwr.edu.pl"},
 ]
 maintainers = [
-    { name = "REPLACE WITH MAINTAINER NAME", email = "replace-maintainer@example.com" },
+    { name = "Kamil Smolak", email = "kamil.smolak@upwr.edu.pl" },
 ]
 keywords = ["agriculture", "environmental-data", "geospatial", "S2", "FastAPI"]
 classifiers = [
