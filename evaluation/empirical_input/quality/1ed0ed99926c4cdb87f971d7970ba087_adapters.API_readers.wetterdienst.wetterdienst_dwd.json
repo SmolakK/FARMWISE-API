@@ -1,0 +1,37 @@
+{
+  "S2_completeness": 0.006462035541195477,
+  "S2_level": 12,
+  "api_name": "wetterdienst_dwd",
+  "created_at": "2026-08-11T10:22:42.800040+00:00",
+  "data_cutshort": 0.0,
+  "data_delay": 0.0,
+  "error_values": 0.5,
+  "expected_end": "2018-01-07T00:00:00",
+  "expected_s2_cells": 1857,
+  "expected_start": "2018-01-01T00:00:00",
+  "factor_missing_value_rates": {
+    "Precipitation total [mm]": 0.0,
+    "Temperature [\u00b0C]": 0.0
+  },
+  "factor_missing_values": 0.0,
+  "factors_expected": [
+    "precipitation",
+    "temperature"
+  ],
+  "factors_returned": [
+    "Temperature [\u00b0C]",
+    "Precipitation total [mm]"
+  ],
+  "factors_returned_completeness": 1.0,
+  "implausible_value_rates": {
+    "Precipitation total [mm]": 0.0,
+    "Temperature [\u00b0C]": 1.0
+  },
+  "missing_days": 0.0,
+  "request_id": "1ed0ed99926c4cdb87f971d7970ba087",
+  "returned_end": "2018-01-07T00:00:00",
+  "returned_s2_cells": 12,
+  "returned_start": "2018-01-01T00:00:00",
+  "source": "adapters.API_readers.wetterdienst.wetterdienst_dwd",
+  "total_missing_values": 0.0
+}

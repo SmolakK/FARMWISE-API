@@ -40,6 +40,14 @@ def built_wheel(tmp_path_factory):
                 "temp_storage",
             ),
         )
+    bundled_hubeau = Path(
+        "internal-lib/hubeaupyutils/hubeaupyutils-main"
+    )
+    shutil.copytree(
+        ROOT / bundled_hubeau,
+        source_dir / bundled_hubeau,
+        ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.egg-info"),
+    )
 
     build_python = os.environ.get("FARMWISE_BUILD_PYTHON", sys.executable)
     result = subprocess.run(
@@ -94,7 +102,11 @@ def test_built_wheel_installs_and_exposes_local_api(built_wheel, tmp_path):
                 "import sys; "
                 f"sys.path.insert(0, {str(install_dir)!r}); "
                 "from main_call import read_data; "
-                "assert callable(read_data)"
+                "import hubeaupyutils; "
+                "import main; "
+                "assert callable(read_data); "
+                "assert hubeaupyutils.__version__ == '0.1.0'; "
+                "assert callable(main.run)"
             ),
         ],
         cwd=tmp_path,
@@ -102,6 +114,38 @@ def test_built_wheel_installs_and_exposes_local_api(built_wheel, tmp_path):
         text=True,
     )
     assert smoke_test.returncode == 0, smoke_test.stdout + smoke_test.stderr
+
+    base_entrypoint_test = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import importlib.abc\n"
+                "import sys\n"
+                f"sys.path.insert(0, {str(install_dir)!r})\n"
+                "class BlockServer(importlib.abc.MetaPathFinder):\n"
+                "    def find_spec(self, fullname, path=None, target=None):\n"
+                "        if fullname == 'server' or fullname.startswith('server.'):\n"
+                "            raise ModuleNotFoundError(name=fullname)\n"
+                "        return None\n"
+                "sys.meta_path.insert(0, BlockServer())\n"
+                "import main\n"
+                "assert callable(main.run)\n"
+                "try:\n"
+                "    main.run()\n"
+                "except SystemExit as error:\n"
+                "    assert 'farmwise-api[server]' in str(error)\n"
+                "else:\n"
+                "    raise AssertionError('base CLI unexpectedly started the server')"
+            ),
+        ],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+    )
+    assert base_entrypoint_test.returncode == 0, (
+        base_entrypoint_test.stdout + base_entrypoint_test.stderr
+    )
 
 
 def test_built_wheel_declares_runtime_and_server_dependencies(built_wheel):
@@ -117,7 +161,10 @@ def test_built_wheel_declares_runtime_and_server_dependencies(built_wheel):
         for requirement in metadata.get_all("Requires-Dist", [])
         if "extra ==" not in requirement
     ]
-    assert "hubeaupyutils==0.1.0" in base_requirements
+    assert not any(
+        requirement.startswith("hubeaupyutils")
+        for requirement in base_requirements
+    )
 
     assert "server" in metadata.get_all("Provides-Extra", [])
     server_requirements = [
@@ -130,8 +177,15 @@ def test_built_wheel_declares_runtime_and_server_dependencies(built_wheel):
 
     assert "main.py" in names
     assert "server/main.py" in names
+    assert "hubeaupyutils/__init__.py" in names
+    assert "hubeaupyutils/hubeau.py" in names
+    assert "hubeaupyutils/wrappers.py" in names
     assert any(
         name.endswith(".dist-info/licenses/DATA_LICENSES.md") for name in names
+    )
+    assert any(
+        "hubeaupyutils" in name and name.endswith("/LICENSE")
+        for name in names
     )
 
 

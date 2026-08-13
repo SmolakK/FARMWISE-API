@@ -2,68 +2,174 @@
 
 from __future__ import annotations
 
-
 REQUEST_SCENARIOS = [
+    # ========================================================
+    # 1. MULTI-SOURCE METEOROLOGY — DWD + ERA5
+    # ========================================================
     {
-        "scenario": "poland-temperature",
-        "country": "Poland",
-        "bounding_box": (54.84, 49.00, 24.15, 14.12),
-        "level": 6,
+        "scenario": "germany-meteo-overlap",
+        "country": "Germany",
+        "bounding_box": (51.5, 50.5, 10.5, 9.5),
+        "level": 10,
         "time_from": "2018-01-01",
         "time_to": "2018-01-07",
-        "factors": ["temperature"],
-    },
-    {
-        "scenario": "germany-meteo",
-        "country": "Germany",
-        "bounding_box": (55.10, 47.20, 15.10, 5.80),
-        "level": 8,
-        "time_from": "2010-06-01",
-        "time_to": "2010-06-30",
         "factors": ["temperature", "precipitation"],
     },
+
+    # ========================================================
+    # 2. MULTI-SOURCE METEOROLOGY — GeoSphere + ERA5
+    #
+    # Eastern Austria deliberately outside DWD coverage.
+    # ========================================================
     {
-        "scenario": "austria-precipitation",
+        "scenario": "austria-meteo-overlap",
         "country": "Austria",
-        "bounding_box": (49.10, 46.30, 17.20, 9.50),
+        "bounding_box": (48.5, 47.5, 17.0, 16.0),
         "level": 10,
-        "time_from": "2024-04-01",
-        "time_to": "2024-04-14",
+        "time_from": "2018-01-01",
+        "time_to": "2018-01-07",
+        "factors": ["temperature", "precipitation"],
+    },
+
+    # ========================================================
+    # 3. ANOTHER CROSS-SOURCE METEOROLOGY CASE
+    #    Irish Met + ERA5
+    # ========================================================
+    {
+        "scenario": "ireland-precipitation-overlap",
+        "country": "Ireland",
+        "bounding_box": (54.0, 53.0, -7.0, -8.0),
+        "level": 10,
+        "time_from": "2018-01-01",
+        "time_to": "2018-01-07",
         "factors": ["precipitation"],
     },
+
+    # ========================================================
+    # 4. SPECIALISED NON-METEOROLOGICAL DATA
+    # ========================================================
     {
         "scenario": "ireland-groundwater",
         "country": "Ireland",
-        "bounding_box": (55.40, 51.40, -6.00, -10.50),
-        "level": 12,
+        "bounding_box": (54.0, 53.0, -7.0, -8.0),
+        "level": 10,
         "time_from": "2020-01-01",
         "time_to": "2020-03-31",
         "factors": ["groundwater quantity"],
     },
+
+    # ========================================================
+    # 5. STATIC / LAND-COVER INTEGRATION
+    #
+    # 2020 allows CORINE + EuroCropV2 + IFSGRID temporal
+    # eligibility.
+    # ========================================================
     {
-        "scenario": "france-water-quality",
-        "country": "France",
-        "bounding_box": (51.10, 41.30, 9.55, -5.15),
-        "level": 9,
-        "time_from": "2021-01-01",
-        "time_to": "2021-12-31",
-        "factors": ["surface water quality"],
-    },
-    {
-        "scenario": "europe-land-cover",
-        "country": "Europe subset",
-        "bounding_box": (60.00, 45.00, 25.00, -5.00),
-        "level": 7,
-        "time_from": "2015-01-01",
-        "time_to": "2015-12-31",
+        "scenario": "germany-land-cover",
+        "country": "Germany",
+        "bounding_box": (51.5, 50.5, 10.5, 9.5),
+        "level": 10,
+        "time_from": "2020-01-01",
+        "time_to": "2020-12-31",
         "factors": ["land cover"],
+    },
+
+    # ========================================================
+    # 6. SOIL / DIFFERENT DATA MODEL
+    # ========================================================
+    {
+        "scenario": "germany-soil",
+        "country": "Germany",
+        "bounding_box": (51.5, 50.5, 10.5, 9.5),
+        "level": 10,
+        "time_from": "2018-01-01",
+        "time_to": "2018-01-07",
+        "factors": ["soil"],
+    },
+
+    # ========================================================
+    # 7. NEGATIVE TEST — FACTOR EXISTS BUT NOT HERE
+    #
+    # Groundwater sources exist, but none cover Germany.
+    # Should be eliminated by coverage precheck.
+    # ========================================================
+    {
+        "scenario": "no-spatial-coverage",
+        "country": "Germany",
+        "bounding_box": (51.5, 50.5, 10.5, 9.5),
+        "level": 10,
+        "time_from": "2020-01-01",
+        "time_to": "2020-01-07",
+        "factors": ["groundwater quantity"],
+    },
+
+    # ========================================================
+    # 8. NEGATIVE TEST — TEMPORAL COVERAGE
+    #
+    # Potential evaporation exists, but CDS vegetation ends
+    # in 2018.
+    # ========================================================
+    {
+        "scenario": "no-temporal-coverage",
+        "country": "Germany",
+        "bounding_box": (51.5, 50.5, 10.5, 9.5),
+        "level": 10,
+        "time_from": "2024-01-01",
+        "time_to": "2024-01-07",
+        "factors": ["potential evaporation"],
     },
 ]
 
+CROSS_SOURCE_SCENARIOS = [
+    # DWD vs ERA5
+    {
+        "scenario": "cross-source-germany-meteo",
+        "country": "Germany",
+        "bounding_box": (51.5, 50.5, 10.5, 9.5),
+        "level": 10,
+        "time_from": "2018-01-01",
+        "time_to": "2018-01-31",
+        "factors": ["temperature", "precipitation"],
+    },
+
+    # GeoSphere vs ERA5
+    {
+        "scenario": "cross-source-austria-meteo",
+        "country": "Austria",
+        "bounding_box": (48.5, 47.5, 17.0, 16.0),
+        "level": 10,
+        "time_from": "2018-01-01",
+        "time_to": "2018-01-31",
+        "factors": ["temperature", "precipitation"],
+    },
+
+    # Irish Met vs ERA5
+    {
+        "scenario": "cross-source-ireland-precipitation",
+        "country": "Ireland",
+        "bounding_box": (54.0, 53.0, -7.0, -8.0),
+        "level": 10,
+        "time_from": "2018-01-01",
+        "time_to": "2018-01-31",
+        "factors": ["precipitation"],
+    },
+    {
+        "scenario": "cross-source-poland-meteo",
+        "country": "Poland",
+        "bounding_box": (52.5, 50.5, 21.0, 18.0),
+        "level": 10,
+        "time_from": "2018-01-01",
+        "time_to": "2018-01-31",
+        "factors": ["temperature", "precipitation"],
+    }
+]
 
 _SCALING_CENTER_LAT = 51.0
 _SCALING_CENTER_LON = 10.0
 _SCALING_BASE_BBOX = (51.5, 50.5, 10.5, 9.5)
+_SCALING_TIME_FROM = "2018-01-01"
+_SCALING_TIME_TO = "2018-01-07"
+_SCALING_LEVEL = 10
 _SCALING_FACTORS = [
     "temperature",
     "precipitation",

@@ -1,8 +1,7 @@
-"""Collect live dispatch, agreement, and quality artifacts for evaluation."""
+"""Collect live empirical inputs for analysis in the evaluation notebooks."""
 
 from __future__ import annotations
 
-import argparse
 import asyncio
 from datetime import datetime, timezone
 import json
@@ -16,63 +15,60 @@ import pandas as pd
 from tqdm import tqdm
 
 from core.main_call import plan_source_dispatch, read_data
-from core.utils.paths import CACHE_ROOT, PROJECT_ROOT
 from evaluation.collect_cross_source import (
     separate_frame_to_observations,
-    validate_private_output)
-from evaluation.scenarios import LIVE_SCALING_SCENARIOS, REQUEST_SCENARIOS
+    validate_private_output,
+)
+from evaluation.scenarios import (
+    CROSS_SOURCE_SCENARIOS,
+    LIVE_SCALING_SCENARIOS,
+    REQUEST_SCENARIOS,
+)
 
 
-def _selected_scenarios(names: list[str] | None) -> list[dict]:
-    scenarios_by_name = {
-        scenario["scenario"]: scenario for scenario in REQUEST_SCENARIOS
-    }
-    if not names:
-        return list(REQUEST_SCENARIOS)
-    unknown = sorted(set(names) - set(scenarios_by_name))
-    if unknown:
-        raise ValueError(f"Unknown evaluation scenarios: {unknown}")
-    return [scenarios_by_name[name] for name in names]
+OUTPUT_DIR = Path(__file__).resolve().parent / "empirical_input"
+SCALING_REPEATS = 3
+REQUEST_TIMEOUT_SECONDS = 600
 
 
-def _require_private_output_directory(path: Path) -> None:
-    """Keep raw live evaluation artifacts outside the source repository."""
-    try:
-        path.resolve().relative_to(PROJECT_ROOT.resolve())
-    except ValueError:
-        return
-    raise PermissionError(
-        "Empirical collection output must be outside the repository because "
-        "it may contain restricted live observations or derived reports."
-    )
+async def collect(
+    scenarios=REQUEST_SCENARIOS,
+    scaling_scenarios=LIVE_SCALING_SCENARIOS,
+    cross_scenarios=CROSS_SOURCE_SCENARIOS,
+    scaling_repeats=SCALING_REPEATS,
+    *,
+    output_dir=OUTPUT_DIR,
+    timeout=REQUEST_TIMEOUT_SECONDS,
+) -> dict:
+    """Collect raw request, scaling, cross-source, and quality measurements."""
+    if scaling_repeats < 1:
+        raise ValueError("scaling_repeats must be at least 1")
 
-
-async def collect(args) -> dict:
-    """Run selected live requests and persist raw provenance artifacts."""
-    scenarios = _selected_scenarios(args.scenario)
-    if not args.skip_live_scaling and args.live_scaling_repeats < 1:
-        raise ValueError("live_scaling_repeats must be at least 1")
-    _require_private_output_directory(args.output_dir)
-    args.output_dir.mkdir(parents=True, exist_ok=True)
-    quality_dir = args.output_dir / "quality"
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    quality_dir = output_dir / "quality"
     observations_frames = []
     runs = []
 
-    work_items = [(request, "coverage", 1) for request in scenarios]
-    if not args.skip_live_scaling:
-        scaling_items = [
-            (request, "live-scaling", repeat)
-            for repeat in range(1, args.live_scaling_repeats + 1)
-            for request in LIVE_SCALING_SCENARIOS
-        ]
-        random.Random(42).shuffle(scaling_items)
-        work_items.extend(scaling_items)
+    work_items = [
+        (request, "coverage", 1) for request in scenarios
+    ]
+    work_items.extend(
+        (request, "cross-source", 1) for request in cross_scenarios
+    )
+
+    scaling_items = [
+        (request, "live-scaling", repeat)
+        for repeat in range(1, scaling_repeats + 1)
+        for request in scaling_scenarios
+    ]
+    random.Random(42).shuffle(scaling_items)
+    work_items.extend(scaling_items)
 
     progress = tqdm(
         work_items,
-        desc="Live evaluation collection",
+        desc="Live empirical collection",
         unit="request",
-        disable=args.no_progress,
         dynamic_ncols=True,
         file=sys.stdout,
     )
@@ -108,8 +104,8 @@ async def collect(args) -> dict:
                 time_from=request["time_from"],
                 time_to=request["time_to"],
                 factors=request["factors"],
-                separate_api=run_kind == "coverage",
-                timeout=args.timeout,
+                separate_api=run_kind in {"coverage", "cross-source"},
+                timeout=timeout,
                 assess_quality=True,
                 persist_quality_reports=True,
                 quality_report_dir=quality_dir,
@@ -118,6 +114,7 @@ async def collect(args) -> dict:
             _current, peak = tracemalloc.get_traced_memory()
             tracemalloc.stop()
             peak_memory_mb = peak / (1024 * 1024)
+
             if not isinstance(result, dict):
                 runs.append(
                     {
@@ -132,6 +129,7 @@ async def collect(args) -> dict:
                     }
                 )
                 continue
+
             metadata = result["metadata"]
             frame = result["data"]
             if isinstance(frame.columns, pd.MultiIndex):
@@ -144,6 +142,7 @@ async def collect(args) -> dict:
             else:
                 returned_cells = len(frame.columns)
                 returned_factors = len(frame.columns)
+
             runs.append(
                 {
                     "request": request,
@@ -164,7 +163,8 @@ async def collect(args) -> dict:
                     ),
                 }
             )
-            if run_kind == "coverage":
+
+            if run_kind == "cross-source":
                 observations = separate_frame_to_observations(frame)
                 if not observations.empty:
                     observations["scenario"] = request["scenario"]
@@ -187,8 +187,6 @@ async def collect(args) -> dict:
                     "dispatch": [],
                 }
             )
-            if args.fail_fast:
-                raise
 
     observations = (
         pd.concat(observations_frames, ignore_index=True)
@@ -204,19 +202,17 @@ async def collect(args) -> dict:
             ]
         )
     )
-    observations_path = args.output_dir / "cross_source_observations_live.csv"
+    observations_path = output_dir / "cross_source_observations_live.csv"
     validate_private_output(observations_path, observations)
     observations.to_csv(observations_path, index=False)
 
     payload = {
         "mode": "empirical-live",
         "collected_at": datetime.now(timezone.utc).isoformat(),
-        "live_scaling_repeats": (
-            0 if args.skip_live_scaling else args.live_scaling_repeats
-        ),
+        "live_scaling_repeats": scaling_repeats,
         "runs": runs,
     }
-    runs_path = args.output_dir / "empirical_runs.json"
+    runs_path = output_dir / "empirical_runs.json"
     runs_path.write_text(
         json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8"
     )
@@ -229,33 +225,20 @@ async def collect(args) -> dict:
     }
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--output-dir",
-        type=Path,
-        default=CACHE_ROOT / "evaluation" / "empirical_input",
+def main() -> None:
+    """Collect the scenarios configured in ``evaluation.scenarios``."""
+    result = asyncio.run(
+        collect(
+            scenarios=REQUEST_SCENARIOS,
+            scaling_scenarios=LIVE_SCALING_SCENARIOS,
+            cross_scenarios=CROSS_SOURCE_SCENARIOS,
+            scaling_repeats=SCALING_REPEATS,
+        )
     )
-    parser.add_argument(
-        "--scenario",
-        action="append",
-        choices=[item["scenario"] for item in REQUEST_SCENARIOS],
-        help="Run only this scenario; repeat the option to select several.",
-    )
-    parser.add_argument("--timeout", type=float, default=600)
-    parser.add_argument("--live-scaling-repeats", type=int, default=3)
-    parser.add_argument(
-        "--skip-live-scaling",
-        action="store_true",
-        help="Collect coverage/agreement inputs without live scaling cases.",
-    )
-    parser.add_argument("--fail-fast", action="store_true")
-    parser.add_argument("--no-progress", action="store_true")
-    args = parser.parse_args(argv)
-    result = asyncio.run(collect(args))
     print(
         f"Collected {result['request_count']} live requests and "
-        f"{result['observation_count']} observations in {args.output_dir}."
+        f"{result['observation_count']} cross-source observations in "
+        f"{OUTPUT_DIR}."
     )
 
 

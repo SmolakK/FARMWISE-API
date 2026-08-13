@@ -8,7 +8,11 @@ version = "0.1.0"
 description = "European agricultural and environmental data aggregation API"
 readme = "README.md"
 license = "Apache-2.0"
-license-files = ["LICENSE", "DATA_LICENSES.md"]
+license-files = [
+    "LICENSE",
+    "DATA_LICENSES.md",
+    "internal-lib/hubeaupyutils/hubeaupyutils-main/LICENSE",
+]
 requires-python = ">=3.10"
 dependencies = [
     "aiofiles",
@@ -20,7 +24,6 @@ dependencies = [
     "geopy",
     "geopandas",
     "httpx",
-    "hubeaupyutils==0.1.0",
     "numpy",
     "openpyxl",
     "pandas",
@@ -66,8 +69,14 @@ evaluation = [
 farmwise-api = "main:run"
 
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["adapters*", "core*", "server*", "evaluation*"]
+where = [".", "internal-lib/hubeaupyutils/hubeaupyutils-main/src"]
+include = [
+    "adapters*",
+    "core*",
+    "server*",
+    "evaluation*",
+    "hubeaupyutils*",
+]
 exclude = ["tests*", "internal-lib*", "adapters.API_readers.egdi*"]
 
 [tool.setuptools]
