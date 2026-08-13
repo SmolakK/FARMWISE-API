@@ -3,9 +3,9 @@ from unittest.mock import MagicMock
 import pandas as pd
 import pytest
 
-from adapters.API_readers.gios import gios_api_stations
-from adapters.API_readers.imgw import imgw_api_stations
-from adapters.API_readers.imgw_hydro import imgw_hydro_stations_api
+from farmwise_api.adapters.API_readers.gios import gios_api_stations
+from farmwise_api.adapters.API_readers.imgw import imgw_api_stations
+from farmwise_api.adapters.API_readers.imgw_hydro import imgw_hydro_stations_api
 
 
 def test_gios_station_builder_geocodes_and_writes_csv(monkeypatch, tmp_path):

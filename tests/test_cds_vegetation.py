@@ -2,17 +2,17 @@ import pytest
 from unittest.mock import patch, MagicMock
 import pandas as pd
 from datetime import datetime
-from adapters.API_readers.cds.cds_vegetation import read_data
+from farmwise_api.adapters.API_readers.cds.cds_vegetation import read_data
 
 
 @pytest.mark.asyncio
-@patch("adapters.API_readers.cds.cds_vegetation.cdsapi.Client")
-@patch("adapters.API_readers.cds.cds_vegetation.zipfile.ZipFile")
-@patch("adapters.API_readers.cds.cds_vegetation.glob.glob")
-@patch("adapters.API_readers.cds.cds_vegetation.xr.open_dataset")
-@patch("adapters.API_readers.cds.cds_vegetation.prepare_coordinates")
-@patch("adapters.API_readers.cds.cds_vegetation.os.remove")
-@patch("adapters.API_readers.cds.cds_vegetation.os.path.join", return_value="/mocked/path/temp_data.zip")
+@patch("farmwise_api.adapters.API_readers.cds.cds_vegetation.cdsapi.Client")
+@patch("farmwise_api.adapters.API_readers.cds.cds_vegetation.zipfile.ZipFile")
+@patch("farmwise_api.adapters.API_readers.cds.cds_vegetation.glob.glob")
+@patch("farmwise_api.adapters.API_readers.cds.cds_vegetation.xr.open_dataset")
+@patch("farmwise_api.adapters.API_readers.cds.cds_vegetation.prepare_coordinates")
+@patch("farmwise_api.adapters.API_readers.cds.cds_vegetation.os.remove")
+@patch("farmwise_api.adapters.API_readers.cds.cds_vegetation.os.path.join", return_value="/mocked/path/temp_data.zip")
 async def test_read_data(
     mock_join,
     mock_os_remove,

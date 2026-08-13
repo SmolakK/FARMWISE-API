@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
-from server.schemas import ReadDataRequest
-from server.schemas import UserCreate, Token
+from farmwise_api.server.schemas import ReadDataRequest
+from farmwise_api.server.schemas import UserCreate, Token
 
 valid_bounding_box = (35.0, 34.0, -117.0, -118.0)
 valid_time_from = "2024-01-01"

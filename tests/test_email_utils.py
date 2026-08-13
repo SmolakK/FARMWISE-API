@@ -1,6 +1,11 @@
 from unittest.mock import MagicMock
 
-from server import email_utils
+from farmwise_api.server import email_utils
+
+
+def test_smtp_config_is_not_written_inside_installed_package():
+    assert email_utils.SMTP_ENV_FILE.name == "smtp.env"
+    assert email_utils.SMTP_ENV_FILE.parent == email_utils.PROJECT_ROOT
 
 
 def test_send_email_uses_configured_smtp(monkeypatch):

@@ -25,11 +25,11 @@ s2_cell_2 = CellId.from_lat_lng(LatLng.from_degrees(50.5, 14.2))
 
 
 @pytest.mark.asyncio
-@patch("core.main_call.API_PATH_RANGES", mock_api_path_ranges)
-@patch("core.main_call.importlib.import_module")
-@patch("core.main_call.spatial_ranges_overlap", return_value=True)
-@patch("core.main_call.time_ranges_overlap", return_value=True)
-@patch("core.main_call.COUNTRY_BBOXES", mock_country_bboxes)
+@patch("farmwise_api.core.main_call.API_PATH_RANGES", mock_api_path_ranges)
+@patch("farmwise_api.core.main_call.importlib.import_module")
+@patch("farmwise_api.core.main_call.spatial_ranges_overlap", return_value=True)
+@patch("farmwise_api.core.main_call.time_ranges_overlap", return_value=True)
+@patch("farmwise_api.core.main_call.COUNTRY_BBOXES", mock_country_bboxes)
 async def test_read_data_with_bbox_and_country(mock_time_overlap, mock_spatial_overlap, mock_import_module):
     # Create MultiIndex for columns
     arrays = [
@@ -50,7 +50,7 @@ async def test_read_data_with_bbox_and_country(mock_time_overlap, mock_spatial_o
     mock_import_module.return_value = mock_module
 
     # Call the function under test
-    from core.main_call import read_data
+    from farmwise_api.core.main_call import read_data
     result = await read_data(
         bounding_box=(51.09, 50.00, 14.56, 14.14),
         level=10,
@@ -101,7 +101,7 @@ async def test_read_data_with_bbox_and_country(mock_time_overlap, mock_spatial_o
 
 @pytest.mark.asyncio
 async def test_read_data_requires_country_or_bounding_box():
-    from core.main_call import read_data
+    from farmwise_api.core.main_call import read_data
 
     with pytest.raises(ValueError, match="either a 'bounding_box' or a 'country'"):
         await read_data(
@@ -114,7 +114,7 @@ async def test_read_data_requires_country_or_bounding_box():
 
 @pytest.mark.asyncio
 async def test_read_data_rejects_unknown_country(monkeypatch):
-    from core import main_call
+    from farmwise_api.core import main_call
 
     monkeypatch.setattr(main_call, "COUNTRY_BBOXES", {"Poland": (55, 49, 24, 14)})
 
@@ -130,7 +130,7 @@ async def test_read_data_rejects_unknown_country(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_read_data_skips_non_overlapping_sources(monkeypatch):
-    from core import main_call
+    from farmwise_api.core import main_call
 
     monkeypatch.setattr(
         main_call,
@@ -156,7 +156,7 @@ async def test_read_data_skips_non_overlapping_sources(monkeypatch):
 @pytest.mark.asyncio
 @pytest.mark.parametrize("failure", [asyncio.TimeoutError(), RuntimeError("API failed")])
 async def test_read_data_isolates_adapter_failures(monkeypatch, failure):
-    from core import main_call
+    from farmwise_api.core import main_call
 
     monkeypatch.setattr(
         main_call,
@@ -183,8 +183,8 @@ async def test_read_data_isolates_adapter_failures(monkeypatch, failure):
 
 @pytest.mark.asyncio
 async def test_read_data_applies_separation_interpolation_and_map(monkeypatch):
-    from core import main_call
-    from core.utils import map_ploter
+    from farmwise_api.core import main_call
+    from farmwise_api.core.utils import map_ploter
 
     cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
     frame = pd.DataFrame(
@@ -230,7 +230,7 @@ async def test_read_data_applies_separation_interpolation_and_map(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_read_data_returns_empty_frame_when_concatenation_fails(monkeypatch):
-    from core import main_call
+    from farmwise_api.core import main_call
 
     cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
     frame = pd.DataFrame(
@@ -264,7 +264,7 @@ async def test_read_data_returns_empty_frame_when_concatenation_fails(monkeypatc
 
 @pytest.mark.asyncio
 async def test_read_data_applies_source_weights_and_type_methods(monkeypatch):
-    from core import main_call
+    from farmwise_api.core import main_call
 
     cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
     columns = pd.MultiIndex.from_tuples(
@@ -332,7 +332,7 @@ async def test_read_data_applies_source_weights_and_type_methods(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_read_data_validates_harmonization_before_calling_sources(monkeypatch):
-    from core import main_call
+    from farmwise_api.core import main_call
 
     import_module = MagicMock()
     monkeypatch.setattr(main_call.importlib, "import_module", import_module)
@@ -351,7 +351,7 @@ async def test_read_data_validates_harmonization_before_calling_sources(monkeypa
 
 
 def test_plan_source_dispatch_records_each_precheck_reason():
-    from core.main_call import plan_source_dispatch
+    from farmwise_api.core.main_call import plan_source_dispatch
 
     plan = plan_source_dispatch(
         (55, 49, 24, 14),
@@ -387,7 +387,7 @@ def test_plan_source_dispatch_records_each_precheck_reason():
 
 
 def test_plan_source_dispatch_skips_disabled_source():
-    from core.main_call import plan_source_dispatch
+    from farmwise_api.core.main_call import plan_source_dispatch
 
     source_ranges = {
         "retired.source": [
@@ -413,7 +413,7 @@ def test_plan_source_dispatch_skips_disabled_source():
 async def test_read_data_passes_within_source_policy_to_supported_adapter(
     monkeypatch,
 ):
-    from core import main_call
+    from farmwise_api.core import main_call
 
     cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
     frame = pd.DataFrame(
@@ -466,7 +466,7 @@ async def test_read_data_passes_within_source_policy_to_supported_adapter(
 
 @pytest.mark.asyncio
 async def test_read_data_persists_per_source_quality_report(monkeypatch, tmp_path):
-    from core import main_call
+    from farmwise_api.core import main_call
 
     cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
     frame = pd.DataFrame(
@@ -524,7 +524,7 @@ async def test_read_data_persists_per_source_quality_report(monkeypatch, tmp_pat
 
 @pytest.mark.asyncio
 async def test_read_data_can_skip_quality_assessment(monkeypatch):
-    from core import main_call
+    from farmwise_api.core import main_call
 
     cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
     frame = pd.DataFrame(
@@ -571,7 +571,7 @@ async def test_read_data_can_skip_quality_assessment(monkeypatch):
 @pytest.mark.asyncio
 async def test_source_quality_assessments_run_concurrently(monkeypatch):
     from threading import Barrier
-    from core import main_call
+    from farmwise_api.core import main_call
 
     cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
     frame = pd.DataFrame(

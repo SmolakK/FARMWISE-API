@@ -2,7 +2,7 @@ import os
 import time
 import pytest
 import tempfile
-from server.api_utils import cleanup_old_files, secure_filename
+from farmwise_api.server.api_utils import cleanup_old_files, secure_filename
 
 
 # Test for cleanup_old_files

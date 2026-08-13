@@ -7,7 +7,7 @@ import pytest
 from PIL import Image
 from s2sphere import CellId, LatLng
 
-from core.utils import map_ploter
+from farmwise_api.core.utils import map_ploter
 
 
 def _dataset(value=5.0):

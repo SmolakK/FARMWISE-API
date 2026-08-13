@@ -8,9 +8,9 @@ import httpx
 import pandas as pd
 import pytest
 
-from adapters.API_readers.UA_sw_quality import ukrainian_surface_water as ua_water
-from adapters.API_readers.epa_ireland import epa_gw
-from adapters.API_readers.gios_gw import gios_gw
+from farmwise_api.adapters.API_readers.UA_sw_quality import ukrainian_surface_water as ua_water
+from farmwise_api.adapters.API_readers.epa_ireland import epa_gw
+from farmwise_api.adapters.API_readers.gios_gw import gios_gw
 
 
 def test_ukrainian_load_and_clean_data():

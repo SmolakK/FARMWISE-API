@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, MagicMock
 import pandas as pd
 import pytest
 
-from adapters.API_readers.hubeau import hubeau_sw_quality_read as surface
-from adapters.API_readers.hubeau import hubeau_wq_read as groundwater
+from farmwise_api.adapters.API_readers.hubeau import hubeau_sw_quality_read as surface
+from farmwise_api.adapters.API_readers.hubeau import hubeau_wq_read as groundwater
 
 
 @pytest.mark.asyncio

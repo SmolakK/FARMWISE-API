@@ -1,10 +1,10 @@
 import pytest
 from unittest.mock import Mock, patch
 import pandas as pd
-from adapters.API_readers.hubeau.get_piezo_stations import get_station_codes  # Adjust the import path as necessary
+from farmwise_api.adapters.API_readers.hubeau.get_piezo_stations import get_station_codes  # Adjust the import path as necessary
 
 @pytest.mark.asyncio
-@patch("adapters.API_readers.hubeau.get_piezo_stations.httpx.AsyncClient")  # Adjust based on your import
+@patch("farmwise_api.adapters.API_readers.hubeau.get_piezo_stations.httpx.AsyncClient")  # Adjust based on your import
 async def test_get_station_codes(mock_async_client):
     # Create mock responses
     mock_response_page_1 = Mock()

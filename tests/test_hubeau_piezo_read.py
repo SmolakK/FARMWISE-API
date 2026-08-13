@@ -3,17 +3,17 @@ from unittest.mock import AsyncMock, patch
 import pandas as pd
 import pytest
 
-from adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm import read_data
+from farmwise_api.adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm import read_data
 
 
 @pytest.mark.asyncio
 @patch(
-    "adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm.fetch_data",
+    "farmwise_api.adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm.fetch_data",
     new_callable=AsyncMock,
 )
-@patch("adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm.prepare_coordinates")
-@patch("adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm.pd.read_csv")
-@patch("adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm.hub.init_api")
+@patch("farmwise_api.adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm.prepare_coordinates")
+@patch("farmwise_api.adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm.pd.read_csv")
+@patch("farmwise_api.adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm.hub.init_api")
 async def test_read_data(
     mock_init_api,
     mock_read_csv,

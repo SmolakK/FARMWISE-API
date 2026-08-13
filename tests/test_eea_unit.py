@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from affine import Affine
 
-from adapters.API_readers.eea import eea_read
+from farmwise_api.adapters.API_readers.eea import eea_read
 
 
 @pytest.mark.asyncio

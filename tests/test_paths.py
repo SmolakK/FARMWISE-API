@@ -5,7 +5,7 @@ from unittest.mock import Mock, call
 
 import pytest
 
-from core.utils import paths
+from farmwise_api.core.utils import paths
 
 
 def test_adapter_data_returns_bundled_file(monkeypatch, tmp_path):

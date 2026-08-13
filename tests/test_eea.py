@@ -3,8 +3,8 @@ import pytest
 import inspect
 import os
 import pandas as pd
-from adapters.API_readers.eea.eea_read import read_data
-from core.utils.paths import DATA_ROOT
+from farmwise_api.adapters.API_readers.eea.eea_read import read_data
+from farmwise_api.core.utils.paths import DATA_ROOT
 
 EEA_RASTER = (
     DATA_ROOT

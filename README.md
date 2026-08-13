@@ -2,8 +2,8 @@
 
 FARMWISE is dual-use:
 
-- as a local Python library through `main_call`;
-- as an HTTP service through `main`.
+- as a local Python library through `farmwise_api`;
+- as an HTTP service through `farmwise_api.server`.
 
 A request describes an area (a country or a bounding box), a date range, an S2
 cell level, and one or more factors. FARMWISE selects matching adapters,
@@ -13,24 +13,25 @@ with source metadata and an optional HTML map.
 ## Project layout
 
 ```text
-adapters/
-  API_readers/       integrations with individual data providers
-  mappings/          adapter registry and supported ranges
-core/
-  main_call.py       adapter selection and result aggregation
-  utils/             spatial, interpolation, mapping, and data-path helpers
-server/
-  main.py            FastAPI application
-  routers/           authentication, frontend, and data endpoints
-  static/            packaged frontend assets
-  *.py               persistence, security, and background services
+farmwise_api/
+  adapters/
+    API_readers/     integrations with individual data providers
+    mappings/        adapter registry and supported ranges
+  core/
+    main_call.py     adapter selection and result aggregation
+    utils/           spatial, interpolation, mapping, and data-path helpers
+  server/
+    main.py          FastAPI application
+    routers/         authentication, frontend, and data endpoints
+    static/          packaged frontend assets
+  cli.py             console and lazy ASGI entry point
+evaluation/          empirical collection and analysis tools
 tests/               unit and integration tests
-main_call.py          stable local-library entry point
-main.py               stable server entry point
 ```
 
-All imports are rooted at one of the three top-level packages (`adapters`,
-`core`, or `server`). Commands should be run from the repository root.
+All installed modules are contained under the `farmwise_api` namespace to
+avoid collisions with unrelated Python packages. Development commands should
+be run from the repository root.
 
 ## Installation
 
@@ -58,8 +59,9 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[server,dev]"
 ```
 
-The Hub'Eau helper package `hubeaupyutils` is bundled with FARMWISE under its
-MIT licence, so it does not require a separate package-index installation.
+The Hub'Eau helper library is vendored privately under
+`farmwise_api._vendor.hubeaupyutils` and retains its MIT licence. It does not
+install a separate top-level `hubeaupyutils` package.
 
 ## Configuration
 
@@ -67,23 +69,25 @@ Copy the example files and provide real values:
 
 ```powershell
 Copy-Item fidel.env.example fidel.env
-Copy-Item server\smtp.env.example server\smtp.env
+Copy-Item farmwise_api\server\smtp.env.example smtp.env
 Copy-Item public_host.env.example public_host.env
 ```
 
 `fidel.env` contains JWT settings. SMTP configuration is only required when
-email delivery is used. `PUBLIC_BASE_URL` should contain a host and optional
-port without a URL scheme, for example `localhost:8000`.
+email delivery is used. By default it is read from `smtp.env` in the working
+directory; set `FARMWISE_SMTP_ENV_FILE` to use another location.
+`PUBLIC_BASE_URL` should contain a host and optional port without a URL scheme,
+for example `localhost:8000`.
 
 Large adapter datasets are intentionally excluded from both pip wheels and
 source distributions. This includes EuroCropV2, EEA, IFSGRID and QUADICA
 data. Supply redistributable datasets through `FARMWISE_DATA_DIR`, or configure a
 licence-compliant remote source with a real URL and checksum in
-`core/utils/data_manifest.py`.
+`farmwise_api/core/utils/data_manifest.py`.
 Remote prefetching is disabled by default; enable it with
 `FARMWISE_PREFETCH_DATA=true` only after configuring that manifest.
 QUADICA v1 additionally requires the prepared filenames and provenance
-described in `adapters/API_readers/quadica/DATA_SETUP.md`.
+described in `farmwise_api/adapters/API_readers/quadica/DATA_SETUP.md`.
 
 CORRECTIV.Lokal data is treated as protected: its Parquet file is absent from
 the repository, packages and remote-data manifest, and its adapter is disabled
@@ -142,7 +146,7 @@ Set `FARMWISE_DATABASE_URL` to use another SQLAlchemy database URL.
 ```python
 import asyncio
 
-from main_call import read_data
+from farmwise_api import read_data
 
 result = asyncio.run(
     read_data(
@@ -173,7 +177,7 @@ and reuse cached S2 coverings.
 
 When several sources provide the same value, FARMWISE harmonizes them using
 the source weights and per-data-type methods defined in
-`adapters.mappings.data_source_mapping`. Both dictionaries can also be
+`farmwise_api.adapters.mappings.data_source_mapping`. Both dictionaries can also be
 overridden for one call:
 
 ```python
@@ -184,8 +188,8 @@ result = await read_data(
     time_to="2018-01-07",
     factors=["temperature", "precipitation"],
     source_weights={
-        "adapters.API_readers.imgw.imgw_api_synop_daily": 2.0,
-        "adapters.API_readers.cds.cds_single_levels": 1.0,
+        "farmwise_api.adapters.API_readers.imgw.imgw_api_synop_daily": 2.0,
+        "farmwise_api.adapters.API_readers.cds.cds_single_levels": 1.0,
     },
     harmonization_methods={
         "temperature": "weighted_mean",
@@ -220,7 +224,7 @@ farmwise-api
 For development with automatic reload:
 
 ```powershell
-python -m uvicorn main:app --reload
+python -m uvicorn farmwise_api.server.main:app --reload
 ```
 
 Open `http://localhost:8000`, or use the OpenAPI documentation at
@@ -275,6 +279,33 @@ accept no command-line arguments. Scenario definitions and collection settings
 are explicit in the Python source. Statistical analysis and figure generation
 are performed separately in the evaluation notebooks.
 
+## Publishing to PyPI
+
+Before creating the first release, replace the author, maintainer, citation,
+and security-contact placeholders in `pyproject.toml`, `CITATION.cff`, and
+`SECURITY.md`. The publication workflow refuses to upload artifacts while
+those placeholders remain.
+
+Configure a PyPI Trusted Publisher for:
+
+- owner: `SmolakK`;
+- repository: `FARMWISE-API`;
+- workflow: `publish.yml`;
+- environment: `pypi`.
+
+Then create and publish a GitHub Release whose tag matches the version in
+`pyproject.toml`, for example `v0.1.0`. The workflow builds wheel and sdist,
+runs `twine check`, and publishes through OpenID Connect; no long-lived PyPI
+API token is stored in GitHub.
+
+To inspect the exact artifacts locally before releasing:
+
+```powershell
+python -m pip install -e ".[release]"
+python -m build
+python -m twine check dist\*
+```
+
 ## License
 
 The FARMWISE source code is licensed under the
@@ -282,3 +313,7 @@ The FARMWISE source code is licensed under the
 FARMWISE remain subject to their respective licences and are not relicensed
 under Apache-2.0. See the [data licensing and attribution
 register](DATA_LICENSES.md) for source-specific terms.
+
+For responsible vulnerability reporting, see the [security
+policy](SECURITY.md). For software citation metadata, see
+[`CITATION.cff`](CITATION.cff).

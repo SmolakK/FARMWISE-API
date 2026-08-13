@@ -14,7 +14,7 @@ import tracemalloc
 import pandas as pd
 from tqdm import tqdm
 
-from core.main_call import plan_source_dispatch, read_data
+from farmwise_api.core.main_call import plan_source_dispatch, read_data
 from evaluation.collect_cross_source import (
     separate_frame_to_observations,
     validate_private_output,

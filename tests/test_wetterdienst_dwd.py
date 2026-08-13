@@ -6,8 +6,8 @@ from threading import Event, current_thread, enumerate as enumerate_threads
 
 ORIGINAL_ASYNCIO_TASK = asyncio.Task
 
-from adapters.API_readers.gios_gw import gios_gw
-from adapters.API_readers.wetterdienst.wetterdienst_dwd import (
+from farmwise_api.adapters.API_readers.gios_gw import gios_gw
+from farmwise_api.adapters.API_readers.wetterdienst.wetterdienst_dwd import (
     _DwdFetchCancelled,
     _collect_request,
     _reject_incompatible_pydevd_asyncio_patch,
@@ -17,8 +17,8 @@ from adapters.API_readers.wetterdienst.wetterdienst_dwd import (
 
 
 @pytest.mark.asyncio
-@patch("adapters.API_readers.wetterdienst.wetterdienst_dwd.prepare_coordinates")
-@patch("adapters.API_readers.wetterdienst.wetterdienst_dwd.DwdObservationRequest")
+@patch("farmwise_api.adapters.API_readers.wetterdienst.wetterdienst_dwd.prepare_coordinates")
+@patch("farmwise_api.adapters.API_readers.wetterdienst.wetterdienst_dwd.DwdObservationRequest")
 async def test_read_data(mock_dwd_request, mock_prepare_coordinates):
     # Mock DwdObservationRequest
     mock_request_instance = MagicMock()
@@ -123,6 +123,8 @@ async def test_read_data(mock_dwd_request, mock_prepare_coordinates):
     mock_prepare_coordinates.assert_called_once()
     assert result['Temperature [°C]'].values[0][0] == pytest.approx(-5.2)  # validate temperature convertion
     assert isinstance(result.index, pd.DatetimeIndex)
+    settings = mock_dwd_request.call_args.kwargs["settings"]
+    assert settings["cache_disable"] is True
 
 
 def test_collect_request_stops_between_station_downloads():
@@ -163,7 +165,7 @@ async def test_fetch_data_closes_worker_after_cancellation():
     request.df = pd.DataFrame({"station_id": ["1"]})
 
     with patch(
-        "adapters.API_readers.wetterdienst.wetterdienst_dwd.DwdObservationRequest",
+        "farmwise_api.adapters.API_readers.wetterdienst.wetterdienst_dwd.DwdObservationRequest",
         return_value=MagicMock(filter_by_bbox=MagicMock(return_value=request)),
     ):
         task = asyncio.create_task(
@@ -199,7 +201,7 @@ async def test_fetch_data_builds_request_outside_event_loop_thread():
         return MagicMock(filter_by_bbox=MagicMock(return_value=request))
 
     with patch(
-        "adapters.API_readers.wetterdienst.wetterdienst_dwd.DwdObservationRequest",
+        "farmwise_api.adapters.API_readers.wetterdienst.wetterdienst_dwd.DwdObservationRequest",
         side_effect=build_request,
     ):
         await fetch_data(

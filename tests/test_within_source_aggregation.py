@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from core.within_source_aggregation import (
+from farmwise_api.core.within_source_aggregation import (
     aggregate_to_s2,
     validate_within_source_methods,
 )

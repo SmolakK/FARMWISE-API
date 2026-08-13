@@ -1,6 +1,6 @@
 import pandas as pd
 import s2sphere
-from core.utils.coordinates_to_cells import prepare_coordinates
+from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
 
 
 def test_prepare_coordinates_with_valid_data():

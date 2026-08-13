@@ -2,8 +2,8 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from adapters.mappings.data_source_mapping import PUBLIC_SERVER_DISABLED_SOURCES
-from server import services
+from farmwise_api.adapters.mappings.data_source_mapping import PUBLIC_SERVER_DISABLED_SOURCES
+from farmwise_api.server import services
 
 
 @pytest.mark.asyncio

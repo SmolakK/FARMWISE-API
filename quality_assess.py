@@ -1,6 +1,6 @@
 """Backward-compatible imports for the packaged quality assessment module."""
 
-from core.quality_assess import (
+from farmwise_api.core.quality_assess import (
     DEFAULT_QUALITY_REPORT_DIR,
     assess_data_quality,
     bbox_intersects,

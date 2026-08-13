@@ -9,8 +9,8 @@ import re
 
 import pandas as pd
 
-from core.main_call import read_data
-from core.utils.paths import CACHE_ROOT, PROJECT_ROOT
+from farmwise_api.core.main_call import read_data
+from farmwise_api.core.utils.paths import CACHE_ROOT, PROJECT_ROOT
 
 
 SOURCE_NAMES = {

@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pandas as pd
 import pytest
 
-from adapters.API_readers.CHMI_Meteo import CHMI_meteo
+from farmwise_api.adapters.API_readers.CHMI_Meteo import CHMI_meteo
 
 
 @pytest.mark.asyncio

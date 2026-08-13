@@ -1,6 +1,6 @@
 import pytest
 
-from core.utils.access_policy import (
+from farmwise_api.core.utils.access_policy import (
     IMGW_PRIVATE_USE_ENV,
     require_private_noncommercial_imgw,
 )

@@ -3,7 +3,7 @@ from datetime import date
 import pandas as pd
 import pytest
 
-from adapters.mappings.data_source_mapping import (
+from farmwise_api.adapters.mappings.data_source_mapping import (
     API_PATH_RANGES,
     DATA_SOURCE_WEIGHTS,
     DATA_TYPE_HARMONIZATION_METHODS,
@@ -12,7 +12,7 @@ from adapters.mappings.data_source_mapping import (
     PUBLIC_SERVER_DISABLED_SOURCES,
     WITHIN_SOURCE_AGGREGATION_METHODS,
 )
-from core.harmonization import (
+from farmwise_api.core.harmonization import (
     harmonize_data,
     resolve_data_type,
     validate_harmonization_methods,
@@ -36,8 +36,8 @@ def test_mapping_configures_every_current_source_and_data_type():
 
 def test_egdi_is_excluded_from_public_dispatch():
     egdi_sources = {
-        "adapters.API_readers.egdi.egdi_read_hc",
-        "adapters.API_readers.egdi.egdi_read_d10",
+        "farmwise_api.adapters.API_readers.egdi.egdi_read_hc",
+        "farmwise_api.adapters.API_readers.egdi.egdi_read_d10",
     }
 
     assert egdi_sources.isdisjoint(API_PATH_RANGES)
@@ -45,10 +45,10 @@ def test_egdi_is_excluded_from_public_dispatch():
 
 
 def test_protected_and_private_sources_are_restricted_by_context():
-    correctiv = "adapters.API_readers.correctiv.correctiv_read"
+    correctiv = "farmwise_api.adapters.API_readers.correctiv.correctiv_read"
     imgw_sources = {
-        "adapters.API_readers.imgw.imgw_api_synop_daily",
-        "adapters.API_readers.imgw_hydro.imgw_api_hydro_daily",
+        "farmwise_api.adapters.API_readers.imgw.imgw_api_synop_daily",
+        "farmwise_api.adapters.API_readers.imgw_hydro.imgw_api_hydro_daily",
     }
 
     assert correctiv not in API_PATH_RANGES

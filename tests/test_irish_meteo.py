@@ -10,10 +10,10 @@ import pandas as pd
 import pytest
 
 daily = importlib.import_module(
-    "adapters.API_readers.irish_meteo.Irish MS_daily"
+    "farmwise_api.adapters.API_readers.irish_meteo.Irish MS_daily"
 )
 monthly = importlib.import_module(
-    "adapters.API_readers.irish_meteo.Irish MS_monthly"
+    "farmwise_api.adapters.API_readers.irish_meteo.Irish MS_monthly"
 )
 
 

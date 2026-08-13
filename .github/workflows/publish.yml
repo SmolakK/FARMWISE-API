@@ -1,0 +1,66 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build release distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Require completed publication metadata
+        run: >-
+          python -c "from pathlib import Path;
+          paths=['pyproject.toml','CITATION.cff','SECURITY.md'];
+          text='\n'.join(Path(path).read_text(encoding='utf-8') for path in paths);
+          markers=['REPLACE WITH','REPLACE-WITH','replace-author@example.com',
+          'replace-maintainer@example.com'];
+          assert not any(marker in text for marker in markers),
+          'Replace all publication placeholders in pyproject.toml, CITATION.cff, and SECURITY.md'"
+      - name: Require tag to match package version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: >-
+          python -c "import os,tomllib;
+          version=tomllib.load(open('pyproject.toml','rb'))['project']['version'];
+          tag=os.environ['RELEASE_TAG'].removeprefix('v');
+          assert tag == version, f'tag {tag!r} does not match version {version!r}'"
+      - name: Install release tools
+        run: python -m pip install --upgrade pip build twine
+      - name: Build wheel and source distribution
+        run: python -m build
+      - name: Validate package metadata
+        run: python -m twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-distributions
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: Publish distributions
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/farmwise-api
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-distributions
+          path: dist/
+      - name: Upload to PyPI with Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@release/v1

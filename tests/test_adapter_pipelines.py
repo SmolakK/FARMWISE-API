@@ -4,9 +4,9 @@ from unittest.mock import MagicMock
 import pandas as pd
 import pytest
 
-from adapters.API_readers.EuroCropV2 import EuroCropV2_read
-from adapters.API_readers.IFSGRID import IFSGRID_read
-from adapters.API_readers.correctiv import correctiv_read
+from farmwise_api.adapters.API_readers.EuroCropV2 import EuroCropV2_read
+from farmwise_api.adapters.API_readers.IFSGRID import IFSGRID_read
+from farmwise_api.adapters.API_readers.correctiv import correctiv_read
 
 
 @pytest.mark.asyncio

@@ -22,32 +22,25 @@ def built_wheel(tmp_path_factory):
         "DATA_LICENSES.md",
         "MANIFEST.in",
         "README.md",
-        "main.py",
-        "main_call.py",
         "pyproject.toml",
-        "quality_assess.py",
     ):
         shutil.copy2(ROOT / filename, source_dir / filename)
-    for package in ("adapters", "core", "evaluation", "server"):
-        shutil.copytree(
-            ROOT / package,
-            source_dir / package,
-            ignore=shutil.ignore_patterns(
-                "__pycache__",
-                "*.pyc",
-                "data",
-                "eea_data",
-                "temp_storage",
-            ),
-        )
-    bundled_hubeau = Path(
-        "internal-lib/hubeaupyutils/hubeaupyutils-main"
-    )
     shutil.copytree(
-        ROOT / bundled_hubeau,
-        source_dir / bundled_hubeau,
-        ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.egg-info"),
+        ROOT / "farmwise_api",
+        source_dir / "farmwise_api",
+        ignore=shutil.ignore_patterns(
+            "__pycache__",
+            "*.pyc",
+            "data",
+            "eea_data",
+            "temp_storage",
+        ),
     )
+    bundled_license = Path(
+        "internal-lib/hubeaupyutils/hubeaupyutils-main/LICENSE"
+    )
+    (source_dir / bundled_license).parent.mkdir(parents=True)
+    shutil.copy2(ROOT / bundled_license, source_dir / bundled_license)
 
     build_python = os.environ.get("FARMWISE_BUILD_PYTHON", sys.executable)
     result = subprocess.run(
@@ -101,12 +94,12 @@ def test_built_wheel_installs_and_exposes_local_api(built_wheel, tmp_path):
             (
                 "import sys; "
                 f"sys.path.insert(0, {str(install_dir)!r}); "
-                "from main_call import read_data; "
-                "import hubeaupyutils; "
-                "import main; "
+                "from farmwise_api import read_data; "
+                "from farmwise_api import cli; "
+                "from farmwise_api._vendor import hubeaupyutils; "
                 "assert callable(read_data); "
                 "assert hubeaupyutils.__version__ == '0.1.0'; "
-                "assert callable(main.run)"
+                "assert callable(cli.run)"
             ),
         ],
         cwd=tmp_path,
@@ -125,14 +118,14 @@ def test_built_wheel_installs_and_exposes_local_api(built_wheel, tmp_path):
                 f"sys.path.insert(0, {str(install_dir)!r})\n"
                 "class BlockServer(importlib.abc.MetaPathFinder):\n"
                 "    def find_spec(self, fullname, path=None, target=None):\n"
-                "        if fullname == 'server' or fullname.startswith('server.'):\n"
+                "        if fullname == 'farmwise_api.server' or fullname.startswith('farmwise_api.server.'):\n"
                 "            raise ModuleNotFoundError(name=fullname)\n"
                 "        return None\n"
                 "sys.meta_path.insert(0, BlockServer())\n"
-                "import main\n"
-                "assert callable(main.run)\n"
+                "from farmwise_api import cli\n"
+                "assert callable(cli.run)\n"
                 "try:\n"
-                "    main.run()\n"
+                "    cli.run()\n"
                 "except SystemExit as error:\n"
                 "    assert 'farmwise-api[server]' in str(error)\n"
                 "else:\n"
@@ -174,12 +167,25 @@ def test_built_wheel_declares_runtime_and_server_dependencies(built_wheel):
     ]
     for dependency in ("fastapi", "sqlalchemy", "uvicorn"):
         assert any(requirement.startswith(dependency) for requirement in server_requirements)
+    assert any(requirement.startswith("PyJWT") for requirement in server_requirements)
+    assert not any(requirement.startswith("python-jose") for requirement in server_requirements)
 
-    assert "main.py" in names
-    assert "server/main.py" in names
-    assert "hubeaupyutils/__init__.py" in names
-    assert "hubeaupyutils/hubeau.py" in names
-    assert "hubeaupyutils/wrappers.py" in names
+    assert "farmwise_api/__init__.py" in names
+    assert "farmwise_api/cli.py" in names
+    assert "farmwise_api/server/main.py" in names
+    assert "farmwise_api/_vendor/hubeaupyutils/__init__.py" in names
+    assert "farmwise_api/_vendor/hubeaupyutils/hubeau.py" in names
+    assert "farmwise_api/_vendor/hubeaupyutils/wrappers.py" in names
+    for generic_name in (
+        "main.py",
+        "main_call.py",
+        "quality_assess.py",
+        "adapters/__init__.py",
+        "core/__init__.py",
+        "server/__init__.py",
+        "hubeaupyutils/__init__.py",
+    ):
+        assert generic_name not in names
     assert any(
         name.endswith(".dist-info/licenses/DATA_LICENSES.md") for name in names
     )
@@ -198,9 +204,9 @@ def test_public_package_excludes_egdi_and_large_adapter_data():
     excluded_packages = setuptools["packages"]["find"]["exclude"]
 
     assert setuptools["include-package-data"] is False
-    assert "adapters.API_readers.egdi*" in excluded_packages
-    assert "adapters.API_readers.imgw" not in package_data
-    assert "adapters.API_readers.imgw_hydro" not in package_data
+    assert "farmwise_api.adapters.API_readers.egdi*" in excluded_packages
+    assert "farmwise_api.adapters.API_readers.imgw" not in package_data
+    assert "farmwise_api.adapters.API_readers.imgw_hydro" not in package_data
 
     forbidden_suffixes = {".db", ".nc", ".parquet", ".sqlite", ".tif", ".tiff"}
     allowlisted_patterns = {
@@ -215,16 +221,31 @@ def test_public_package_excludes_egdi_and_large_adapter_data():
 def test_sdist_manifest_prunes_private_and_large_data():
     manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
 
+    assert "include SECURITY.md" in manifest
+    assert "include CITATION.cff" in manifest
+
     required_prunes = {
-        "prune adapters/API_readers/egdi",
-        "prune adapters/API_readers/EuroCropV2/data",
-        "prune adapters/API_readers/correctiv/data",
-        "prune adapters/API_readers/imgw/constants",
-        "prune adapters/API_readers/imgw_hydro/constants",
-        "prune adapters/API_readers/eea/eea_data",
-        "prune adapters/API_readers/IFSGRID/data",
-        "prune adapters/API_readers/quadica/data",
+        "prune farmwise_api/adapters/API_readers/egdi",
+        "prune farmwise_api/adapters/API_readers/EuroCropV2/data",
+        "prune farmwise_api/adapters/API_readers/correctiv/data",
+        "prune farmwise_api/adapters/API_readers/imgw/constants",
+        "prune farmwise_api/adapters/API_readers/imgw_hydro/constants",
+        "prune farmwise_api/adapters/API_readers/eea/eea_data",
+        "prune farmwise_api/adapters/API_readers/IFSGRID/data",
+        "prune farmwise_api/adapters/API_readers/quadica/data",
     }
     assert required_prunes <= set(manifest.splitlines())
     assert "exclude tests/test_egdi_read_d10.py" in manifest
     assert "exclude tests/test_egdi_read_hc.py" in manifest
+
+
+def test_publication_governance_documents_are_present():
+    security = (ROOT / "SECURITY.md").read_text(encoding="utf-8")
+    citation = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
+
+    assert "GitHub Security Advisory" in security
+    assert "REPLACE-WITH-SECURITY-CONTACT@example.com" in security
+    assert citation.startswith("cff-version: 1.2.0\n")
+    assert "title: FARMWISE-API" in citation
+    assert "license: Apache-2.0" in citation
+    assert "repository-code: \"https://github.com/SmolakK/FARMWISE-API\"" in citation

@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pandas as pd
 
-from adapters.API_readers.cds.cds_utils import cds_data_read
+from farmwise_api.adapters.API_readers.cds.cds_utils import cds_data_read
 
 
 def test_cds_read_data_builds_request_and_converts_temperature(monkeypatch):

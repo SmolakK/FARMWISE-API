@@ -3,11 +3,14 @@ from types import SimpleNamespace
 from unittest.mock import ANY, MagicMock, patch
 
 import pytest
+import jwt
 from fastapi import HTTPException
-from jose import jwt
 from sqlalchemy.orm import Session
-from server import security
-from server.security import authenticate_user
+from farmwise_api.server import security
+from farmwise_api.server.security import authenticate_user
+
+
+TEST_SECRET = "test-secret-at-least-32-bytes-long"
 
 
 def test_authenticate_user_valid():
@@ -17,7 +20,7 @@ def test_authenticate_user_valid():
     db.query.return_value.filter.return_value.first.return_value = mock_user
 
     # Mock the verify_password function
-    with patch("server.security.verify_password") as mock_verify_password:
+    with patch("farmwise_api.server.security.verify_password") as mock_verify_password:
         mock_verify_password.return_value = True  # Simulate successful password verification
 
         result = authenticate_user(db, "validuser", "plaintextpassword")
@@ -34,7 +37,7 @@ def test_authenticate_user_invalid_password():
     db.query.return_value.filter.return_value.first.return_value = mock_user
 
     # Mock the verify_password function
-    with patch("server.security.verify_password") as mock_verify_password:
+    with patch("farmwise_api.server.security.verify_password") as mock_verify_password:
         mock_verify_password.return_value = False  # Simulate unsuccessful password verification
 
         result = authenticate_user(db, "validuser", "wrongpassword")
@@ -53,13 +56,13 @@ def test_authenticate_user_nonexistent_user():
 
 
 def test_create_access_token_contains_subject_and_expiry(monkeypatch):
-    monkeypatch.setattr(security, "SECRET_KEY", "test-secret")
+    monkeypatch.setattr(security, "SECRET_KEY", TEST_SECRET)
     monkeypatch.setattr(security, "ALGORITHM", "HS256")
 
     token = security.create_access_token(
         {"sub": "alice"}, expires_delta=timedelta(minutes=5)
     )
-    payload = jwt.decode(token, "test-secret", algorithms=["HS256"])
+    payload = jwt.decode(token, TEST_SECRET, algorithms=["HS256"])
 
     assert payload["sub"] == "alice"
     assert "exp" in payload
@@ -67,7 +70,7 @@ def test_create_access_token_contains_subject_and_expiry(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_get_current_user_returns_database_user(monkeypatch):
-    monkeypatch.setattr(security, "SECRET_KEY", "test-secret")
+    monkeypatch.setattr(security, "SECRET_KEY", TEST_SECRET)
     monkeypatch.setattr(security, "ALGORITHM", "HS256")
     token = security.create_access_token({"sub": "alice"})
     user = SimpleNamespace(username="alice", disabled=False)
@@ -85,11 +88,11 @@ async def test_get_current_user_returns_database_user(monkeypatch):
     "token",
     [
         "not-a-token",
-        jwt.encode({"role": "reader"}, "test-secret", algorithm="HS256"),
+        jwt.encode({"role": "reader"}, TEST_SECRET, algorithm="HS256"),
     ],
 )
 async def test_get_current_user_rejects_invalid_token(monkeypatch, token):
-    monkeypatch.setattr(security, "SECRET_KEY", "test-secret")
+    monkeypatch.setattr(security, "SECRET_KEY", TEST_SECRET)
     monkeypatch.setattr(security, "ALGORITHM", "HS256")
 
     with pytest.raises(HTTPException) as exc_info:
@@ -101,7 +104,7 @@ async def test_get_current_user_rejects_invalid_token(monkeypatch, token):
 
 @pytest.mark.asyncio
 async def test_get_current_user_rejects_deleted_user(monkeypatch):
-    monkeypatch.setattr(security, "SECRET_KEY", "test-secret")
+    monkeypatch.setattr(security, "SECRET_KEY", TEST_SECRET)
     monkeypatch.setattr(security, "ALGORITHM", "HS256")
     token = security.create_access_token({"sub": "deleted"})
     monkeypatch.setattr(security, "get_user_by_username", MagicMock(return_value=None))

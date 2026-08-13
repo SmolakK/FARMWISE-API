@@ -1,19 +1,21 @@
 include LICENSE
 include README.md
 include DATA_LICENSES.md
+include SECURITY.md
+include CITATION.cff
 
 # Never ship source datasets, generated caches, logs, or application state in
 # source distributions. Runtime constants explicitly allowlisted in
 # pyproject.toml remain available to wheel builds.
-prune adapters/API_readers/egdi
-prune adapters/API_readers/EuroCropV2/data
-prune adapters/API_readers/correctiv/data
-prune adapters/API_readers/imgw/constants
-prune adapters/API_readers/imgw_hydro/constants
-prune adapters/API_readers/eea/eea_data
-prune adapters/API_readers/IFSGRID/data
-prune adapters/API_readers/quadica/data
-prune adapters/API_readers/soilgrids/temp_storage
+prune farmwise_api/adapters/API_readers/egdi
+prune farmwise_api/adapters/API_readers/EuroCropV2/data
+prune farmwise_api/adapters/API_readers/correctiv/data
+prune farmwise_api/adapters/API_readers/imgw/constants
+prune farmwise_api/adapters/API_readers/imgw_hydro/constants
+prune farmwise_api/adapters/API_readers/eea/eea_data
+prune farmwise_api/adapters/API_readers/IFSGRID/data
+prune farmwise_api/adapters/API_readers/quadica/data
+prune farmwise_api/adapters/API_readers/soilgrids/temp_storage
 prune downloaded_json
 prune temp_files
 prune evaluation/logs
@@ -35,8 +37,11 @@ global-exclude *.zip
 global-exclude *.xlsx
 
 exclude server.log
-exclude server/server.log
+exclude farmwise_api/server/server.log
 exclude tests/test_egdi_read_d10.py
 exclude tests/test_egdi_read_hc.py
 exclude user_storage.db
-exclude server/user_storage.db
+exclude farmwise_api/server/user_storage.db
+exclude main.py
+exclude main_call.py
+exclude quality_assess.py

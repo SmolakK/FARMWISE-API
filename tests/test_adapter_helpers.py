@@ -6,12 +6,12 @@ import pandas as pd
 import pytest
 from shapely.geometry import box
 
-from adapters.API_readers.EuroCropV2.utils import extractors as euro_extractors
-from adapters.API_readers.EuroCropV2.utils import preparation as euro_preparation
-from adapters.API_readers.IFSGRID.utils import extraction as ifs_extraction
-from adapters.API_readers.IFSGRID.utils import preparation as ifs_preparation
-from adapters.API_readers.correctiv.utils import extractors as correctiv_extractors
-from adapters.API_readers.correctiv.utils import preparation as correctiv_preparation
+from farmwise_api.adapters.API_readers.EuroCropV2.utils import extractors as euro_extractors
+from farmwise_api.adapters.API_readers.EuroCropV2.utils import preparation as euro_preparation
+from farmwise_api.adapters.API_readers.IFSGRID.utils import extraction as ifs_extraction
+from farmwise_api.adapters.API_readers.IFSGRID.utils import preparation as ifs_preparation
+from farmwise_api.adapters.API_readers.correctiv.utils import extractors as correctiv_extractors
+from farmwise_api.adapters.API_readers.correctiv.utils import preparation as correctiv_preparation
 
 
 def test_eurocrop_extract_data_by_bbox(tmp_path):

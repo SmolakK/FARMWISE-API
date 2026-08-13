@@ -2,14 +2,14 @@ import pytest
 from unittest.mock import patch, AsyncMock, MagicMock
 import numpy as np
 import pandas as pd
-from adapters.API_readers.corine.corine_read import read_data
+from farmwise_api.adapters.API_readers.corine.corine_read import read_data
 
 
 @pytest.mark.asyncio
-@patch("adapters.API_readers.corine.corine_read.asyncio.to_thread")
-@patch("adapters.API_readers.corine.corine_read.Image.open")
-@patch("adapters.API_readers.corine.corine_read.prepare_coordinates")
-@patch("adapters.API_readers.corine.corine_read.httpx.AsyncClient")
+@patch("farmwise_api.adapters.API_readers.corine.corine_read.asyncio.to_thread")
+@patch("farmwise_api.adapters.API_readers.corine.corine_read.Image.open")
+@patch("farmwise_api.adapters.API_readers.corine.corine_read.prepare_coordinates")
+@patch("farmwise_api.adapters.API_readers.corine.corine_read.httpx.AsyncClient")
 async def test_read_data(
     mock_httpx_client,
     mock_prepare_coordinates,

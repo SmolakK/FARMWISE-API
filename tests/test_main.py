@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from server.main import app
+from farmwise_api.server.main import app
 from unittest.mock import patch
 import os
 
@@ -18,10 +18,10 @@ def test_app_startup_and_shutdown(client, tmp_path):
     Test app startup and shutdown logic.
     """
     runtime_dir = tmp_path / "runtime"
-    with patch("server.main.TEMP_DIR", runtime_dir), \
-         patch("server.main.start_scheduler") as mock_start_scheduler, \
-         patch("server.main.shutdown_scheduler") as mock_shutdown_scheduler, \
-         patch("server.main.shutil.rmtree") as mock_rmtree:
+    with patch("farmwise_api.server.main.TEMP_DIR", runtime_dir), \
+         patch("farmwise_api.server.main.start_scheduler") as mock_start_scheduler, \
+         patch("farmwise_api.server.main.shutdown_scheduler") as mock_shutdown_scheduler, \
+         patch("farmwise_api.server.main.shutil.rmtree") as mock_rmtree:
 
         # Simulate lifespan
         with TestClient(app) as client:

@@ -2,16 +2,16 @@ import pytest
 from unittest.mock import patch, MagicMock
 import pandas as pd
 from datetime import datetime
-from adapters.API_readers.cds.cds_single_levels import (
+from farmwise_api.adapters.API_readers.cds.cds_single_levels import (
     _open_downloaded_dataset,
     read_data,
 )
 
 
 @pytest.mark.asyncio
-@patch("adapters.API_readers.cds.cds_single_levels.cdsapi.Client")
-@patch("adapters.API_readers.cds.cds_single_levels.xr.open_dataset")
-@patch("adapters.API_readers.cds.cds_single_levels.prepare_coordinates")
+@patch("farmwise_api.adapters.API_readers.cds.cds_single_levels.cdsapi.Client")
+@patch("farmwise_api.adapters.API_readers.cds.cds_single_levels.xr.open_dataset")
+@patch("farmwise_api.adapters.API_readers.cds.cds_single_levels.prepare_coordinates")
 async def test_read_data(mock_prepare_coordinates, mock_open_dataset, mock_cds_client):
     # Mock the CDS API client retrieve method
     mock_retrieve = MagicMock()
@@ -94,7 +94,7 @@ def test_open_downloaded_dataset_extracts_zip_wrapped_netcdf(tmp_path):
 
     dataset = MagicMock()
     with patch(
-        "adapters.API_readers.cds.cds_single_levels.xr.open_dataset",
+        "farmwise_api.adapters.API_readers.cds.cds_single_levels.xr.open_dataset",
         return_value=dataset,
     ) as open_dataset:
         assert _open_downloaded_dataset(archive_path) is dataset

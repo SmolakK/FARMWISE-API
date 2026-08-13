@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import pytest
 
-from core import quality_assess
+from farmwise_api.core import quality_assess
 
 
 def _quality_frame():

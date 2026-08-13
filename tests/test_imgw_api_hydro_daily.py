@@ -1,21 +1,21 @@
 import pytest
 from unittest.mock import AsyncMock, patch
 import pandas as pd
-from adapters.API_readers.imgw_hydro.imgw_api_hydro_daily import read_data
+from farmwise_api.adapters.API_readers.imgw_hydro.imgw_api_hydro_daily import read_data
 from io import BytesIO
 import zipfile
 
 
 @pytest.mark.asyncio
-@patch("adapters.API_readers.imgw_hydro.imgw_api_hydro_daily.prepare_coordinates")
-@patch("adapters.API_readers.imgw_hydro.imgw_api_hydro_daily.httpx.AsyncClient")
-@patch("adapters.API_readers.imgw_hydro.imgw_api_hydro_daily.pd.read_csv")
+@patch("farmwise_api.adapters.API_readers.imgw_hydro.imgw_api_hydro_daily.prepare_coordinates")
+@patch("farmwise_api.adapters.API_readers.imgw_hydro.imgw_api_hydro_daily.httpx.AsyncClient")
+@patch("farmwise_api.adapters.API_readers.imgw_hydro.imgw_api_hydro_daily.pd.read_csv")
 async def test_read_data(
     mock_read_csv, mock_httpx_client, mock_prepare_coordinates, monkeypatch
 ):
     monkeypatch.setenv("FARMWISE_ENABLE_PRIVATE_IMGW", "1")
     monkeypatch.setattr(
-        "adapters.API_readers.imgw_hydro.imgw_api_hydro_daily.adapter_data",
+        "farmwise_api.adapters.API_readers.imgw_hydro.imgw_api_hydro_daily.adapter_data",
         lambda *_parts: "private-imgw-hydro-coordinates.csv",
     )
     # Mock the imgw_coordinates.csv file

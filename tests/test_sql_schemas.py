@@ -1,8 +1,8 @@
 import pytest
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker
-from server.user_database import Base
-from server.sql_schemas import User
+from farmwise_api.server.user_database import Base
+from farmwise_api.server.sql_schemas import User
 
 
 # Configure a SQLite in-memory database for testing

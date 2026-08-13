@@ -1,9 +1,9 @@
 import pandas as pd
 import pytest
 
-from adapters.API_readers.quadica import quadica_read
-from adapters.API_readers.quadica.mappings.quadica_mappings import GLOBAL_MAPPING
-from adapters.API_readers.quadica.utils import extractors, preparation
+from farmwise_api.adapters.API_readers.quadica import quadica_read
+from farmwise_api.adapters.API_readers.quadica.mappings.quadica_mappings import GLOBAL_MAPPING
+from farmwise_api.adapters.API_readers.quadica.utils import extractors, preparation
 
 
 def _assign_one_cell(frame, _spatial_range, _level):

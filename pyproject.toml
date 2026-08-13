@@ -8,6 +8,23 @@ version = "0.1.0"
 description = "European agricultural and environmental data aggregation API"
 readme = "README.md"
 license = "Apache-2.0"
+# TODO: replace these placeholder identities before publishing version 0.1.0.
+authors = [
+    { name = "REPLACE WITH AUTHOR NAME", email = "replace-author@example.com" },
+]
+maintainers = [
+    { name = "REPLACE WITH MAINTAINER NAME", email = "replace-maintainer@example.com" },
+]
+keywords = ["agriculture", "environmental-data", "geospatial", "S2", "FastAPI"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: GIS",
+]
 license-files = [
     "LICENSE",
     "DATA_LICENSES.md",
@@ -50,7 +67,7 @@ server = [
     "passlib[bcrypt]",
     "pydantic",
     "python-dotenv",
-    "python-jose[cryptography]",
+    "PyJWT[crypto]>=2.8,<3",
     "python-multipart",
     "slowapi",
     "sqlalchemy",
@@ -64,34 +81,37 @@ dev = [
 evaluation = [
     "matplotlib",
 ]
+release = [
+    "build",
+    "twine",
+]
+
+[project.urls]
+Homepage = "https://github.com/SmolakK/FARMWISE-API"
+Repository = "https://github.com/SmolakK/FARMWISE-API"
+Documentation = "https://github.com/SmolakK/FARMWISE-API#readme"
+Issues = "https://github.com/SmolakK/FARMWISE-API/issues"
 
 [project.scripts]
-farmwise-api = "main:run"
+farmwise-api = "farmwise_api.cli:run"
 
 [tool.setuptools.packages.find]
-where = [".", "internal-lib/hubeaupyutils/hubeaupyutils-main/src"]
-include = [
-    "adapters*",
-    "core*",
-    "server*",
-    "evaluation*",
-    "hubeaupyutils*",
-]
-exclude = ["tests*", "internal-lib*", "adapters.API_readers.egdi*"]
+where = ["."]
+include = ["farmwise_api*"]
+exclude = ["farmwise_api.adapters.API_readers.egdi*"]
 
 [tool.setuptools]
-py-modules = ["main", "main_call", "quality_assess"]
 include-package-data = false
 
 [tool.setuptools.package-data]
-"adapters.API_readers.epa_ireland" = ["constants/EPA_coordinates.csv"]
-"adapters.API_readers.gios" = ["constants/gios_coordinates.csv"]
-"adapters.API_readers.hubeau" = ["constants/*.csv"]
-"adapters.API_readers.IFSGRID.utils" = ["definitions.json"]
-"adapters.API_readers.irish_meteo" = ["EPA_ireland_stations.csv"]
-"adapters.API_readers.quadica" = ["DATA_SETUP.md", "mappings/quadica_table.html"]
-"core.utils" = ["country_codes"]
-"server" = ["static/*"]
+"farmwise_api.adapters.API_readers.epa_ireland" = ["constants/EPA_coordinates.csv"]
+"farmwise_api.adapters.API_readers.gios" = ["constants/gios_coordinates.csv"]
+"farmwise_api.adapters.API_readers.hubeau" = ["constants/*.csv"]
+"farmwise_api.adapters.API_readers.IFSGRID.utils" = ["definitions.json"]
+"farmwise_api.adapters.API_readers.irish_meteo" = ["EPA_ireland_stations.csv"]
+"farmwise_api.adapters.API_readers.quadica" = ["DATA_SETUP.md", "mappings/quadica_table.html"]
+"farmwise_api.core.utils" = ["country_codes"]
+"farmwise_api.server" = ["static/*"]
 
 [tool.setuptools.exclude-package-data]
 "*" = [

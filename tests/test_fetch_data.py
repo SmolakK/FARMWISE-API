@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from core.utils import fetch_data
+from farmwise_api.core.utils import fetch_data
 
 
 def test_fetch_data_lists_manifest_entries(monkeypatch, capsys):

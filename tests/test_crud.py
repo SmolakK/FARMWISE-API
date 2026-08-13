@@ -1,15 +1,15 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from server.sql_schemas import Base
-from server.schemas import UserCreate
-from server.crud import (
+from farmwise_api.server.sql_schemas import Base
+from farmwise_api.server.schemas import UserCreate
+from farmwise_api.server.crud import (
     create_user,
     delete_user,
     get_user_by_email,
     get_user_by_username,
 )
-from server.hashing_utils import verify_password
+from farmwise_api.server.hashing_utils import verify_password
 
 
 # Setup test database

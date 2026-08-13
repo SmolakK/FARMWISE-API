@@ -1,4 +1,4 @@
-from core.utils.data_operators import flatten_list
+from farmwise_api.core.utils.data_operators import flatten_list
 
 
 def test_flatten_list_with_nested_lists():

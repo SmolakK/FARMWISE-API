@@ -1,7 +1,7 @@
-from core.main_call import read_data as core_read_data
-from main import app
-from main_call import read_data
-from server.main import STATIC_DIR, app as server_app
+from farmwise_api.core.main_call import read_data as core_read_data
+from farmwise_api import read_data
+from farmwise_api.cli import app
+from farmwise_api.server.main import STATIC_DIR, app as server_app
 
 
 def test_local_library_entrypoint():

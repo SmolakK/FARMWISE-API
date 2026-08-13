@@ -10,7 +10,7 @@ import pytest
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
-from server.routers import data_call
+from farmwise_api.server.routers import data_call
 
 
 def _request(tmp_path):

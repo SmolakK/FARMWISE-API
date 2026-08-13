@@ -1,5 +1,5 @@
 from shapely.geometry import Polygon
-from core.utils.generate_cells import generate_s2cell_polygons, generate_s2cell_points
+from farmwise_api.core.utils.generate_cells import generate_s2cell_polygons, generate_s2cell_points
 
 
 def test_generate_s2cell_polygons():

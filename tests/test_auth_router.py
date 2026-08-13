@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi import HTTPException
 
-from server.routers import auth
+from farmwise_api.server.routers import auth
 
 
 @pytest.mark.asyncio

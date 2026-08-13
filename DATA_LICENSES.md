@@ -24,7 +24,7 @@ licence, access date, and modification notices listed below.
 
 ### GeoSphere Austria daily station data
 
-- **Adapter:** `adapters.API_readers.geosphere.geosphere`
+- **Adapter:** `farmwise_api.adapters.API_readers.geosphere.geosphere`
 - **Dataset/resource:** Station Data-v2 (1 d), resource `klima-v2-1d`
 - **Local persistence:** response data is processed in memory; derived server
   exports and quality reports may be persisted.
@@ -38,7 +38,7 @@ licence, access date, and modification notices listed below.
 
 ### Deutscher Wetterdienst observations
 
-- **Adapter:** `adapters.API_readers.wetterdienst.wetterdienst_dwd`
+- **Adapter:** `farmwise_api.adapters.API_readers.wetterdienst.wetterdienst_dwd`
 - **Dataset/resource:** DWD Climate Data Center/Open Data observations accessed
   through Wetterdienst.
 - **Local persistence:** Wetterdienst may maintain its own disk cache; derived
@@ -55,9 +55,9 @@ licence, access date, and modification notices listed below.
 
 ### SoilGrids
 
-- **Adapter:** `adapters.API_readers.soilgrids.soilgrids_call`
+- **Adapter:** `farmwise_api.adapters.API_readers.soilgrids.soilgrids_call`
 - **Dataset/resource:** SoilGrids 2.0 predicted soil-property maps.
-- **Local resources:** `adapters/API_readers/soilgrids/temp_storage/*.tif`
+- **Local resources:** `farmwise_api/adapters/API_readers/soilgrids/temp_storage/*.tif`
   and per-request scratch GeoTIFFs.
 - **Provider:** ISRIC — World Soil Information
 - **Source:** <https://soilgrids.org/>
@@ -69,7 +69,7 @@ licence, access date, and modification notices listed below.
 
 ### ERA5 single-level reanalysis
 
-- **Adapter:** `adapters.API_readers.cds.cds_single_levels`
+- **Adapter:** `farmwise_api.adapters.API_readers.cds.cds_single_levels`
 - **Dataset/resource:** `reanalysis-era5-single-levels`
 - **Local persistence:** temporary NetCDF or ZIP-wrapped NetCDF files are
   created per request and removed after processing.
@@ -97,11 +97,11 @@ licence, access date, and modification notices listed below.
 
 ### CDS satellite land cover
 
-- **Adapter/helper:** `adapters.API_readers.cds.cds_land_cover` (not currently
+- **Adapter/helper:** `farmwise_api.adapters.API_readers.cds.cds_land_cover` (not currently
   registered for normal dispatch)
 - **Dataset/resource:** `satellite-land-cover`
 - **Local persistence:** ZIP and extracted products may be written to
-  `adapters/API_readers/cds/temp_storage/`.
+  `farmwise_api/adapters/API_readers/cds/temp_storage/`.
 - **Source:** <https://cds.climate.copernicus.eu/datasets/satellite-land-cover>
 - **DOI:** <https://doi.org/10.24381/cds.006f2c9a>
 - **Licence:** the catalogue lists ESA CCI, CC-BY, and VITO licences. The
@@ -115,8 +115,8 @@ licence, access date, and modification notices listed below.
 
 ### IMGW-PIB meteorological and hydrological observations
 
-- **Adapters:** `adapters.API_readers.imgw.imgw_api_synop_daily` and
-  `adapters.API_readers.imgw_hydro.imgw_api_hydro_daily`
+- **Adapters:** `farmwise_api.adapters.API_readers.imgw.imgw_api_synop_daily` and
+  `farmwise_api.adapters.API_readers.imgw_hydro.imgw_api_hydro_daily`
 - **Local resources:** protected station-coordinate files are not bundled or
   distributed. A permitted local user must supply them privately through
   `FARMWISE_DATA_DIR`.
@@ -139,11 +139,11 @@ licence, access date, and modification notices listed below.
 
 ### GIOŚ soil monitoring and groundwater monitoring
 
-- **Adapters:** `adapters.API_readers.gios.gios_scraper` and
-  `adapters.API_readers.gios_gw.gios_gw`
+- **Adapters:** `farmwise_api.adapters.API_readers.gios.gios_scraper` and
+  `farmwise_api.adapters.API_readers.gios_gw.gios_gw`
 - **Local resources:**
-  `adapters/API_readers/gios/constants/gios_coordinates.csv` and
-  `adapters/API_readers/gios_gw/constants/gios_gw_stations.csv`.
+  `farmwise_api/adapters/API_readers/gios/constants/gios_coordinates.csv` and
+  `farmwise_api/adapters/API_readers/gios_gw/constants/gios_gw_stations.csv`.
 - **Provider:** Główny Inspektorat Ochrony Środowiska (GIOŚ)
 - **Terms:** <https://www.gov.pl/web/gios/ponowne-wykorzystywanie-danych>
 - **Required attribution:** use either `Źródło danych: Główny Inspektorat
@@ -155,7 +155,7 @@ licence, access date, and modification notices listed below.
 
 ### CORINE Land Cover
 
-- **Adapter:** `adapters.API_readers.corine.corine_read`
+- **Adapter:** `farmwise_api.adapters.API_readers.corine.corine_read`
 - **Dataset/resource:** CORINE Land Cover map services for requested reference
   years.
 - **Local persistence:** fetched raster images are processed per request;
@@ -173,8 +173,8 @@ licence, access date, and modification notices listed below.
 
 ### EGDI / GeoERA HOVER WP7 DRASTIC layers
 
-- **Adapters:** `adapters.API_readers.egdi.egdi_read_hc` and
-  `adapters.API_readers.egdi.egdi_read_d10`
+- **Adapters:** `farmwise_api.adapters.API_readers.egdi.egdi_read_hc` and
+  `farmwise_api.adapters.API_readers.egdi.egdi_read_d10`
 - **Local resources:** not bundled. A local user may place lawfully obtained
   files under `egdi/data/` in `FARMWISE_DATA_DIR`.
 - **Originator:** Federal Institute for Geosciences and Natural Resources
@@ -191,11 +191,11 @@ licence, access date, and modification notices listed below.
 
 ### Hub'Eau water data
 
-- **Adapters:** `adapters.API_readers.hubeau.hubeau_wq_read`,
-  `adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm`, and
-  `adapters.API_readers.hubeau.hubeau_sw_quality_read`
+- **Adapters:** `farmwise_api.adapters.API_readers.hubeau.hubeau_wq_read`,
+  `farmwise_api.adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm`, and
+  `farmwise_api.adapters.API_readers.hubeau.hubeau_sw_quality_read`
 - **Local resources:** station and parameter selections under
-  `adapters/API_readers/hubeau/constants/`.
+  `farmwise_api/adapters/API_readers/hubeau/constants/`.
 - **Providers:** Office français de la biodiversité (OFB), BRGM, Service
   Central Vigicrues, and the producers identified by individual records.
 - **Source:** <https://hubeau.eaufrance.fr/>
@@ -208,7 +208,7 @@ licence, access date, and modification notices listed below.
 
 ### Ukrainian surface-water monitoring
 
-- **Adapter:** `adapters.API_readers.UA_sw_quality.ukrainian_surface_water`
+- **Adapter:** `farmwise_api.adapters.API_readers.UA_sw_quality.ukrainian_surface_water`
 - **Dataset/resource:** state monitoring observations for Ukrainian surface
   waters.
 - **Local persistence:** source CSVs are processed in memory; derived server
@@ -223,9 +223,9 @@ licence, access date, and modification notices listed below.
 
 ### EPA Ireland groundwater observations
 
-- **Adapter:** `adapters.API_readers.epa_ireland.epa_gw`
+- **Adapter:** `farmwise_api.adapters.API_readers.epa_ireland.epa_gw`
 - **Local resource:**
-  `adapters/API_readers/epa_ireland/constants/EPA_coordinates.csv`.
+  `farmwise_api/adapters/API_readers/epa_ireland/constants/EPA_coordinates.csv`.
 - **Provider:** Environmental Protection Agency Ireland
 - **Source:** station downloads referenced from EPA Hydronet; general EPA data
   portal at <https://data.epa.ie/>.
@@ -240,9 +240,9 @@ licence, access date, and modification notices listed below.
 
 ### Met Éireann daily station observations
 
-- **Adapter:** `adapters.API_readers.irish_meteo.Irish MS_daily`
+- **Adapter:** `farmwise_api.adapters.API_readers.irish_meteo.Irish MS_daily`
 - **Local resource:**
-  `adapters/API_readers/irish_meteo/EPA_ireland_stations.csv`.
+  `farmwise_api/adapters/API_readers/irish_meteo/EPA_ireland_stations.csv`.
 - **Provider:** Met Éireann
 - **Source:** <https://cli.fusio.net/cli/climate_data/webdata/>
 - **Published licence example and attribution terms:**
@@ -256,8 +256,8 @@ licence, access date, and modification notices listed below.
 
 ### EuroCropV2
 
-- **Adapter:** `adapters.API_readers.EuroCropV2.EuroCropV2_read`
-- **Local resource:** `adapters/API_readers/EuroCropV2/data/points.csv`.
+- **Adapter:** `farmwise_api.adapters.API_readers.EuroCropV2.EuroCropV2_read`
+- **Local resource:** `farmwise_api/adapters/API_readers/EuroCropV2/data/points.csv`.
 - **Provider:** European Commission, Joint Research Centre (JRC), with the
   contributors identified in the dataset catalogue.
 - **Source:** <https://data.jrc.ec.europa.eu/dataset/b9fb9e67-78a9-4327-9d59-39a928d812d3>
@@ -273,7 +273,7 @@ licence, access date, and modification notices listed below.
 
 ### CORRECTIV.Lokal groundwater data
 
-- **Adapter:** `adapters.API_readers.correctiv.correctiv_read`
+- **Adapter:** `farmwise_api.adapters.API_readers.correctiv.correctiv_read`
 - **Local resource:** protected Parquet data is not bundled, mirrored, or
   listed in the remote-data manifest.
 - **Source:** <https://github.com/correctiv/grundwasser-data>
@@ -289,10 +289,10 @@ licence, access date, and modification notices listed below.
 
 ### IFSGRID agricultural census data
 
-- **Adapter:** `adapters.API_readers.IFSGRID.IFSGRID_read`
+- **Adapter:** `farmwise_api.adapters.API_readers.IFSGRID.IFSGRID_read`
 - **Local resources:** shapefile layers under
-  `adapters/API_readers/IFSGRID/data/IFSGRID/data/` and
-  `adapters/API_readers/IFSGRID/utils/definitions.json`.
+  `farmwise_api/adapters/API_readers/IFSGRID/data/IFSGRID/data/` and
+  `farmwise_api/adapters/API_readers/IFSGRID/utils/definitions.json`.
 - **Provider:** Eurostat and contributing national statistical authorities
 - **Source/DOI:** <https://doi.org/10.5281/zenodo.14852709>
 - **Licence:** [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/)
@@ -306,9 +306,9 @@ licence, access date, and modification notices listed below.
 
 ### EEA Environmental Zones 2018
 
-- **Adapter:** `adapters.API_readers.eea.eea_read`
+- **Adapter:** `farmwise_api.adapters.API_readers.eea.eea_read`
 - **Local resource:**
-  `adapters/API_readers/eea/eea_data/eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif`.
+  `farmwise_api/adapters/API_readers/eea/eea_data/eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif`.
 - **Distributor:** European Environment Agency (EEA)
 - **EEA source:** <https://www.eea.europa.eu/en/datahub/datahubitem-view/c8c4144a-8c0e-4686-9422-80dbf86bc0cb>
 - **Underlying dataset:** Marc J. Metzger (2018), The Environmental
@@ -324,7 +324,7 @@ licence, access date, and modification notices listed below.
 
 ### QUADICA v1 water quality, discharge, and catchment drivers
 
-- **Adapter:** `adapters.API_readers.quadica.quadica_read`
+- **Adapter:** `farmwise_api.adapters.API_readers.quadica.quadica_read`
 - **Dataset/resource:** QUADICA v1, HydroShare DOI
   <https://doi.org/10.4211/hs.0ec5f43e43c349ff818a8d57699c0fe1>.
 - **Local resources:** prepared CSV derivatives under
@@ -349,10 +349,10 @@ licence, access date, and modification notices listed below.
 
 ### Czech Hydrometeorological Institute historical daily observations
 
-- **Adapter:** `adapters.API_readers.CHMI_Meteo.CHMI_meteo` (currently not
+- **Adapter:** `farmwise_api.adapters.API_readers.CHMI_Meteo.CHMI_meteo` (currently not
   registered for normal dispatch)
 - **Local resources:**
-  `adapters/API_readers/CHMI_Meteo/json_files_list.txt`, runtime
+  `farmwise_api/adapters/API_readers/CHMI_Meteo/json_files_list.txt`, runtime
   `downloaded_json/`, and runtime `CHMI_merged_data.csv`.
 - **Provider:** Český hydrometeorologický ústav (ČHMÚ/CHMI)
 - **Source:** <https://opendata.chmi.cz/meteorology/climate/historical/data/daily/>
@@ -396,7 +396,7 @@ FARMWISE must not apply Apache-2.0 to the data portion of such exports.
 
 ## Non-data and sensitive files
 
-`user_storage.db`, `server/user_storage.db`, and any database under the
+`user_storage.db`, `farmwise_api/server/user_storage.db`, and any database under the
 FARMWISE cache contain authentication/application state, not source data. They
 must never be published, bundled, or uploaded to a data repository.
 

@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: >-
+  If you use FARMWISE-API in research, please cite the software using this
+  metadata. Replace the author placeholders before publishing a release.
+title: FARMWISE-API
+type: software
+authors:
+  - family-names: "REPLACE WITH FAMILY NAME"
+    given-names: "REPLACE WITH GIVEN NAMES"
+    email: "replace-author@example.com"
+    # Add an ORCID after the author has confirmed it, for example:
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+version: 0.1.0
+repository-code: "https://github.com/SmolakK/FARMWISE-API"
+url: "https://github.com/SmolakK/FARMWISE-API"
+license: Apache-2.0
+abstract: >-
+  FARMWISE-API is a Python library and FastAPI service for selecting,
+  retrieving, harmonising, and assessing European agricultural and
+  environmental data in a common S2-cell representation.
+keywords:
+  - agriculture
+  - environmental data
+  - geospatial data
+  - S2 geometry
+  - data harmonisation
+# After archiving the release, add its publication date and Zenodo DOI:
+# date-released: "YYYY-MM-DD"
+# doi: "10.5281/zenodo.REPLACE_WITH_RECORD_ID"
