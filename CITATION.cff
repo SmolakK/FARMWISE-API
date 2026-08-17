@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: >-
   If you use FARMWISE-API in research, please cite the software using this
-  metadata. Replace the author placeholders before publishing a release.
+  metadata.
 title: FARMWISE-API
 type: software
 authors:
@@ -23,3 +23,4 @@ keywords:
   - data harmonisation
 # date-released: "YYYY-MM-DD"
 # doi: "10.5281/zenodo.REPLACE_WITH_RECORD_ID"
+# Citation will appear here
