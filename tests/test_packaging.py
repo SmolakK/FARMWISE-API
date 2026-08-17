@@ -4,7 +4,10 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python 3.10
+    import tomli as tomllib
 from zipfile import ZipFile
 
 import pytest
@@ -158,6 +161,10 @@ def test_built_wheel_declares_runtime_and_server_dependencies(built_wheel):
         requirement.startswith("hubeaupyutils")
         for requirement in base_requirements
     )
+    assert any(
+        requirement.startswith("matplotlib")
+        for requirement in base_requirements
+    )
 
     assert "server" in metadata.get_all("Provides-Extra", [])
     server_requirements = [
@@ -244,7 +251,7 @@ def test_publication_governance_documents_are_present():
     citation = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
 
     assert "GitHub Security Advisory" in security
-    assert "REPLACE-WITH-SECURITY-CONTACT@example.com" in security
+    assert "REPLACE-WITH-SECURITY-CONTACT@example.com" not in security
     assert citation.startswith("cff-version: 1.2.0\n")
     assert "title: FARMWISE-API" in citation
     assert "license: Apache-2.0" in citation
