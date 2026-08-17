@@ -17,8 +17,6 @@ discussion, pull request, evaluation output, or dataset.
 
 Use the repository's private
 [GitHub Security Advisory form](https://github.com/SmolakK/FARMWISE-API/security/advisories/new).
-If private vulnerability reporting is unavailable, contact
-`REPLACE-WITH-SECURITY-CONTACT@example.com`.
 
 Include, where possible:
 
