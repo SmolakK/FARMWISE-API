@@ -1,5 +1,13 @@
 # FARMWISE API
 
+FARMWISE API is a unified platform for accessing European agricultural and environmental data. It
+is developed under the FARMWISE project (https://farmwise-project.eu/) to facilitate experiments and studies
+on the sustainable agriculture and decision-making. FARMWISE-API brings together information from 
+multiple sources, standardizes it, and organizes it into a consistent geospatial format. Users can 
+request data for a specific area and time period, including factors such as temperature and precipitation. 
+The platform can be used as either a Python library or an HTTP service, supporting research and 
+informed decision-making for sustainable agriculture.
+
 FARMWISE is dual-use:
 
 - as a local Python library through `farmwise_api`;
@@ -74,7 +82,7 @@ Copy-Item public_host.env.example public_host.env
 ```
 
 `fidel.env` contains JWT settings. SMTP configuration is only required when
-email delivery is used. By default it is read from `smtp.env` in the working
+email delivery is used. By default, it is read from `smtp.env` in the working
 directory; set `FARMWISE_SMTP_ENV_FILE` to use another location.
 `PUBLIC_BASE_URL` should contain a host and optional port without a URL scheme,
 for example `localhost:8000`.
@@ -260,7 +268,16 @@ Authenticated clients can call `POST /read-data-direct`:
 ```
 
 The response contains download links for the data CSV, metadata JSON, and,
-when requested, an HTML map.
+when requested, an HTML map with data visualization.
+
+## Web frontend
+
+FARMWISE API includes an authenticated web interface for users who prefer not to interact with the Python library 
+or REST endpoints directly. After signing in, users can select one or more countries or define a custom WGS 84 bounding
+box, choose a date range, set the S2 spatial resolution, and request multiple agricultural or environmental parameters.
+The interface also provides options to keep outputs from individual data sources in separate columns, enable
+interpolation, and generate an interactive HTML map. Requests are processed asynchronously,
+and links to the resulting CSV data, source metadata, and optional map are sent to the user by email.
 
 ## Evaluation and benchmarks
 
@@ -277,33 +294,6 @@ python -m evaluation.run_all
 accept no command-line arguments. Scenario definitions and collection settings
 are explicit in the Python source. Statistical analysis and figure generation
 are performed separately in the evaluation notebooks.
-
-## Publishing to PyPI
-
-Before creating the first release, replace the author, maintainer, citation,
-and security-contact placeholders in `pyproject.toml`, `CITATION.cff`, and
-`SECURITY.md`. The publication workflow refuses to upload artifacts while
-those placeholders remain.
-
-Configure a PyPI Trusted Publisher for:
-
-- owner: `SmolakK`;
-- repository: `FARMWISE-API`;
-- workflow: `publish.yml`;
-- environment: `pypi`.
-
-Then create and publish a GitHub Release whose tag matches the version in
-`pyproject.toml`, for example `v0.1.0`. The workflow builds wheel and sdist,
-runs `twine check`, and publishes through OpenID Connect; no long-lived PyPI
-API token is stored in GitHub.
-
-To inspect the exact artifacts locally before releasing:
-
-```powershell
-python -m pip install -e ".[release]"
-python -m build
-python -m twine check dist\*
-```
 
 ## License
 
