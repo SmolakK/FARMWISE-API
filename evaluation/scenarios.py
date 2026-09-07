@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import date, timedelta
+
 REQUEST_SCENARIOS = [
     # ========================================================
     # 1. MULTI-SOURCE METEOROLOGY — DWD + ERA5
@@ -179,7 +181,15 @@ _SCALING_FACTORS = [
 
 
 def _scaling_request(
-    *, scenario, dimension, input_value, bounding_box, level, factors
+    *,
+    scenario,
+    dimension,
+    input_value,
+    bounding_box,
+    level,
+    factors,
+    time_from=_SCALING_TIME_FROM,
+    time_to=_SCALING_TIME_TO,
 ):
     return {
         "scenario": scenario,
@@ -188,8 +198,8 @@ def _scaling_request(
         "input_value": input_value,
         "bounding_box": bounding_box,
         "level": level,
-        "time_from": "2018-01-01",
-        "time_to": "2018-01-07",
+        "time_from": time_from,
+        "time_to": time_to,
         "factors": factors,
     }
 
@@ -233,5 +243,19 @@ LIVE_SCALING_SCENARIOS = [
         )
         for factor_count in (1, 2, 3, 4)
     ],
+    *[
+        _scaling_request(
+            scenario=f"live-duration-days-{duration_days}",
+            dimension="Requested days",
+            input_value=duration_days,
+            bounding_box=_SCALING_BASE_BBOX,
+            level=_SCALING_LEVEL,
+            factors=_SCALING_FACTORS[:2],
+            time_to=(
+                date.fromisoformat(_SCALING_TIME_FROM)
+                + timedelta(days=duration_days - 1)
+            ).isoformat(),
+        )
+        for duration_days in (1, 7, 30, 90)
+    ],
 ]
-
