@@ -483,7 +483,7 @@ if __name__ == "__main__":
     #     produce_map=True
     # ))
     asyncio.run(read_data(
-        country=['Andorra'],
+        country=['Germany'],
         level=10,
         time_from='2010-01-10',
         time_to='2010-02-10',

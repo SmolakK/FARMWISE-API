@@ -26,8 +26,9 @@ The scenario definitions are kept in `evaluation/scenarios.py`:
 
 - `REQUEST_SCENARIOS` exercises coverage pre-check and ordinary requests;
 - `CROSS_SOURCE_SCENARIOS` collects separate, non-harmonized source values;
-- `LIVE_SCALING_SCENARIOS` varies S2 level, bounding-box area, and factor
-  count.
+- `LIVE_SCALING_SCENARIOS` varies S2 level, bounding-box area, factor count,
+  and requested duration. The duration sweep covers 1, 7, 30, and 90 inclusive
+  days while holding the other request parameters fixed.
 
 Collection settings are explicit constants near the top of
 `evaluation/collect_empirical.py`:

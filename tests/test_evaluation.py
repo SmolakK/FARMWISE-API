@@ -1,4 +1,5 @@
 import json
+from datetime import date
 
 import pandas as pd
 import pytest
@@ -10,6 +11,7 @@ from evaluation.collect_cross_source import (
     separate_frame_to_observations,
     validate_private_output,
 )
+from evaluation.scenarios import LIVE_SCALING_SCENARIOS
 
 
 @pytest.mark.asyncio
@@ -124,6 +126,30 @@ def test_separate_frame_conversion_extracts_source_and_logical_variable():
 
     assert set(result["source"]) == {"ERA5", "DWD"}
     assert set(result["variable"]) == {"temperature", "precipitation"}
+
+
+def test_live_scaling_scenarios_include_requested_duration_sweep():
+    duration_cases = [
+        request
+        for request in LIVE_SCALING_SCENARIOS
+        if request["dimension"] == "Requested days"
+    ]
+
+    assert [request["input_value"] for request in duration_cases] == [
+        1,
+        7,
+        30,
+        90,
+    ]
+    for request in duration_cases:
+        inclusive_days = (
+            date.fromisoformat(request["time_to"])
+            - date.fromisoformat(request["time_from"])
+        ).days + 1
+        assert inclusive_days == request["input_value"]
+        assert request["bounding_box"] == (51.5, 50.5, 10.5, 9.5)
+        assert request["level"] == 10
+        assert request["factors"] == ["temperature", "precipitation"]
 
 
 def test_live_imgw_output_is_rejected_inside_repository(monkeypatch, tmp_path):

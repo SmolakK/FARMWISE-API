@@ -236,8 +236,8 @@ async def read_data(spatial_range, time_range, data_range, level,
     df = df.rename(GLOBAL_MAPPING, axis=1)
 
     # Recalculate temperature to Celsius
-    if "Temperature [°C]" in df.columns:
-        df["Temperature [°C]"] = df["Temperature [°C]"] - 273.15
+    # if "Temperature [°C]" in df.columns:
+    #     df["Temperature [°C]"] = df["Temperature [°C]"] - 273.15
 
     # Pivot the DataFrame
     df_pivot = df.pivot(
