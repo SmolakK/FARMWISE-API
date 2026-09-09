@@ -106,7 +106,7 @@ def test_fetch_remote_downloads_and_verifies_file(monkeypatch, tmp_path):
             rel: {
                 "kind": "file",
                 "url": "https://example.test/new.bin",
-                "sha256": hashlib.sha256(payload).hexdigest(),
+                "sha256": hashlib.sha256(payload).hexdigest().upper(),
             }
         },
     )

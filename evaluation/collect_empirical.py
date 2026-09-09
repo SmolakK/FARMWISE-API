@@ -46,7 +46,9 @@ async def collect(
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    quality_dir = output_dir / "quality"
+    collection_started = datetime.now(timezone.utc)
+    quality_run_name = collection_started.strftime("%Y%m%dT%H%M%S%fZ")
+    quality_dir = output_dir / "quality" / quality_run_name
     observations_frames = []
     runs = []
 
@@ -208,7 +210,8 @@ async def collect(
 
     payload = {
         "mode": "empirical-live",
-        "collected_at": datetime.now(timezone.utc).isoformat(),
+        "collected_at": collection_started.isoformat(),
+        "quality_report_dir": f"quality/{quality_run_name}",
         "live_scaling_repeats": scaling_repeats,
         "runs": runs,
     }

@@ -36,7 +36,12 @@ def generate_links(csv_file: str) -> pd.DataFrame:
             on_bad_lines="warn"
         )
 
-    selected_df = df[["station name", "latitude", "longitude"]].copy()
+    selected_columns = ["station name", "latitude", "longitude"]
+    selected_columns.extend(
+        column for column in ("open year", "close year")
+        if column in df.columns
+    )
+    selected_df = df[selected_columns].copy()
     selected_df["download_link"] = selected_df["station name"].apply(
         lambda x: BASE_URL.format(int(x)) if pd.notna(x) and x.strip() else "Invalid station name"
     )
@@ -126,22 +131,44 @@ async def read_data(
     csv_file = adapter_data("irish_meteo", "EPA_ireland_stations.csv")
     df = generate_links(csv_file)
 
-    async with httpx.AsyncClient() as client:
-        tasks = [check_link(client, link) for link in df["download_link"]]
-        status_results = await tqdm.gather(*tasks, desc="Checking links")
-    status_df = pd.DataFrame(status_results, columns=["download_link", "status"])
-    df_with_status = df.merge(status_df, on="download_link", how="left")
-
-    combined_df = await process_working_links(df_with_status)
-
-    if combined_df.empty:
+    # Select geographically and temporally eligible stations before any
+    # network traffic. The provider does not consistently support HEAD, so a
+    # failed HEAD request must not suppress an otherwise valid GET download.
+    north, south, east, west = spatial_range
+    df = df[
+        df["latitude"].between(south, north)
+        & df["longitude"].between(west, east)
+    ].copy()
+    requested_start = pd.Timestamp(time_range[0])
+    requested_end = pd.Timestamp(time_range[1])
+    if "open year" in df.columns:
+        opened = pd.to_numeric(df["open year"], errors="coerce")
+        df = df[opened.isna() | (opened <= requested_end.year)]
+    if "close year" in df.columns:
+        closed = pd.to_numeric(df["close year"], errors="coerce")
+        df = df[closed.isna() | (closed >= requested_start.year)]
+    if df.empty:
         return pd.DataFrame()
 
-    # --- Apply spatial filtering ---
-    unique_points = combined_df[['id', 'lat', 'lon']].drop_duplicates()
-    coordinates = prepare_coordinates(unique_points, spatial_range=spatial_range, level=level)
-
+    station_points = df[["station name", "latitude", "longitude"]].rename(
+        columns={
+            "station name": "id",
+            "latitude": "lat",
+            "longitude": "lon",
+        }
+    )
+    coordinates = prepare_coordinates(
+        station_points,
+        spatial_range=spatial_range,
+        level=level,
+    )
     if coordinates is None or coordinates.empty:
+        return pd.DataFrame()
+
+    df["status"] = 200
+    combined_df = await process_working_links(df)
+
+    if combined_df.empty:
         return pd.DataFrame()
 
     valid_ids = coordinates['id'].unique()
@@ -150,7 +177,7 @@ async def read_data(
     combined_df = combined_df.rename({'date': 'Timestamp'}, axis=1)
 
     # --- Apply time filtering ---
-    time_from, time_to = pd.to_datetime(time_range[0]), pd.to_datetime(time_range[1])
+    time_from, time_to = requested_start, requested_end
     combined_df['Timestamp'] = pd.to_datetime(combined_df['Timestamp'])
     combined_df = combined_df[(combined_df['Timestamp'] >= time_from) & (combined_df['Timestamp'] <= time_to)]
     combined_df['Timestamp'] = combined_df['Timestamp'].dt.date

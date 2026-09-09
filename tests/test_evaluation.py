@@ -95,6 +95,10 @@ async def test_empirical_collector_collects_all_scenario_groups(
     )
 
     payload = json.loads(result["runs"].read_text(encoding="utf-8"))
+    assert payload["quality_report_dir"].startswith("quality/")
+    assert result["quality_reports"] == (
+        tmp_path / "empirical-input" / payload["quality_report_dir"]
+    )
     run_kinds = [run["run_kind"] for run in payload["runs"]]
     assert run_kinds.count("coverage") == 1
     assert run_kinds.count("cross-source") == 1

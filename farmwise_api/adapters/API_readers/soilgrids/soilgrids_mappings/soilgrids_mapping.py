@@ -12,18 +12,35 @@ DATA_ALIASES = {
     'ocd': 'soil',
 }
 
-GLOBAL_MAPPING = {'bdod': 'Bulk Density CLASS',
-           'cec': 'Citation Exchange Capacity at ph7 CLASS',
-           'cfvo': 'Coarse Fragments Volumetric CLASS',
-           'clay': 'Clay Content CLASS',
-           'nitrogen': 'Nitrogen CLASS',
-           'phh2o': 'Soil pH H2O [pH] CLASS',
-           'sand': 'Sand Content CLASS',
-           'silt': 'Silt Content CLASS',
-           'soc': 'Soil Organic Carbon [%] CLASS',
-           'ocs': 'Soil Organic Carbon stock CLASS',
-           'ocd': 'Organic Carbon Densities CLASS',
-                  }
+GLOBAL_MAPPING = {
+    'bdod': 'Bulk density [kg/dm3]',
+    'cec': 'Cation exchange capacity at pH 7 [cmol(c)/kg]',
+    'cfvo': 'Coarse fragments [%]',
+    'clay': 'Clay content [%]',
+    'nitrogen': 'Total nitrogen [g/kg]',
+    'phh2o': 'Soil pH in H2O [pH]',
+    'sand': 'Sand content [%]',
+    'silt': 'Silt content [%]',
+    'soc': 'Soil organic carbon [g/kg]',
+    'ocs': 'Soil organic carbon stock [kg/m2]',
+    'ocd': 'Organic carbon density [kg/m3]',
+}
+
+# SoilGrids maps store integer values with property-specific scale factors.
+# Dividing by these values converts the rasters to the units above.
+CONVERSION_DIVISORS = {
+    'bdod': 100,
+    'cec': 10,
+    'cfvo': 10,
+    'clay': 10,
+    'nitrogen': 100,
+    'phh2o': 10,
+    'sand': 10,
+    'silt': 10,
+    'soc': 10,
+    'ocs': 10,
+    'ocd': 10,
+}
 
 DEPTH_MAPPING = {
             'bdod': 'bdod_0-5cm_mean',

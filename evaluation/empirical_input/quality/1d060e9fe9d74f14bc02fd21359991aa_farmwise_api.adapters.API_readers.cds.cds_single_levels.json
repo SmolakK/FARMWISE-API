@@ -1,0 +1,33 @@
+{
+  "S2_completeness": 0.18382352941176472,
+  "S2_level": 10,
+  "api_name": "cds_single_levels",
+  "created_at": "2026-09-07T14:31:25.251007+00:00",
+  "data_cutshort": 0.0,
+  "data_delay": 0.0,
+  "error_values": 0.0,
+  "expected_end": "2018-01-07T00:00:00",
+  "expected_s2_cells": 136,
+  "expected_start": "2018-01-01T00:00:00",
+  "factor_missing_value_rates": {
+    "Temperature [\u00b0C]": 0.0
+  },
+  "factor_missing_values": 0.0,
+  "factors_expected": [
+    "temperature"
+  ],
+  "factors_returned": [
+    "Temperature [\u00b0C]"
+  ],
+  "factors_returned_completeness": 1.0,
+  "implausible_value_rates": {
+    "Temperature [\u00b0C]": 0.0
+  },
+  "missing_days": 0.0,
+  "request_id": "1d060e9fe9d74f14bc02fd21359991aa",
+  "returned_end": "2018-01-07T00:00:00",
+  "returned_s2_cells": 25,
+  "returned_start": "2018-01-01T00:00:00",
+  "source": "farmwise_api.adapters.API_readers.cds.cds_single_levels",
+  "total_missing_values": 0.0
+}

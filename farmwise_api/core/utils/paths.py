@@ -29,6 +29,7 @@ import os
 import shutil
 import tempfile
 import threading
+import time
 import uuid
 import zipfile
 from contextlib import contextmanager
@@ -134,13 +135,33 @@ def _download(url: str, dest: Path) -> None:
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     tmp = dest.with_suffix(dest.suffix + f".part-{uuid.uuid4().hex[:8]}")
-    with requests.get(url, stream=True, timeout=60) as r:
-        r.raise_for_status()
-        with open(tmp, "wb") as f:
-            for chunk in r.iter_content(chunk_size=1 << 20):
-                if chunk:
-                    f.write(chunk)
-    os.replace(tmp, dest)  # atomic on same filesystem
+    try:
+        for attempt in range(3):
+            offset = tmp.stat().st_size if tmp.exists() else 0
+            request_options = {"stream": True, "timeout": 60}
+            if offset:
+                request_options["headers"] = {"Range": f"bytes={offset}-"}
+            try:
+                with requests.get(
+                    url,
+                    **request_options,
+                ) as response:
+                    response.raise_for_status()
+                    append = offset > 0 and response.status_code == 206
+                    with open(tmp, "ab" if append else "wb") as output:
+                        for chunk in response.iter_content(chunk_size=1 << 20):
+                            if chunk:
+                                output.write(chunk)
+                os.replace(tmp, dest)  # atomic on same filesystem
+                return
+            except requests.HTTPError:
+                raise
+            except requests.RequestException:
+                if attempt == 2:
+                    raise
+                time.sleep(2 ** attempt)
+    finally:
+        tmp.unlink(missing_ok=True)
 
 
 def fetch_remote(rel: str) -> Path:
@@ -170,7 +191,7 @@ def fetch_remote(rel: str) -> Path:
             _download(entry["url"], target)
             if entry.get("sha256") and entry["sha256"] != "REPLACE_ME":
                 digest = _sha256(target)
-                if digest != entry["sha256"]:
+                if digest.casefold() != entry["sha256"].casefold():
                     target.unlink(missing_ok=True)
                     raise ValueError(
                         f"Checksum mismatch for {rel}: expected "
@@ -185,7 +206,7 @@ def fetch_remote(rel: str) -> Path:
                 _download(entry["url"], zip_path)
                 if entry.get("sha256") and entry["sha256"] != "REPLACE_ME":
                     digest = _sha256(zip_path)
-                    if digest != entry["sha256"]:
+                    if digest.casefold() != entry["sha256"].casefold():
                         raise ValueError(
                             f"Checksum mismatch for archive {rel}: expected "
                             f"{entry['sha256']}, got {digest}."

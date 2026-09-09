@@ -22,20 +22,21 @@ async def test_read_data(mock_prepare_coordinates, mock_open_dataset, mock_cds_c
     mock_open_dataset.return_value = mock_dataset
 
     # Mock Dataset to DataFrame conversion
+    timestamps = pd.date_range("2023-01-01", periods=25, freq="h")
     mock_df = pd.DataFrame({
-        'latitude': [50.0, 50.1],
-        'longitude': [10.0, 10.1],
-        'valid_time': [datetime(2023, 1, 1, 0, 0), datetime(2023, 1, 1, 1, 0)],
-        't2m': [273.15, 274.15],  # Temperature in Kelvin
-        'tp': [0.01, 0.02],  # Precipitation in meters
-        'expver': [1, 1],
-        'number': [0, 0]
+        'latitude': [50.0] * len(timestamps),
+        'longitude': [10.0] * len(timestamps),
+        'valid_time': timestamps,
+        't2m': [273.15] * len(timestamps),
+        'tp': [0.001] * len(timestamps),
+        'expver': [1] * len(timestamps),
+        'number': [0] * len(timestamps),
     })
     mock_dataset.to_dataframe.return_value = mock_df
 
     # Define a side effect for prepare_coordinates
     def add_s2cell_column(df, spatial_range, level):
-        df['S2CELL'] = ['cell1', 'cell2']
+        df['S2CELL'] = ['cell1'] * len(df)
         return df
 
     # Assign the side effect to the mock
@@ -43,7 +44,7 @@ async def test_read_data(mock_prepare_coordinates, mock_open_dataset, mock_cds_c
 
     # Test data
     spatial_range = (50, 40, -10, 10)
-    time_range = ('2023-01-01', '2023-01-02')
+    time_range = ('2023-01-01', '2023-01-01')
     data_range = ['temperature', 'precipitation']
     level = 10
 
@@ -54,8 +55,10 @@ async def test_read_data(mock_prepare_coordinates, mock_open_dataset, mock_cds_c
     mock_retrieve.assert_called_once()
     opened_path = mock_open_dataset.call_args.args[0]
     assert str(opened_path).endswith(
-        "reanalysis-era5-single-levels_temp_data.nc"
+        "reanalysis-era5-single-levels_202301_temp_data.nc"
     )
+    request = mock_retrieve.call_args.args[1]
+    assert request["day"] == ["01", "02"]
     mock_prepare_coordinates.assert_called_once()
 
     # Validate the arguments passed to prepare_coordinates
@@ -75,7 +78,7 @@ async def test_read_data(mock_prepare_coordinates, mock_open_dataset, mock_cds_c
     assert result["Temperature [°C]"].iloc[0, 0] == pytest.approx(0)
     # Precipitation should be converted from meters to daily total in mm
     assert result["Precipitation total [mm]"].iloc[0, 0] == pytest.approx(
-        0.01 * 24 * 60 * 60
+        24.0
     )
 
     # Ensure the result is pivoted by Timestamp and S2CELL

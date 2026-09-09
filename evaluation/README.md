@@ -51,7 +51,8 @@ empirical_input/
   empirical_runs.json
   cross_source_observations_live.csv
   quality/
-    <request-id>_<source>.json
+    <collection-timestamp>/
+      <request-id>_<source>.json
 ```
 
 `empirical_runs.json` contains one record for every request, cross-source run,
@@ -66,11 +67,10 @@ decisions, and per-adapter dispatch timing.
 timestamp, cell, variable, source, value, scenario
 ```
 
-The files under `quality/` are the per-source quality reports produced during
-all successful requests. Existing files in this directory are not removed by
-a new run, while the JSON run bundle and cross-source CSV are overwritten.
-Use a clean output directory when a notebook must represent exactly one
-collection.
+The timestamped directory recorded as `quality_report_dir` in
+`empirical_runs.json` contains the per-source quality reports produced during
+that collection. Reports from earlier runs remain available, but are not read
+into the current notebook analysis.
 
 Evaluation procedure is implemented in the jupyter notebook file called "Evaluation
 summariser". It produces all the tables and plots used to evaluate the FARMWISE-API.
