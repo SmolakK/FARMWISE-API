@@ -105,3 +105,25 @@ def test_open_downloaded_dataset_extracts_zip_wrapped_netcdf(tmp_path):
     opened_path = open_dataset.call_args.args[0]
     assert opened_path.name == "data.nc"
     assert opened_path.parent.name == "extracted"
+
+
+def test_open_downloaded_dataset_reuses_extraction_directory(tmp_path):
+    import zipfile
+
+    archives = []
+    for index in range(2):
+        source = tmp_path / f"data-{index}.nc"
+        source.write_bytes(b"netcdf-placeholder")
+        archive_path = tmp_path / f"era5-{index}.zip"
+        with zipfile.ZipFile(archive_path, "w") as archive:
+            archive.write(source, arcname=source.name)
+        archives.append(archive_path)
+
+    with patch(
+        "farmwise_api.adapters.API_readers.cds.cds_single_levels.xr.open_dataset",
+        return_value=MagicMock(),
+    ) as open_dataset:
+        for archive_path in archives:
+            _open_downloaded_dataset(archive_path)
+
+    assert open_dataset.call_count == 2

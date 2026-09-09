@@ -1,11 +1,14 @@
 import pandas as pd
-from farmwise_api.core.utils.paths import adapter_data
+from farmwise_api.core.utils.paths import adapter_cache, adapter_data
 import httpx
 import asyncio
 import io
+import os
 import zipfile
 from typing import Tuple
 import re
+from uuid import uuid4
+from pyproj import Transformer
 from tqdm.asyncio import tqdm
 from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
 from farmwise_api.adapters.API_readers.irish_meteo.irish_meteo_mappings.irish_meteo_mapping import GLOBAL_MAPPING
@@ -14,6 +17,10 @@ from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGG
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
 
 BASE_URL = "https://cli.fusio.net/cli/climate_data/webdata/dly{}.zip"
+GRID_URL = (
+    "https://clidata.met.ie/cli/grids_daily/latest/rain/"
+    "IRL_DLY_RR_{year}_grid.csv.gz"
+)
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
@@ -128,67 +135,38 @@ async def read_data(
     level,
     within_source_aggregation_methods=None,
 ):
-    csv_file = adapter_data("irish_meteo", "EPA_ireland_stations.csv")
-    df = generate_links(csv_file)
-
-    # Select geographically and temporally eligible stations before any
-    # network traffic. The provider does not consistently support HEAD, so a
-    # failed HEAD request must not suppress an otherwise valid GET download.
-    north, south, east, west = spatial_range
-    df = df[
-        df["latitude"].between(south, north)
-        & df["longitude"].between(west, east)
-    ].copy()
     requested_start = pd.Timestamp(time_range[0])
     requested_end = pd.Timestamp(time_range[1])
-    if "open year" in df.columns:
-        opened = pd.to_numeric(df["open year"], errors="coerce")
-        df = df[opened.isna() | (opened <= requested_end.year)]
-    if "close year" in df.columns:
-        closed = pd.to_numeric(df["close year"], errors="coerce")
-        df = df[closed.isna() | (closed >= requested_start.year)]
-    if df.empty:
-        return pd.DataFrame()
+    if requested_start > requested_end:
+        raise ValueError("time_range start must not be after end")
 
-    station_points = df[["station name", "latitude", "longitude"]].rename(
-        columns={
-            "station name": "id",
-            "latitude": "lat",
-            "longitude": "lon",
-        }
-    )
-    coordinates = prepare_coordinates(
-        station_points,
-        spatial_range=spatial_range,
-        level=level,
-    )
-    if coordinates is None or coordinates.empty:
-        return pd.DataFrame()
+    yearly_frames = []
+    async with httpx.AsyncClient(follow_redirects=True, timeout=120) as client:
+        for year in range(requested_start.year, requested_end.year + 1):
+            dates = pd.date_range(
+                max(requested_start, pd.Timestamp(year=year, month=1, day=1)),
+                min(requested_end, pd.Timestamp(year=year, month=12, day=31)),
+                freq="D",
+            )
+            grid_path = await _download_grid(client, year)
+            yearly_frames.append(
+                await asyncio.to_thread(
+                    _read_grid_subset,
+                    grid_path,
+                    dates,
+                    spatial_range,
+                )
+            )
 
-    df["status"] = 200
-    combined_df = await process_working_links(df)
-
+    combined_df = pd.concat(yearly_frames, ignore_index=True)
     if combined_df.empty:
         return pd.DataFrame()
-
-    valid_ids = coordinates['id'].unique()
-    combined_df = combined_df[combined_df['id'].isin(valid_ids)]
-
-    combined_df = combined_df.rename({'date': 'Timestamp'}, axis=1)
-
-    # --- Apply time filtering ---
-    time_from, time_to = requested_start, requested_end
-    combined_df['Timestamp'] = pd.to_datetime(combined_df['Timestamp'])
-    combined_df = combined_df[(combined_df['Timestamp'] >= time_from) & (combined_df['Timestamp'] <= time_to)]
-    combined_df['Timestamp'] = combined_df['Timestamp'].dt.date
-
-    combined_df['precipitation [mm]'] = pd.to_numeric(combined_df['precipitation [mm]'],errors='coerce')
-
-    # Merge with coordinates to add S2CELL
-    combined_df = combined_df.merge(coordinates[['id', 'S2CELL']], on='id')
+    combined_df = prepare_coordinates(combined_df, spatial_range, level)
+    if combined_df is None or combined_df.empty:
+        return pd.DataFrame()
 
     combined_df = aggregate_to_s2(
-        combined_df[['Timestamp', 'S2CELL', 'precipitation [mm]']],
+        combined_df[["Timestamp", "S2CELL", "precipitation [mm]"]],
         logical_data_types=data_range,
         methods=(within_source_aggregation_methods
                  or WITHIN_SOURCE_AGGREGATION_METHODS),
@@ -200,3 +178,84 @@ async def read_data(
         index='Timestamp',
         columns='S2CELL',
     )
+
+
+async def _download_grid(client, year):
+    """Download and cache one official Met Éireann annual rainfall grid."""
+    filename = f"IRL_DLY_RR_{year}_grid.csv.gz"
+    target = adapter_cache("irish_meteo") / filename
+    if target.is_file():
+        return target
+
+    temporary = target.with_suffix(target.suffix + f".part-{uuid4().hex[:8]}")
+    try:
+        async with client.stream("GET", GRID_URL.format(year=year)) as response:
+            response.raise_for_status()
+            with open(temporary, "wb") as output:
+                async for chunk in response.aiter_bytes():
+                    output.write(chunk)
+        os.replace(temporary, target)
+        return target
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def _read_grid_subset(path, dates, spatial_range):
+    """Read requested days and bbox from a TM65 annual rainfall grid."""
+    date_columns = {f"X{date:%Y%m%d}" for date in dates}
+    requested_columns = {"east", "north", *date_columns}
+    north, south, east, west = spatial_range
+
+    to_tm65 = Transformer.from_crs("EPSG:4326", "EPSG:29902", always_xy=True)
+    corners = [
+        to_tm65.transform(lon, lat)
+        for lon in (west, east)
+        for lat in (south, north)
+    ]
+    eastings, northings = zip(*corners)
+    projected_west, projected_east = min(eastings) - 1000, max(eastings) + 1000
+    projected_south = min(northings) - 1000
+    projected_north = max(northings) + 1000
+
+    selected = []
+    for chunk in pd.read_csv(
+        path,
+        compression="gzip",
+        usecols=lambda column: column in requested_columns,
+        chunksize=10_000,
+    ):
+        subset = chunk[
+            chunk["east"].between(projected_west, projected_east)
+            & chunk["north"].between(projected_south, projected_north)
+        ]
+        if not subset.empty:
+            selected.append(subset)
+    if not selected:
+        return pd.DataFrame(
+            columns=["lat", "lon", "Timestamp", "precipitation [mm]"]
+        )
+
+    frame = pd.concat(selected, ignore_index=True)
+    to_wgs84 = Transformer.from_crs("EPSG:29902", "EPSG:4326", always_xy=True)
+    frame["lon"], frame["lat"] = to_wgs84.transform(
+        frame["east"].to_numpy(), frame["north"].to_numpy()
+    )
+    frame = frame[
+        frame["lat"].between(south, north)
+        & frame["lon"].between(west, east)
+    ]
+    frame = frame.melt(
+        id_vars=["lat", "lon"],
+        value_vars=sorted(date_columns),
+        var_name="Timestamp",
+        value_name="precipitation [mm]",
+    )
+    frame["Timestamp"] = pd.to_datetime(
+        frame["Timestamp"].str.removeprefix("X"),
+        format="%Y%m%d",
+    ).dt.date
+    # Values are published as tenths of a millimetre (e.g. 123 = 12.3 mm).
+    frame["precipitation [mm]"] = (
+        pd.to_numeric(frame["precipitation [mm]"], errors="coerce") / 10
+    )
+    return frame.dropna(subset=["precipitation [mm]"])
