@@ -1,4 +1,5 @@
 import asyncio
+from datetime import date
 import importlib
 import io
 import zipfile
@@ -236,39 +237,22 @@ async def test_process_working_links_combines_successful_results(
 
 @pytest.mark.asyncio
 async def test_daily_read_data_filters_space_and_time(monkeypatch):
-    monkeypatch.setattr(daily, "adapter_data", lambda *_args: "stations.csv")
-    links = pd.DataFrame(
-        {
-            "station name": ["123"],
-            "latitude": [50.0],
-            "longitude": [-8.0],
-            "download_link": ["https://example.test/dly123.zip"],
-        }
-    )
-    monkeypatch.setattr(daily, "generate_links", lambda _path: links)
-    monkeypatch.setattr(daily.httpx, "AsyncClient", _ClientContext)
     monkeypatch.setattr(
-        daily, "check_link", AsyncMock(return_value=(links.loc[0, "download_link"], 200))
+        daily, "_download_grid", AsyncMock(return_value="grid.csv.gz")
     )
-
-    async def gather(*tasks, **_kwargs):
-        return await asyncio.gather(*tasks)
-
-    monkeypatch.setattr(daily.tqdm, "gather", gather)
-    combined = pd.DataFrame(
+    grid = pd.DataFrame(
         {
-            "id": ["123", "123"],
             "lat": [50.0, 50.0],
             "lon": [-8.0, -8.0],
-            "date": pd.to_datetime(["2024-01-01", "2025-01-01"]),
-            "precipitation [mm]": ["2.5", "9.0"],
+            "Timestamp": [date(2024, 1, 1), date(2024, 1, 1)],
+            "precipitation [mm]": [2.0, 4.0],
         }
     )
     monkeypatch.setattr(
-        daily, "process_working_links", AsyncMock(return_value=combined)
+        daily, "_read_grid_subset", lambda *_args: grid
     )
 
-    def prepare(frame, **_kwargs):
+    def prepare(frame, *_args, **_kwargs):
         return frame.assign(S2CELL="cell")
 
     monkeypatch.setattr(daily, "prepare_coordinates", prepare)
@@ -280,35 +264,20 @@ async def test_daily_read_data_filters_space_and_time(monkeypatch):
         10,
     )
 
-    assert result.iloc[0, 0] == 2.5
-    processed_links = daily.process_working_links.await_args.args[0]
-    assert processed_links["status"].tolist() == [200]
-    daily.check_link.assert_not_awaited()
+    assert result.iloc[0, 0] == 3.0
 
 
 @pytest.mark.asyncio
 async def test_daily_read_data_returns_empty_when_downloads_fail(monkeypatch):
-    monkeypatch.setattr(daily, "adapter_data", lambda *_args: "stations.csv")
-    links = pd.DataFrame(
-        {
-            "station name": ["123"],
-            "latitude": [50.0],
-            "longitude": [-8.0],
-            "download_link": ["https://example.test/dly123.zip"],
-        }
-    )
-    monkeypatch.setattr(daily, "generate_links", lambda _path: links)
-    monkeypatch.setattr(daily.httpx, "AsyncClient", _ClientContext)
     monkeypatch.setattr(
-        daily, "check_link", AsyncMock(return_value=(links.loc[0, "download_link"], 0))
+        daily, "_download_grid", AsyncMock(return_value="grid.csv.gz")
     )
-
-    async def gather(*tasks, **_kwargs):
-        return await asyncio.gather(*tasks)
-
-    monkeypatch.setattr(daily.tqdm, "gather", gather)
     monkeypatch.setattr(
-        daily, "process_working_links", AsyncMock(return_value=pd.DataFrame())
+        daily,
+        "_read_grid_subset",
+        lambda *_args: pd.DataFrame(
+            columns=["lat", "lon", "Timestamp", "precipitation [mm]"]
+        ),
     )
 
     result = await daily.read_data(
@@ -319,3 +288,35 @@ async def test_daily_read_data_returns_empty_when_downloads_fail(monkeypatch):
     )
 
     assert result.empty
+
+
+def test_daily_grid_reader_converts_tm65_subset_and_tenths_mm(
+    monkeypatch, tmp_path
+):
+    grid_path = tmp_path / "grid.csv.gz"
+    pd.DataFrame(
+        {
+            "east": [10.0, 30.0],
+            "north": [50.0, 70.0],
+            "X20240101": [123, 999],
+        }
+    ).to_csv(grid_path, index=False, compression="gzip")
+
+    class IdentityTransformer:
+        def transform(self, first, second):
+            return first, second
+
+    monkeypatch.setattr(
+        daily.Transformer,
+        "from_crs",
+        lambda *_args, **_kwargs: IdentityTransformer(),
+    )
+
+    result = daily._read_grid_subset(
+        grid_path,
+        pd.date_range("2024-01-01", "2024-01-01"),
+        (51.0, 49.0, 11.0, 9.0),
+    )
+
+    assert result["precipitation [mm]"].tolist() == [12.3]
+    assert result["Timestamp"].tolist() == [date(2024, 1, 1)]

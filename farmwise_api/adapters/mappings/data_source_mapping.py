@@ -136,7 +136,7 @@ API_PATH_RANGES = {
     ),
     'farmwise_api.adapters.API_readers.irish_meteo.Irish MS_daily': (
         ((55.3822, 51.4476, -6.0024, -10.4781),
-         ('1985-01-01', CURRENT_DAY),
+         ('1941-01-01', '2025-12-31'),
          ['precipitation'],
          'daily',
          1,

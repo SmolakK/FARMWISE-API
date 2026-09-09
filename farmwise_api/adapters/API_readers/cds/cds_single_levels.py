@@ -16,7 +16,7 @@ def _open_downloaded_dataset(path):
         return xr.open_dataset(path)
 
     extract_dir = path.parent / "extracted"
-    extract_dir.mkdir()
+    extract_dir.mkdir(exist_ok=True)
     with zipfile.ZipFile(path) as archive:
         netcdf_members = [
             member
