@@ -122,6 +122,18 @@ def test_persist_quality_report_writes_standard_json(tmp_path):
     assert payload["api_name"] == "mock"
 
 
+def test_single_factor_is_not_counted_when_columns_are_unrelated():
+    assert quality_assess._factor_completeness(
+        ["land cover"], ["CORINE R", "CORINE G", "CORINE B"]
+    ) == 0
+
+
+def test_factor_completeness_recognizes_quantity_aliases():
+    assert quality_assess._factor_completeness(
+        ["groundwater quantity"], ["Groundwater level [m]"]
+    ) == 1
+
+
 def test_s2_covering_is_cached_between_source_reports(monkeypatch):
     calls = []
     quality_assess._get_s2_cells_cached.cache_clear()

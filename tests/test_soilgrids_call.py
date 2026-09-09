@@ -3,6 +3,10 @@ from unittest.mock import patch, MagicMock
 import pandas as pd
 import numpy as np
 from farmwise_api.adapters.API_readers.soilgrids.soilgrids_call import read_data
+from farmwise_api.adapters.API_readers.soilgrids.soilgrids_mappings.soilgrids_mapping import (
+    CONVERSION_DIVISORS,
+    GLOBAL_MAPPING,
+)
 
 
 @pytest.mark.asyncio
@@ -21,7 +25,10 @@ async def test_read_data(mock_soilgrids, mock_how_many, mock_prepare_coordinates
     # Mock the `fetch_soil_data` function
     def mock_fetch_soil_data_side_effect(soilgrids, soil_property, west, south, east, north, size_lon, size_lat):
         # Return a mock dataset as a numpy array
-        return np.random.rand(1, size_lat, size_lon)
+        return np.full(
+            (1, size_lat, size_lon),
+            2 * CONVERSION_DIVISORS[soil_property],
+        )
 
     mock_fetch_soil_data.side_effect = mock_fetch_soil_data_side_effect
 
@@ -52,3 +59,8 @@ async def test_read_data(mock_soilgrids, mock_how_many, mock_prepare_coordinates
     mock_how_many.assert_called_once_with(*spatial_range, level)
     assert mock_fetch_soil_data.call_count == 11  # Called once per soil property, soil mapping
     mock_prepare_coordinates.assert_called_once()
+    prepared = mock_prepare_coordinates.call_args.args[0]
+    assert prepared["lat"].iloc[0] > prepared["lat"].iloc[-1]
+    assert prepared["lon"].iloc[0] < prepared["lon"].iloc[-1]
+    for output_column in GLOBAL_MAPPING.values():
+        assert (result[output_column] == 2).all().all()

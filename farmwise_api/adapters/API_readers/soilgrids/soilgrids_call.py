@@ -3,8 +3,12 @@ from farmwise_api.core.utils.interpolate_data import how_many
 import pandas as pd
 import numpy as np
 from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
-from farmwise_api.adapters.API_readers.soilgrids.soilgrids_mappings.soilgrids_mapping import GLOBAL_MAPPING, DATA_ALIASES, DEPTH_MAPPING
-import warnings
+from farmwise_api.adapters.API_readers.soilgrids.soilgrids_mappings.soilgrids_mapping import (
+    CONVERSION_DIVISORS,
+    DATA_ALIASES,
+    DEPTH_MAPPING,
+    GLOBAL_MAPPING,
+)
 from farmwise_api.core.utils.paths import scratch_file
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
@@ -24,7 +28,11 @@ def fetch_soil_data(soilgrids, soil_property, west, south, east, north, size_lon
         height=size_lat,
         output=str(scratch_file("soilgrids", stem=f"out_{soil_property}")),
     )
-    return np.array(data)
+    values = np.asarray(data, dtype=float)
+    nodata = getattr(getattr(data, "rio", None), "nodata", None)
+    if nodata is not None:
+        values[values == nodata] = np.nan
+    return values
 
 
 async def read_data(spatial_range, time_range, data_range, level,
@@ -53,13 +61,19 @@ async def read_data(spatial_range, time_range, data_range, level,
     datasets_np = []
     for prop in data_requested:
         data = fetch_soil_data(soilgrids, prop, west, south, east, north, size_lon, size_lat)
-        datasets_np.append(data)
+        datasets_np.append(data / CONVERSION_DIVISORS[prop])
 
     datasets_np = np.stack(datasets_np, axis=0)
 
     # Create latitude and longitude grids based on the bounding box
-    latitudes = np.linspace(south, north, size_lat)
-    longitudes = np.linspace(west, east, size_lon)
+    # WCS raster rows run north-to-south and coordinates represent pixel
+    # centres, rather than the bounding-box edges.
+    latitudes = north - (
+        np.arange(size_lat) + 0.5
+    ) * (north - south) / size_lat
+    longitudes = west + (
+        np.arange(size_lon) + 0.5
+    ) * (east - west) / size_lon
 
     data_rows = []
     for i, lat in enumerate(latitudes):

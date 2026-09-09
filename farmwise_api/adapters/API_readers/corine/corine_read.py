@@ -1,126 +1,183 @@
+"""CORINE Land Cover adapter using the EEA ArcGIS feature layers."""
+
+from __future__ import annotations
+
+from datetime import date, datetime, timedelta
+
 import httpx
-import numpy as np
 import pandas as pd
-from PIL import Image
-from io import BytesIO
-from farmwise_api.core.utils.interpolate_data import how_many
-from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
-from farmwise_api.adapters.API_readers.corine.corine_mappings.corine_mapping import PARAMETERS_SELECTION
-from datetime import datetime, date
-import asyncio
-from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
-from farmwise_api.core.within_source_aggregation import aggregate_to_s2
+import s2sphere
+from shapely.geometry import Polygon, box, shape
+
+from farmwise_api.core.utils.coordinates_to_cells import get_s2_cells
 
 
-async def read_data(spatial_range, time_range, data_range, level,
-                    within_source_aggregation_methods=None):
+AVAILABLE_SNAPSHOTS = (1990, 2000, 2006, 2012, 2018)
+CLASS_FIELDS = {
+    1990: "Code_90",
+    2000: "Code_00",
+    2006: "Code_06",
+    2012: "Code_12",
+    2018: "Code_18",
+}
+OUTPUT_COLUMN = "CORINE land-cover class code"
+PAGE_SIZE = 2000
+
+
+async def read_data(
+    spatial_range,
+    time_range,
+    data_range,
+    level,
+    within_source_aggregation_methods=None,
+):
+    """Return the dominant CORINE class in every intersecting S2 cell.
+
+    CORINE is a categorical polygon dataset. The adapter therefore queries
+    the feature layer and selects the class occupying the largest intersected
+    area of each requested S2 cell. Each survey remains valid until the next
+    available CORINE snapshot.
     """
-    N = 51.2
-    S = 49.0
-    E = 17.1
-    W = 15.0
-    LEVEL = 8
-    TIME_FROM = '2010-01-01'
-    TIME_TO = '2023-12-31'
-    FACTORS = ['land cover']
+    del data_range, within_source_aggregation_methods
+    start = datetime.strptime(time_range[0], "%Y-%m-%d").date()
+    end = datetime.strptime(time_range[1], "%Y-%m-%d").date()
+    if start > end:
+        raise ValueError("time_range start must not be after end")
 
-    df = read_data((N, S, E, W),(TIME_FROM,TIME_TO),FACTORS,LEVEL)
+    cell_polygons = _s2_cell_polygons(spatial_range, level)
+    frames = []
+    async with httpx.AsyncClient(timeout=120) as client:
+        for snapshot, period_start, period_end in _snapshot_periods(start, end):
+            features = await _fetch_features(client, snapshot, spatial_range)
+            classes = _dominant_classes(cell_polygons, features, snapshot)
+            if not classes:
+                continue
+            index = pd.date_range(period_start, period_end, freq="D").date
+            frame = pd.DataFrame(
+                {
+                    cell: [class_code] * len(index)
+                    for cell, class_code in classes.items()
+                },
+                index=index,
+            )
+            frames.append(frame)
 
-    :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
-    :param time_range: A tuple containing the start and end timestamps defining the time range.
-    :param data_range: A list of properties requested.
-                       Allowed CORINE properties: 'land cover'
-    :param level: S2Cell level.
-    :return: A pandas DataFrame containing the processed data.
-    """
-    # Define the base URL for the CORINE Land Cover SERVICES
-    avail_years = [1990,2000,2006,2012,2018,2024]
-    avail_years = [(avail_years[x],avail_years[x+1]) for x in range(len(avail_years)-1)]
-    start, end = time_range
-    start = datetime.strptime(start, '%Y-%m-%d').date()
-    end = datetime.strptime(end, '%Y-%m-%d').date()
-    between_years = [(s,e) for s,e in avail_years if e >= start.year > s]
+    if not frames:
+        return pd.DataFrame()
+    result = pd.concat(frames).sort_index()
+    result.index.name = "Timestamp"
+    result.columns = pd.MultiIndex.from_product(
+        [[OUTPUT_COLUMN], result.columns], names=[None, "S2CELL"]
+    )
+    return result
 
-    stacked_df = []
-    async with httpx.AsyncClient() as client:
-        for year_start,year_end in between_years:
-            base_url = "https://image.discomap.eea.europa.eu/arcgis/rest/services/Corine/CLC{}_WM/MapServer/export".format(year_start)
 
-            # Define the query parameters
-            north, south, east, west = spatial_range
-            size_lat, size_lon = how_many(north, south, east, west, level)
+def _snapshot_periods(start: date, end: date):
+    """Yield snapshots and the request period represented by each snapshot."""
+    for position, snapshot in enumerate(AVAILABLE_SNAPSHOTS):
+        next_snapshot = (
+            date(AVAILABLE_SNAPSHOTS[position + 1], 1, 1)
+            if position + 1 < len(AVAILABLE_SNAPSHOTS)
+            else end + timedelta(days=1)
+        )
+        period_start = max(start, date(snapshot, 1, 1))
+        period_end = min(end, next_snapshot - timedelta(days=1))
+        if period_start <= period_end:
+            yield snapshot, period_start, period_end
 
-            params = {
-                'bbox': f"{west},{south},{east},{north}",  # Bounding box (xmin, ymin, xmax, ymax)
-                'bboxSR': '4326',  # Spatial reference (EPSG:4326 for WGS84)
-                'size': f"{size_lon},{size_lat}",  # Image size (width, height)
-                'imageSR': '4326',  # Spatial reference for the output image
-                'format': format,  # Output image format (e.g., png, jpeg)
-                'f': 'image'  # Return the result as an image
-            }
 
-            # Make the GET request to the API
-            response = await client.get(base_url, params=params)
+async def _fetch_features(client, snapshot, spatial_range):
+    north, south, east, west = spatial_range
+    url = (
+        "https://image.discomap.eea.europa.eu/arcgis/rest/services/"
+        f"Corine/CLC{snapshot}_WM/MapServer/0/query"
+    )
+    features = []
+    offset = 0
+    while True:
+        response = await client.get(
+            url,
+            params={
+                "where": "1=1",
+                "geometry": f"{west},{south},{east},{north}",
+                "geometryType": "esriGeometryEnvelope",
+                "inSR": "4326",
+                "outSR": "4326",
+                "spatialRel": "esriSpatialRelIntersects",
+                "outFields": CLASS_FIELDS[snapshot],
+                "returnGeometry": "true",
+                "resultOffset": offset,
+                "resultRecordCount": PAGE_SIZE,
+                "f": "geojson",
+            },
+        )
+        response.raise_for_status()
+        payload = response.json()
+        if "error" in payload:
+            raise RuntimeError(
+                f"CORINE {snapshot} query failed: {payload['error']}"
+            )
+        page = payload.get("features", [])
+        features.extend(page)
+        if len(page) < PAGE_SIZE:
+            break
+        offset += len(page)
+    return features
 
-            # Check if the response is successful
-            if response.status_code == 200:
-                print("Image successfully retrieved.")
 
-                # Process image asynchronously
-                image = await asyncio.to_thread(Image.open, BytesIO(response.content))
-                image_array = await asyncio.to_thread(np.array, image)
+def _s2_cell_polygons(spatial_range, level):
+    north, south, east, west = spatial_range
+    requested_area = box(west, south, east, north)
+    polygons = {}
+    for cell_id in get_s2_cells(spatial_range, level):
+        cell = s2sphere.Cell(cell_id)
+        vertices = []
+        for index in range(4):
+            coordinate = s2sphere.LatLng.from_point(cell.get_vertex(index))
+            vertices.append(
+                (coordinate.lng().degrees, coordinate.lat().degrees)
+            )
+        clipped = Polygon(vertices).intersection(requested_area)
+        if not clipped.is_empty:
+            polygons[cell_id] = clipped
+    return polygons
 
-                # Generate lat/lon for each pixel
-                latitudes = np.linspace(south, north, size_lat)
-                longitudes = np.linspace(west, east, size_lon)
 
-                data_rows = []
-                for i, lat in enumerate(latitudes):
-                    for j, lon in enumerate(longitudes):
-                        coors = {'lat': lat, 'lon': lon}
-                        coors.update({k:v for k,v in zip(PARAMETERS_SELECTION,image_array[i,j])})
-                        data_rows.append(coors)
+def _dominant_classes(cell_polygons, features, snapshot):
+    field = CLASS_FIELDS[snapshot].casefold()
+    feature_polygons = []
+    for feature in features:
+        geometry = feature.get("geometry")
+        if not geometry:
+            continue
+        properties = feature.get("properties", {})
+        class_code = next(
+            (
+                value
+                for key, value in properties.items()
+                if key.casefold() == field
+            ),
+            None,
+        )
+        if class_code is None:
+            continue
+        try:
+            class_code = int(class_code)
+        except (TypeError, ValueError):
+            pass
+        feature_polygons.append((shape(geometry), class_code))
 
-                # Convert data to DataFrame asynchronously
-                df = pd.DataFrame.from_dict(data_rows)
-                df = prepare_coordinates(df, spatial_range, level)
-                df = aggregate_to_s2(
-                    df,
-                    group_by=("S2CELL",),
-                    logical_data_types=data_range,
-                    methods=(within_source_aggregation_methods
-                             or WITHIN_SOURCE_AGGREGATION_METHODS),
-                    column_aggregations={"lat": "mean", "lon": "mean"},
-                ).reset_index()
+    result = {}
+    for cell_id, cell_polygon in cell_polygons.items():
+        areas = {}
+        for feature_polygon, class_code in feature_polygons:
+            if not cell_polygon.intersects(feature_polygon):
+                continue
+            area = cell_polygon.intersection(feature_polygon).area
+            areas[class_code] = areas.get(class_code, 0.0) + area
+        if areas:
+            result[cell_id] = max(areas, key=areas.get)
+    return result
 
-                # Explode to days
-                if start.year > year_start:
-                    explode_start = start
-                else:
-                    explode_start = date(year_start,1,1)
-                if year_end > end.year:
-                    explode_end = end
-                else:
-                    explode_end = date(year_end, 12, 31)
-                days = pd.date_range(explode_start, explode_end, freq='D')
-                df = pd.concat([df.assign(Timestamp=dates.date()) for dates in days])
 
-                df = df.drop(['lat', 'lon'], axis=1)
-                stacked_df.append(df)
-
-    # Concatenate and pivot data asynchronously
-    final_df = pd.concat(stacked_df)
-    final_df = final_df.pivot(index='Timestamp', columns='S2CELL')
-
-    return final_df
-
-# Define the input parameters
-N, S, E, W = 51.2, 49.0, 17.1, 15.0
-TIME_FROM, TIME_TO = '2018-01-01', '2018-12-31'
-FACTORS = ['land cover']
-LEVEL = 8
-
-# Run the async function
-if __name__ == "__main__":
-    result = asyncio.run(read_data((N, S, E, W), (TIME_FROM, TIME_TO), FACTORS, LEVEL))
-    print(result)
+__all__ = ["OUTPUT_COLUMN", "read_data"]

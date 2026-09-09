@@ -3,6 +3,7 @@ from farmwise_api.adapters.mappings.data_source_mapping import (
     DATA_SOURCE_WEIGHTS,
     DATA_TYPE_HARMONIZATION_METHODS,
     DISABLED_API_SOURCES,
+    PUBLIC_SERVER_DISABLED_SOURCES,
     WITHIN_SOURCE_AGGREGATION_METHODS,
 )
 from farmwise_api.core.harmonization import (
@@ -19,6 +20,7 @@ from farmwise_api.core.utils.interpolate_data import interpolate
 from farmwise_api.core.utils.cells_to_coordinates import extract_bbox
 from farmwise_api.core.utils.country_bboxes import return_country_bboxes
 from farmwise_api.core.utils.merge_bboxes import merge_bounding_boxes
+from farmwise_api.core.utils.access_policy import private_noncommercial_imgw_enabled
 import importlib
 import inspect
 import pandas as pd
@@ -29,6 +31,16 @@ from uuid import uuid4
 
 logger = logging.getLogger(__name__)
 COUNTRY_BBOXES = return_country_bboxes()
+
+
+def _default_disabled_sources():
+    """Return static and runtime-disabled sources for local Python calls."""
+    disabled = dict(DISABLED_API_SOURCES)
+    if not private_noncommercial_imgw_enabled():
+        for source, reason in PUBLIC_SERVER_DISABLED_SOURCES.items():
+            if ".imgw." in source or ".imgw_hydro." in source:
+                disabled[source] = reason
+    return disabled
 
 
 async def _assess_source_quality(
@@ -86,7 +98,7 @@ def plan_source_dispatch(
     using_default_sources = source_ranges is None
     source_ranges = API_PATH_RANGES if using_default_sources else source_ranges
     if disabled_sources is None:
-        disabled_sources = DISABLED_API_SOURCES if using_default_sources else {}
+        disabled_sources = _default_disabled_sources() if using_default_sources else {}
     requested_factors = set(factors or [])
     plan = []
 
@@ -199,7 +211,7 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
         raise ValueError("You must provide either a 'bounding_box' or a 'country' parameter.")
 
     precheck_started = perf_counter()
-    effective_disabled_sources = dict(DISABLED_API_SOURCES)
+    effective_disabled_sources = _default_disabled_sources()
     if disabled_sources:
         effective_disabled_sources.update(disabled_sources)
     dispatch_plan = plan_source_dispatch(

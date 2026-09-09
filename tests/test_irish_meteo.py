@@ -281,6 +281,9 @@ async def test_daily_read_data_filters_space_and_time(monkeypatch):
     )
 
     assert result.iloc[0, 0] == 2.5
+    processed_links = daily.process_working_links.await_args.args[0]
+    assert processed_links["status"].tolist() == [200]
+    daily.check_link.assert_not_awaited()
 
 
 @pytest.mark.asyncio

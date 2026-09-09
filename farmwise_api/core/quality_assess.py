@@ -252,15 +252,38 @@ def _factor_completeness(
 ) -> float | None:
     if not expected_factors:
         return None
-    normalized_columns = [column.lower() for column in returned_columns]
+    normalized_columns = [_normalize_factor_text(column) for column in returned_columns]
+    aliases = {
+        "groundwater quantity": (
+            "groundwater depth",
+            "groundwater level",
+            "water table depth",
+        ),
+        "surface water quantity": (
+            "surface water level",
+            "water level",
+            "flow",
+            "discharge",
+        ),
+    }
     matched = {
         factor
         for factor in expected_factors
-        if any(factor.lower() in column for column in normalized_columns)
+        if any(
+            term in column
+            for column in normalized_columns
+            for term in (
+                _normalize_factor_text(factor),
+                *aliases.get(_normalize_factor_text(factor), ()),
+            )
+        )
     }
-    if len(expected_factors) == 1 and returned_columns:
-        matched.update(expected_factors)
     return len(matched) / len(expected_factors)
+
+
+def _normalize_factor_text(value: Any) -> str:
+    """Normalize labels before matching logical factors to output columns."""
+    return " ".join(re.sub(r"[^a-z0-9]+", " ", str(value).lower()).split())
 
 
 def _implausible_value_rates(

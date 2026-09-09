@@ -92,7 +92,8 @@ async def test_read_data(mock_dwd_request, mock_prepare_coordinates):
                 "dataset": "climate_summary",
                 "parameter": "temperature_air_mean_2m",
                 "date": "2017-01-10T00:00:00+00:00",
-                "value": 267.95,
+                # Wetterdienst climate summaries are already expressed in °C.
+                "value": -5.2,
                 "quality": 9.0
             },
         ]
@@ -121,7 +122,7 @@ async def test_read_data(mock_dwd_request, mock_prepare_coordinates):
     assert "Precipitation total [mm]" in result.columns.levels[0]
     assert "cell1" in result.columns.levels[1]
     mock_prepare_coordinates.assert_called_once()
-    assert result['Temperature [°C]'].values[0][0] == pytest.approx(-5.2)  # validate temperature convertion
+    assert result['Temperature [°C]'].values[0][0] == pytest.approx(-5.2)
     assert isinstance(result.index, pd.DatetimeIndex)
     settings = mock_dwd_request.call_args.kwargs["settings"]
     assert settings["cache_disable"] is True

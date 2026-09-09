@@ -409,6 +409,45 @@ def test_plan_source_dispatch_skips_disabled_source():
     assert plan[0]["disabled_reason"] == "retired upstream"
 
 
+def test_default_precheck_rejects_imgw_without_private_use_acknowledgement(
+    monkeypatch,
+):
+    from farmwise_api.core.main_call import plan_source_dispatch
+
+    monkeypatch.delenv("FARMWISE_ENABLE_PRIVATE_IMGW", raising=False)
+    plan = plan_source_dispatch(
+        (52.0, 51.0, 20.0, 19.0),
+        "2024-01-01",
+        "2024-01-02",
+        ["temperature"],
+    )
+    imgw = next(
+        item for item in plan
+        if item["source"].endswith("imgw.imgw_api_synop_daily")
+    )
+
+    assert imgw["dispatched"] is False
+    assert "private" in imgw["disabled_reason"]
+
+
+def test_default_precheck_rejects_unverified_ifsgrid_archive():
+    from farmwise_api.core.main_call import plan_source_dispatch
+
+    plan = plan_source_dispatch(
+        (51.0, 50.0, 11.0, 10.0),
+        "2020-01-01",
+        "2020-01-02",
+        ["land cover"],
+    )
+    ifsgrid = next(
+        item for item in plan
+        if item["source"].endswith("IFSGRID.IFSGRID_read")
+    )
+
+    assert ifsgrid["dispatched"] is False
+    assert "checksum" in ifsgrid["disabled_reason"]
+
+
 @pytest.mark.asyncio
 async def test_read_data_passes_within_source_policy_to_supported_adapter(
     monkeypatch,

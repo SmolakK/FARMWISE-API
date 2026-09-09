@@ -215,6 +215,11 @@ DISABLED_API_SOURCES = {
         'CORRECTIV.Lokal research data is protected and has no confirmed '
         'redistribution permission. The source is excluded from dispatch.'
     ),
+    'farmwise_api.adapters.API_readers.IFSGRID.IFSGRID_read': (
+        'The current upstream IFSGRID archive does not match the pinned '
+        'checksum. Dispatch is disabled until the replacement release is '
+        'independently verified.'
+    ),
 }
 
 # Sources available only to an informed local, private, non-commercial user.
