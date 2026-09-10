@@ -9,9 +9,7 @@ from farmwise_api.core.utils.paths import PROJECT_ROOT
 from farmwise_api.server.logging_config import logger
 
 
-SMTP_ENV_FILE = Path(
-    os.environ.get("FARMWISE_SMTP_ENV_FILE", PROJECT_ROOT / "smtp.env")
-).resolve()
+SMTP_ENV_FILE = Path(os.environ.get("FARMWISE_SMTP_ENV_FILE", PROJECT_ROOT / "farmwise_api" / "server" / "smtp.env")).resolve()
 
 
 def _smtp_config():

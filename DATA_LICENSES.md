@@ -1,6 +1,6 @@
 # FARMWISE data licensing and attribution register
 
-Last reviewed: 2026-08-07
+Last reviewed: 2026-09-10
 
 This register covers third-party datasets accessed, cached, transformed, or
 redistributed by FARMWISE. The Apache License 2.0 in [`LICENSE`](LICENSE)
@@ -123,19 +123,23 @@ licence, access date, and modification notices listed below.
 - **Provider:** Instytut Meteorologii i Gospodarki Wodnej — Państwowy Instytut
   Badawczy (IMGW-PIB)
 - **Source and terms:** <https://danepubliczne.imgw.pl/datastore>
-- **Permitted purpose in FARMWISE:** **private, non-commercial local use
-  only**. The adapter is disabled in all public server entry points. Local use
-  additionally requires the explicit acknowledgement
-  `FARMWISE_ENABLE_PRIVATE_IMGW=1`.
+- **Permitted purpose in FARMWISE:** local private/non-commercial use and
+  academic research or teaching by an eligible university or research
+  institution, subject to the current IMGW-PIB terms. The adapter is disabled
+  in all public server entry points. Academic evaluation additionally requires
+  the explicit acknowledgement `FARMWISE_ENABLE_RESEARCH_IMGW=1` (the legacy
+  `FARMWISE_ENABLE_PRIVATE_IMGW` name remains accepted).
 - **Required attribution:** include the exact statement
   `Źródłem pochodzenia danych jest Instytut Meteorologii i Gospodarki Wodnej – Państwowy Instytut Badawczy`.
   For processed data also include
   `Dane Instytutu Meteorologii i Gospodarki Wodnej – Państwowego Instytutu Badawczego zostały przetworzone`.
-- **Redistribution status:** **Prohibited by FARMWISE policy**. Do not bundle,
-  mirror, publish, cache for sharing, expose through a hosted API, or include
-  IMGW source/derived data in GitHub, PyPI, Zenodo, containers, evaluation
-  logs, figures, or downloadable exports. Commercial or other non-private use
-  requires a separate agreement with IMGW-PIB and a subsequent policy review.
+- **Redistribution status:** **Conditional**. Do not bundle or mirror IMGW
+  source datasets or station files in GitHub releases, PyPI, Zenodo, or
+  containers, and do not expose them through the public FARMWISE server.
+  Academic evaluation statistics and figures may be published when the
+  required source and processing notices are retained. Commercial or other
+  uses outside the stated terms require a separate agreement with IMGW-PIB and
+  a subsequent policy review.
 
 ### GIOŚ soil monitoring and groundwater monitoring
 

@@ -9,9 +9,10 @@ from evaluation import collect_empirical as empirical_collector
 from evaluation import run_all as empirical_runner
 from evaluation.collect_cross_source import (
     separate_frame_to_observations,
+    summarise_source_comparison,
     validate_private_output,
 )
-from evaluation.scenarios import LIVE_SCALING_SCENARIOS
+from evaluation.scenarios import CROSS_SOURCE_SCENARIOS, LIVE_SCALING_SCENARIOS
 
 
 @pytest.mark.asyncio
@@ -132,6 +133,54 @@ def test_separate_frame_conversion_extracts_source_and_logical_variable():
     assert set(result["variable"]) == {"temperature", "precipitation"}
 
 
+def test_poland_cross_source_scenario_requires_imgw_and_era5():
+    scenario = next(
+        request
+        for request in CROSS_SOURCE_SCENARIOS
+        if request["scenario"] == "cross-source-poland-imgw-era5"
+    )
+
+    assert scenario["country"] == "Poland"
+    assert scenario["required_sources"] == ["IMGW", "ERA5"]
+    assert scenario["factors"] == ["temperature", "precipitation"]
+
+
+def test_cross_source_summary_requires_both_sources_and_shared_keys():
+    observations = pd.DataFrame(
+        [
+            {
+                "timestamp": "2018-01-01",
+                "cell": "cell-1",
+                "variable": "temperature",
+                "source": "IMGW",
+                "value": 1.0,
+            },
+            {
+                "timestamp": "2018-01-01",
+                "cell": "cell-1",
+                "variable": "temperature",
+                "source": "ERA5",
+                "value": 2.0,
+            },
+        ]
+    )
+
+    summary = summarise_source_comparison(
+        observations, required_sources=["IMGW", "ERA5"]
+    )
+
+    assert summary["comparison_ready"] is True
+    assert summary["missing_sources"] == []
+    assert summary["overlapping_observation_keys"] == 1
+
+    missing_imgw = summarise_source_comparison(
+        observations[observations["source"] == "ERA5"],
+        required_sources=["IMGW", "ERA5"],
+    )
+    assert missing_imgw["comparison_ready"] is False
+    assert missing_imgw["missing_sources"] == ["IMGW"]
+
+
 def test_live_scaling_scenarios_include_requested_duration_sweep():
     duration_cases = [
         request
@@ -156,18 +205,29 @@ def test_live_scaling_scenarios_include_requested_duration_sweep():
         assert request["factors"] == ["temperature", "precipitation"]
 
 
-def test_live_imgw_output_is_rejected_inside_repository(monkeypatch, tmp_path):
-    monkeypatch.setattr(live_collector, "PROJECT_ROOT", tmp_path)
+def test_live_imgw_output_is_rejected_inside_package(monkeypatch, tmp_path):
+    monkeypatch.setattr(live_collector, "PACKAGE_ROOT", tmp_path / "farmwise_api")
     observations = pd.DataFrame({"source": ["IMGW"], "value": [1.0]})
 
-    with pytest.raises(PermissionError, match="outside the repository"):
+    with pytest.raises(PermissionError, match="distributable"):
         validate_private_output(
-            tmp_path / "evaluation" / "live.csv", observations
+            tmp_path / "farmwise_api" / "data" / "live.csv", observations
         )
 
 
+def test_live_imgw_evaluation_output_may_remain_outside_package(
+    monkeypatch, tmp_path
+):
+    monkeypatch.setattr(live_collector, "PACKAGE_ROOT", tmp_path / "farmwise_api")
+    observations = pd.DataFrame({"source": ["IMGW"], "value": [1.0]})
+
+    assert validate_private_output(
+        tmp_path / "evaluation" / "live.csv", observations
+    ) is None
+
+
 def test_non_imgw_live_output_may_remain_in_repository(monkeypatch, tmp_path):
-    monkeypatch.setattr(live_collector, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(live_collector, "PACKAGE_ROOT", tmp_path / "farmwise_api")
     observations = pd.DataFrame({"source": ["ERA5"], "value": [1.0]})
 
     assert (

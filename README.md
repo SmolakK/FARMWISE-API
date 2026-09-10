@@ -102,18 +102,20 @@ the repository, packages and remote-data manifest, and its adapter is disabled
 from dispatch. Do not publish or mirror source or derived row-level data
 without explicit written permission covering the exact dataset and use.
 
-IMGW-PIB data is enabled only for private, non-commercial local use. It is
-blocked by every server entry point and its station files are not distributed
-in pip packages. A permitted local user must privately populate
+IMGW-PIB data is enabled only for permitted local private/non-commercial or
+academic-research use. It is blocked by every server entry point and its
+station files are not distributed in pip packages. A permitted local user must
+privately populate
 `FARMWISE_DATA_DIR` and explicitly acknowledge the restriction before use:
 
 ```powershell
-$env:FARMWISE_ENABLE_PRIVATE_IMGW = "1"
+$env:FARMWISE_ENABLE_RESEARCH_IMGW = "1"
 ```
 
-Do not set this variable on a public or commercial deployment. IMGW source or
-derived data must not be written to public exports, evaluation outputs, shared
-caches, GitHub, PyPI, Zenodo, or container images.
+Do not set this variable on a public or commercial deployment. IMGW source
+datasets and station files must not be bundled in GitHub releases, PyPI,
+Zenodo, or container images. Academic outputs derived from IMGW observations
+must retain the attribution and processing notices in `DATA_LICENSES.md`.
 
 Keep private datasets outside the repository, preferably in a directory
 mounted through `FARMWISE_DATA_DIR`. Local data directories, credentials,
@@ -290,10 +292,16 @@ python -m pip install -e ".[evaluation]"
 python -m evaluation.run_all
 ```
 
-`run_all.py` and `collect_empirical.py` perform the same data collection and
-accept no command-line arguments. Scenario definitions and collection settings
-are explicit in the Python source. Statistical analysis and figure generation
-are performed separately in the evaluation notebooks.
+For a permitted local academic evaluation that includes the IMGW--ERA5 Poland
+comparison, run:
+
+```powershell
+python -m evaluation.collect_empirical --include-imgw-research
+```
+
+Scenario definitions and collection settings are explicit in the Python
+source. Statistical analysis and figure generation are performed separately
+in the evaluation notebook.
 
 ## License
 

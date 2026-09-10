@@ -426,10 +426,10 @@ if __name__ == "__main__":
     #     produce_map=True
     # ))
     asyncio.run(read_data(
-        country=['Ireland'],
+        country=['Poland'],
         level=10,
         time_from='2010-01-10',
-        time_to='2010-01-13',
+        time_to='2010-01-10',
         factors=[
             'temperature', 'precipitation','surface water quality','groundwater quantity','groundwater quality','soil',
             'land cover', 'surface water quantity'],

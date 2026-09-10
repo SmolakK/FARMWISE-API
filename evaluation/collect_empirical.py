@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+import argparse
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import random
 import sys
@@ -15,8 +17,13 @@ import pandas as pd
 from tqdm import tqdm
 
 from farmwise_api.core.main_call import plan_source_dispatch, read_data
+from farmwise_api.core.utils.access_policy import (
+    IMGW_RESEARCH_USE_ENV,
+    private_noncommercial_imgw_enabled,
+)
 from evaluation.collect_cross_source import (
     separate_frame_to_observations,
+    summarise_source_comparison,
     validate_private_output,
 )
 from evaluation.scenarios import (
@@ -168,6 +175,14 @@ async def collect(
 
             if run_kind == "cross-source":
                 observations = separate_frame_to_observations(frame)
+                runs[-1]["cross_source_comparison"] = (
+                    summarise_source_comparison(
+                        observations,
+                        required_sources=request.get(
+                            "required_sources", []
+                        ),
+                    )
+                )
                 if not observations.empty:
                     observations["scenario"] = request["scenario"]
                     observations_frames.append(observations)
@@ -211,6 +226,15 @@ async def collect(
     payload = {
         "mode": "empirical-live",
         "collected_at": collection_started.isoformat(),
+        "imgw_research_use_enabled": private_noncommercial_imgw_enabled(),
+        "imgw_attribution": (
+            "Źródłem pochodzenia danych jest Instytut Meteorologii i "
+            "Gospodarki Wodnej – Państwowy Instytut Badawczy. Dane "
+            "Instytutu Meteorologii i Gospodarki Wodnej – Państwowego "
+            "Instytutu Badawczego zostały przetworzone."
+            if private_noncommercial_imgw_enabled()
+            else None
+        ),
         "quality_report_dir": f"quality/{quality_run_name}",
         "live_scaling_repeats": scaling_repeats,
         "runs": runs,
@@ -230,6 +254,21 @@ async def collect(
 
 def main() -> None:
     """Collect the scenarios configured in ``evaluation.scenarios``."""
+    parser = argparse.ArgumentParser(
+        description="Collect FARMWISE live empirical evaluation inputs."
+    )
+    parser.add_argument(
+        "--include-imgw-research",
+        action="store_true",
+        help=(
+            "Acknowledge permitted local academic-research use of IMGW data. "
+            "IMGW remains disabled in public server entry points and its "
+            "local station files remain excluded from distributions."
+        ),
+    )
+    args = parser.parse_args()
+    if args.include_imgw_research:
+        os.environ[IMGW_RESEARCH_USE_ENV] = "1"
     result = asyncio.run(
         collect(
             scenarios=REQUEST_SCENARIOS,

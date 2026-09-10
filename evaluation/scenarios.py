@@ -155,14 +155,18 @@ CROSS_SOURCE_SCENARIOS = [
         "time_to": "2018-01-31",
         "factors": ["precipitation"],
     },
+    # IMGW station observations vs ERA5 reanalysis.  The relatively broad
+    # two-degree box contains several IMGW synoptic stations and, at S2 level
+    # 10, shared cells with the ERA5 grid for direct paired comparisons.
     {
-        "scenario": "cross-source-poland-meteo",
+        "scenario": "cross-source-poland-imgw-era5",
         "country": "Poland",
         "bounding_box": (52.5, 50.5, 21.0, 18.0),
         "level": 10,
         "time_from": "2018-01-01",
         "time_to": "2018-01-31",
         "factors": ["temperature", "precipitation"],
+        "required_sources": ["IMGW", "ERA5"],
     }
 ]
 
