@@ -31,6 +31,7 @@ async def test_read_data(
         else:  # Handles other CSV files (e.g., imgw_coordinates.csv)
             return pd.DataFrame({
                 "Code": [250180460, 254230010, 250190430, 250210030],
+                "Value": [550, 551, 552, 553],
                 "Name": ["ADAMOWICE,Poland", "ALEKSANDRĂ“WKA,Poland", "ALWERNIA,Poland", "ANNOPOL,Poland"],
                 "lat": [51.9399783, 51.5719923, 50.0690434, 50.8851655],
                 "lon": [20.4814776, 21.5422823, 19.5396737, 21.8550836]
@@ -46,15 +47,11 @@ async def test_read_data(
     mock_prepare_coordinates.side_effect = mock_prepare
 
     # Create a valid in-memory ZIP file
-    zip_buffer_t = BytesIO()
-    with zipfile.ZipFile(zip_buffer_t, mode="w") as zf:
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, mode="w") as zf:
         zf.writestr("_t_file.csv", "Station code,Year,Month,Day,Temperature [°C]\n250180460,2020,01,01,5.2")
-    zip_buffer_t.seek(0)
-
-    zip_buffer_d_t = BytesIO()
-    with zipfile.ZipFile(zip_buffer_d_t , mode="w") as zf:
         zf.writestr("_d_file.csv", "Station code,Year,Month,Day,Temperature [°C]\n250180460,2020,01,01,5.2")
-    zip_buffer_d_t.seek(0)
+    zip_buffer.seek(0)
 
     # Define the dynamic mock_get function
     async def mock_get(url, params=None, **kwargs):
@@ -64,23 +61,19 @@ async def test_read_data(
                 status_code=200,
                 text="<a href='2020/'>2020/</a><a href='2021/'>2021/</a>"
             )
-        elif ("/2020" in url or "/2021" in url) and not 'file' in url:
+        elif url.rstrip("/").endswith(("/2020", "/2021")):
             # Simulate the response for a specific year folder listing files
             return AsyncMock(
                 status_code=200,
-                text="<a href='file1.zip'>file1.zip</a><a href='file2.zip'>file2.zip</a>"
+                text=(
+                    "<a href='2020_550_s.zip'>selected</a>"
+                    "<a href='2020_999_s.zip'>outside bbox</a>"
+                )
             )
-        elif url.endswith("file1.zip"):
-            # Simulate the response for downloading zip files
+        elif url.endswith("2020_550_s.zip"):
             return AsyncMock(
                 status_code=200,
-                content=zip_buffer_t.getvalue()
-            )
-        elif url.endswith("file2.zip"):
-            # Simulate the response for downloading zip files
-            return AsyncMock(
-                status_code=200,
-                content=zip_buffer_d_t.getvalue()
+                content=zip_buffer.getvalue()
             )
         else:
             # Default to a generic 404 error
@@ -94,7 +87,7 @@ async def test_read_data(
 
     # Test parameters
     spatial_range = (50.0, 40.0, 10.0, 0.0)
-    time_range = ("2020-01-01", "2021-12-31")
+    time_range = ("2020-01-01", "2020-12-31")
     data_range = ["temperature", "precipitation"]
     level = 8
 
@@ -105,3 +98,9 @@ async def test_read_data(
     assert result is not None
     assert "S2CELL" in result.columns.names
     assert isinstance(result, pd.DataFrame)
+    assert "Value" not in result.columns.get_level_values(0)
+    requested_urls = [
+        call.args[0]
+        for call in mock_httpx_client.return_value.__aenter__.return_value.get.await_args_list
+    ]
+    assert not any(url.endswith("2020_999_s.zip") for url in requested_urls)

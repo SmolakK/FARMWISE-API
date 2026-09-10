@@ -1,3 +1,4 @@
+import asyncio
 import httpx
 import pandas as pd
 import warnings
@@ -18,6 +19,23 @@ from datetime import datetime
 
 URL = "https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteorologiczne/dobowe/synop"
 SPACE_TIME_COLUMNS = ['Station code', 'Year', 'Month', 'Day', 'Code', 'lat', 'lon', 'Name']
+
+
+async def _get_with_retries(client, url, attempts=3):
+    """Fetch an IMGW directory or archive with bounded transport retries."""
+    for attempt in range(1, attempts + 1):
+        try:
+            response = await client.get(url, timeout=60)
+            # Avoid invoking the status helper for successful responses.  This
+            # also keeps lightweight async test doubles compatible with the
+            # real httpx response API, where raise_for_status is synchronous.
+            if response.status_code >= 400:
+                response.raise_for_status()
+            return response
+        except (httpx.TransportError, httpx.HTTPStatusError):
+            if attempt == attempts:
+                raise
+            await asyncio.sleep(attempt)
 
 
 async def read_data(spatial_range, time_range, data_range, level,
@@ -49,44 +67,67 @@ async def read_data(spatial_range, time_range, data_range, level,
     data_requested = set([k for k, v in DATA_ALIASES.items() if v in data_range])
 
     async with httpx.AsyncClient(follow_redirects=True) as client:
-        response = await client.get(URL)
-        if response.status_code == 200:
-            # Parse the HTML content
-            soup = BeautifulSoup(response.text, 'html.parser')
+        response = await _get_with_retries(client, URL)
+        # Parse the HTML content
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-            # Find all links (assuming directory listing is in <a> tags)
-            links = soup.find_all('a')
+        # Find all links (assuming directory listing is in <a> tags)
+        links = soup.find_all('a')
 
-            # Extract folder names
-            folders = [link['href'].replace('/','') for link in links if link['href'].endswith('/')]
-            folders = [year for year in folders if re.match(r'^\d{4}(_\d{4})?$', year)]
+        # Extract folder names
+        folders = [link['href'].replace('/','') for link in links if link['href'].endswith('/')]
+        folders = [year for year in folders if re.match(r'^\d{4}(_\d{4})?$', year)]
 
-            # Expand names for searching
-            expanded_years = {}
-            for item in folders:
-                expanded_years.update(expand_range(item))
+        # Expand names for searching
+        expanded_years = {}
+        for item in folders:
+            expanded_years.update(expand_range(item))
 
-            read_urls = [urljoin(URL+'/', expanded_years[x]) for x in years]
-        else:
-            warnings.warn("IMGW server not responding")
+        if any(year not in expanded_years for year in years):
+            warnings.warn("Requested year is not available from IMGW")
             return None
+        read_urls = [urljoin(URL+'/', expanded_years[x]) for x in years]
 
     s_d_files = []
     s_d_t_files = []
 
     # Process URLs
+    station_keys = {
+        str(int(value))
+        for value in coordinates.get("Value", pd.Series(dtype=float)).dropna()
+    }
     async with httpx.AsyncClient(follow_redirects=True) as client:
         for url in tqdm(read_urls,total=len(read_urls)):
-            response = await client.get(url)
-            if response.status_code == 200:
+            try:
+                response = await _get_with_retries(client, url)
                 # Parse HTML to find file links
                 soup = BeautifulSoup(response.text, 'html.parser')
                 links = soup.find_all('a')
-                file_names = [link['href'] for link in links if '.' in link['href']]
+                file_names = [
+                    link['href']
+                    for link in links
+                    if link.get('href', '').lower().endswith('.zip')
+                ]
+                # Recent IMGW folders contain one archive per station.  Only
+                # fetch stations retained by the spatial preselection rather
+                # than every station in Poland.
+                matching_files = [
+                    file_name
+                    for file_name in file_names
+                    if not station_keys
+                    or any(
+                        re.search(rf"_{re.escape(key)}_s\.zip$", file_name)
+                        for key in station_keys
+                    )
+                ]
 
-                for file_name in file_names:
+                for file_name in matching_files:
                     zip_url = urljoin(url + '/', file_name)
-                    zip_response = await client.get(zip_url)
+                    try:
+                        zip_response = await _get_with_retries(client, zip_url)
+                    except (httpx.TransportError, httpx.HTTPStatusError) as error:
+                        warnings.warn(f"Skipping unavailable IMGW archive {zip_url}: {error}")
+                        continue
 
                     # Process zip files asynchronously
                     with ZipFile(io.BytesIO(zip_response.content)) as zip_ref:
@@ -103,10 +144,12 @@ async def read_data(spatial_range, time_range, data_range, level,
                                 data_selection += SPACE_TIME_COLUMNS
                                 s_d_file = s_d_file.loc[:, s_d_file.columns.intersection(data_selection)]
                                 s_d_files.append(s_d_file)
-            else:
-                warnings.warn("IMGW server not responding")
+            except (httpx.TransportError, httpx.HTTPStatusError) as error:
+                warnings.warn(f"IMGW server not responding for {url}: {error}")
 
     # Concatenate dataframes
+    if not s_d_files or not s_d_t_files:
+        return pd.DataFrame()
     s_d = pd.concat(s_d_files)
     s_d_t = pd.concat(s_d_t_files)
 
@@ -123,7 +166,9 @@ async def read_data(spatial_range, time_range, data_range, level,
 
     # Drop overlapping columns
     s_d_merged = s_d_merged.loc[:, [col for col in s_d_merged.columns if '_right' not in col]]
-    s_d_merged.drop(['Unnamed: 0'], axis=1, errors='ignore', inplace=True)
+    # ``Value`` is the station identifier from IMGW's station catalogue.  It
+    # is used to select archives but is metadata, not an observed factor.
+    s_d_merged.drop(['Unnamed: 0', 'Value'], axis=1, errors='ignore', inplace=True)
 
     # Map to global names
     s_d_merged = s_d_merged.rename(GLOBAL_MAPPING, axis=1)

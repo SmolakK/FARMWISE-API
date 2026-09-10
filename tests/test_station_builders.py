@@ -42,7 +42,7 @@ def test_gios_station_builder_does_not_write_empty_result(monkeypatch, tmp_path)
 @pytest.mark.parametrize(
     "module, csv_text, expected_code",
     [
-        (imgw_api_stations, "123,Wroclaw,value\n", 123),
+        (imgw_api_stations, "123,Wroclaw,295\n", 123),
         (imgw_hydro_stations_api, "Wroclaw,456,value\n", 456),
     ],
 )

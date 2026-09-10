@@ -1,4 +1,4 @@
-"""Runtime acknowledgements for sources with restricted usage terms."""
+"""Runtime acknowledgements for sources with usage-specific terms."""
 
 from __future__ import annotations
 
@@ -6,12 +6,20 @@ import os
 
 
 IMGW_PRIVATE_USE_ENV = "FARMWISE_ENABLE_PRIVATE_IMGW"
+IMGW_RESEARCH_USE_ENV = "FARMWISE_ENABLE_RESEARCH_IMGW"
 _TRUE_VALUES = {"1", "true", "yes", "on"}
 
 
 def private_noncommercial_imgw_enabled() -> bool:
-    """Return whether local private, non-commercial IMGW use was acknowledged."""
-    return os.getenv(IMGW_PRIVATE_USE_ENV, "").strip().lower() in _TRUE_VALUES
+    """Return whether permitted local IMGW use was acknowledged.
+
+    ``FARMWISE_ENABLE_PRIVATE_IMGW`` is retained as a backwards-compatible
+    alias.  Academic evaluation should use ``FARMWISE_ENABLE_RESEARCH_IMGW``.
+    """
+    return any(
+        os.getenv(name, "").strip().lower() in _TRUE_VALUES
+        for name in (IMGW_RESEARCH_USE_ENV, IMGW_PRIVATE_USE_ENV)
+    )
 
 
 def require_private_noncommercial_imgw() -> None:
@@ -19,6 +27,7 @@ def require_private_noncommercial_imgw() -> None:
     if not private_noncommercial_imgw_enabled():
         raise PermissionError(
             "IMGW-PIB access is disabled by default. It may be enabled only "
-            "for private, non-commercial local use by setting "
-            f"{IMGW_PRIVATE_USE_ENV}=1. Public/server use remains disabled."
+            "for permitted local private/non-commercial or academic research "
+            "use by setting "
+            f"{IMGW_RESEARCH_USE_ENV}=1. Public/server use remains disabled."
         )

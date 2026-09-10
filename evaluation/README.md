@@ -6,7 +6,7 @@ notebooks.
 
 ## Running the collection
 
-Run either entry point from the repository root:
+Run the standard collection from the repository root:
 
 ```powershell
 python -m evaluation.collect_empirical
@@ -18,14 +18,23 @@ or:
 python -m evaluation.run_all
 ```
 
-Both commands execute the same collection. There are no command-line
-arguments or parser. `run_all.py` is only a short convenience entry point; it
-does not calculate metrics or generate figures.
+For a permitted local academic-research evaluation that includes IMGW, use:
+
+```powershell
+python -m evaluation.collect_empirical --include-imgw-research
+```
+
+The flag is an explicit acknowledgement of the IMGW terms. It does not enable
+IMGW in the public server, and IMGW station files and downloaded source data
+remain excluded from wheels and source distributions. `run_all.py` is only a
+short convenience entry point; it does not calculate metrics or generate
+figures.
 
 The scenario definitions are kept in `evaluation/scenarios.py`:
 
 - `REQUEST_SCENARIOS` exercises coverage pre-check and ordinary requests;
-- `CROSS_SOURCE_SCENARIOS` collects separate, non-harmonized source values;
+- `CROSS_SOURCE_SCENARIOS` collects separate, non-harmonized source values,
+  including an explicit IMGW--ERA5 comparison over central Poland;
 - `LIVE_SCALING_SCENARIOS` varies S2 level, bounding-box area, factor count,
   and requested duration. The duration sweep covers 1, 7, 30, and 90 inclusive
   days while holding the other request parameters fixed.
@@ -58,7 +67,10 @@ empirical_input/
 `empirical_runs.json` contains one record for every request, cross-source run,
 and live-scaling repeat. Records include request parameters, run type, status,
 wall time, peak Python-traced memory, returned data sizes, coverage-precheck
-decisions, and per-adapter dispatch timing.
+decisions, and per-adapter dispatch timing. Cross-source records also identify
+required, observed, and missing sources and count exact timestamp--S2
+cell--variable keys shared by all required sources. `comparison_ready` is true
+only when both required sources returned data and at least one such key exists.
 
 `cross_source_observations_live.csv` contains only the scenarios declared in
 `CROSS_SOURCE_SCENARIOS`. Its columns are:
@@ -81,10 +93,12 @@ ERA5 collection requires an ECMWF/CDS account, acceptance of the dataset
 terms, and a configured `.cdsapirc`. The FARMWISE server login is unrelated to
 CDS authentication.
 
-IMGW may be used only according to the private, non-commercial policy recorded
-in `DATA_LICENSES.md`. Do not publish raw or derived IMGW observations without
-separate permission. The collector retains the safeguard that rejects IMGW
-observations written into the repository.
+IMGW may be used locally for permitted academic research according to the
+terms recorded in `DATA_LICENSES.md`. Research outputs must identify IMGW-PIB
+as the source and state that the observations were processed. Do not bundle
+IMGW station files or downloaded source datasets in the Python package; the
+packaging manifest explicitly excludes them. Public-server dispatch remains
+disabled.
 
 The notebooks are intentionally not executed or modified by either collection
 entry point.

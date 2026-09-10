@@ -4,6 +4,7 @@ from io import StringIO
 from pathlib import Path
 
 import pandas as pd
+from geopy.extra.rate_limiter import RateLimiter
 import requests
 from tqdm import tqdm
 
@@ -17,7 +18,18 @@ URL = (
 DEFAULT_OUTPUT = Path(__file__).resolve().parent / "constants" / "imgw_coordinates.csv"
 
 
-def build_station_file(output_path: Path = DEFAULT_OUTPUT) -> pd.DataFrame:
+def build_station_file(
+    output_path: Path = DEFAULT_OUTPUT,
+    *,
+    synoptic_only: bool = True,
+) -> pd.DataFrame:
+    """Build coordinates for stations used by the daily synoptic adapter.
+
+    The official station list also contains roughly two thousand climate and
+    precipitation stations.  The adapter reads the ``dobowe/synop`` product,
+    so geocoding those unrelated stations is both unnecessary and liable to
+    exceed the public geocoder's rate limit.
+    """
     require_private_noncommercial_imgw()
     response = requests.get(URL, timeout=60)
     response.raise_for_status()
@@ -27,9 +39,17 @@ def build_station_file(output_path: Path = DEFAULT_OUTPUT) -> pd.DataFrame:
         header=None,
         names=["Code", "Name", "Value"],
     )
+    if synoptic_only:
+        station_class = pd.to_numeric(stations["Value"], errors="coerce")
+        stations = stations.loc[station_class.between(0, 999)].copy()
     stations["Name"] = stations["Name"] + ",Poland"
     tqdm.pandas(desc="Processing")
-    stations["coordinates"] = stations["Name"].progress_apply(get_coordinates)
+    geocode = RateLimiter(
+        get_coordinates,
+        min_delay_seconds=1.1,
+        swallow_exceptions=True,
+    )
+    stations["coordinates"] = stations["Name"].progress_apply(geocode)
     stations[["lat", "lon"]] = pd.DataFrame(
         stations["coordinates"].tolist(),
         index=stations.index,
