@@ -32,7 +32,7 @@ async def read_data(
     time_range : tuple of str
         Time range as (start_date, end_date), e.g. ("2018-01-01", "2022-12-31").
     data_range : list of str
-        Reserved for future use (e.g., selecting specific variables like 'c', 'cf').
+        Logical data types requested through FARMWISE (``land cover`` here).
     level : int
         S2 cell level defining spatial resolution.
 
@@ -70,6 +70,15 @@ async def read_data(
         return pd.DataFrame()
 
     melted_data = data_melting(aggregated_data, time_range)
+    if isinstance(melted_data.columns, pd.MultiIndex):
+        melted_data = melted_data.loc[
+            :,
+            melted_data.columns.get_level_values(0).isin(GLOBAL_MAPPING),
+        ]
+    else:
+        melted_data = melted_data.loc[
+            :, melted_data.columns.isin(GLOBAL_MAPPING)
+        ]
     # EuroCropV2 coverage varies by country and year.  The registry stores
     # only the dataset-wide temporal extent, so a request can pass the
     # pre-check even though every annual value in the selected area is
