@@ -65,8 +65,9 @@ def test_eurocrop_extract_years_selects_requested_columns_and_nan():
         frame, ("2023-01-01", "2024-12-31")
     )
 
-    assert result.columns.tolist() == ["lon", "lat", "c2023", "cf2024"]
+    assert result.columns.tolist() == ["lon", "lat", "c2023"]
     assert "other" not in result
+    assert "cf2024" not in result
 
 
 def test_eurocrop_data_aggregation_uses_mode(monkeypatch):
@@ -130,7 +131,7 @@ def test_eurocrop_data_melting_expands_year_to_requested_days():
 
     assert result.index.tolist() == list(pd.date_range("2024-01-01", periods=3))
     assert result[("c", "cell")].tolist() == [2, 2, 2]
-    assert result[("cf", "cell")].tolist() == [7, 7, 7]
+    assert "cf" not in result.columns.get_level_values(0)
 
 
 def test_correctiv_time_filters_and_column_cleanup():

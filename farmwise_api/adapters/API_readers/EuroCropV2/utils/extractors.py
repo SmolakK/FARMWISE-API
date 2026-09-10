@@ -75,7 +75,8 @@ def extract_years(df: pd.DataFrame, time_range:tuple) -> pd.DataFrame:
 
     Notes
     -----
-    - Column names are expected to end with a year (e.g., 'c2018', 'cf2020').
+    - Cultivation columns follow the ``cYYYY`` convention. Source parcel-ID
+      columns (``cfYYYY``) are deliberately excluded.
     - All None values are converted to NaN for compatibility with numeric operations.
     """
 
@@ -84,7 +85,13 @@ def extract_years(df: pd.DataFrame, time_range:tuple) -> pd.DataFrame:
     year_from, year_to = (int(t[:4]) for t in time_range)
     years = tuple(str(year) for year in range(year_from, year_to + 1))
 
-    year_cols = [col for col in df.columns if col.endswith(years)]
+    # ``cYYYY`` contains the cultivation class. ``cfYYYY`` is the source
+    # parcel identifier and must not be exposed as an environmental factor.
+    year_cols = [
+        col
+        for col in df.columns
+        if col.startswith("c") and col[1:] in years
+    ]
 
     result = df[base_cols + year_cols].copy()
 

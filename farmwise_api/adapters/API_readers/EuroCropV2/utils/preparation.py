@@ -52,7 +52,8 @@ def data_melting(df, time_range):
     """
     Transform wide-format temporal data into a daily time series format.
 
-    The function reshapes a DataFrame containing yearly values (e.g., c2018, cf2020)
+    The function reshapes a DataFrame containing yearly cultivation values
+    (e.g., c2018)
     into a long format, expands it to daily frequency, and pivots it into a
     time-indexed structure.
 
@@ -61,7 +62,7 @@ def data_melting(df, time_range):
     df : pd.DataFrame
         Input DataFrame indexed by 'S2CELL', containing:
         - spatial columns ('lon', 'lat')
-        - yearly columns (e.g., 'c2018', 'cf2020')
+        - yearly cultivation columns (e.g., 'c2018')
     time_range : tuple of str
         Tuple specifying the time range (start, end), e.g. ("2018-01-01", "2022-12-31").
 
@@ -70,7 +71,7 @@ def data_melting(df, time_range):
     pd.DataFrame
         Pivoted DataFrame with:
         - index: 'Timestamp' (daily frequency)
-        - columns: MultiIndex ('c', 'cf') x S2CELL
+        - columns: MultiIndex ('c') x S2CELL
         - values: numeric data
 
     Notes
@@ -80,11 +81,18 @@ def data_melting(df, time_range):
     - Uses 'first' aggregation when pivoting (data assumed constant per year).
     """
 
+    cultivation_columns = [
+        column
+        for column in df.columns
+        if str(column).startswith("c") and str(column)[1:].isdigit()
+    ]
+    df = df[["lon", "lat", *cultivation_columns]].copy()
+
     # --- reshape wide -> long ---
     df_long = (
         pd.wide_to_long(
             df.reset_index(),
-            stubnames=["c", "cf"],
+            stubnames=["c"],
             i=["S2CELL", "lon", "lat"],
             j="year",
             sep="",
@@ -95,7 +103,7 @@ def data_melting(df, time_range):
     )
 
     # --- ensure numeric types (critical for later aggregations) ---
-    df_long[["c", "cf"]] = df_long[["c", "cf"]].apply(
+    df_long[["c"]] = df_long[["c"]].apply(
         pd.to_numeric, errors="coerce"
     )
 
@@ -130,5 +138,5 @@ def data_melting(df, time_range):
     return df_daily.reset_index().pivot(
         index="Timestamp",
         columns="S2CELL",
-        values=["c", "cf"],
+        values=["c"],
     )

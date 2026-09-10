@@ -134,6 +134,13 @@ def test_factor_completeness_recognizes_quantity_aliases():
     ) == 1
 
 
+def test_factor_completeness_recognizes_eurocrop_cultivation_output():
+    assert quality_assess._factor_completeness(
+        ["land cover"],
+        ["Original cultivation code in the annual GSA layer"],
+    ) == 1
+
+
 def test_s2_covering_is_cached_between_source_reports(monkeypatch):
     calls = []
     quality_assess._get_s2_cells_cached.cache_clear()

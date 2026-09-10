@@ -265,6 +265,11 @@ def _factor_completeness(
             "flow",
             "discharge",
         ),
+        "land cover": (
+            "cultivation code",
+            "crop code",
+            "crop type",
+        ),
     }
     matched = {
         factor

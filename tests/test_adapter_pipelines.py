@@ -33,9 +33,11 @@ async def test_eurocrop_read_data_runs_transformation_pipeline(monkeypatch):
         {"c2024": [2]}, index=pd.Index(["cell"], name="S2CELL")
     )
     melted = pd.DataFrame(
-        [[2]],
+        [[2, 123456]],
         index=pd.to_datetime(["2024-01-01"]),
-        columns=pd.MultiIndex.from_tuples([("c", "cell")]),
+        columns=pd.MultiIndex.from_tuples(
+            [("c", "cell"), ("cf", "cell")]
+        ),
     )
     monkeypatch.setattr(EuroCropV2_read, "adapter_data", lambda *_args: "points.csv")
     monkeypatch.setattr(
@@ -58,6 +60,9 @@ async def test_eurocrop_read_data_runs_transformation_pipeline(monkeypatch):
     assert result.columns.get_level_values(0).tolist() == [
         "Original cultivation code in the annual GSA layer"
     ]
+    assert "Parcel ID in the annual GSA layer" not in set(
+        result.columns.get_level_values(0)
+    )
     melt.assert_called_once_with(aggregated, ("2024-01-01", "2024-01-02"))
 
 
