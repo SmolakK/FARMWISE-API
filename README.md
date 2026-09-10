@@ -293,10 +293,11 @@ python -m evaluation.run_all
 ```
 
 For a permitted local academic evaluation that includes the IMGW--ERA5 Poland
-comparison, run:
+comparison, set the option in `evaluation/collect_empirical.py` and run that
+file from the IDE:
 
-```powershell
-python -m evaluation.collect_empirical --include-imgw-research
+```python
+INCLUDE_IMGW_RESEARCH = True
 ```
 
 Scenario definitions and collection settings are explicit in the Python
