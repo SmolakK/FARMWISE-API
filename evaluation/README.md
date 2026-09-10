@@ -18,17 +18,18 @@ or:
 python -m evaluation.run_all
 ```
 
-For a permitted local academic-research evaluation that includes IMGW, use:
+For the permitted local academic-research evaluation, set the file-level
+option near the top of `evaluation/collect_empirical.py`:
 
-```powershell
-python -m evaluation.collect_empirical --include-imgw-research
+```python
+INCLUDE_IMGW_RESEARCH = True
 ```
 
-The flag is an explicit acknowledgement of the IMGW terms. It does not enable
-IMGW in the public server, and IMGW station files and downloaded source data
-remain excluded from wheels and source distributions. `run_all.py` is only a
-short convenience entry point; it does not calculate metrics or generate
-figures.
+Running `collect_empirical.py` directly from an IDE then includes IMGW without
+command-line parameters. The setting does not enable IMGW in the public
+server, and IMGW station files and downloaded source data remain excluded from
+wheels and source distributions. `run_all.py` is only a short convenience
+entry point; it does not calculate metrics or generate figures.
 
 The scenario definitions are kept in `evaluation/scenarios.py`:
 
