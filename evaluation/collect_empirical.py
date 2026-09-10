@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import argparse
 from datetime import datetime, timezone
 import json
 import os
@@ -36,6 +35,10 @@ from evaluation.scenarios import (
 OUTPUT_DIR = Path(__file__).resolve().parent / "empirical_input"
 SCALING_REPEATS = 3
 REQUEST_TIMEOUT_SECONDS = 600
+# File-level opt-in for this academic evaluation. This affects only direct
+# execution of this collector; the public FARMWISE server continues to block
+# IMGW through its own source policy.
+INCLUDE_IMGW_RESEARCH = True
 
 
 async def collect(
@@ -254,20 +257,7 @@ async def collect(
 
 def main() -> None:
     """Collect the scenarios configured in ``evaluation.scenarios``."""
-    parser = argparse.ArgumentParser(
-        description="Collect FARMWISE live empirical evaluation inputs."
-    )
-    parser.add_argument(
-        "--include-imgw-research",
-        action="store_true",
-        help=(
-            "Acknowledge permitted local academic-research use of IMGW data. "
-            "IMGW remains disabled in public server entry points and its "
-            "local station files remain excluded from distributions."
-        ),
-    )
-    args = parser.parse_args()
-    if args.include_imgw_research:
+    if INCLUDE_IMGW_RESEARCH:
         os.environ[IMGW_RESEARCH_USE_ENV] = "1"
     result = asyncio.run(
         collect(
