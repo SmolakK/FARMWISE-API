@@ -14,13 +14,30 @@ SMTP_ENV_FILE = Path(
 ).resolve()
 
 
+def _smtp_config():
+    load_dotenv(SMTP_ENV_FILE)
+    values = {
+        "EMAIL_HOST": os.getenv("EMAIL_HOST"),
+        "EMAIL_PORT": os.getenv("EMAIL_PORT"),
+        "EMAIL_USER": os.getenv("EMAIL_USER"),
+        "EMAIL_PASS": os.getenv("EMAIL_PASS"),
+    }
+    missing = [name for name, value in values.items() if not value]
+    if missing:
+        raise RuntimeError(
+            f"SMTP configuration is missing: {', '.join(missing)} "
+            f"(expected in {SMTP_ENV_FILE})"
+        )
+    try:
+        port = int(values["EMAIL_PORT"])
+    except ValueError as exc:
+        raise RuntimeError("EMAIL_PORT must be an integer") from exc
+    return values["EMAIL_HOST"], port, values["EMAIL_USER"], values["EMAIL_PASS"]
+
+
 def send_email(to_email, subject, body):
     try:
-        load_dotenv(SMTP_ENV_FILE)
-        smtp_server = os.getenv("EMAIL_HOST")
-        smtp_port = int(os.getenv("EMAIL_PORT"))
-        smtp_user = os.getenv("EMAIL_USER")
-        smtp_password = os.getenv("EMAIL_PASS")
+        smtp_server, smtp_port, smtp_user, smtp_password = _smtp_config()
 
         msg = MIMEText(body)
         msg["Subject"] = subject
