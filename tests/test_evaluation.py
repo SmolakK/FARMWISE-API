@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import date
 
 import pandas as pd
@@ -247,3 +248,22 @@ def test_run_all_only_runs_empirical_collection(monkeypatch):
     monkeypatch.setattr(empirical_runner, "collect", fake_collect)
 
     assert empirical_runner.run_all() == expected
+
+
+def test_collect_empirical_main_enables_file_level_imgw_opt_in(
+    monkeypatch, tmp_path
+):
+    expected = {"request_count": 1, "observation_count": 2}
+
+    def fake_run(coroutine):
+        coroutine.close()
+        return expected
+
+    monkeypatch.delenv("FARMWISE_ENABLE_RESEARCH_IMGW", raising=False)
+    monkeypatch.setattr(empirical_collector, "INCLUDE_IMGW_RESEARCH", True)
+    monkeypatch.setattr(empirical_collector.asyncio, "run", fake_run)
+    monkeypatch.setattr(empirical_collector, "OUTPUT_DIR", tmp_path)
+
+    empirical_collector.main()
+
+    assert os.environ["FARMWISE_ENABLE_RESEARCH_IMGW"] == "1"
