@@ -62,6 +62,44 @@ async def test_eurocrop_read_data_runs_transformation_pipeline(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_eurocrop_read_data_returns_empty_when_selected_year_has_no_values(
+    monkeypatch,
+):
+    extracted = pd.DataFrame(
+        {"lat": [53.5], "lon": [-7.5], "c2016": [None], "cf2016": [None]}
+    )
+    aggregated = pd.DataFrame(
+        {"c2016": [None], "cf2016": [None]},
+        index=pd.Index(["cell"], name="S2CELL"),
+    )
+    all_missing = pd.DataFrame(
+        [[None, None]],
+        index=pd.to_datetime(["2016-01-01"]),
+        columns=pd.MultiIndex.from_tuples([("c", "cell"), ("cf", "cell")]),
+    )
+    monkeypatch.setattr(EuroCropV2_read, "adapter_data", lambda *_args: "points.csv")
+    monkeypatch.setattr(
+        EuroCropV2_read, "extract_data_by_bbox", lambda *_args: extracted
+    )
+    monkeypatch.setattr(EuroCropV2_read, "extract_years", lambda *_args: extracted)
+    monkeypatch.setattr(
+        EuroCropV2_read, "data_agregation", lambda *_args: aggregated
+    )
+    monkeypatch.setattr(
+        EuroCropV2_read, "data_melting", lambda *_args: all_missing
+    )
+
+    result = await EuroCropV2_read.read_data(
+        (54.0, 53.0, -7.0, -8.0),
+        ("2016-01-01", "2016-01-02"),
+        ["land cover"],
+        10,
+    )
+
+    assert result.empty
+
+
+@pytest.mark.asyncio
 async def test_correctiv_read_data_runs_transformation_pipeline(monkeypatch):
     source = pd.DataFrame(
         {

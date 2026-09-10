@@ -70,5 +70,12 @@ async def read_data(
         return pd.DataFrame()
 
     melted_data = data_melting(aggregated_data, time_range)
+    # EuroCropV2 coverage varies by country and year.  The registry stores
+    # only the dataset-wide temporal extent, so a request can pass the
+    # pre-check even though every annual value in the selected area is
+    # missing.  Treat that case as an empty source response rather than as a
+    # successful response containing only NaNs.
+    if melted_data.empty or not melted_data.notna().to_numpy().any():
+        return pd.DataFrame()
     melted_data = melted_data.rename(columns=GLOBAL_MAPPING, level=0)
     return melted_data

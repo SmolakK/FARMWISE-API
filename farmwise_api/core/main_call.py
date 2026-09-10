@@ -409,75 +409,6 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
         logger.warning("No data retrieved from available APIs")
         return pd.DataFrame()
 
-
-# import random
-# from datetime import datetime, timedelta
-#
-# EUROPE_COUNTRIES = ["Ireland"]
-#
-# # FACTORS = [
-# #     'temperature', 'precipitation', 'potential evaporation', 'soil',
-# #     'surface water quantity', 'land cover', 'hydraulic conductivity',
-# #     'depth to watertable', 'groundwater quality', 'groundwater quantity',
-# #     'surface water quality'
-# # ]
-# FACTORS = [
-#     'precipitation','temperature'
-# ]
-#
-#
-# def generate_test_cases(
-#         n_countries=10, n_levels=3, n_dates=3,
-#         date_start="2010-01-01", date_end="2020-01-20",
-#         date_range_days=720
-# ):
-#     """
-#     Generates parameterized test cases for read_data().
-#
-#     :param n_countries: How many random countries to pick from Europe
-#     :param n_levels: How many random levels to generate
-#     :param n_dates: How many random date ranges to generate
-#     :param date_start: Earliest possible start date
-#     :param date_end: Latest possible end date
-#     :param date_range_days: Length of each test date window (days)
-#     :return: List of test case dictionaries
-#     """
-#     test_cases = []
-#
-#     chosen_countries = random.sample(EUROPE_COUNTRIES, n_countries)
-#     chosen_levels = random.sample(range(5, 12), n_levels)
-#
-#     # Convert to datetime
-#     date_start = datetime.fromisoformat(date_start)
-#     date_end = datetime.fromisoformat(date_end)
-#
-#     for country in chosen_countries:
-#         for level in chosen_levels:
-#             for _ in range(n_dates):
-#                 # Pick random date window
-#                 start = date_start + timedelta(
-#                     days=random.randint(0, (date_end - date_start).days - date_range_days)
-#                 )
-#                 end = start + timedelta(days=date_range_days)
-#
-#                 test_cases.append({
-#                     "country": country,
-#                     "level": level,
-#                     "time_from": start.strftime("%Y-%m-%d"),
-#                     "time_to": end.strftime("%Y-%m-%d"),
-#                     "factors": FACTORS
-#                 })
-#
-#     return test_cases
-#
-#
-# # Example usage:
-# TEST_CASES = generate_test_cases()
-#
-# for case in TEST_CASES:
-#     # Example using bounding box
-#     asyncio.run(read_data(**case))
-
 # Example using bounding box
 if __name__ == "__main__":
     # asyncio.run(read_data(
@@ -495,13 +426,14 @@ if __name__ == "__main__":
     #     produce_map=True
     # ))
     asyncio.run(read_data(
-        country=['Germany'],
+        country=['Ireland'],
         level=10,
         time_from='2010-01-10',
-        time_to='2010-02-10',
+        time_to='2010-01-13',
         factors=[
-            'temperature', 'precipitation'
-        ],
+            'temperature', 'precipitation','surface water quality','groundwater quantity','groundwater quality','soil',
+            'land cover', 'surface water quantity'],
+        assess_quality=True,
     ))
 
 

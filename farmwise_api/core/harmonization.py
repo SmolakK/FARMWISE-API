@@ -36,13 +36,7 @@ SUPPORTED_HARMONIZATION_METHODS = frozenset(
 
 
 def normalize_temporal_index(frame: pd.DataFrame) -> pd.DataFrame:
-    """Return a shallow copy with one timezone-neutral DatetimeIndex.
-
-    Adapters historically returned a mixture of ``datetime.date``, naive
-    ``Timestamp`` and timezone-aware values. Pandas cannot reliably align or
-    sort a mixed object index, so source boundaries normalize timestamps to
-    UTC and then remove the timezone before concatenation.
-    """
+    """Return a shallow copy with one timezone-neutral DatetimeIndex."""
     if isinstance(frame.index, pd.MultiIndex):
         raise ValueError("Source data must use a single temporal index.")
     normalized = frame.copy(deep=False)
