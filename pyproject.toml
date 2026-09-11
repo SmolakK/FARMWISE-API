@@ -27,7 +27,7 @@ classifiers = [
 license-files = [
     "LICENSE",
     "DATA_LICENSES.md",
-    "internal-lib/hubeaupyutils/hubeaupyutils-main/LICENSE",
+     "farmwise_api/_vendor/hubeaupyutils/LICENSE",
 ]
 requires-python = ">=3.10"
 dependencies = [
@@ -110,6 +110,7 @@ include-package-data = false
 "farmwise_api.adapters.API_readers.epa_ireland" = ["constants/EPA_coordinates.csv"]
 "farmwise_api.adapters.API_readers.gios" = ["constants/gios_coordinates.csv"]
 "farmwise_api.adapters.API_readers.hubeau" = ["constants/*.csv"]
+"farmwise_api._vendor.hubeaupyutils" = ["LICENSE"]
 "farmwise_api.adapters.API_readers.IFSGRID.utils" = ["definitions.json"]
 "farmwise_api.adapters.API_readers.irish_meteo" = ["EPA_ireland_stations.csv"]
 "farmwise_api.adapters.API_readers.quadica" = ["DATA_SETUP.md", "mappings/quadica_table.html"]
