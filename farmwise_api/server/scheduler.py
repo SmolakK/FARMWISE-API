@@ -4,10 +4,10 @@ from farmwise_api.server.api_utils import cleanup_old_files
 scheduler = BackgroundScheduler()
 
 
-def start_scheduler(temp_dir):
+def start_scheduler(temp_dir) -> None:
     scheduler.add_job(cleanup_old_files, 'interval', minutes=60, args=[temp_dir, 3600])
     scheduler.start()
 
 
-def shutdown_scheduler():
+def shutdown_scheduler() -> None:
     scheduler.shutdown()

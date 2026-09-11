@@ -8,6 +8,7 @@ from farmwise_api.server.logging_config import logger
 from farmwise_api.server.user_database import engine, Base
 import shutil
 from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator
 from fastapi.staticfiles import StaticFiles
 import os
 import asyncio
@@ -25,7 +26,7 @@ Base.metadata.create_all(bind=engine)
 
 # Define the lifespan context manager
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     try:
         # Startup logic
         TEMP_DIR.mkdir(parents=True, exist_ok=True)

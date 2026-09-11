@@ -168,7 +168,11 @@ def _get_s2_cells_cached(bbox: tuple, level: int) -> tuple:
         return _get_s2_cells_cached_inner(bbox, level)
 
 
-_get_s2_cells_cached.cache_clear = _get_s2_cells_cached_inner.cache_clear
+# Expose the inner cache's clear hook on the locking wrapper; assigning an
+# attribute to a function is not expressible in the type system.
+_get_s2_cells_cached.cache_clear = (  # type: ignore[attr-defined]
+    _get_s2_cells_cached_inner.cache_clear
+)
 
 
 def _daily_frame(
@@ -206,7 +210,7 @@ def _factor_missing_rates(
     *,
     expected_rows: int | None = None,
 ) -> dict[str, float | None]:
-    rates = {}
+    rates: dict[str, float | None] = {}
     for factor in _factor_columns(frame):
         values = (
             frame.xs(factor, axis=1, level=0, drop_level=False)
@@ -295,7 +299,7 @@ def _implausible_value_rates(
     frame: pd.DataFrame,
     api_factors: list[str],
 ) -> dict[str, float | None]:
-    rates = {}
+    rates: dict[str, float | None] = {}
     for factor_value in _factor_columns(frame):
         factor = str(factor_value)
         normalized = factor.lower()

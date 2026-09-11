@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 Base.metadata.create_all(bind=engine)
 
 
-def delete_user(username: str):
+def delete_user(username: str) -> None:
     db = SessionLocal()
     try:
         # Look up the user by username
@@ -29,7 +29,7 @@ def delete_user(username: str):
         db.close()
 
 
-def add_user(username: str, email: str, full_name: str, password: str, disabled: bool = False):
+def add_user(username: str, email: str, full_name: str, password: str, disabled: bool = False) -> None:
     db = SessionLocal()
     try:
         existing_user = db.query(User).filter(User.username == username).first()

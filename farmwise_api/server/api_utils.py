@@ -3,7 +3,7 @@ import time
 from farmwise_api.server.logging_config import logger
 
 
-def cleanup_old_files(folder_path, max_age_in_seconds):
+def cleanup_old_files(folder_path, max_age_in_seconds) -> None:
     """
     Deletes files older than `max_age_in_seconds` in the specified `folder_path`.
     Raises FileNotFoundError if the folder doesn't exist.
@@ -22,7 +22,7 @@ def cleanup_old_files(folder_path, max_age_in_seconds):
                 logger.info(f"Deleted {file_path}")
 
 
-def secure_filename(filename):
+def secure_filename(filename) -> str:
     """
     Sanitize the filename to ensure it is safe for use in file paths.
     This function strips directory paths and removes non-alphanumeric characters.

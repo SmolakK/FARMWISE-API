@@ -117,7 +117,7 @@ def harmonize_data(
     for column in columns:
         series_by_source = []
         column_weights = []
-        available_types = []
+        available_types: list[str] = []
 
         for source, frame, logical_types in source_frames:
             if column not in frame.columns:
@@ -281,12 +281,12 @@ def _weighted_median(row: pd.Series, weights: pd.Series) -> float:
 
 
 def _weighted_mode(row: pd.Series, weights: pd.Series) -> Any:
-    scores = {}
+    scores: dict[Any, float] = {}
     for value, weight in zip(row, weights):
         if pd.isna(value) or weight <= 0:
             continue
         scores[value] = scores.get(value, 0.0) + weight
-    return max(scores, key=scores.get) if scores else np.nan
+    return max(scores, key=lambda value: scores[value]) if scores else np.nan
 
 
 def _mode(row: pd.Series) -> Any:

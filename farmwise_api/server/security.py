@@ -10,6 +10,7 @@ from farmwise_api.server.user_database import get_db
 from farmwise_api.server.crud import get_user_by_username
 from dotenv import load_dotenv
 import os
+from typing import Literal
 from sqlalchemy.orm import Session
 from farmwise_api.server.hashing_utils import verify_password
 from farmwise_api.core.utils.paths import PROJECT_ROOT
@@ -18,7 +19,7 @@ from farmwise_api.core.utils.paths import PROJECT_ROOT
 limiter = Limiter(key_func=get_remote_address)
 
 
-def setup_security(app):
+def setup_security(app) -> None:
     app.state.limiter = limiter
     app.add_exception_handler(429, _rate_limit_exceeded_handler)
     app.add_middleware(SlowAPIMiddleware)
@@ -40,7 +41,23 @@ if ALGORITHM not in _ALLOWED_JWT_ALGORITHMS:
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-def authenticate_user(db: Session, username: str, password: str):
+def _secret_key() -> str:
+    """Return the configured JWT secret, or explain what is missing.
+
+    SECRET_KEY is read at import so the library and the test suite can be
+    imported without a server configuration; a request that actually needs
+    to sign or verify a token fails here with an actionable message rather
+    than deep inside PyJWT.
+    """
+    if not SECRET_KEY:
+        raise RuntimeError(
+            "SECRET_KEY is not configured. Set it as an environment "
+            "variable, or provide it in the JWT settings file."
+        )
+    return SECRET_KEY
+
+
+def authenticate_user(db: Session, username: str, password: str) -> User | Literal[False]:
     user = get_user_by_username(db, username)
     if not user:
         return False
@@ -49,38 +66,41 @@ def authenticate_user(db: Session, username: str, password: str):
     return user
 
 
-def create_access_token(data: dict, expires_delta: timedelta = None):
+def create_access_token(
+    data: dict, expires_delta: timedelta | None = None
+) -> str:
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, _secret_key(), algorithm=ALGORITHM)
     return encoded_jwt
 
 
-async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
+        payload = jwt.decode(token, _secret_key(), algorithms=[ALGORITHM])
+        username = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        # validates the claim; `username` is already known to be present
+        TokenData(username=username)
     except jwt.PyJWTError:
         raise credentials_exception
-    user = get_user_by_username(db, username=token_data.username)
+    user = get_user_by_username(db, username=username)
     if user is None:
         raise credentials_exception
     return user
 
 
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
+async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

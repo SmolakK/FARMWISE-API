@@ -23,6 +23,8 @@ FARMWISE_CACHE_DIR
 
 from __future__ import annotations
 
+from typing import Any
+
 import hashlib
 import logging
 import os
@@ -138,7 +140,7 @@ def _download(url: str, dest: Path) -> None:
     try:
         for attempt in range(3):
             offset = tmp.stat().st_size if tmp.exists() else 0
-            request_options = {"stream": True, "timeout": 60}
+            request_options: dict[str, Any] = {"stream": True, "timeout": 60}
             if offset:
                 request_options["headers"] = {"Range": f"bytes={offset}-"}
             try:

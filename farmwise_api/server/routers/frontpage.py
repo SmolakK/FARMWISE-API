@@ -15,7 +15,7 @@ available_factors = list(set(available_factors))
 frontpage_router = APIRouter()
 
 @frontpage_router.get("/", response_class=HTMLResponse)
-async def login_page():
+async def login_page() -> HTMLResponse:
     html_content = """
     <html>
         <head>
@@ -179,7 +179,7 @@ async def login_page():
 
 
 @frontpage_router.get("/frontend", response_class=HTMLResponse)
-async def secured_frontend_page():
+async def secured_frontend_page() -> HTMLResponse:
     return HTMLResponse("""
 <html>
     <head>
@@ -320,7 +320,7 @@ async def secured_frontend_page():
 
 
 @frontpage_router.get("/api-call", response_class=HTMLResponse)
-async def api_call_page(current_user: User = Depends(get_current_active_user)):
+async def api_call_page(current_user: User = Depends(get_current_active_user)) -> HTMLResponse:
     country_options = "".join([f'<option value="{c}">{c}</option>' for c in available_countries])
     factor_options = "".join([f'<option value="{f}">{f}</option>' for f in available_factors])
 

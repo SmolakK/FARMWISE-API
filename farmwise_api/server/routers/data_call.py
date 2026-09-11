@@ -16,7 +16,7 @@ from farmwise_api.core.utils.paths import PROJECT_ROOT
 api_router = APIRouter()
 
 
-def _has_no_data(result):
+def _has_no_data(result) -> bool:
     """Return True when the core call did not produce a non-empty data frame."""
     if not isinstance(result, dict):
         return True
@@ -25,7 +25,7 @@ def _has_no_data(result):
 
 
 # Dependency to check for client disconnection
-async def monitor_client_disconnection(request: Request, stop_event: asyncio.Event):
+async def monitor_client_disconnection(request: Request, stop_event: asyncio.Event) -> None:
     """
     Continuously monitors client disconnection in a separate task.
     """
@@ -42,7 +42,7 @@ async def monitor_client_disconnection(request: Request, stop_event: asyncio.Eve
 
 
 # BACKGROUND PROCESS BACKUP
-async def process_and_send_email(request_body, request, user_email):
+async def process_and_send_email(request_body, request, user_email) -> None:
     logger.info('Started processing background email task')
     try:
         boundingbox = getattr(request_body, 'bounding_box', None)
@@ -113,13 +113,13 @@ async def process_and_send_email(request_body, request, user_email):
         send_email(user_email, "Data Processing Failed", "An internal error occurred during data processing.")
 
 
-@api_router.post("/read-data")
+@api_router.post("/read-data", response_model=None)
 @limiter.limit("5/minute")
 async def read_data_endpoint(
         request_body: ReadDataRequest,
         request: Request,
         current_user: User = Depends(get_current_active_user)
-                             ):
+                             ) -> str | dict:
     """
     Endpoint to read data based on provided parameters and return a download link for the resulting CSV file.
 
@@ -226,7 +226,7 @@ async def read_data_endpoint(
 
 
 @api_router.get("/download/{file_name}")
-async def download_file(file_name: str, background_tasks: BackgroundTasks, request: Request):
+async def download_file(file_name: str, background_tasks: BackgroundTasks, request: Request) -> FileResponse:
     """
     Downloads a file from the server after validating the filename to prevent directory traversal attacks.
 
@@ -253,21 +253,23 @@ async def download_file(file_name: str, background_tasks: BackgroundTasks, reque
         return FileResponse(path=file_path, media_type='application/octet-stream', filename=safe_file_name)
 
     except ValueError as e:
+        # Log the reason, return a fixed message: exception text from this
+        # block can carry filesystem detail, and it reaches the client.
         logger.error(f"Error processing request: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail="Invalid file name")
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@api_router.post("/read-data-direct")
+@api_router.post("/read-data-direct", response_model=None)
 @limiter.limit("10/minute")
 async def read_data_direct(
     request_body: ReadDataRequest,
     request: Request,
     current_user: User = Depends(get_current_active_user)
-):
+) -> dict:
     """
     Same as /read-data but returns direct REST download links instead of sending email.
     """

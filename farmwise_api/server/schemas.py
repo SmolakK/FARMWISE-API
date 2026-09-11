@@ -19,7 +19,7 @@ valid_factors = set(
 class ReadDataRequest(BaseModel):
     bounding_box: Optional[Tuple[float, float, float, float]] = Field(
         None,
-        json_schema_extra={"example": (34.0, -118.0, 35.0, -117.0)},
+        json_schema_extra={"example": [34.0, -118.0, 35.0, -117.0]},
         description="Tuple of (North, South, East, West) coordinates in decimal degrees."
     )
     country: Optional[List[str]] = Field(
@@ -90,7 +90,7 @@ class ReadDataRequest(BaseModel):
     )
 
     @field_validator("time_from", "time_to")
-    def validate_date(cls, value):
+    def validate_date(cls, value) -> str:
         try:
             datetime.strptime(value, '%Y-%m-%d')
         except ValueError:
@@ -98,7 +98,7 @@ class ReadDataRequest(BaseModel):
         return value
 
     @field_validator("bounding_box")
-    def validate_bounding_box(cls, value):
+    def validate_bounding_box(cls, value) -> Optional[Tuple[float, float, float, float]]:
         if value is None:
             return value  # Allow None if user selects country
         if not (len(value) == 4 and all(isinstance(num, (int, float)) for num in value)):
@@ -108,17 +108,17 @@ class ReadDataRequest(BaseModel):
         return value
 
     @field_validator("factors")
-    def check_factors(cls, value):
+    def check_factors(cls, value) -> List[str]:
         if any(factor not in valid_factors for factor in value):
             raise ValueError(f"Factors must be within {valid_factors}")
         return value
 
     @field_validator("source_weights")
-    def check_source_weights(cls, value):
+    def check_source_weights(cls, value) -> Optional[Dict[str, float]]:
         return validate_source_weights(value) if value is not None else value
 
     @field_validator("harmonization_methods")
-    def check_harmonization_methods(cls, value):
+    def check_harmonization_methods(cls, value) -> Optional[Dict[str, str]]:
         return (
             validate_harmonization_methods(value)
             if value is not None
@@ -126,7 +126,7 @@ class ReadDataRequest(BaseModel):
         )
 
     @field_validator("within_source_aggregation_methods")
-    def check_within_source_aggregation_methods(cls, value):
+    def check_within_source_aggregation_methods(cls, value) -> Optional[Dict[str, str]]:
         return (
             validate_within_source_methods(value)
             if value is not None
