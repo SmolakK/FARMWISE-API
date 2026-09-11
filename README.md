@@ -75,7 +75,22 @@ install a separate top-level `hubeaupyutils` package.
 
 ## Configuration
 
-Copy the example files and provide real values:
+FARMWISE reads every secret from the process environment. The `.env` files
+described below are a convenience for local development only: they are loaded
+without overriding variables that are already set, so a deployment supplies
+the same settings directly and needs no credential file on disk at all.
+
+| Variable | Purpose |
+| --- | --- |
+| `SECRET_KEY`, `ALGORITHM` | JWT signing |
+| `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASS` | SMTP delivery, only when email is enabled |
+| `PUBLIC_BASE_URL` | host and optional port, no URL scheme, e.g. `localhost:8000` |
+| `FARMWISE_DATABASE_URL` | SQLAlchemy URL for the user database |
+| `FARMWISE_CACHE_DIR`, `FARMWISE_DATA_DIR` | writable cache and bundled-data locations |
+
+### Local development
+
+Copy the example files in a source checkout and fill in real values:
 
 ```powershell
 Copy-Item fidel.env.example fidel.env
@@ -83,17 +98,24 @@ Copy-Item smtp.env.example smtp.env
 Copy-Item public_host.env.example public_host.env
 ```
 
-`fidel.env` contains JWT settings. SMTP configuration is only required when
-email delivery is used. By default it is read from `smtp.env` in the
-repository root when FARMWISE runs from a source checkout, and from `smtp.env`
-in the process working directory when it runs as an installed package. Never
-place it inside the `farmwise_api` package directory: that directory may be
-read-only once installed, and credentials must not sit next to the shipped
-source. Set `FARMWISE_SMTP_ENV_FILE` to use another location; it is read when
-`farmwise_api.server.email_utils` is first imported, so export it before
-starting the server.
-`PUBLIC_BASE_URL` should contain a host and optional port without a URL scheme,
-for example `localhost:8000`.
+`FARMWISE_SMTP_ENV_FILE` overrides where the SMTP file is read from. It is
+consulted when `farmwise_api.server.email_utils` is first imported, so set it
+before the process starts.
+
+### Deployment
+
+Provide `SECRET_KEY` and any SMTP credentials through the environment, a
+secret manager, or your orchestrator's secret mechanism — not through files
+committed, copied, or baked into an image. If you do use a credential file,
+keep it outside the repository and outside the installed `farmwise_api`
+package, give it owner-only permissions, and do not publish its location.
+Rotate any secret that has been committed, logged, or shared: removing a file
+afterwards does not undo the disclosure.
+
+Credential files are excluded from Git by `.gitignore` and from both wheel and
+source distributions; `tests/test_packaging.py` enforces this on every CI run.
+FARMWISE does not put credential paths in the errors it raises, so exception
+text can be logged or surfaced without revealing where secrets are kept.
 
 Large adapter datasets are intentionally excluded from both pip wheels and
 source distributions. This includes EuroCropV2, EEA, IFSGRID and QUADICA
@@ -143,9 +165,9 @@ data, the operator must:
 
 1. register and sign in to the ECMWF Climate Data Store;
 2. manually accept the terms shown on the ERA5 dataset page; and
-3. place their personal CDS API token in `%USERPROFILE%\.cdsapirc` on Windows
-   or `$HOME/.cdsapirc` on Linux/macOS, following the
-   [official CDS API setup](https://cds.climate.copernicus.eu/how-to-api).
+3. install their personal CDS API token as described in the
+   [official CDS API setup](https://cds.climate.copernicus.eu/how-to-api),
+   in the location that documentation specifies for their platform.
 
 The FARMWISE application login is unrelated to the CDS account and does not
 grant ERA5 access. In server mode, `cdsapi.Client()` uses the credentials of

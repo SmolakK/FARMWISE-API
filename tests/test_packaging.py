@@ -275,7 +275,9 @@ def test_secret_files_are_untracked_and_ignored():
         assert rule in ignore_rules, f"missing .gitignore rule: {rule}"
 
 
-def test_configuration_errors_do_not_disclose_credential_paths():
+def test_configuration_errors_do_not_disclose_credential_paths(
+    monkeypatch, tmp_path
+):
     """A missing-configuration error must not name the file holding secrets.
 
     Exception text travels into logs and, through any caller that reports it,
@@ -283,13 +285,18 @@ def test_configuration_errors_do_not_disclose_credential_paths():
     """
     from farmwise_api.server import email_utils
 
+    secret_path = tmp_path / "nowhere" / "smtp.env"
+    monkeypatch.setattr(email_utils, "SMTP_ENV_FILE", secret_path)
+    for name in ("EMAIL_HOST", "EMAIL_PORT", "EMAIL_USER", "EMAIL_PASS"):
+        monkeypatch.delenv(name, raising=False)
+
     with pytest.raises(RuntimeError) as excinfo:
         email_utils._smtp_config()
 
     message = str(excinfo.value)
     assert "SMTP configuration is missing" in message
-    assert str(email_utils.SMTP_ENV_FILE) not in message
-    assert str(email_utils.SMTP_ENV_FILE.parent) not in message
+    assert str(secret_path) not in message
+    assert str(secret_path.parent) not in message
 
 
 def test_publication_governance_documents_are_present():
