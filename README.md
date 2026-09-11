@@ -372,7 +372,7 @@ python -m pip install -e ".[server,dev]"
 ```
 
 [`requirements-lock.txt`](requirements-lock.txt) pins the *exact* transitive
-closure — 132 packages, each with a SHA-256 hash — of the environment the
+closure — 146 packages, each with SHA-256 hashes — of the environment the
 published results and the CI test runs were produced in. Install this way to
 reconstruct that environment:
 
@@ -381,11 +381,15 @@ python -m pip install --require-hashes -r requirements-lock.txt
 python -m pip install -e . --no-deps
 ```
 
-The hashes identify specific wheels, so the lock file applies to the platform
-recorded in its header (CPython 3.12, Linux x86-64). On another platform,
-install from the ranges instead. The `locked` CI job installs from this file
-and runs the full test suite, so a stale lock fails the build rather than
-going unnoticed.
+The lock is a *universal* resolution: one file that installs on Linux, macOS
+and Windows. Every entry carries the environment markers that decide where it
+applies, because the dependency set genuinely differs by platform —
+`uvicorn[standard]` needs `uvloop` off Windows, `tqdm` needs `colorama` on
+Windows. The file is byte-identical whichever platform generates it, so the
+`locked` CI job can regenerate it on Linux and compare against a lock
+committed from a Windows checkout. That job then installs from the lock and
+runs the full suite, so a stale lock fails the build rather than going
+unnoticed.
 
 Regenerate the lock after changing any dependency in `pyproject.toml`:
 
@@ -393,11 +397,16 @@ Regenerate the lock after changing any dependency in `pyproject.toml`:
 python tools\make_lock.py
 ```
 
-The script resolves the declared ranges for the target interpreter and
-platform without installing anything, so it can be run from any machine.
-`python tools\make_lock.py --check` reports whether the committed lock still
-matches `pyproject.toml`; CI runs that check, so the two cannot drift apart
-silently.
+Resolution is performed by [uv](https://docs.astral.sh/uv/) (a `dev`
+dependency) and installs nothing, so the lock can be regenerated from any
+machine. `python tools\make_lock.py --check` reports whether the committed
+lock still matches `pyproject.toml`; CI runs that check, so the two cannot
+drift apart silently.
+
+pip cannot produce this file: `pip install --platform` selects wheel *tags*
+but still evaluates environment markers against the interpreter it runs on, so
+a cross-platform lock built with pip silently describes the machine that
+generated it.
 
 The CI matrix covers Python 3.11 and 3.12, which resolve to NumPy 2.4 and 2.5
 respectively and to pandas 3 on both. The declared floors reach further back
