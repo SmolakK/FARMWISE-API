@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 from farmwise_api.adapters.API_readers.hubeau.hubeau_mappings.hubeau_mapping_piezo import MAPPING
 from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
@@ -11,13 +12,19 @@ import asyncio
 from farmwise_api._vendor import hubeaupyutils as hub
 from farmwise_api.core.utils.paths import adapter_data
 
+logger = logging.getLogger(__name__)
+
 
 async def fetch_data(api, pt_id, he_period_bounds, data_requested_varnames, verbose_level):
     """
     Asynchronous function to fetch data for a specific point.
     """
     if verbose_level >= 1:
-        print(f"Fetching data for point ID: {pt_id} for variables: {data_requested_varnames}")
+        logger.info(
+            "Fetching data for point ID: %s for variables: %s",
+            pt_id,
+            data_requested_varnames,
+        )
 
     try:
         # Fetch data using the hub API (Note: Here argument names are specific to the hubeaupyutils lib functions,
@@ -42,19 +49,20 @@ async def fetch_data(api, pt_id, he_period_bounds, data_requested_varnames, verb
             df = df.rename_axis(['date_mesure','xINDICEx']).reset_index().drop(columns=['xINDICEx']).rename(columns={"value": "niveau_nappe_eau"})
             df['code_bss_old'] = pt_id
             if verbose_level >= 2:
-                print(f"Data fetched for point {pt_id}:")
-                print(df.head())
+                logger.debug(
+                    "Data fetched for point %s:\n%s", pt_id, df.head()
+                )
 
         # Output table column names (if not empty): date_mesure, niveau_nappe_eau, code_bss_old.
         return df
     except Exception as e:
         if verbose_level >= 1:
-            print(f"Error fetching data for point {pt_id}: {e}")
+            logger.warning("Error fetching data for point %s: %s", pt_id, e)
         return None
 
 
 async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
-                    verbose_level=0, within_source_aggregation_methods=None):
+                    verbose_level=0, within_source_aggregation_methods=None) -> pd.DataFrame | None:
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range. 2 text dates (str) of format YYYY-mm-dd
@@ -98,9 +106,11 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
 
     # Diagnostic info:
     if (verbose_level >= 1):
-        print("\nPARAMETERS (GW Quantity)...\n")
-        print("Asked parameter names (data_range set, all made lower case) =")
-        print(data_asked_raw_set)
+        logger.info(
+            "PARAMETERS (GW Quantity): asked parameter names "
+            "(data_range set, all made lower case) = %s",
+            data_asked_raw_set,
+        )
 
     data_requested_keys_set = data_asked_raw_set & set(['groundwater quantity']) # Note that 'gwdepth' is no longer allowed!
 
@@ -109,25 +119,42 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
 
     # Diagnostic info:
     if (verbose_level >= 1):
-        print("Verified (recognized) parameter names (data_requested_keys_set) =")
-        print(data_requested_keys_set)
+        logger.info(
+            "Verified (recognized) parameter names (data_requested_keys_set)"
+            " = %s",
+            data_requested_keys_set,
+        )
         if (len(data_asked_not_recognized) > 0):
-            print("NOT recognized parameter names (data_asked_not_recognized) =")
-            print(data_asked_not_recognized)
+            logger.warning(
+                "NOT recognized parameter names "
+                "(data_asked_not_recognized) = %s",
+                data_asked_not_recognized,
+            )
 
         if (data_asked_raw_set.issubset(data_requested_keys_set)):
-            print(" OK, all of the {} requested parameters are recognized by the API reader.".format(
-                len(data_asked_raw_set)))
+            logger.info(
+                "All of the %s requested parameters are recognized by the "
+                "API reader.",
+                len(data_asked_raw_set),
+            )
         else:
-            print(" OOPS! {} of the {} requested parameters are recognized by the API reader.".format(
-                len(data_asked_not_recognized), len(data_asked_raw_set)))
+            logger.warning(
+                "%s of the %s requested parameters are NOT recognized by "
+                "the API reader.",
+                len(data_asked_not_recognized),
+                len(data_asked_raw_set),
+            )
 
     data_requested_varnames = list(data_requested_keys_set)
 
     # Diagnostic info:
     if (verbose_level >= 1):
-        print("Parameters that will be extracted from HubEau 'Piézométrie' (GWL) API results (data_requested_codes) =")
-        print(data_requested_varnames) # (variable names... of columns in the obtained data tables)
+        # (variable names... of columns in the obtained data tables)
+        logger.info(
+            "Parameters that will be extracted from HubEau 'Piézométrie' "
+            "(GWL) API results (data_requested_codes) = %s",
+            data_requested_varnames,
+        )
 
     # Exiting here if there is no valid parameter code:
     if len(data_requested_varnames) == 0:
@@ -136,8 +163,10 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     ################### POINTS (preparing list of...) ###################
 
     if (verbose_level >= 1):
-        print("\nPOINTS...\n")
-        print("Selecting France GW LEVEL monitoring points (Piezometers) inside the Spatial Range...")
+        logger.info(
+            "POINTS: selecting France GW LEVEL monitoring points "
+            "(Piezometers) inside the Spatial Range..."
+        )
 
     coors = pd.read_csv(
         adapter_data(
@@ -155,23 +184,27 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     # Optional limitation for faster tests (only!):
     if nmax_pts is not None:
         if (verbose_level >= 1):
-            print(
-                "  {} points INITIALLY found (pre-selected) based on the constants list & spatial_range constraint".format(
-                    len(coordinates)))
+            logger.info(
+                "%s points INITIALLY found (pre-selected) based on the "
+                "constants list & spatial_range constraint",
+                len(coordinates),
+            )
         coordinates = coordinates.head(nmax_pts)
 
     if (verbose_level >= 1):
-        print("  {} points are selected for this query".format(len(coordinates)))
+        logger.info("%s points are selected for this query", len(coordinates))
 
     # List of point IDs to iterate (loop) over:
     pt_ids_lst = coordinates["code_bss_old"].to_list()
     if (verbose_level >= 2):
-        print(pt_ids_lst)
+        logger.debug("Selected point IDs: %s", pt_ids_lst)
 
     ################### Preparing the GET arguments... ###################
 
     if (verbose_level >= 2):
-        print("GET (Preparing the arguments for the api.get_data() calls...")
+        logger.debug(
+            "GET: preparing the arguments for the api.get_data() calls..."
+        )
 
     # LIST of dataframes to accumulate what we get for the N points (inside the loop below)
     accum_dfs = []
@@ -194,7 +227,9 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
         he_period_bounds[1] = "{:%Y-%m-%d}".format(time_range[1])
 
     if (verbose_level >= 1):
-        print("\nDOWNLOADING: HubEau (France) GW Quantity (GW LEVEL) data...\n")
+        logger.info(
+            "DOWNLOADING: HubEau (France) GW Quantity (GW LEVEL) data..."
+        )
 
     # Initialisation of the hubeaupyutils API object
     api = hub.init_api('piezometry')
@@ -230,14 +265,23 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
         return None
 
     if (verbose_level >= 1):
-        print("\nPREVIEW of the whole data table (concatenation of all points' data frames):")
-        print(df)
+        logger.info(
+            "PREVIEW of the whole data table (concatenation of all "
+            "points' data frames):\n%s",
+            df,
+        )
 
     if (verbose_level >= 2):
-        print("\nList of all {} point IDs (also called 'bss_id'):".format(df['point_id'].nunique()))
-        print(df['point_id'].unique())
-        print("\nList of all column names (before further processing of the DataFrame):")
-        print(df.columns.to_list())
+        logger.debug(
+            "List of all %s point IDs (also called 'bss_id'): %s",
+            df['point_id'].nunique(),
+            df['point_id'].unique(),
+        )
+        logger.debug(
+            "List of all column names (before further processing of the "
+            "DataFrame): %s",
+            df.columns.to_list(),
+        )
 
     # Column names of df at this stage :
     #   date_mesure  niveau_nappe_eau    point_id       lon        lat symbole_unite

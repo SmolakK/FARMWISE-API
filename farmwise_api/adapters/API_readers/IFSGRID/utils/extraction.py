@@ -5,6 +5,9 @@ import geopandas as gpd
 import pandas as pd
 from farmwise_api.adapters.API_readers.IFSGRID.mappings.IFSGRID_mappings import DATA_ALIASES
 from farmwise_api.core.utils.paths import adapter_data
+import logging
+
+logger = logging.getLogger(__name__)
 
 def factor_mapping_extractor(factor:str) -> dict:
     """
@@ -127,7 +130,7 @@ def stack_values(data_range:list, bbox:Polygon) -> pd.DataFrame:
                     how="outer"
                 )
             except Exception as e:
-                print(value, e)
+                logger.warning("Failed to merge factor %s: %s", value, e)
 
     if factor_data_frame.empty:
         return pd.DataFrame()

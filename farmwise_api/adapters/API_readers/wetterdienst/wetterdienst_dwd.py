@@ -145,7 +145,7 @@ def _to_pandas(frame):
 
 
 async def read_data(spatial_range, time_range, data_range, level,
-                    within_source_aggregation_methods=None):
+                    within_source_aggregation_methods=None) -> pd.DataFrame | None:
     """
     Reads meteorological data from DWD using wetterdienst.
 

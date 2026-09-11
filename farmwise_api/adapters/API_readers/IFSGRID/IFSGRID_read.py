@@ -11,7 +11,7 @@ from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGG
 async def read_data(
         spatial_range:tuple, time_range:tuple, data_range:list, level:int,
         within_source_aggregation_methods=None,
-    ):
+    ) -> pd.DataFrame | None:
     """
     Read, process and aggregate IFSGRID data for a given
     spatial and temporal range.

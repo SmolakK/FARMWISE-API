@@ -61,7 +61,7 @@ async def read_data(
     data_range,
     level,
     within_source_aggregation_methods=None,
-):
+) -> pd.DataFrame:
     """Read QUADICA v1 values at their native monthly or yearly timestamps.
 
     Source files are deliberately not bundled in the wheel. They must be

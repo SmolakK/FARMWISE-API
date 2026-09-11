@@ -8,6 +8,9 @@ import zipfile
 from farmwise_api.core.utils.paths import scratch_dir
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def _open_downloaded_dataset(path):
@@ -47,7 +50,7 @@ def _open_downloaded_dataset(path):
 
 
 async def read_data(spatial_range, time_range, data_range, level,
-                    within_source_aggregation_methods=None):
+                    within_source_aggregation_methods=None) -> pd.DataFrame:
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.
@@ -57,7 +60,7 @@ async def read_data(spatial_range, time_range, data_range, level,
     :param level: S2Cell level.
     :return:
     """
-    print("DOWNLOADING: Copernicus ERA5 data")
+    logger.info("DOWNLOADING: Copernicus ERA5 data")
 
     dataset = 'reanalysis-era5-single-levels'
 

@@ -15,13 +15,16 @@ from farmwise_api.core.utils.paths import adapter_data
 from tqdm import tqdm
 from farmwise_api.adapters.API_readers.imgw_hydro.imgw_mappings.imgw_hydro_mappings import WATER_COLUMNS, WATER_SELECTED, DATA_ALIASES
 import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
 
 URL = r'https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_hydrologiczne/dobowe/'
 SPACE_TIME_COLUMNS = ['Station code', 'Hydrological year', 'Day', 'Calendar month']
 
 
 async def read_data(spatial_range, time_range, data_range, level,
-                    within_source_aggregation_methods=None):
+                    within_source_aggregation_methods=None) -> pd.DataFrame | None:
     """
 
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
@@ -33,7 +36,7 @@ async def read_data(spatial_range, time_range, data_range, level,
     :return:
     """
     require_private_noncommercial_imgw()
-    print("DOWNLOADING: IMGW hydro data")
+    logger.info("DOWNLOADING: IMGW hydro data")
     # Load coordinates CSV asynchronously
     coors = await asyncio.to_thread(
         pd.read_csv,

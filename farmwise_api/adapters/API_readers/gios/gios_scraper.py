@@ -12,6 +12,9 @@ from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGG
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
 from farmwise_api.core.utils.paths import adapter_data
 import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # TODO: time wrapping bug
@@ -102,7 +105,7 @@ async def scrape_point_data(
 
 
 async def read_data(spatial_range, time_range, data_range, level,
-                    within_source_aggregation_methods=None):
+                    within_source_aggregation_methods=None) -> pd.DataFrame | None:
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.
@@ -112,7 +115,7 @@ async def read_data(spatial_range, time_range, data_range, level,
     :param level: S2Cell level.
     :return:
     """
-    print("DOWNLOADING: GIOS soil data")
+    logger.info("DOWNLOADING: GIOS soil data")
     avail_years = [1995, 2000, 2005, 2010, 2015, 2020, 2025]
     avail_years = [(avail_years[x], avail_years[x + 1]) for x in range(len(avail_years) - 1)]
 

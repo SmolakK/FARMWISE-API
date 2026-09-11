@@ -1,6 +1,9 @@
 from farmwise_api.server.hashing_utils import get_password_hash
 from farmwise_api.server.sql_schemas import User
 from farmwise_api.server.user_database import Base, SessionLocal, engine
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Ensure the database tables are created
 Base.metadata.create_all(bind=engine)
@@ -16,11 +19,11 @@ def delete_user(username: str):
             # Delete the user if they exist
             db.delete(user_to_delete)
             db.commit()
-            print(f"User {username} deleted successfully.")
+            logger.info("User %s deleted successfully.", username)
         else:
-            print(f"User {username} does not exist.")
+            logger.info("User %s does not exist.", username)
     except Exception as e:
-        print(f"Failed to delete user {username}: {e}")
+        logger.error("Failed to delete user %s: %s", username, e)
         db.rollback()  # Rollback in case of any errors
     finally:
         db.close()
@@ -31,7 +34,7 @@ def add_user(username: str, email: str, full_name: str, password: str, disabled:
     try:
         existing_user = db.query(User).filter(User.username == username).first()
         if existing_user:
-            print(f"User {username} already exists.")
+            logger.info("User %s already exists.", username)
             return
 
         hashed_password = get_password_hash(password)
@@ -45,9 +48,9 @@ def add_user(username: str, email: str, full_name: str, password: str, disabled:
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        print(f"User {username} added successfully.")
+        logger.info("User %s added successfully.", username)
     except Exception as e:
-        print(f"Failed to add user {username}: {e}")
+        logger.error("Failed to add user %s: %s", username, e)
     finally:
         db.close()
 

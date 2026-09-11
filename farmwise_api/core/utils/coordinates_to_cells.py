@@ -1,4 +1,7 @@
 import s2sphere
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def _limit_coordinates(spatial_range, coordinates):
@@ -29,7 +32,7 @@ def prepare_coordinates(coordinates, spatial_range, level):
     coords.lon = coords.lon.astype('float32')
     coords = _limit_coordinates(spatial_range=spatial_range, coordinates=coords)
     if coords.size == 0:
-        print("No data in the range")
+        logger.info("No data in the range")
         return None
     coords['S2CELL'] = coords.apply(lambda x:
                                     s2sphere.CellId.from_lat_lng(
