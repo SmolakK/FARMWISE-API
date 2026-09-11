@@ -108,17 +108,27 @@ REQUEST_SCENARIOS = [
     # ========================================================
     # 8. NEGATIVE TEST — TEMPORAL COVERAGE
     #
-    # Potential evaporation exists, but CDS vegetation ends
-    # in 2018.
+    # Both factors and the area are supported, but no source
+    # reaches back to 1900 - the earliest coverage starts in 1941.
+    # Every candidate is therefore rejected on temporal grounds
+    # alone, which is what this case is meant to demonstrate.
+    #
+    # This case previously used 'potential evaporation' from CDS
+    # vegetation, whose coverage ended in 2018. That source was
+    # retired upstream and removed, taking the factor with it; the
+    # request would then have been rejected for an unsupported
+    # factor rather than for temporal coverage, testing something
+    # else entirely. Asking before any record exists keeps the test
+    # valid as sources come and go.
     # ========================================================
     {
         "scenario": "no-temporal-coverage",
         "country": "Germany",
         "bounding_box": (51.5, 50.5, 10.5, 9.5),
         "level": 10,
-        "time_from": "2024-01-01",
-        "time_to": "2024-01-07",
-        "factors": ["potential evaporation"],
+        "time_from": "1900-01-01",
+        "time_to": "1900-01-07",
+        "factors": ["temperature", "precipitation"],
     },
 ]
 
