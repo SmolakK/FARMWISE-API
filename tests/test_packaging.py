@@ -1,13 +1,11 @@
 from email.parser import BytesParser
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
-try:
-    import tomllib
-except ModuleNotFoundError:  # Python 3.10
-    import tomli as tomllib
+import tomllib
 from zipfile import ZipFile
 
 import pytest
@@ -239,6 +237,59 @@ def test_sdist_manifest_prunes_private_and_large_data():
     assert required_prunes <= set(manifest.splitlines())
     assert "exclude tests/test_egdi_read_d10.py" in manifest
     assert "exclude tests/test_egdi_read_hc.py" in manifest
+
+
+SECRET_FILE_PATTERN = re.compile(
+    r"(^|/)(fidel|smtp|public_host)\.env$"
+    r"|\.cdsapirc$"
+    r"|(^|/)\.env$"
+    r"|\.(db|sqlite|sqlite3|pem|key|p12|pfx)$"
+    r"|(^|/)server\.log$",
+    re.IGNORECASE,
+)
+
+
+def test_built_wheel_contains_no_credential_or_state_files(built_wheel):
+    """A published wheel must never carry secrets or server state.
+
+    Credentials are supplied by the operator at run time; anything matching
+    here would ship them to PyPI, where deletion does not undo disclosure.
+    """
+    with ZipFile(built_wheel) as archive:
+        leaked = [n for n in archive.namelist() if SECRET_FILE_PATTERN.search(n)]
+
+    assert leaked == [], f"credential/state files present in wheel: {leaked}"
+
+
+def test_secret_files_are_untracked_and_ignored():
+    """The real credential files must be both absent from git and ignored."""
+    tracked = subprocess.run(
+        ["git", "ls-files"],
+        cwd=ROOT, capture_output=True, text=True, check=True,
+    ).stdout.splitlines()
+    leaked = [name for name in tracked if SECRET_FILE_PATTERN.search(name)]
+    assert leaked == [], f"credential/state files tracked in git: {leaked}"
+
+    ignore_rules = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+    for rule in ("*.env", ".cdsapirc", "user_storage.db"):
+        assert rule in ignore_rules, f"missing .gitignore rule: {rule}"
+
+
+def test_configuration_errors_do_not_disclose_credential_paths():
+    """A missing-configuration error must not name the file holding secrets.
+
+    Exception text travels into logs and, through any caller that reports it,
+    potentially to a client. The resolved path stays in the debug log.
+    """
+    from farmwise_api.server import email_utils
+
+    with pytest.raises(RuntimeError) as excinfo:
+        email_utils._smtp_config()
+
+    message = str(excinfo.value)
+    assert "SMTP configuration is missing" in message
+    assert str(email_utils.SMTP_ENV_FILE) not in message
+    assert str(email_utils.SMTP_ENV_FILE.parent) not in message
 
 
 def test_publication_governance_documents_are_present():
