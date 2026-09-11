@@ -149,6 +149,7 @@
 # if __name__ == "__main__":
 #     main()
 
+import logging
 import pandas as pd
 import httpx
 import asyncio
@@ -156,6 +157,8 @@ import io
 import zipfile
 from typing import Tuple
 import re
+
+logger = logging.getLogger(__name__)
 
 # Base URL template (daily data)
 BASE_URL = "https://cli.fusio.net/cli/climate_data/webdata/mly{}.zip"
@@ -174,7 +177,7 @@ def generate_links(csv_file: str) -> pd.DataFrame:
             engine="python"
         )
     except pd.errors.ParserError as e:
-        print(f"Error reading CSV: {e}")
+        logger.warning("Error reading CSV: %s", e)
         df = pd.read_csv(
             csv_file,
             usecols=["station name", "latitude", "longitude"],
@@ -193,7 +196,7 @@ async def check_link(client: httpx.AsyncClient, url: str) -> Tuple[str, int]:
         response = await client.head(url, headers=HEADERS, timeout=10)
         return url, response.status_code
     except httpx.RequestError as e:
-        print(f"Error checking {url}: {e}")
+        logger.warning("Error checking %s: %s", url, e)
         return url, 0
 
 
@@ -210,7 +213,7 @@ async def download_and_process(client: httpx.AsyncClient, row: pd.Series) -> pd.
         with zipfile.ZipFile(io.BytesIO(response.content)) as z:
             csv_name = f"mly{station_id}.csv"
             if csv_name not in z.namelist():
-                print(f"CSV {csv_name} not found in {url}")
+                logger.warning("CSV %s not found in %s", csv_name, url)
                 return pd.DataFrame()
 
             with z.open(csv_name) as f:
@@ -220,7 +223,7 @@ async def download_and_process(client: httpx.AsyncClient, row: pd.Series) -> pd.
                         skip = i
                         break
                 else:
-                    print(f"No data header found in {csv_name}")
+                    logger.warning("No data header found in %s", csv_name)
                     return pd.DataFrame()
 
                 df = pd.read_csv(
@@ -238,29 +241,31 @@ async def download_and_process(client: httpx.AsyncClient, row: pd.Series) -> pd.
                 processed_df["precipitation [mm]"] = processed_df["rain"]
                 processed_df = processed_df[["id", "lat", "lon", "date", "precipitation [mm]"]]
 
-                print(f"Processed data for station {station_id}")
+                logger.debug("Processed data for station %s", station_id)
                 return processed_df
 
     except httpx.RequestError as e:
-        print(f"Failed to process {url} (HTTP error): {e}")
+        logger.warning("Failed to process %s (HTTP error): %s", url, e)
         return pd.DataFrame()
     except (zipfile.BadZipFile, pd.errors.ParserError) as e:
-        print(f"Failed to process {url} (Zip/CSV error): {e}")
+        logger.warning("Failed to process %s (Zip/CSV error): %s", url, e)
         with z.open(csv_name) as f:
             lines = f.read().decode("utf-8").splitlines()
-            print(f"First 10 lines of {csv_name}:")
             for j, line in enumerate(lines[:10], 1):
-                print(f"Line {j}: {line}")
+                logger.debug("%s line %s: %s", csv_name, j, line)
         return pd.DataFrame()
 
 async def process_working_links(df: pd.DataFrame) -> pd.DataFrame:
     working_df = df[df["status"] == 200].copy()
     if working_df.empty:
-        print("No working links (status 200) found.")
+        logger.info("No working links (status 200) found.")
         return pd.DataFrame()
 
-    print(f"\nProcessing {len(working_df)} working links:")
-    print(working_df[["station name", "download_link", "status"]])
+    logger.info(
+        "Processing %s working links:\n%s",
+        len(working_df),
+        working_df[["station name", "download_link", "status"]],
+    )
 
     async with httpx.AsyncClient() as client:
         tasks = [download_and_process(client, row) for _, row in working_df.iterrows()]
