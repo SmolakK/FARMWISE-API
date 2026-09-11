@@ -244,7 +244,7 @@ licence, access date, and modification notices listed below.
 
 ### Met Éireann daily station observations
 
-- **Adapter:** `farmwise_api.adapters.API_readers.irish_meteo.Irish MS_daily`
+- **Adapter:** `farmwise_api.adapters.API_readers.irish_meteo.irish_ms_daily`
 - **Local resource:**
   `farmwise_api/adapters/API_readers/irish_meteo/EPA_ireland_stations.csv`.
 - **Provider:** Met Éireann
@@ -280,7 +280,16 @@ licence, access date, and modification notices listed below.
 - **Adapter:** `farmwise_api.adapters.API_readers.correctiv.correctiv_read`
 - **Local resource:** protected Parquet data is not bundled, mirrored, or
   listed in the remote-data manifest.
+- **Provider:** CORRECTIV (CORRECTIV.Lokal), compiling observations supplied
+  by the groundwater monitoring authorities of 13 German federal states.
+- **Dataset/resource:** monthly minimum, mean and maximum groundwater levels
+  in metres above sea level for roughly 6,700 monitoring stations, 1990-2021,
+  with long-term trend classifications.
 - **Source:** <https://github.com/correctiv/grundwasser-data>
+- **Declared licence:** the repository declares GPL-3.0 and requires the
+  CORRECTIV.Lokal attribution rules to be followed. GPL-3.0 is a software
+  licence; it does not clearly grant redistribution of the compiled
+  observational dataset, which is why the rights status below is unchanged.
 - **Rights status:** **protected**. A code licence in a repository must not be
   treated as permission to redistribute the compiled research dataset or its
   authority-supplied observations. CORRECTIV.Lokal also provides research
