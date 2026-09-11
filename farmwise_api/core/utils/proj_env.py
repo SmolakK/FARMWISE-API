@@ -22,7 +22,8 @@ shipped with rasterio. ``PROJ_DATA`` takes precedence over the legacy
 ``PROJ_LIB`` in PROJ 9+, so the host variable is left untouched and other
 software on the machine keeps working.
 
-Set ``FARMWISE_FIX_PROJ_DATA=0`` to disable this entirely.
+Set ``FARMWISE_FIX_PROJ_DATA=0`` to disable this entirely. This is also documented in the README.
+This was implemented for the dev purposes but left working as workaround.
 """
 
 from __future__ import annotations
