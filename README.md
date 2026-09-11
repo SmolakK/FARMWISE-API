@@ -1,5 +1,7 @@
 # FARMWISE API
 
+[![CI](https://github.com/SmolakK/FARMWISE-API/actions/workflows/ci.yml/badge.svg)](https://github.com/SmolakK/FARMWISE-API/actions/workflows/ci.yml)
+
 FARMWISE API is a unified platform for accessing European agricultural and environmental data. It
 is developed under the FARMWISE project (https://farmwise-project.eu/) to facilitate experiments and studies
 on the sustainable agriculture and decision-making. FARMWISE-API brings together information from 
