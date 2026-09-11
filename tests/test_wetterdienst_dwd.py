@@ -9,6 +9,7 @@ ORIGINAL_ASYNCIO_TASK = asyncio.Task
 from farmwise_api.adapters.API_readers.gios_gw import gios_gw
 from farmwise_api.adapters.API_readers.wetterdienst.wetterdienst_dwd import (
     _DwdFetchCancelled,
+    _build_and_collect_request,
     _collect_request,
     _reject_incompatible_pydevd_asyncio_patch,
     fetch_data,
@@ -231,3 +232,60 @@ def test_incompatible_pydevd_task_patch_has_actionable_error(monkeypatch):
 
     with pytest.raises(RuntimeError, match="python.debug.asyncio.repl"):
         _reject_incompatible_pydevd_asyncio_patch()
+
+
+@patch("farmwise_api.adapters.API_readers.wetterdienst.wetterdienst_dwd.DwdObservationRequest")
+def test_dwd_request_disables_the_pickle_backed_listings_cache(mock_dwd_request):
+    """Wetterdienst must be asked not to cache directory listings on disk.
+
+    diskcache (<=5.6.3, the newest release) serialises cached values with
+    pickle, so anything able to write into the cache directory can run code
+    inside this process the next time a listing is read. FARMWISE does not
+    need that cache, so it never creates one. If this assertion fails, the
+    setting was dropped and the deserialisation boundary is back.
+    """
+    request = MagicMock()
+    request.filter_by_bbox.return_value = request
+    mock_dwd_request.return_value = request
+
+    with patch(
+        "farmwise_api.adapters.API_readers.wetterdienst.wetterdienst_dwd._collect_request",
+        return_value=("values", "stations"),
+    ):
+        _build_and_collect_request(
+            ["precipitation_height"],
+            "2018-01-01",
+            "2018-01-07",
+            (9.5, 50.5, 10.5, 51.5),
+            Event(),
+        )
+
+    settings = mock_dwd_request.call_args.kwargs["settings"]
+    assert settings["cache_disable"] is True
+
+
+def test_disabled_wetterdienst_cache_creates_no_diskcache():
+    """The disabled setting must actually stop diskcache being constructed."""
+    import diskcache
+    from wetterdienst.util.network import FileDirCache
+
+    constructed = []
+    original = diskcache.Cache.__init__
+
+    def record(self, directory=None, *args, **kwargs):
+        constructed.append(directory)
+        return original(self, directory, *args, **kwargs)
+
+    diskcache.Cache.__init__ = record
+    try:
+        cache = FileDirCache(
+            use_listings_cache=False,
+            listings_expiry_time=None,
+            listings_cache_location=None,
+        )
+    finally:
+        diskcache.Cache.__init__ = original
+
+    assert constructed == []
+    assert cache._cache is None
+    assert cache.cache_location is None
