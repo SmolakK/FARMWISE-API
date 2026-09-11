@@ -134,7 +134,7 @@ API_PATH_RANGES = {
          1,
          1)
     ),
-    'farmwise_api.adapters.API_readers.irish_meteo.Irish MS_daily': (
+    'farmwise_api.adapters.API_readers.irish_meteo.irish_ms_daily': (
         ((55.3822, 51.4476, -6.0024, -10.4781),
          ('1941-01-01', '2025-12-31'),
          ['precipitation'],
