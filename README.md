@@ -87,6 +87,31 @@ the same settings directly and needs no credential file on disk at all.
 | `PUBLIC_BASE_URL` | host and optional port, no URL scheme, e.g. `localhost:8000` |
 | `FARMWISE_DATABASE_URL` | SQLAlchemy URL for the user database |
 | `FARMWISE_CACHE_DIR`, `FARMWISE_DATA_DIR` | writable cache and bundled-data locations |
+| `FARMWISE_FIX_PROJ_DATA` | set to `0` to keep the host's PROJ configuration (see below) |
+
+### A stale PROJ database on the host
+
+If the machine also carries a conda, OSGeo4W or PostGIS installation, its
+`PROJ_LIB` variable often points at an older `proj.db` than GDAL accepts:
+
+```text
+proj_create_from_database: ...\proj.db contains DATABASE.LAYOUT.VERSION.MINOR
+= 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+```
+
+Every coordinate lookup then fails — `CRS.from_epsg(4326)` raises — so
+reprojection and the raster adapters stop working, and GDAL repeats the
+message on each attempt. At import, FARMWISE reads the configured database's
+layout version directly and, if GDAL would reject it, points `PROJ_DATA` at
+the PROJ data shipped with rasterio for that process only. `PROJ_DATA` takes
+precedence over the legacy `PROJ_LIB` in PROJ 9+, so the host variable is left
+untouched and other software on the machine is unaffected. One warning is
+logged explaining what happened.
+
+The permanent fix is to remove `PROJ_LIB` (and a stale `GDAL_DATA`) from the
+environment; modern `pyproj` and `rasterio` ship their own data and do not
+need them. Set `FARMWISE_FIX_PROJ_DATA=0` to disable the guard and keep the
+host configuration as-is.
 
 ### Local development
 

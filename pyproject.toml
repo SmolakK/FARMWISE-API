@@ -62,6 +62,7 @@ dependencies = [
     "tqdm>=4.70,<5",
     "wetterdienst>=0.117,<0.137",
     "xarray>=2025.6",
+
 ]
 
 [project.optional-dependencies]
