@@ -265,15 +265,24 @@ sources:
     dataset: CORINE Land Cover map services for requested reference years
     provider: European Union's Copernicus Land Monitoring Service (CLMS)
     reference: https://land.copernicus.eu/en/products/corine-land-cover
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    spatial_resolution: vector polygons, 25 ha minimum mapping unit, 100 m minimum mapping
+      width
+    spatial_support: polygon; reduced to the class covering the largest share of each S2 cell
+    temporal_support: survey snapshots for 1990, 2000, 2006, 2012 and 2018; each snapshot
+      is carried forward until the next one begins
     variables:
       (land cover):
-        native_unit: null
-        notes: null
-        reference: null
-        transformation: null
+        native_unit: none - categorical level-3 class code
+        notes: 'Values are the provider''s own CLC level-3 codes (44 classes); labels are
+          in farmwise_api.adapters.API_readers.corine.corine_mappings.corine_mapping.CLC_CLASSES,
+          transcribed from the service legend. The returned row does not record which survey
+          it came from: a request after 2018 is served the 2018 classification stamped with
+          the requested date.'
+        physical_meaning: CORINE Land Cover level-3 class occupying the largest area of the
+          S2 cell
+        reference: https://image.discomap.eea.europa.eu/arcgis/rest/services/Corine/CLC2018_WM/MapServer/legend
+        transformation: none - the Code_YY field is passed through unchanged; selection is
+          by largest intersected area within each S2 cell
   farmwise_api.adapters.API_readers.correctiv.correctiv_read:
     dataset: monthly minimum, mean and maximum groundwater levels in metres above sea level
       for roughly 6,700 monitoring stations, 1990-2021, with long-term trend classifications
