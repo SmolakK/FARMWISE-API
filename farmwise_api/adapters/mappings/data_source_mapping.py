@@ -46,14 +46,6 @@ API_PATH_RANGES = {
          2,
          1)
     ),
-    'farmwise_api.adapters.API_readers.cds.cds_vegetation': (
-        ((71, 34, 45, -25),
-         ('2000-01-01', '2018-12-31'),
-         ['potential evaporation'],
-         'deca-daily',
-         2,
-         1)
-    ),
     'farmwise_api.adapters.API_readers.imgw.imgw_api_synop_daily': (
         ((54.8396, 49.0023, 24.1453, 14.1226),
          ('1960-01-01', CURRENT_DAY),
@@ -199,10 +191,6 @@ API_PATH_RANGES = {
 # The CDS agroproductivity collection is still visible in the catalogue, but
 # its API now returns HTTP 403 because downloads have been permanently retired.
 DISABLED_API_SOURCES = {
-    'farmwise_api.adapters.API_readers.cds.cds_vegetation': (
-        'The CDS sis-agroproductivity-indicators dataset is deprecated and '
-        'downloads are no longer supported.'
-    ),
     'farmwise_api.adapters.API_readers.egdi.egdi_read_hc': (
         'EGDI HOVER WP7 data is not licensed for redistribution. The adapter '
         'is excluded from public packages and dispatch.'
@@ -270,7 +258,6 @@ DATA_TYPE_HARMONIZATION_METHODS = {
     "precipitation": "weighted_mean",
     "soil": "weighted_mean",
     "soil humidity": "weighted_mean",
-    "potential evaporation": "weighted_mean",
     "surface water quantity": "weighted_mean",
     "land cover": "weighted_mode",
     "hydraulic conductivity": "weighted_mean",
@@ -293,7 +280,6 @@ WITHIN_SOURCE_AGGREGATION_METHODS = {
     "precipitation": "mean",
     "soil": "mean",
     "soil humidity": "mean",
-    "potential evaporation": "mean",
     "surface water quantity": "mean",
     "land cover": "mode",
     "hydraulic conductivity": "mean",
