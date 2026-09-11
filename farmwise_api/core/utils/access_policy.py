@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
+from collections.abc import Iterator
 import os
 
 
@@ -20,6 +22,26 @@ def private_noncommercial_imgw_enabled() -> bool:
         os.getenv(name, "").strip().lower() in _TRUE_VALUES
         for name in (IMGW_RESEARCH_USE_ENV, IMGW_PRIVATE_USE_ENV)
     )
+
+
+@contextmanager
+def acknowledged_private_noncommercial_imgw() -> Iterator[None]:
+    """Acknowledge permitted local IMGW use for the duration of the block.
+
+    The acknowledgement is process-global while active, because adapters read
+    it from the environment. The previous value is restored on exit, so a
+    caller cannot leave the gate open for unrelated code running later in the
+    same process.
+    """
+    previous = os.environ.get(IMGW_RESEARCH_USE_ENV)
+    os.environ[IMGW_RESEARCH_USE_ENV] = "1"
+    try:
+        yield
+    finally:
+        if previous is None:
+            os.environ.pop(IMGW_RESEARCH_USE_ENV, None)
+        else:
+            os.environ[IMGW_RESEARCH_USE_ENV] = previous
 
 
 def require_private_noncommercial_imgw() -> None:
