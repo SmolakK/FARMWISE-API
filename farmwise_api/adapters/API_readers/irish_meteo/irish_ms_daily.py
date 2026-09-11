@@ -134,7 +134,7 @@ async def read_data(
     data_range,
     level,
     within_source_aggregation_methods=None,
-):
+) -> pd.DataFrame:
     requested_start = pd.Timestamp(time_range[0])
     requested_end = pd.Timestamp(time_range[1])
     if requested_start > requested_end:

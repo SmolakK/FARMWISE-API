@@ -11,10 +11,7 @@ import pandas as pd
 import pytest
 
 daily = importlib.import_module(
-    "farmwise_api.adapters.API_readers.irish_meteo.Irish MS_daily"
-)
-monthly = importlib.import_module(
-    "farmwise_api.adapters.API_readers.irish_meteo.Irish MS_monthly"
+    "farmwise_api.adapters.API_readers.irish_meteo.irish_ms_daily"
 )
 
 
@@ -41,23 +38,8 @@ def test_daily_generate_links_builds_urls_and_marks_invalid_station(tmp_path):
     assert result.loc[1, "download_link"] == "Invalid station name"
 
 
-def test_monthly_generate_links_builds_url(tmp_path):
-    stations = tmp_path / "stations.csv"
-    pd.DataFrame(
-        {
-            "station name": [123],
-            "latitude": [50.0],
-            "longitude": [-8.0],
-        }
-    ).to_csv(stations, index=False)
-
-    result = monthly.generate_links(stations)
-
-    assert result.loc[0, "download_link"].endswith("mly123.zip")
-
-
 @pytest.mark.asyncio
-@pytest.mark.parametrize("module", [daily, monthly])
+@pytest.mark.parametrize("module", [daily])
 async def test_check_link_returns_status(module):
     response = SimpleNamespace(status_code=200)
     client = SimpleNamespace(head=AsyncMock(return_value=response))
@@ -69,7 +51,7 @@ async def test_check_link_returns_status(module):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("module", [daily, monthly])
+@pytest.mark.parametrize("module", [daily])
 async def test_check_link_returns_zero_on_network_error(module):
     client = SimpleNamespace(
         head=AsyncMock(side_effect=httpx.RequestError("offline"))
@@ -129,35 +111,8 @@ async def test_daily_download_and_process_retries_network_errors(monkeypatch):
     assert client.get.await_count == 3
     assert sleep.await_count == 2
 
-
 @pytest.mark.asyncio
-async def test_monthly_download_and_process_reads_station_archive():
-    payload = _zip_file(
-        "mly123.csv",
-        "station metadata\n"
-        "year,month,rain,temp\n"
-        "2024,1,3.5,10\n",
-    )
-    response = MagicMock(content=payload)
-    client = SimpleNamespace(get=AsyncMock(return_value=response))
-    row = pd.Series(
-        {
-            "download_link": "https://example.test/mly123.zip",
-            "station name": 123,
-            "latitude": 50.0,
-            "longitude": -8.0,
-        }
-    )
-
-    result = await monthly.download_and_process(client, row)
-
-    assert result.loc[0, "date"] == pd.Timestamp("2024-01-01")
-    assert result.loc[0, "precipitation [mm]"] == 3.5
-    assert result.loc[0, "id"] == 123
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("module", [daily, monthly])
+@pytest.mark.parametrize("module", [daily])
 async def test_download_and_process_rejects_archive_without_station_csv(module):
     prefix = "dly" if module is daily else "mly"
     response = MagicMock(content=_zip_file("other.csv", "data"))
@@ -183,7 +138,7 @@ class _ClientContext:
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("module", [daily, monthly])
+@pytest.mark.parametrize("module", [daily])
 async def test_process_working_links_returns_empty_without_status_200(module):
     result = await module.process_working_links(
         pd.DataFrame(
@@ -199,7 +154,7 @@ async def test_process_working_links_returns_empty_without_status_200(module):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("module", [daily, monthly])
+@pytest.mark.parametrize("module", [daily])
 async def test_process_working_links_combines_successful_results(
     monkeypatch, module
 ):
