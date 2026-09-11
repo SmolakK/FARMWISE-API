@@ -1,6 +1,9 @@
 import httpx
 import pandas as pd
 import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def get_station_codes(bbox, time_range, size=10000):
@@ -32,7 +35,9 @@ async def get_station_codes(bbox, time_range, size=10000):
             response = await client.get(url, params=params)
             response.raise_for_status()
             if response.status_code != 200:
-                print(f"Error: {response.status_code}, {response.text}")
+                logger.warning(
+                    "Error: %s, %s", response.status_code, response.text
+                )
                 break
 
             data = response.json()

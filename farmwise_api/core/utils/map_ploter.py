@@ -15,6 +15,9 @@ import folium
 from folium import plugins
 
 from tqdm import tqdm
+import logging
+
+logger = logging.getLogger(__name__)
 # ==============================
 #   RASTER CREATION UTILITIES
 # ==============================
@@ -138,7 +141,7 @@ def encode_image_to_base64(image_path):
         with open(image_path, 'rb') as img_file:
             return base64.b64encode(img_file.read()).decode('utf-8')
     except FileNotFoundError:
-        print(f"Warning: Image file '{image_path}' not found.")
+        logger.warning("Image file '%s' not found.", image_path)
         return None
 
 
@@ -178,7 +181,10 @@ def create_folium_map(
     logo_left, logo_right : str or None
         Paths to optional logo images
     """
-    print(f"Generating map with Folium (downsampling by {downsample_factor}x)...")
+    logger.info(
+        "Generating map with Folium (downsampling by %sx)...",
+        downsample_factor,
+    )
 
     # ---- Basic index/parameter extraction ----
     dates_index = dataset.index.tolist()
@@ -198,7 +204,7 @@ def create_folium_map(
         raise ValueError("Dataset has no parameters in columns.")
 
     # ---- 1st pass: compute global bounds & per-parameter min/max ----
-    print("Calculating parameter ranges...")
+    logger.debug("Calculating parameter ranges...")
 
     param_ranges = {param: {'min': float('inf'), 'max': float('-inf')} for param in parameters}
     all_bounds = []
@@ -214,7 +220,7 @@ def create_folium_map(
             try:
                 raster, _, bounds = create_raster(dataset, day, param)
             except Exception as e:
-                print(f"  Skipping {day} - {param}: {e}")
+                logger.debug("Skipping %s - %s: %s", day, param, e)
                 continue
 
             all_bounds.append(bounds)
@@ -239,9 +245,9 @@ def create_folium_map(
             rng['min'] = 0.0
             rng['max'] = 0.0
 
-    print("\nParameter ranges:")
+    logger.debug("Parameter ranges:")
     for param, rng in param_ranges.items():
-        print(f"  {param}: {rng['min']:.2f} - {rng['max']:.2f}")
+        logger.debug("%s: %.2f - %.2f", param, rng['min'], rng['max'])
 
     if not all_bounds:
         raise ValueError("No valid rasters produced; check dataset content.")
@@ -288,7 +294,7 @@ def create_folium_map(
         layer.add_to(m)
 
     # ---- 2nd pass: create raster overlays & encode as base64 PNG ----
-    print("\nGenerating overlay images...")
+    logger.debug("Generating overlay images...")
     overlay_data = {}
 
     for param_idx, param in tqdm(enumerate(parameters),total=len(parameters)):
@@ -318,9 +324,9 @@ def create_folium_map(
                     "date_idx": date_idx,
                 }
 
-                print(f"  Processed: {day} - {param}")
+                logger.debug("Processed: %s - %s", day, param)
             except Exception as e:
-                print(f"  Error: {day} - {param}: {e}")
+                logger.warning("Error: %s - %s: %s", day, param, e)
 
     # ---- Plugins ----
     plugins.Fullscreen().add_to(m)

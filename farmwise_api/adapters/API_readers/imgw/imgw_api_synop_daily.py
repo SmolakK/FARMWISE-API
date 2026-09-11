@@ -16,6 +16,9 @@ from farmwise_api.core.utils.imgw_utils import create_timestamp_from_row, expand
 from farmwise_api.core.utils.access_policy import require_private_noncommercial_imgw
 from farmwise_api.core.utils.paths import adapter_data
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 URL = "https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteorologiczne/dobowe/synop"
 SPACE_TIME_COLUMNS = ['Station code', 'Year', 'Month', 'Day', 'Code', 'lat', 'lon', 'Name']
@@ -39,7 +42,7 @@ async def _get_with_retries(client, url, attempts=3):
 
 
 async def read_data(spatial_range, time_range, data_range, level,
-                    within_source_aggregation_methods=None):
+                    within_source_aggregation_methods=None) -> pd.DataFrame | None:
     """
     Read data from the IMGW-API for the specified spatial and time range, and data types.
 
@@ -52,7 +55,7 @@ async def read_data(spatial_range, time_range, data_range, level,
     :return: A DataFrame containing the requested data pivoted by Timestamp and S2CELL.
     """
     require_private_noncommercial_imgw()
-    print("DOWNLOADING: IMGW synop data")
+    logger.info("DOWNLOADING: IMGW synop data")
 
     # Load and process the coordinates CSV asynchronously
     coors = pd.read_csv(

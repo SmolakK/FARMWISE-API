@@ -11,6 +11,8 @@ from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGG
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
 from farmwise_api.core.utils.paths import adapter_data
 
+logger = logging.getLogger(__name__)
+
 coordinates = adapter_data("epa_ireland", "constants", "EPA_coordinates.csv")
 initial_df = pd.read_csv(coordinates, sep=',', header=0)
 
@@ -20,7 +22,7 @@ async def process_link(client: httpx.AsyncClient, row: pd.Series) -> Optional[pd
     link = row['download_link']
 
     try:
-        print(f"Downloading data for {id} from {link}")
+        logger.debug("Downloading data for %s from %s", id, link)
         async with client.stream('GET', link) as response:
             response.raise_for_status()
             content = await response.aread()
@@ -47,7 +49,7 @@ async def process_link(client: httpx.AsyncClient, row: pd.Series) -> Optional[pd
                 return df
 
     except Exception as e:
-        print(f"Error processing {id} from {link}: {str(e)}")
+        logger.warning("Error processing %s from %s: %s", id, link, e)
         return None
 
 
@@ -60,7 +62,9 @@ async def fetch_all_data():
             id = row['id']
 
             if pd.isna(link) or not isinstance(link, str) or not link.endswith('.zip'):
-                print(f"Skipping {id}: Invalid or missing download link")
+                logger.debug(
+                    "Skipping %s: Invalid or missing download link", id
+                )
                 continue
 
             tasks.append(process_link(client, row))
@@ -75,8 +79,8 @@ async def read_data(
     data_range,
     level,
     within_source_aggregation_methods=None,
-):
-    print("DOWNLOADING: EPA GROUNDWATER QUANTITY DATA")
+) -> pd.DataFrame:
+    logger.info("DOWNLOADING: EPA GROUNDWATER QUANTITY DATA")
     results = await fetch_all_data()
     all_data = []
 

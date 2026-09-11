@@ -9,6 +9,9 @@ from farmwise_api.core.utils.interpolate_data import interpolate
 import warnings
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def cds_read_data(spatial_range, time_range, data_range, level, dataset,
@@ -22,7 +25,7 @@ def cds_read_data(spatial_range, time_range, data_range, level, dataset,
     :param level: S2Cell level.
     :return:
     """
-    print("DOWNLOADING: Copernicus ERA5 data")
+    logger.info("DOWNLOADING: Copernicus ERA5 data")
     # Initialise the client
     c = cdsapi.Client()
     north, south, east, west = spatial_range

@@ -15,6 +15,8 @@ from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGG
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
 from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
 
+logger = logging.getLogger(__name__)
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -162,7 +164,7 @@ async def read_data(
     data_range,
     level,
     within_source_aggregation_methods=None,
-):
+) -> pd.DataFrame | None:
     """
     Read and process groundwater data, filtering by spatial and time ranges, and return a MultiIndex DataFrame.
 
@@ -173,7 +175,7 @@ async def read_data(
     :return: DataFrame with MultiIndex ['date', 'S2CELL'] and numeric measurement columns.
     """
     _require_excel_reader()
-    print("DOWNLOADING: GIOS groundwater q&q data")
+    logger.info("DOWNLOADING: GIOS groundwater q&q data")
     async with httpx.AsyncClient(timeout=30) as client:
         subpage_links = _filter_links_by_time_range(
             await find_subpage_links(URL, client),

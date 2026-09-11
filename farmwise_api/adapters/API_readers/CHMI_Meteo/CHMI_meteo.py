@@ -6,8 +6,11 @@ from bs4 import BeautifulSoup
 import requests
 from pathlib import Path
 import json
+import logging
 from datetime import datetime
 import time
+
+logger = logging.getLogger(__name__)
 
 # Constants
 BASE_URL = "https://opendata.chmi.cz/meteorology/climate/historical/data/daily/"
@@ -35,10 +38,10 @@ async def fetch_json_files():
             f.write('\n'.join(json_files))
         return json_files
     except requests.exceptions.Timeout:
-        print("Timeout occurred while fetching JSON file list.")
+        logger.warning("Timeout occurred while fetching JSON file list.")
         return []
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching JSON file list: {e}")
+        logger.warning("Error fetching JSON file list: %s", e)
         return []
 
 
@@ -57,12 +60,12 @@ async def download_file(session, url, filepath):
                     content = await resp.read()
                     async with aiofiles.open(filepath, 'wb') as f:
                         await f.write(content)
-                print(f"Downloaded: {filepath.name}")
+                logger.debug("Downloaded: %s", filepath.name)
             return
         except (aiohttp.ClientError, asyncio.TimeoutError) as e:
-            print(f"Attempt {attempt} failed for {url}: {e}")
+            logger.warning("Attempt %s failed for %s: %s", attempt, url, e)
             if attempt == max_attempts:
-                print(f"Max attempts reached for {url}. Giving up.")
+                logger.error("Max attempts reached for %s. Giving up.", url)
                 raise
             attempt += 1
             await asyncio.sleep(2 ** attempt)  # Exponential backoff
@@ -86,17 +89,17 @@ async def download_missing_files(json_files):
                 filepath.parent.mkdir(parents=True, exist_ok=True)
                 tasks.append(bounded_download(url, filepath))
             except Exception as e:
-                print(f"Error preparing task for {f}: {e}")
+                logger.warning("Error preparing task for %s: %s", f, e)
 
         if tasks:
             for i, task in enumerate(asyncio.as_completed(tasks), 1):
                 try:
                     await task
-                    print(f"Download progress: {i}/{total_files}")
+                    logger.debug("Download progress: %s/%s", i, total_files)
                 except Exception as e:
-                    print(f"Task failed: {e}")
+                    logger.warning("Task failed: %s", e)
         else:
-            print("No files to download.")
+            logger.info("No files to download.")
 
 
 async def load_json(file_path):
@@ -138,7 +141,7 @@ async def process_file(filepath, loc_df):
         values = data['data']['data']['values']
 
         if not values:
-            print(f"Skipping {filepath.name}: No data values found")
+            logger.debug("Skipping %s: No data values found", filepath.name)
             return pd.DataFrame(columns=['station', 'element', 'dt', 'val', 'lat', 'lon'])
 
         df = pd.DataFrame(values, columns=header)
@@ -150,12 +153,12 @@ async def process_file(filepath, loc_df):
         })[['station', 'element', 'dt', 'val']]
 
         if df.empty or df[['station', 'element', 'dt', 'val']].replace('', pd.NA).isna().all().all():
-            print(f"Skipping {filepath.name}: All columns empty or NA")
+            logger.debug("Skipping %s: All columns empty or NA", filepath.name)
             return pd.DataFrame(columns=['station', 'element', 'dt', 'val', 'lat', 'lon'])
 
         df = df[df['element'].isin(['SRA', 'T'])]
         if df.empty:
-            print(f"Skipping {filepath.name}: No 'SRA' or 'T' elements found")
+            logger.debug("Skipping %s: No 'SRA' or 'T' elements found", filepath.name)
             return pd.DataFrame(columns=['station', 'element', 'dt', 'val', 'lat', 'lon'])
 
         df['dt'] = pd.to_datetime(df['dt'], errors='coerce')
@@ -167,11 +170,16 @@ async def process_file(filepath, loc_df):
                      .query('dt >= begin_date and dt <= end_date')
                      .drop(['wsi', 'begin_date', 'end_date'], axis=1))
 
-        print(f"Processed: {filepath.name} in {time.time() - start_time:.2f}s (Rows: {len(merged_df)})")
+        logger.debug(
+            "Processed: %s in %.2fs (Rows: %s)",
+            filepath.name,
+            time.time() - start_time,
+            len(merged_df),
+        )
         return merged_df
 
     except Exception as e:
-        print(f"Error processing {filepath.name}: {e}")
+        logger.warning("Error processing %s: %s", filepath.name, e)
         return pd.DataFrame(columns=['station', 'element', 'dt', 'val', 'lat', 'lon'])
 
 
@@ -187,46 +195,64 @@ async def process_batch(files, loc_df):
             df = await task
             if not df.empty and not df.isna().all().all():
                 batch_dfs.append(df)
-            print(f"Batch progress: {i}/{total_files} (Collected rows: {sum(len(d) for d in batch_dfs)})")
+            logger.debug(
+                "Batch progress: %s/%s (Collected rows: %s)",
+                i,
+                total_files,
+                sum(len(d) for d in batch_dfs),
+            )
         batch_df = pd.concat(batch_dfs, ignore_index=True) if batch_dfs else pd.DataFrame(
             columns=['station', 'element', 'dt', 'val', 'lat', 'lon'])
-        print(f"Batch completed in {time.time() - start_time:.2f}s (Total rows: {len(batch_df)})")
+        logger.debug(
+            "Batch completed in %.2fs (Total rows: %s)",
+            time.time() - start_time,
+            len(batch_df),
+        )
     return batch_df
 
 
-async def read_data(metadata_loc_file, max_files=None):
+async def read_data(metadata_loc_file, max_files=None) -> pd.DataFrame:
     """Main execution function with single final pivot and aggregation"""
     start_time = time.time()
     meta_loc = await load_json(metadata_loc_file)
     loc_df = process_metadata(meta_loc)
-    print(f"Metadata processed in {time.time() - start_time:.2f}s")
+    logger.debug("Metadata processed in %.2fs", time.time() - start_time)
 
     json_files = await fetch_json_files()
 
     if max_files is not None:
         json_files = json_files[:max_files]
-        print(f"Limited to {len(json_files)} files for testing.")
+        logger.info("Limited to %s files for testing.", len(json_files))
 
     await download_missing_files(json_files)
 
     filepaths = [DOWNLOAD_DIR / f for f in json_files]
     batches = [filepaths[i:i + BATCH_SIZE] for i in range(0, len(filepaths), BATCH_SIZE)]
 
-    print(f"Total batches to process: {len(batches)}")
+    logger.info("Total batches to process: %s", len(batches))
     all_dfs = []
     for i, batch in enumerate(batches):
         batch_start = time.time()
         batch_df = await process_batch(batch, loc_df)
         if not batch_df.empty:
             all_dfs.append(batch_df)
-        print(
-            f"Completed batch {i + 1}/{len(batches)} in {time.time() - batch_start:.2f}s (Cumulative time: {time.time() - start_time:.2f}s)")
+        logger.debug(
+            "Completed batch %s/%s in %.2fs (Cumulative time: %.2fs)",
+            i + 1,
+            len(batches),
+            time.time() - batch_start,
+            time.time() - start_time,
+        )
 
     # Merge all data once
     merge_start = time.time()
     merged_df = pd.concat(all_dfs, ignore_index=True) if all_dfs else pd.DataFrame(
         columns=['station', 'element', 'dt', 'val', 'lat', 'lon'])
-    print(f"Merged all data in {time.time() - merge_start:.2f}s (Rows: {len(merged_df)})")
+    logger.debug(
+        "Merged all data in %.2fs (Rows: %s)",
+        time.time() - merge_start,
+        len(merged_df),
+    )
 
     # Single pivot and aggregation
     if not merged_df.empty:
@@ -236,7 +262,7 @@ async def read_data(metadata_loc_file, max_files=None):
                                   values='val')
                   .reset_index()
                   .rename(columns={'SRA': 'precipitation [mm]', 'T': 'temperature [°c]'}))
-        print(f"Final pivot took {time.time() - pivot_start:.2f}s")
+        logger.debug("Final pivot took %.2fs", time.time() - pivot_start)
 
         for col in FINAL_COLS[4:]:
             if col not in result:
@@ -248,12 +274,12 @@ async def read_data(metadata_loc_file, max_files=None):
             .agg({'precipitation [mm]': 'sum', 'temperature [°c]': 'mean'})
             .reset_index()
             .rename(columns={'station': 'station_ID'})[FINAL_COLS])
-        print(f"Final aggregation took {time.time() - agg_start:.2f}s")
+        logger.debug("Final aggregation took %.2fs", time.time() - agg_start)
     else:
         final_df = pd.DataFrame(columns=FINAL_COLS)
 
-    print(f"Final shape: {final_df.shape}")
-    print(f"Total processing time: {time.time() - start_time:.2f}s")
+    logger.info("Final shape: %s", final_df.shape)
+    logger.info("Total processing time: %.2fs", time.time() - start_time)
     final_df.to_csv('CHMI_merged_data.csv', index=False)
     return final_df
 

@@ -7,6 +7,9 @@ import scipy.spatial
 from scipy.interpolate import griddata
 from tqdm import tqdm
 from farmwise_api.core.utils.cells_to_coordinates import s2cells_to_coordinates
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Constants
 EARTH_SURFACE_AREA_KM2 = 510.1e6
@@ -140,7 +143,7 @@ def interpolate(df_data, spatial_range, level):
     :param level: An integer representing the S2 level to use for the grid cells.
     :return: A pandas DataFrame containing the interpolated data at the finer S2 cell grid.
     """
-    print("INTERPOLATING")
+    logger.info("INTERPOLATING")
     df_data = df_data.stack(level=1)
     df_data = df_data.ffill().bfill()
     df_data = s2cells_to_coordinates(df_data)

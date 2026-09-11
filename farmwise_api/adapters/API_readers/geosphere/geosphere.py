@@ -8,6 +8,9 @@ import warnings
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def fetch_station_metadata(resource_id="klima-v2-1d"):
@@ -49,7 +52,7 @@ async def fetch_station_data(resource_id, station_ids, time_range, parameters):
 
 
 async def read_data(spatial_range, time_range, data_range, level,
-                    within_source_aggregation_methods=None):
+                    within_source_aggregation_methods=None) -> pd.DataFrame | None:
     """
     Fetch `klima-v2-1d` data by bounding box.
     :param spatial_range: Tuple containing the bounding box (south, west, north, east) in EPSG:4326.
@@ -76,7 +79,9 @@ async def read_data(spatial_range, time_range, data_range, level,
         ]
 
     if filtered_stations.empty:
-        print("Geosphere: No stations found within the specified bounding box.")
+        logger.info(
+            "Geosphere: No stations found within the specified bounding box."
+        )
         return None
 
     station_ids = filtered_stations["id"].tolist()
@@ -86,7 +91,7 @@ async def read_data(spatial_range, time_range, data_range, level,
 
     # Step 4: Combine and return the data
     if data_df.empty:
-        print("No data found for the selected stations.")
+        logger.info("No data found for the selected stations.")
         return None
 
     # CLEAN

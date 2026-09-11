@@ -10,6 +10,8 @@ from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGG
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
 from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
 
+logger = logging.getLogger(__name__)
+
 
 base_url = 'https://data.gov.ua/dataset/surface-water-monitoring'
 
@@ -36,7 +38,7 @@ def load_and_clean_data(csv_content):
 
         return df
     except Exception as e:
-        print(f"Failed to read CSV content: {e}")
+        logger.warning("Failed to read CSV content: %s", e)
         return None
 
 
@@ -47,7 +49,7 @@ async def read_data(
     data_range,
     level,
     within_source_aggregation_methods=None,
-):
+) -> pd.DataFrame:
     """
         Read and process SURFACE WATER QUALITY data, filtering by spatial and time ranges, and return a MultiIndex DataFrame.
 
@@ -57,7 +59,7 @@ async def read_data(
         :param level: S2Cell level for spatial aggregation.
         :return: DataFrame with MultiIndex ['date', 'S2CELL'] and numeric measurement columns.
         """
-    print("DOWNLOADING: Ukrainian surface water quality data")
+    logger.info("DOWNLOADING: Ukrainian surface water quality data")
     async with httpx.AsyncClient(timeout=30) as client:
         response = await client.get(base_url)
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -88,7 +90,9 @@ async def read_data(
     if len(combined_df.columns) == len(new_headers):
         combined_df.columns = new_headers
     else:
-        print("Warning: Number of columns does not match the number of custom headers.")
+        logger.warning(
+            "Number of columns does not match the number of custom headers."
+        )
 
     unique_points = combined_df[['point_id', 'lat', 'lon']].drop_duplicates()
     unique_points = unique_points[pd.to_numeric(unique_points[['lat','lon']].stack(), errors='coerce')

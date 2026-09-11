@@ -2,6 +2,9 @@ import time
 
 from geopy.exc import GeocoderUnavailable
 from geopy.geocoders import Nominatim
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def get_coordinates(city_name, retries=10, wait_time=20):
@@ -26,7 +29,16 @@ def get_coordinates(city_name, retries=10, wait_time=20):
             else:
                 return None, None
         except GeocoderUnavailable as e:
-            print(f"Geocoder unavailable for {city_name}, retrying... (Attempt {attempt + 1}/{retries})")
+            logger.warning(
+                "Geocoder unavailable for %s, retrying... (Attempt %s/%s)",
+                city_name,
+                attempt + 1,
+                retries,
+            )
             time.sleep(wait_time)  # Wait before retrying
-    print(f"Failed to fetch coordinates for {city_name} after {retries} attempts")
+    logger.error(
+        "Failed to fetch coordinates for %s after %s attempts",
+        city_name,
+        retries,
+    )
     return None, None

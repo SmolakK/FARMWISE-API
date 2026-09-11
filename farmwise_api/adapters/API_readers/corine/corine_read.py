@@ -30,7 +30,7 @@ async def read_data(
     data_range,
     level,
     within_source_aggregation_methods=None,
-):
+) -> pd.DataFrame:
     """Return the dominant CORINE class in every intersecting S2 cell.
 
     CORINE is a categorical polygon dataset. The adapter therefore queries

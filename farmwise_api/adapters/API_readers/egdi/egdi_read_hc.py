@@ -12,7 +12,7 @@ EGDI_RESOURCE = ("egdi", "data", "gewp7_peu7_4326.tif")
 
 
 async def read_data(spatial_range, time_range, data_range, level,
-                    within_source_aggregation_methods=None):
+                    within_source_aggregation_methods=None) -> pd.DataFrame:
     """
     N = 51.2
     S = 49.0

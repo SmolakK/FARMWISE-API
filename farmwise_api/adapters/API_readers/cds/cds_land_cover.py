@@ -1,10 +1,13 @@
 import os.path
 import cdsapi
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 # from farmwise_api.adapters.API_readers.cds.cds_mappings.cds_soilgrid_mappings import DATA_ALIASES, GLOBAL_MAPPING
 
 
-async def read_data(spatial_range, time_range, data_range, level):
+async def read_data(spatial_range, time_range, data_range, level) -> None:
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.
@@ -14,7 +17,7 @@ async def read_data(spatial_range, time_range, data_range, level):
     :param level: S2Cell level.
     :return:
     """
-    print("DOWNLOADING: Copernicus Land Cover")
+    logger.info("DOWNLOADING: Copernicus Land Cover")
 
     dataset = 'satellite-land-cover'
     # Initialise the client

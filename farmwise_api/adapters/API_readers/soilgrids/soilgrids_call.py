@@ -1,3 +1,5 @@
+import logging
+
 from soilgrids import SoilGrids
 from farmwise_api.core.utils.interpolate_data import how_many
 import pandas as pd
@@ -13,9 +15,11 @@ from farmwise_api.core.utils.paths import scratch_file
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
 
+logger = logging.getLogger(__name__)
+
 
 def fetch_soil_data(soilgrids, soil_property, west, south, east, north, size_lon, size_lat):
-    print(f"Fetching {soil_property} data...")
+    logger.debug("Fetching %s data...", soil_property)
     data = soilgrids.get_coverage_data(
         service_id=soil_property,
         coverage_id=DEPTH_MAPPING[soil_property],
@@ -36,7 +40,7 @@ def fetch_soil_data(soilgrids, soil_property, west, south, east, north, size_lon
 
 
 async def read_data(spatial_range, time_range, data_range, level,
-                    within_source_aggregation_methods=None):
+                    within_source_aggregation_methods=None) -> pd.DataFrame:
     """
     :param spatial_range: A tuple containing the spatial range (N, S, E, W) defining the bounding box.
     :param time_range: A tuple containing the start and end timestamps defining the time range.
@@ -46,7 +50,7 @@ async def read_data(spatial_range, time_range, data_range, level,
     :param level: S2Cell level.
     :return: A pandas DataFrame containing the processed soil data.
     """
-    print("DOWNLOADING: SoilGrids Data")
+    logger.info("DOWNLOADING: SoilGrids Data")
 
     # Initialize the SoilGrids client
     soilgrids = SoilGrids()
