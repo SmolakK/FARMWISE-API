@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
-
+from collections import defaultdict
+from pyproj import Transformer
 import httpx
 import pandas as pd
 import s2sphere
 from shapely.geometry import Polygon, box, shape
+from shapely.ops import transform
+from shapely.strtree import STRtree
 
 from farmwise_api.core.utils.coordinates_to_cells import get_s2_cells
 
@@ -119,11 +122,10 @@ async def _fetch_features(client, snapshot, spatial_range):
             )
         page = payload.get("features", [])
         features.extend(page)
-        if len(page) < PAGE_SIZE:
+        if not payload.get("exceededTransferLimit", False):
             break
         offset += len(page)
     return features
-
 
 def _s2_cell_polygons(spatial_range, level):
     north, south, east, west = spatial_range
@@ -143,9 +145,25 @@ def _s2_cell_polygons(spatial_range, level):
     return polygons
 
 
+
 def _dominant_classes(cell_polygons, features, snapshot):
+    """Return the dominant CORINE class for each S2 cell.
+
+    Dominance is defined by the largest intersecting area. Areas are
+    calculated in ETRS89 / LAEA Europe (EPSG:3035), an equal-area CRS
+    suitable for CORINE's European coverage.
+    """
     field = CLASS_FIELDS[snapshot].casefold()
+
+    # CORINE features and S2 polygons arrive in WGS84 longitude/latitude.
+    # Project them before calculating areas.
+    transformer = Transformer.from_crs(
+        "EPSG:4326",
+        "EPSG:3035",
+        always_xy=True,
+    )
     feature_polygons = []
+    class_codes = []
     for feature in features:
         geometry = feature.get("geometry")
         if not geometry:
@@ -164,19 +182,44 @@ def _dominant_classes(cell_polygons, features, snapshot):
         try:
             class_code = int(class_code)
         except (TypeError, ValueError):
-            pass
-        feature_polygons.append((shape(geometry), class_code))
-
+            continue
+        polygon = shape(geometry)
+        if polygon.is_empty:
+            continue
+        polygon = transform(transformer.transform, polygon)
+        feature_polygons.append(polygon)
+        class_codes.append(class_code)
+    if not feature_polygons:
+        return {}
+    # Spatial index avoids testing every cell against every CORINE polygon.
+    tree = STRtree(feature_polygons)
     result = {}
     for cell_id, cell_polygon in cell_polygons.items():
-        areas = {}
-        for feature_polygon, class_code in feature_polygons:
-            if not cell_polygon.intersects(feature_polygon):
+        if cell_polygon.is_empty:
+            continue
+        projected_cell = transform(
+            transformer.transform,
+            cell_polygon,
+        )
+        areas = defaultdict(float)
+        # Shapely 2.x returns indices into feature_polygons.
+        candidate_indices = tree.query(
+            projected_cell,
+            predicate="intersects",
+        )
+        for index in candidate_indices:
+            feature_polygon = feature_polygons[index]
+            intersection = projected_cell.intersection(feature_polygon)
+            if intersection.is_empty:
                 continue
-            area = cell_polygon.intersection(feature_polygon).area
-            areas[class_code] = areas.get(class_code, 0.0) + area
+            areas[class_codes[index]] += intersection.area
         if areas:
-            result[cell_id] = max(areas, key=areas.get)
+            # Smallest class code wins an exact area tie, making the result
+            # deterministic rather than dependent on feature order.
+            result[cell_id] = max(
+                areas.items(),
+                key=lambda item: (item[1], -item[0]),
+            )[0]
     return result
 
 
