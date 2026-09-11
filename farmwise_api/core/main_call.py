@@ -10,11 +10,15 @@ from farmwise_api.core.harmonization import (
     DEFAULT_SOURCE_WEIGHT,
     harmonize_data,
     normalize_temporal_index,
+    resolve_data_type,
     validate_harmonization_methods,
     validate_source_weights,
 )
 from farmwise_api.core.quality_assess import assess_data_quality, persist_quality_report
-from farmwise_api.core.within_source_aggregation import validate_within_source_methods
+from farmwise_api.core.within_source_aggregation import (
+    _aggregator as within_source_aggregator,
+    validate_within_source_methods,
+)
 from farmwise_api.core.utils.overlap_checks import spatial_ranges_overlap, time_ranges_overlap
 from farmwise_api.core.utils.interpolate_data import interpolate
 from farmwise_api.core.utils.cells_to_coordinates import extract_bbox
@@ -84,6 +88,64 @@ async def _assess_source_quality(
             "error": str(error),
             "assessment_wall_seconds": perf_counter() - started,
         }
+
+
+def _reduce_duplicate_timestamps(frame, data_storage, within_source_methods):
+    """Collapse repeated timestamps in the separate-API frame, per column.
+
+    Sources are concatenated rather than harmonized here, so a timestamp can
+    appear once per source and has to be reduced to one row. Averaging every
+    column - which is what this used to do - is wrong for categorical
+    variables: the mean of CORINE classes 211 and 312 is 261.5, which is not a
+    class at all, and even a single source came back as 211.0 instead of 211.
+    Each column is therefore reduced with the method configured for its
+    logical data type, the same one the adapters use within a source.
+    """
+    available_types = sorted(
+        {data_type for _source, _data, types in data_storage for data_type in types}
+    )
+    aggregations = {}
+    for column in frame.columns:
+        data_type = resolve_data_type(
+            column, available_types, within_source_methods
+        )
+        method = within_source_methods.get(
+            data_type, within_source_methods.get("default", "mean")
+        )
+        aggregations[column] = within_source_aggregator(method)
+
+    reduced = frame.groupby(level=0).agg(aggregations)
+    # groupby().agg() can widen integer columns when a group is empty; restore
+    # the input dtype where the values are still integral, so class codes stay
+    # class codes rather than becoming 211.0.
+    for column in reduced.columns:
+        original = frame[column].dtype
+        if pd.api.types.is_integer_dtype(original) and not reduced[column].isna().any():
+            reduced[column] = reduced[column].astype(original)
+    return reduced
+
+
+def _categorical_columns(frame, data_storage, harmonization_methods):
+    """Return the columns whose values are class codes rather than measurements.
+
+    A data type configured to combine by mode is categorical by definition:
+    taking a mean or interpolating linearly between two of its values produces
+    something that is not one of its classes.
+    """
+    available_types = sorted(
+        {data_type for _source, _data, types in data_storage for data_type in types}
+    )
+    categorical = []
+    for column in frame.columns:
+        data_type = resolve_data_type(
+            column, available_types, harmonization_methods
+        )
+        method = harmonization_methods.get(
+            data_type, harmonization_methods.get("default", "weighted_mean")
+        )
+        if "mode" in method:
+            categorical.append(column[0] if isinstance(column, tuple) else column)
+    return tuple(dict.fromkeys(categorical))
 
 
 def plan_source_dispatch(
@@ -347,7 +409,11 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                 combined_data = pd.concat(
                     [data for _source, data, _types in data_storage]
                 )
-                combined_data = combined_data.groupby(level=0).mean()
+                combined_data = _reduce_duplicate_timestamps(
+                    combined_data,
+                    data_storage,
+                    effective_within_source_methods,
+                )
             else:
                 combined_data = harmonize_data(
                     data_storage,
@@ -355,7 +421,14 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                     data_type_methods=effective_methods,
                 )
             if interpolation:  # be aware this inserts values to NaNs
-                combined_data = interpolate(combined_data, bounding_box, level)
+                combined_data = interpolate(
+                    combined_data,
+                    bounding_box,
+                    level,
+                    categorical_columns=_categorical_columns(
+                        combined_data, data_storage, effective_methods
+                    ),
+                )
             metadata = {
                         "request_id": request_id,
                         "apis": api_metadata,

@@ -295,7 +295,16 @@ def _mode(row: pd.Series) -> Any:
 
 
 def _normalize_label(value: Any) -> str:
-    return " ".join(str(value).strip().lower().split())
+    """Fold a label to a comparable form.
+
+    Hyphens, underscores and slashes become spaces so that a column named
+    "CORINE land-cover class code" still matches the configured data type
+    "land cover". Without this the match failed whenever another factor was
+    requested alongside it, and land cover silently fell back to the default
+    weighted mean, averaging class codes into values that are not classes.
+    """
+    collapsed = re.sub(r"[-_/]+", " ", str(value))
+    return " ".join(collapsed.strip().lower().split())
 
 
 __all__ = [

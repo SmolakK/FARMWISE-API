@@ -7,6 +7,7 @@ import scipy.spatial
 from scipy.interpolate import griddata
 from tqdm import tqdm
 from farmwise_api.core.utils.cells_to_coordinates import s2cells_to_coordinates
+from farmwise_api.core.utils.coordinates_to_cells import get_s2_cells
 import logging
 
 logger = logging.getLogger(__name__)
@@ -125,7 +126,7 @@ def how_many(N, S, E, W, level):
     return num_cells_lat, num_cells_lon
 
 
-def interpolate(df_data, spatial_range, level):
+def interpolate(df_data, spatial_range, level, categorical_columns=()):
     """
     Interpolates data from a DataFrame over a specified spatial range using S2 cells at a given level.
 
@@ -141,6 +142,9 @@ def interpolate(df_data, spatial_range, level):
                          - E: Eastern longitude limit
                          - W: Western longitude limit
     :param level: An integer representing the S2 level to use for the grid cells.
+    :param categorical_columns: Columns holding class codes rather than
+                                measurements. These are filled by nearest
+                                neighbour.
     :return: A pandas DataFrame containing the interpolated data at the finer S2 cell grid.
     """
     logger.info("INTERPOLATING")
@@ -150,35 +154,53 @@ def interpolate(df_data, spatial_range, level):
 
     N, S, E, W = spatial_range
 
-    size_lat, size_lon = how_many(N,S,E,W, level)
+    # Target grid: the same covering the adapters and the rest of the pipeline
+    # use for this area, so interpolated output lands on the cells a caller
+    # already expects.
+    #
+    # This replaces a lat/lon sample grid that kept only cells whose *centre*
+    # fell inside the bounding box. A cell is generally larger than the sample
+    # spacing, so at coarse levels - or over any small country - every centre
+    # can lie outside the box and the grid came out empty, failing later with
+    # an opaque IndexError. Albania at level 5 is the worked example: four
+    # cells cover it, and all four centres are outside its bounding box.
+    s2_cells = list(get_s2_cells(spatial_range, level))
+    if not s2_cells:
+        raise ValueError(
+            f"No S2 cells at level {level} cover the requested area "
+            f"(N={N}, S={S}, E={E}, W={W}); nothing to interpolate onto."
+        )
 
-    s2_cells = []
-    s2_cell_centers = []
-    latitudes = np.linspace(S, N, size_lat)
-    longitudes = np.linspace(W, E, size_lon)
-
-    for lat in tqdm(latitudes, total=len(latitudes)):
-        for lon in longitudes:
-            lat_lng = s2sphere.LatLng.from_degrees(lat, lon)
-            cell = s2sphere.CellId.from_lat_lng(lat_lng).parent(level)
-            cell_lat_lng = cell.to_lat_lng()
-            cell_lat = cell_lat_lng.lat().degrees
-            cell_lng = cell_lat_lng.lng().degrees
-            if cell not in s2_cells and S <= cell_lat <= N and W <= cell_lng <= E:
-                s2_cells.append(cell)
-                s2_cell_centers.append([cell_lat, cell_lng])
-
-    s2_cell_centers = np.array(s2_cell_centers)
+    s2_cell_centers = np.array(
+        [
+            [
+                cell.to_lat_lng().lat().degrees,
+                cell.to_lat_lng().lng().degrees,
+            ]
+            for cell in s2_cells
+        ]
+    )
     fine_lat = s2_cell_centers[:, 0]
     fine_lon = s2_cell_centers[:, 1]
 
     # Interpolate data to the finer S2 cell grid
     columns_to = [x for x in df_data.columns if x != 'lat' and x != 'lon']
     interpolated_data = {}
+    categorical = {str(name) for name in categorical_columns}
     for colname in tqdm(columns_to,total=len(columns_to)):
+        is_categorical = str(colname) in categorical
         to_concat = {}
         for day, values in df_data.groupby(level=0):
             filtered_vals = values[[colname,'lat','lon']][~values[colname].isna()]
+            if is_categorical:
+                # Nearest neighbour keeps every interpolated value a real class.
+                finer_grid = griddata(
+                    (filtered_vals.lon, filtered_vals.lat), filtered_vals[colname],
+                    (fine_lon, fine_lat),
+                    method='nearest'
+                )
+                to_concat[day] = pd.DataFrame(finer_grid, index=s2_cells)
+                continue
             try:
                 finer_grid = griddata(
                     (filtered_vals.lon, filtered_vals.lat), filtered_vals[colname],
@@ -208,5 +230,30 @@ def interpolate(df_data, spatial_range, level):
     interpolated_data = interpolated_data.reset_index()
     interpolated_data.columns = ['Timestamp','S2CELL'] + list(interpolated_data.columns[2:])
     interpolated_data.set_index(['Timestamp','S2CELL'],inplace=True)
-    interpolated_data = interpolated_data.pivot_table(index='Timestamp', columns='S2CELL')
+    # pivot_table aggregates with mean by default, which would average class
+    # codes back into non-classes. Categorical columns take the mode instead.
+    if categorical:
+        aggfunc = {
+            column: (_mode if str(column) in categorical else 'mean')
+            for column in interpolated_data.columns
+        }
+    else:
+        aggfunc = 'mean'
+    interpolated_data = interpolated_data.pivot_table(
+        index='Timestamp', columns='S2CELL', aggfunc=aggfunc
+    )
+    # griddata returns float arrays; give class codes their integer type back.
+    for column in interpolated_data.columns:
+        name = column[0] if isinstance(column, tuple) else column
+        if str(name) not in categorical:
+            continue
+        values = interpolated_data[column]
+        if values.notna().all() and (values % 1 == 0).all():
+            interpolated_data[column] = values.astype('int64')
     return interpolated_data
+
+
+def _mode(values):
+    """Most frequent value, for reducing categorical columns."""
+    modes = pd.Series(values).dropna().mode()
+    return modes.iloc[0] if not modes.empty else np.nan

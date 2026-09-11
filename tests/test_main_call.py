@@ -203,7 +203,7 @@ async def test_read_data_applies_separation_interpolation_and_map(monkeypatch):
     monkeypatch.setattr(main_call, "time_ranges_overlap", lambda *_args: True)
     monkeypatch.setattr(main_call.importlib, "import_module", lambda _name: module)
     monkeypatch.setattr(main_call, "extract_bbox", lambda _cells: (51, 51, 17, 17))
-    interpolate = MagicMock(side_effect=lambda data, *_args: data)
+    interpolate = MagicMock(side_effect=lambda data, *_args, **_kwargs: data)
     monkeypatch.setattr(main_call, "interpolate", interpolate)
     create_map = MagicMock(return_value="<html>map</html>")
     monkeypatch.setattr(map_ploter, "create_folium_map", create_map)
