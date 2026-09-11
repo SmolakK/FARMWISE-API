@@ -33,6 +33,26 @@ jobs:
       - name: Run tests
         run: python -m pytest -q
 
+  locked:
+    name: Pinned environment (requirements-lock.txt)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Check the lock file still matches pyproject.toml
+        run: |
+          python -m pip install --upgrade pip
+          python tools/make_lock.py --check
+      - name: Install the locked environment
+        run: |
+          python -m pip install --require-hashes -r requirements-lock.txt
+          python -m pip install -e . --no-deps
+      - name: Run tests against the pinned versions
+        run: python -m pytest -q
+
   package:
     name: Build distributions
     runs-on: ubuntu-latest

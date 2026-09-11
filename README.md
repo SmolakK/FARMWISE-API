@@ -312,6 +312,53 @@ Scenario definitions and collection settings are explicit in the Python
 source. Statistical analysis and figure generation are performed separately
 in the evaluation notebook.
 
+## Reproducibility
+
+Dependencies are specified at two levels, for two different purposes.
+
+`pyproject.toml` declares a supported *range* for every dependency. The floor
+of each range is the lowest version the test suite has actually been run
+against, and the ceiling is the next major release (the next minor for `0.x`
+projects, whose minor releases may break compatibility). Install this way to
+use FARMWISE as a library alongside other packages:
+
+```powershell
+python -m pip install -e ".[server,dev]"
+```
+
+[`requirements-lock.txt`](requirements-lock.txt) pins the *exact* transitive
+closure — 132 packages, each with a SHA-256 hash — of the environment the
+published results and the CI test runs were produced in. Install this way to
+reconstruct that environment:
+
+```powershell
+python -m pip install --require-hashes -r requirements-lock.txt
+python -m pip install -e . --no-deps
+```
+
+The hashes identify specific wheels, so the lock file applies to the platform
+recorded in its header (CPython 3.12, Linux x86-64). On another platform,
+install from the ranges instead. The `locked` CI job installs from this file
+and runs the full test suite, so a stale lock fails the build rather than
+going unnoticed.
+
+Regenerate the lock after changing any dependency in `pyproject.toml`:
+
+```powershell
+python tools\make_lock.py
+```
+
+The script resolves the declared ranges for the target interpreter and
+platform without installing anything, so it can be run from any machine.
+`python tools\make_lock.py --check` reports whether the committed lock still
+matches `pyproject.toml`; CI runs that check, so the two cannot drift apart
+silently.
+
+The CI matrix covers Python 3.10, 3.11 and 3.12. Because the ranges are wide,
+these resolve to materially different stacks — pandas 2.3 with NumPy 2.2 at
+the 3.10 end, pandas 3.0 with NumPy 2.5 at the 3.12 end — and the suite is
+required to pass on both.
+
 ## License
 
 The FARMWISE source code is licensed under the
