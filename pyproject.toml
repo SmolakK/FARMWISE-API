@@ -19,7 +19,6 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: GIS",
@@ -29,10 +28,12 @@ license-files = [
     "DATA_LICENSES.md",
      "farmwise_api/_vendor/hubeaupyutils/LICENSE",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 # Version bounds: the floor of each range is the lowest version the test
-# suite has actually been run against (CI matrix low end, Python 3.10);
-# the ceiling is the next major release (next minor for 0.x projects).
+# suite has been verified against; the ceiling is the next major release
+# (next minor for 0.x projects). The floors sit below what the CI matrix
+# resolves to (3.11 and 3.12 both pull pandas 3 / NumPy 2.4+), so the
+# pandas 2 end of each range is verified by hand, not by CI.
 # Exact, reproducible versions live in requirements-lock.txt - see the
 # Reproducibility section of README.md.
 dependencies = [
@@ -79,12 +80,12 @@ server = [
     "uvicorn[standard]>=0.52,<1",
 ]
 dev = [
+    "mypy>=2.3,<3",
     "pytest>=9.1,<10",
     "pytest-asyncio>=1.4,<2",
     "pytest-cov>=7.1,<8",
     "setuptools>=77,<85",
     "wheel>=0.48,<1",
-    "tomli>=2,<3; python_version < '3.11'",
 ]
 evaluation = [
     # matplotlib is already a core dependency; this extra exists so the
@@ -145,3 +146,47 @@ include-package-data = false
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["farmwise_api"]
+branch = true
+omit = [
+    # Third-party code vendored verbatim under its own licence; covering it
+    # would measure upstream's tests, not this project's.
+    "farmwise_api/_vendor/*",
+    # One-off scripts that rebuild bundled station files from upstream
+    # portals. They are run by hand, need network access, and are not part
+    # of the dispatch path.
+    "farmwise_api/adapters/API_readers/*/*_stations.py",
+    "farmwise_api/adapters/API_readers/*/*_stations_api.py",
+]
+
+[tool.coverage.report]
+# The floor is set just below the measured figure so it ratchets: a change
+# that drops coverage fails CI, while ordinary work has room to move.
+fail_under = 80
+precision = 1
+show_missing = true
+skip_covered = true
+exclude_also = [
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.mypy]
+# python_version is deliberately not pinned: mypy then targets whichever
+# interpreter it runs under, which is the one whose installed stubs it reads.
+# Pinning it to the version floor makes mypy parse the current NumPy stubs (which
+# use 3.12 syntax) under older rules and fail before checking any project code.
+# CI runs this check across the same matrix as the tests.
+#
+# Checked packages are listed in the CI invocation: core and server only.
+# The adapter layer is not type-checked yet - see README, Development.
+ignore_missing_imports = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+strict_equality = true
+pretty = true
