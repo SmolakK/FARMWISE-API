@@ -75,3 +75,8 @@ farmwise_api/adapters/API_readers/IFSGRID/data/IFSGRID/*
 farmwise_api/adapters/API_readers/egdi/data/*
 eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif
 .ipynb_checkpoints
+# Coverage artefacts
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
