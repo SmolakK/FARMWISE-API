@@ -84,6 +84,8 @@ dev = [
     "pytest>=9.1,<10",
     "pytest-asyncio>=1.4,<2",
     "pytest-cov>=7.1,<8",
+    # tools/build_registry.py reads registry/variables.yaml
+    "pyyaml>=6,<7",
     "setuptools>=77,<85",
     # uv resolves requirements-lock.txt (tools/make_lock.py). Bounded because
     # the resolver's output is what CI compares against the committed lock.

@@ -1,0 +1,1397 @@
+# FARMWISE variable/source registry - AUTHORED metadata.
+#
+# This file holds only what cannot be derived from the code: native
+# units, spatial/temporal support, and literature references. Everything
+# else (variable names, output units, aggregation and harmonisation
+# rules, coverage) is read live from the adapters by
+# tools/build_registry.py and must not be duplicated here.
+#
+# `null` means NOT YET SUPPLIED. It is reported as missing, never
+# guessed. Fill these in from provider documentation and cite the
+# source in `reference`.
+#
+# New source x variable pairs are appended automatically when the code
+# gains them; run: python tools/build_registry.py
+sources:
+  farmwise_api.adapters.API_readers.EuroCropV2.EuroCropV2_read:
+    dataset: null
+    provider: European Commission, Joint Research Centre (JRC), with the contributors identified
+      in the dataset catalogue
+    reference: https://data.jrc.ec.europa.eu/dataset/b9fb9e67-78a9-4327-9d59-39a928d812d3
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      c:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.IFSGRID.IFSGRID_read:
+    dataset: null
+    provider: Eurostat and contributing national statistical authorities
+    reference: https://doi.org/10.5281/zenodo.14852709
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      ARA:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      AraShare:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      BOVINE:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      FllwShr:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      GOATS:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      GrassShare:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      HOLDING:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      HldnPK2:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      IrrShare:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      J0000T:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      LSU:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      LSUdensity:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      OrgShar:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      PECR:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      PIGS:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      POULTRY:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      PecrShare:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Q0000T:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      SHEEP:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      SO_EURO:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      UAA:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      UAAXK00:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      UAA_IB:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.UA_sw_quality.ukrainian_surface_water:
+    dataset: state monitoring observations for Ukrainian surface waters
+    provider: State Agency of Water Resources of Ukraine
+    reference: https://data.gov.ua/dataset/surface-water-monitoring
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      BOD5:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      COD:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      SPAR:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      altrazine:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      ammonium:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      chloride:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      nitrate:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      nitrite:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      nitrogen:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      oxygen:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      permanganate:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      phosphate:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      phytoplankton:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      simazine:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      sulfate:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      suspended_solids:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.cds.cds_single_levels:
+    dataset: reanalysis-era5-single-levels
+    provider: Copernicus Climate Change Service (C3S), implemented by ECMWF
+    reference: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      2m_temperature:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      total_precipitation:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      volumetric_soil_water_layer_1:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.corine.corine_read:
+    dataset: CORINE Land Cover map services for requested reference years
+    provider: European Union's Copernicus Land Monitoring Service (CLMS)
+    reference: https://land.copernicus.eu/en/products/corine-land-cover
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      (land cover):
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.correctiv.correctiv_read:
+    dataset: monthly minimum, mean and maximum groundwater levels in metres above sea level
+      for roughly 6,700 monitoring stations, 1990-2021, with long-term trend classifications
+    provider: CORRECTIV (CORRECTIV.Lokal), compiling observations supplied by the groundwater
+      monitoring authorities of 13 German federal states
+    reference: https://github.com/correctiv/grundwasser-data
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      max_gwl:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      mean_gwl:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      min_gwl:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.eea.eea_read:
+    dataset: Marc J. Metzger (2018), The Environmental Stratification of Europe, University
+      of Edinburgh, <https://doi.org/10.7488/ds/2356>
+    provider: European Environment Agency (EEA)
+    reference: https://www.eea.europa.eu/en/datahub/datahubitem-view/c8c4144a-8c0e-4686-9422-80dbf86bc0cb
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      value:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.egdi.egdi_read_d10:
+    dataset: null
+    provider: Federal Institute for Geosciences and Natural Resources (BGR), distributed through
+      EGDI
+    reference: null
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      (unspecified):
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.egdi.egdi_read_hc:
+    dataset: null
+    provider: Federal Institute for Geosciences and Natural Resources (BGR), distributed through
+      EGDI
+    reference: null
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      (unspecified):
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.epa_ireland.epa_gw:
+    dataset: null
+    provider: Environmental Protection Agency Ireland
+    reference: https://data.epa.ie/
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      groundwater depth [m b.g.l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.geosphere.geosphere:
+    dataset: Station Data-v2 (1 d), resource klima-v2-1d
+    provider: GeoSphere Austria
+    reference: https://dataset.api.hub.geosphere.at/app/frontend/station/historical/klima-v2-1d
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      rr:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      tl_mittel:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.gios.gios_scraper:
+    dataset: null
+    provider: Główny Inspektorat Ochrony Środowiska (GIOŚ)
+    reference: null
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      Humus [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Al [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Al [cmol(+)*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Anthracene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil As [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Available Ammonium Nitrogen [NNH4 mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Available Magnesium [mg Mg*100g-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Available Nitrate Nitrogen [NNO3 mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Available Potassium [mg K2O*100g-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Available Sulphur [mg S-SO4*100g-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Ba [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Be [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Benzo(a)Anthracene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Benzo(a)Fluoranthene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Benzo(a)Pyrene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Benzo(b)Fluoranthene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Benzo(ghi)Perylene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Benzo(k)Fluoranthene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil C/N [-]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Ca [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Ca2+ [cmol(+)*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil CaCo3 [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Cd [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Chrysene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Co [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Cr [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Cu [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Dibenzo(a,h)Anthracene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Electrical Conductivity [mS*m-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Fe [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Fluoranthene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Fluorene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      'Soil Granularity: 0.05-0.002 mm [%]':
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      'Soil Granularity: 0.1-0.02 mm [%]':
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      'Soil Granularity: 1.0-0.1 mm [%]':
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      'Soil Granularity: 2.0-0.05 mm [%]':
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      'Soil Granularity: < 0.002 mm [%]':
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      'Soil Granularity: < 0.02 mm [%]':
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Hg [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Hh [cmol(+)*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Hw [cmol(+)*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Indeno(1,2,3-cd)Pyrene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil K [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil K+ [cmol(+)*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil La [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Li [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Mg [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Mg2+ [cmol(+)*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Mn [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Na [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Na+ [cmol(+)*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Naphthalene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Ni [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Organic Carbon [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Organochlorine Pesticides Aldrin [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Organochlorine Pesticides Alfa-HCH [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Organochlorine Pesticides Beta-HCH [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Organochlorine Pesticides DDT/DDE/DDD [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Organochlorine Pesticides Dieldrin [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Organochlorine Pesticides Endrin [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Organochlorine Pesticides Gamma-HCH [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil P [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil PAH Sum 13 [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Pb [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Pesticides Non Chlorinated Compounds Atrazin [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Pesticides Non Chlorinated Compounds Carbaryl [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Pesticides Non Chlorinated Compounds Carbofuran [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Pesticides Non Chlorinated Compounds Maneb [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Phenanthrene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Pyrene [µg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Radioactivity [Bq*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil S [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil S [cmol(+)*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Salinity [mg KCl*100g-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Sr [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil T [cmol(+)*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Total Nitrogen [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil V [%]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil V [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil Zn [mg*kg-1]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil pH H2O [pH]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Soil pH KCl [pH]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.gios_gw.gios_gw:
+    dataset: null
+    provider: Główny Inspektorat Ochrony Środowiska (GIOŚ)
+    reference: null
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      Arsenic [mgAs/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Cadmium [mgCd/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Calcium [mgCa/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Chlorides [mgCl/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Depth to Top of Aquifer Layer [m b.g.l.]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      EC [µS/cm]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Flonicamid (IKI-220) [mg/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Flufenacet [mg/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Fluopyram [mg/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Lead [mgPb/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Magnesium [mgMg/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Novaluron [mg/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      PFOS [mg/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Phosphates [mgPO4/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Potassium [mgK/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Sodium [mgNa/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Trifloxystrobin [mg/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Zinc [mgZn/l]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      pH:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm:
+    dataset: null
+    provider: Office français de la biodiversité (OFB), BRGM, Service Central Vigicrues, and
+      the producers identified by individual records
+    reference: https://hubeau.eaufrance.fr/
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      date_mesure:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      niveau_nappe_eau:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      profondeur_nappe:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.hubeau.hubeau_sw_quality_read:
+    dataset: null
+    provider: Office français de la biodiversité (OFB), BRGM, Service Central Vigicrues, and
+      the producers identified by individual records
+    reference: https://hubeau.eaufrance.fr/
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      Acide pentacosafluorotridecanoique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-dodecanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-n-butanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-n-heptanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-n-nonanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-n-pentanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-n-undecanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-octanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluorodecane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluorododecane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoroheptane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluorononane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoropentane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluorotridecane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoroundecane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide sulfonique de perfluorobutane:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide sulfonique de perfluorooctane:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Arsenic:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Cadmium:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Calcium:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Chlorures:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Conductivité à 25°C:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Magnésium:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Nitrates:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Perfluorohexanesulfonic acid:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Phosphore total:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Plomb:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Potassium:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Potentiel en Hydrogène (pH):
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Sodium:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Somme des pesticides totaux:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Sulfonate de perfluorooctane:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Zinc:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.hubeau.hubeau_wq_read:
+    dataset: null
+    provider: Office français de la biodiversité (OFB), BRGM, Service Central Vigicrues, and
+      the producers identified by individual records
+    reference: https://hubeau.eaufrance.fr/
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      Acide pentacosafluorotridecanoique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-dodecanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-n-butanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-n-heptanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-n-nonanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-n-pentanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-n-undecanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoro-octanoïque:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluorodecane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluorododecane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoroheptane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluorononane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoropentane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluorotridecane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide perfluoroundecane sulfonique:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide sulfonique de perfluorobutane:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Acide sulfonique de perfluorooctane:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Arsenic:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Cadmium:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Calcium:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Chlorures:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Conductivité à 25°C:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Magnésium:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Nitrates:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Perfluorohexanesulfonic acid:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Phosphore total:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Plomb:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Potassium:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Potentiel en Hydrogène (pH):
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Sodium:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Somme des pesticides totaux:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Sulfonate de perfluorooctane:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Zinc:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.imgw.imgw_api_synop_daily:
+    dataset: null
+    provider: Instytut Meteorologii i Gospodarki Wodnej — Państwowy Instytut Badawczy (IMGW-PIB)
+    reference: https://danepubliczne.imgw.pl/datastore
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      Average daily temperature [°C]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Daily precipitation total [mm]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.imgw_hydro.imgw_api_hydro_daily:
+    dataset: null
+    provider: Instytut Meteorologii i Gospodarki Wodnej — Państwowy Instytut Badawczy (IMGW-PIB)
+    reference: https://danepubliczne.imgw.pl/datastore
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      Flow [m³/s]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      Water level [cm]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.irish_meteo.irish_ms_daily:
+    dataset: null
+    provider: Met Éireann
+    reference: https://cli.fusio.net/cli/climate_data/webdata/
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      precipitation [mm]:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.soilgrids.soilgrids_call:
+    dataset: SoilGrids 2.0 predicted soil-property maps
+    provider: ISRIC — World Soil Information
+    reference: https://soilgrids.org/
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      bdod:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      cec:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      cfvo:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      clay:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      nitrogen:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      ocd:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      ocs:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      phh2o:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      sand:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      silt:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      soc:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+  farmwise_api.adapters.API_readers.wetterdienst.wetterdienst_dwd:
+    dataset: DWD Climate Data Center/Open Data observations accessed through Wetterdienst
+    provider: Deutscher Wetterdienst (DWD)
+    reference: https://opendata.dwd.de/climate_environment/CDC/
+    spatial_resolution: null
+    spatial_support: null
+    temporal_support: null
+    variables:
+      precipitation_height:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null
+      temperature_air_mean_2m:
+        native_unit: null
+        notes: null
+        reference: null
+        transformation: null

@@ -275,6 +275,36 @@ Run the test suite with:
 python -m pytest
 ```
 
+## Variable and source registry
+
+[`docs/registry.md`](docs/registry.md) documents every source × variable pair
+FARMWISE can return: the provider's own variable name, its physical meaning,
+native and output units, spatial and temporal support, the transformation
+applied, how repeated values from one source are reduced, and how values from
+different sources are combined. [`docs/registry.csv`](docs/registry.csv) is
+the same content as one row per pair, for analysis or inclusion in a paper
+appendix.
+
+Both are generated:
+
+```powershell
+python tools\build_registry.py            # regenerate
+python tools\build_registry.py --report   # completeness summary
+```
+
+Variable names, output units, coverage, dispatch status, aggregation and
+harmonisation rules are read **live from the adapters**, so the registry
+cannot drift from the behaviour it documents; CI fails if the committed files
+are stale. Provider, dataset and source URL are taken from
+[`DATA_LICENSES.md`](DATA_LICENSES.md).
+
+Everything a domain author must supply — native units, spatial and temporal
+support, per-variable transformations and literature references — lives in
+[`registry/variables.yaml`](registry/variables.yaml). Unset fields are `null`
+and are reported as missing rather than guessed; they render as
+_not supplied_ in the documentation. Run `--report` to see what is
+outstanding.
+
 ### Quality checks
 
 The test suite reports coverage using the settings in `pyproject.toml`
