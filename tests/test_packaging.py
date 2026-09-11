@@ -39,11 +39,6 @@ def built_wheel(tmp_path_factory):
             "temp_storage",
         ),
     )
-    bundled_license = Path(
-        "internal-lib/hubeaupyutils/hubeaupyutils-main/LICENSE"
-    )
-    (source_dir / bundled_license).parent.mkdir(parents=True)
-    shutil.copy2(ROOT / bundled_license, source_dir / bundled_license)
 
     build_python = os.environ.get("FARMWISE_BUILD_PYTHON", sys.executable)
     result = subprocess.run(
