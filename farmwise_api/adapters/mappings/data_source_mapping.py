@@ -11,7 +11,7 @@ FIVE_BEFORE = (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')
 # - Parameters (data types requested)
 # - Temporal type (daily, monthly, yearly)
 # - Spatial type (1 for point-based, 2 for grid-based)
-# - Quality (1 for best quality)
+# - Quality (1 for best quality) (not used, YET)
 # - NName
 API_PATH_RANGES = {
     'farmwise_api.adapters.API_readers.geosphere.geosphere': (
