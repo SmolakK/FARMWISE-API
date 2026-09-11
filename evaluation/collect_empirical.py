@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import nullcontext
 from datetime import datetime, timezone
 import json
-import os
 from pathlib import Path
 import random
 import sys
@@ -17,7 +17,7 @@ from tqdm import tqdm
 
 from farmwise_api.core.main_call import plan_source_dispatch, read_data
 from farmwise_api.core.utils.access_policy import (
-    IMGW_RESEARCH_USE_ENV,
+    acknowledged_private_noncommercial_imgw,
     private_noncommercial_imgw_enabled,
 )
 from evaluation.collect_cross_source import (
@@ -257,16 +257,23 @@ async def collect(
 
 def main() -> None:
     """Collect the scenarios configured in ``evaluation.scenarios``."""
-    if INCLUDE_IMGW_RESEARCH:
-        os.environ[IMGW_RESEARCH_USE_ENV] = "1"
-    result = asyncio.run(
-        collect(
-            scenarios=REQUEST_SCENARIOS,
-            scaling_scenarios=LIVE_SCALING_SCENARIOS,
-            cross_scenarios=CROSS_SOURCE_SCENARIOS,
-            scaling_repeats=SCALING_REPEATS,
-        )
+    # The acknowledgement is scoped to this collection run. Leaving it set
+    # would silently open the IMGW licence gate for anything else running
+    # later in the same process.
+    acknowledgement = (
+        acknowledged_private_noncommercial_imgw()
+        if INCLUDE_IMGW_RESEARCH
+        else nullcontext()
     )
+    with acknowledgement:
+        result = asyncio.run(
+            collect(
+                scenarios=REQUEST_SCENARIOS,
+                scaling_scenarios=LIVE_SCALING_SCENARIOS,
+                cross_scenarios=CROSS_SOURCE_SCENARIOS,
+                scaling_repeats=SCALING_REPEATS,
+            )
+        )
     print(
         f"Collected {result['request_count']} live requests and "
         f"{result['observation_count']} cross-source observations in "
