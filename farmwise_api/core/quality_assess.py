@@ -95,16 +95,13 @@ def assess_data_quality(df, metadata, ranges, req_ranges):
             len(expected_cells.intersection(returned_cells)),
             len(expected_cells),
         ),
-        "total_missing_values": _missing_rate(
-            daily, expected_rows=expected_days
-        ),
         "factor_missing_values": _missing_rate(
             daily, expected_rows=expected_days
         ),
         "factor_missing_value_rates": _factor_missing_rates(
             daily, expected_rows=expected_days
         ),
-        "missing_days": _missing_day_rate(
+        "incomplete_day_rate": _missing_day_rate(
             daily, expected_rows=expected_days
         ),
         "expected_start": actual_start.isoformat(),
