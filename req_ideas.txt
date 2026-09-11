@@ -1,4 +1,0 @@
--> parametry zbiorcze w kodzie - climate, water quality, water quantity
--> Europejskie też
--> parametry None -> all parameters
--> Priority -> stack tabeli z parametrem priority dla overlappu filtr min()
