@@ -82,8 +82,14 @@ Copy-Item public_host.env.example public_host.env
 ```
 
 `fidel.env` contains JWT settings. SMTP configuration is only required when
-email delivery is used. By default, it is read from `smtp.env` in the working
-directory; set `FARMWISE_SMTP_ENV_FILE` to use another location.
+email delivery is used. By default it is read from `smtp.env` in the
+repository root when FARMWISE runs from a source checkout, and from `smtp.env`
+in the process working directory when it runs as an installed package. Never
+place it inside the `farmwise_api` package directory: that directory may be
+read-only once installed, and credentials must not sit next to the shipped
+source. Set `FARMWISE_SMTP_ENV_FILE` to use another location; it is read when
+`farmwise_api.server.email_utils` is first imported, so export it before
+starting the server.
 `PUBLIC_BASE_URL` should contain a host and optional port without a URL scheme,
 for example `localhost:8000`.
 
