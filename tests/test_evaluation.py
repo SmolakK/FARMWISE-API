@@ -14,6 +14,7 @@ from evaluation.collect_cross_source import (
     validate_private_output,
 )
 from evaluation.scenarios import CROSS_SOURCE_SCENARIOS, LIVE_SCALING_SCENARIOS
+from farmwise_api.core.utils.access_policy import IMGW_RESEARCH_USE_ENV
 
 
 @pytest.mark.asyncio
@@ -250,20 +251,56 @@ def test_run_all_only_runs_empirical_collection(monkeypatch):
     assert empirical_runner.run_all() == expected
 
 
-def test_collect_empirical_main_enables_file_level_imgw_opt_in(
-    monkeypatch, tmp_path
-):
+def _record_acknowledgement_during_collection(monkeypatch, tmp_path, observed):
+    """Patch ``main`` dependencies and capture the gate state while collecting."""
     expected = {"request_count": 1, "observation_count": 2}
 
     def fake_run(coroutine):
         coroutine.close()
+        observed["during"] = os.environ.get(IMGW_RESEARCH_USE_ENV)
         return expected
 
-    monkeypatch.delenv("FARMWISE_ENABLE_RESEARCH_IMGW", raising=False)
-    monkeypatch.setattr(empirical_collector, "INCLUDE_IMGW_RESEARCH", True)
     monkeypatch.setattr(empirical_collector.asyncio, "run", fake_run)
     monkeypatch.setattr(empirical_collector, "OUTPUT_DIR", tmp_path)
 
+
+def test_collect_empirical_main_enables_file_level_imgw_opt_in(
+    monkeypatch, tmp_path
+):
+    observed = {}
+    monkeypatch.delenv(IMGW_RESEARCH_USE_ENV, raising=False)
+    monkeypatch.setattr(empirical_collector, "INCLUDE_IMGW_RESEARCH", True)
+    _record_acknowledgement_during_collection(monkeypatch, tmp_path, observed)
+
     empirical_collector.main()
 
-    assert os.environ["FARMWISE_ENABLE_RESEARCH_IMGW"] == "1"
+    assert observed["during"] == "1"
+    assert IMGW_RESEARCH_USE_ENV not in os.environ
+
+
+def test_collect_empirical_main_restores_a_pre_existing_acknowledgement(
+    monkeypatch, tmp_path
+):
+    observed = {}
+    monkeypatch.setenv(IMGW_RESEARCH_USE_ENV, "yes")
+    monkeypatch.setattr(empirical_collector, "INCLUDE_IMGW_RESEARCH", True)
+    _record_acknowledgement_during_collection(monkeypatch, tmp_path, observed)
+
+    empirical_collector.main()
+
+    assert observed["during"] == "1"
+    assert os.environ[IMGW_RESEARCH_USE_ENV] == "yes"
+
+
+def test_collect_empirical_main_leaves_imgw_disabled_without_opt_in(
+    monkeypatch, tmp_path
+):
+    observed = {}
+    monkeypatch.delenv(IMGW_RESEARCH_USE_ENV, raising=False)
+    monkeypatch.setattr(empirical_collector, "INCLUDE_IMGW_RESEARCH", False)
+    _record_acknowledgement_during_collection(monkeypatch, tmp_path, observed)
+
+    empirical_collector.main()
+
+    assert observed["during"] is None
+    assert IMGW_RESEARCH_USE_ENV not in os.environ
