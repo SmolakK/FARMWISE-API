@@ -6,7 +6,7 @@
 #
 #   Python   : 3.12
 #   Platform : linux x86_64 (manylinux_2_28)
-#   Packages : 132
+#   Packages : 135
 #   Generated: 2026-09-11
 #
 # Install exactly this environment:
@@ -36,6 +36,8 @@ anyio==4.15.1 \
     --hash=sha256:6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101
 apscheduler==3.11.3 \
     --hash=sha256:bbeb2ec02d23d3c06a6c07ed7f0f3939ada6680eb121fae809a69bb42c537a30
+ast_serialize==0.11.1 \
+    --hash=sha256:3eebd3dd25a81839ac7d25b5f3fb3527f6141b35eca29f63d2613fe6254307fd
 attrs==26.1.0 \
     --hash=sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309
 bcrypt==4.0.1 \
@@ -124,6 +126,8 @@ jinja2==3.1.6 \
     --hash=sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67
 kiwisolver==1.5.1 \
     --hash=sha256:34633ecf50d16187ab8e5528b7a2530f2feb4e23f300db4672538b51cfc5cd38
+librt==0.15.0 \
+    --hash=sha256:89cc46cfd15022e35084355478c9ac809d90b1152222706ac9a7655ec21df6fa
 limits==5.8.0 \
     --hash=sha256:ae1b008a43eb43073c3c579398bd4eb4c795de60952532dc24720ab45e1ac6b8
 lxml==6.1.3 \
@@ -140,6 +144,8 @@ multidict==6.8.0 \
     --hash=sha256:003a3bddb32915c3f67096ea41d24e53edf710edb65a1f5d0c70ab40b0e4d20b
 multiurl==0.3.9 \
     --hash=sha256:5acedb53343bb47ff6188405dc33e10c1f1713591de8929a69b966d4d395d88e
+mypy==2.3.1 \
+    --hash=sha256:858fc57d3d91fa728e33e7ad71def60fc6272694607b306cd3292db53ae39080
 mypy_extensions==1.1.0 \
     --hash=sha256:1be4cccdb0f2482337c4743e60421de3a356cd97508abadd57d47403e94f5505
 netcdf4==1.7.4 \
