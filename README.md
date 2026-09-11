@@ -45,7 +45,7 @@ be run from the repository root.
 
 ## Installation
 
-Python 3.10 or newer is required.
+Python 3.11 or newer is required.
 
 Install the local-library variant:
 
@@ -79,7 +79,7 @@ Copy the example files and provide real values:
 
 ```powershell
 Copy-Item fidel.env.example fidel.env
-Copy-Item farmwise_api\server\smtp.env.example smtp.env
+Copy-Item smtp.env.example smtp.env
 Copy-Item public_host.env.example public_host.env
 ```
 
@@ -253,6 +253,29 @@ Run the test suite with:
 python -m pytest
 ```
 
+### Quality checks
+
+The test suite reports coverage using the settings in `pyproject.toml`
+(branch coverage, vendored third-party code and the manual station-rebuild
+scripts excluded):
+
+```powershell
+python -m pytest --cov
+```
+
+Coverage is currently **81.3%** of 4,167 statements. `fail_under` is set to
+80, so a change that reduces coverage fails the run.
+
+`core` and `server` are type-checked; the adapter layer is not yet:
+
+```powershell
+python -m mypy -p farmwise_api.core -p farmwise_api.server
+```
+
+Both checks run in CI across the whole Python matrix. Package mode (`-p`) is
+used rather than paths because the repository root contains an `__init__.py`,
+which otherwise makes mypy resolve each module under two names.
+
 The EEA raster integration tests are opt-in:
 
 ```powershell
@@ -354,10 +377,11 @@ platform without installing anything, so it can be run from any machine.
 matches `pyproject.toml`; CI runs that check, so the two cannot drift apart
 silently.
 
-The CI matrix covers Python 3.10, 3.11 and 3.12. Because the ranges are wide,
-these resolve to materially different stacks — pandas 2.3 with NumPy 2.2 at
-the 3.10 end, pandas 3.0 with NumPy 2.5 at the 3.12 end — and the suite is
-required to pass on both.
+The CI matrix covers Python 3.11 and 3.12, which resolve to NumPy 2.4 and 2.5
+respectively and to pandas 3 on both. The declared floors reach further back
+(pandas 2.3, NumPy 2.2): the suite has been run against that older stack and
+passes, but CI does not exercise it, so treat the bottom of each range as
+verified rather than continuously tested.
 
 ## License
 
