@@ -7,6 +7,7 @@ import logging
 from typing import Optional
 from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
 from farmwise_api.adapters.API_readers.epa_ireland.epa_ireland_mappings.epa_ireland_mapping import DATA_ALIASES, GLOBAL_MAPPING
+from farmwise_api.adapters.mappings.units import GROUNDWATER_LEVEL_COLUMN
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
 from farmwise_api.core.utils.paths import adapter_data
@@ -35,16 +36,14 @@ async def process_link(client: httpx.AsyncClient, row: pd.Series) -> Optional[pd
                     skiprows=7,
                     sep=';',
                     usecols=[0, 1],
-                    names=['timestamp', 'groundwater level [m]'],
+                    names=['timestamp', 'groundwater level [m OD Malin]'],
                     header=0,
                     parse_dates=['timestamp']
                 )
+
                 df['id'] = id
                 df['lat'] = row['lat']
                 df['lon'] = row['lon']
-
-                # Calculate depth to groundwater
-                df['groundwater depth [m b.g.l]'] = row['measuring_point_height'] - df['groundwater level [m]']
 
                 return df
 
@@ -91,7 +90,10 @@ async def read_data(
         df = result
 
         # Check if DataFrame has valid data before appending
-        if not df.empty and not df[['groundwater level [m]', 'groundwater depth [m b.g.l]']].isna().all().all():
+        if (
+                not df.empty
+                and not df['groundwater level [m OD Malin]'].isna().all()
+        ):
             all_data.append(df)
 
     # Handle case where no data is collected
@@ -101,9 +103,10 @@ async def read_data(
     # Concatenate all collected DataFrames
     final_df = pd.concat(all_data, ignore_index=True)
 
-    # Drop 'groundwater level [m]' and rename 'timestamp' to 'Timestamp'
-    final_df = final_df.drop('groundwater level [m]', axis=1)
-    final_df = final_df.rename(columns={'timestamp': 'Timestamp'})
+    # Rename 'timestamp' to 'Timestamp'
+    final_df = final_df.rename(
+        columns={'timestamp': 'Timestamp'}
+    )
 
     # Prepare coordinates for spatial filtering
     unique_points = final_df[['id', 'lat', 'lon']].drop_duplicates()
@@ -125,11 +128,11 @@ async def read_data(
     category_columns = {col for col, cat in DATA_ALIASES.items() if cat in data_range}
     available_columns = [col for col in category_columns if col in final_df.columns]
     if not available_columns:
-        logging.warning("No data columns found for the requested categories.")
+        logger.warning("No data columns found for the requested categories.")
         return pd.DataFrame()
 
     # Define measurement columns
-    measurement_columns = ['groundwater depth [m b.g.l]']
+    measurement_columns = available_columns
     final_df = final_df[['id', 'Timestamp'] + measurement_columns]
 
     # Merge with coordinates to include S2CELL
@@ -144,11 +147,13 @@ async def read_data(
                  or WITHIN_SOURCE_AGGREGATION_METHODS),
         column_data_types=DATA_ALIASES,
     )
-    final_df = final_df.rename(GLOBAL_MAPPING, axis=1)
-    final_df['Groundwater Depth [cm]'] *= 100
+    final_df = final_df.rename(
+        GLOBAL_MAPPING,
+        axis=1,
+    )
 
     return final_df.reset_index().pivot(
         index='Timestamp',
         columns='S2CELL',
-        values=['Groundwater Depth [cm]'],
+        values=[GROUNDWATER_LEVEL_COLUMN],
     )

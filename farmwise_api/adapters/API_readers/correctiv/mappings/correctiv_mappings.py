@@ -8,8 +8,11 @@ PARAMETER_SELECTION = []
 DATA_ALIASES = {}
 
 # global mapping of parameter codes to descriptions and units
+# CORRECTIV publishes monthly minimum, mean and maximum groundwater levels in
+# metres above sea level (NHN). These are elevations, not depths - the old
+# labels said "Depth" - and follow the shared groundwater-level convention.
 GLOBAL_MAPPING = {
-    'min_gwl': 'Min Groundwater Depth [a.s.l]',
-    'mean_gwl': 'Mean Groundwater Depth [a.s.l]',
-    'max_gwl': 'Max Groundwater Depth [a.s.l]',
+    'min_gwl': 'Minimum groundwater level [m a.s.l.]',
+    'mean_gwl': 'Mean groundwater level [m a.s.l.]',
+    'max_gwl': 'Maximum groundwater level [m a.s.l.]',
 }
