@@ -14,19 +14,34 @@
 # gains them; run: python tools/build_registry.py
 sources:
   farmwise_api.adapters.API_readers.EuroCropV2.EuroCropV2_read:
-    dataset: null
-    provider: European Commission, Joint Research Centre (JRC), with the contributors identified
-      in the dataset catalogue
-    reference: https://data.jrc.ec.europa.eu/dataset/b9fb9e67-78a9-4327-9d59-39a928d812d3
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    dataset: EuroCropsV2
+    provider: European Commission, Joint Research Centre (JRC), with contributing national
+      paying agencies
+    reference: https://doi.org/10.2905/b9fb9e67-78a9-4327-9d59-39a928d812d3
+    spatial_resolution: parcel-level agricultural field declarations; irregular parcel geometries
+    spatial_support: 'agricultural parcels from national Geo-Spatial Application (GSA) datasets;
+      FARMWISE uses a preprocessed point representation of parcel records for assignment to
+      S2 cells and selects the modal cultivation code within each S2 cell
+
+      '
+    temporal_support: 'annual crop declarations with dataset-wide coverage from 2008 through
+      2023; availability varies by country and year
+
+      '
     variables:
       c:
-        native_unit: null
-        notes: null
+        native_unit: none - categorical cultivation code
+        notes: 'original annual cultivation code from the corresponding GSA layer. Codes are
+          categorical and must not be interpreted as continuous numerical values. FARMWISE
+          uses the modal code when multiple records fall within the same S2 cell.
+
+          '
         reference: null
-        transformation: null
+        transformation: 'no numerical unit conversion; annual categorical cultivation codes
+          are aggregated within S2 cells using mode and the annual value is repeated for requested
+          days within that year
+
+          '
   farmwise_api.adapters.API_readers.IFSGRID.IFSGRID_read:
     dataset: null
     provider: Eurostat and contributing national statistical authorities
@@ -242,27 +257,39 @@ sources:
     dataset: reanalysis-era5-single-levels
     provider: Copernicus Climate Change Service (C3S), implemented by ECMWF
     reference: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    spatial_resolution: 0.25° x 0.25°
+    spatial_support: global regular latitude-longitude grid; FARMWISE adapter requests a bounding-box
+      subset and aggregates grid cells to requested S2 cells
+    temporal_support: hourly ERA5 data available from 1940 to present; FARMWISE dispatch currently
+      uses data from 1950-01-01 to approximately 5 days before the current date and aggregates
+      hourly observations to daily values
     variables:
       2m_temperature:
-        native_unit: null
-        notes: null
+        native_unit: K
+        notes: FARMWISE output is Temperature [°C]
+        physical_meaning: air temperature at 2 m above the surface
         reference: null
-        transformation: null
+        transformation: K to °C by subtracting 273.15; hourly instantaneous values are aggregated
+          to daily mean
       total_precipitation:
-        native_unit: null
-        notes: null
+        native_unit: m
+        notes: FARMWISE retrieves the following midnight when necessary so that the final
+          requested day contains all 24 hourly accumulation intervals
+        physical_meaning: total precipitation accumulated over the corresponding ERA5 accumulation
+          interval
         reference: null
-        transformation: null
+        transformation: m to mm by multiplying by 1000; hourly accumulations are assigned
+          to the preceding hour and summed to daily precipitation
       volumetric_soil_water_layer_1:
-        native_unit: null
-        notes: null
+        native_unit: m³ m⁻³
+        notes: FARMWISE output is Soil moisture [%]
+        physical_meaning: volumetric soil water content in ERA5 soil layer 1 (0-7 cm)
         reference: null
-        transformation: null
+        transformation: volumetric fraction to percent by multiplying by 100; hourly instantaneous
+          values are aggregated to daily mean
   farmwise_api.adapters.API_readers.corine.corine_read:
-    dataset: CORINE Land Cover map services for requested reference years
+    dataset: CORINE Land Cover status layers 1990, 2000, 2006, 2012 and 2018, accessed through
+      EEA ArcGIS feature services
     provider: European Union's Copernicus Land Monitoring Service (CLMS)
     reference: https://land.copernicus.eu/en/products/corine-land-cover
     spatial_resolution: vector polygons, 25 ha minimum mapping unit, 100 m minimum mapping
@@ -289,39 +316,65 @@ sources:
     provider: CORRECTIV (CORRECTIV.Lokal), compiling observations supplied by the groundwater
       monitoring authorities of 13 German federal states
     reference: https://github.com/correctiv/grundwasser-data
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    spatial_resolution: not applicable - irregular monitoring-station network
+    spatial_support: point observations at roughly 6,700 groundwater monitoring stations in
+      13 German federal states
+    temporal_support: monthly statistics 1990-2021; FARMWISE repeats each monthly value on
+      every day of that month
     variables:
       max_gwl:
-        native_unit: null
-        notes: null
-        reference: null
-        transformation: null
+        native_unit: m a.s.l.
+        notes: 'Output: ''Maximum groundwater level [m a.s.l.]''. Earlier labels called this
+          a ''Depth'', which described an elevation incorrectly. The vertical datum is not
+          stated in the published data. Source is disabled from dispatch (protected dataset).'
+        physical_meaning: monthly maximum groundwater level (elevation of the water table)
+        reference: https://github.com/correctiv/grundwasser-data
+        transformation: monthly value repeated on each day of the month
       mean_gwl:
-        native_unit: null
-        notes: null
-        reference: null
-        transformation: null
+        native_unit: m a.s.l.
+        notes: 'Output: ''Mean groundwater level [m a.s.l.]''. Earlier labels called this
+          a ''Depth'', which described an elevation incorrectly. The vertical datum is not
+          stated in the published data. Source is disabled from dispatch (protected dataset).'
+        physical_meaning: monthly mean groundwater level (elevation of the water table)
+        reference: https://github.com/correctiv/grundwasser-data
+        transformation: monthly value repeated on each day of the month
       min_gwl:
-        native_unit: null
-        notes: null
-        reference: null
-        transformation: null
+        native_unit: m a.s.l.
+        notes: 'Output: ''Minimum groundwater level [m a.s.l.]''. Earlier labels called this
+          a ''Depth'', which described an elevation incorrectly. The vertical datum is not
+          stated in the published data. Source is disabled from dispatch (protected dataset).'
+        physical_meaning: monthly minimum groundwater level (elevation of the water table)
+        reference: https://github.com/correctiv/grundwasser-data
+        transformation: monthly value repeated on each day of the month
   farmwise_api.adapters.API_readers.eea.eea_read:
-    dataset: Marc J. Metzger (2018), The Environmental Stratification of Europe, University
-      of Edinburgh, <https://doi.org/10.7488/ds/2356>
+    dataset: Environmental Zones 2018 - version 1.0
     provider: European Environment Agency (EEA)
-    reference: https://www.eea.europa.eu/en/datahub/datahubitem-view/c8c4144a-8c0e-4686-9422-80dbf86bc0cb
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    reference: https://data.europa.eu/data/datasets/6ef007ab-1fcd-4c4f-bc96-14e8afbcb688
+    spatial_resolution: '100 m raster pixel size; derived from the Environmental Stratification
+      of Europe with an original spatial resolution of 1 km
+
+      '
+    spatial_support: 'categorical raster covering Europe in ETRS89 / LAEA Europe (EPSG:3035);
+      FARMWISE clips the raster to the requested bounding box, reprojects it to WGS84 and
+      aggregates raster values to S2 cells
+
+      '
+    temporal_support: 'static Environmental Zones 2018 classification; not a time series.
+      FARMWISE currently repeats the 2018 classification for each requested day
+
+      '
     variables:
       value:
-        native_unit: null
-        notes: null
+        native_unit: none - categorical environmental-zone code
+        notes: 'categorical environmental stratification derived from the Environmental Stratification
+          of Europe; values must not be interpreted as continuous measurements
+
+          '
         reference: null
-        transformation: null
+        transformation: 'no unit conversion; raster is reprojected using nearest-neighbour
+          resampling and categorical values are aggregated to S2 cells
+
+          '
   farmwise_api.adapters.API_readers.egdi.egdi_read_d10:
     dataset: null
     provider: Federal Institute for Geosciences and Natural Resources (BGR), distributed through
@@ -351,43 +404,67 @@ sources:
         reference: null
         transformation: null
   farmwise_api.adapters.API_readers.epa_ireland.epa_gw:
-    dataset: null
+    dataset: EPA HydroNet groundwater-level daily mean time series
     provider: Environmental Protection Agency Ireland
-    reference: https://data.epa.ie/
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    reference: https://www.epa.ie/our-services/monitoring--assessment/freshwater--marine/groundwater/
+    spatial_resolution: not applicable - irregular groundwater monitoring network
+    spatial_support: 'point observations at groundwater monitoring stations from the EPA HydroNet
+      network; FARMWISE currently uses a curated local station catalogue and aggregates stations
+      falling within the same S2 cell
+
+      '
+    temporal_support: 'station-dependent groundwater-level records, with some records extending
+      back to the 1970s; groundwater levels are generally monitored at sub-daily frequency,
+      while FARMWISE consumes HydroNet daily-mean time series
+
+      '
     variables:
-      groundwater depth [m b.g.l]:
-        native_unit: null
-        notes: null
+      groundwater level [m OD Malin]:
+        native_unit: m above Ordnance Datum Malin (OSGM02)
+        notes: 'Output: Groundwater level [m a.s.l.] - shared FARMWISE groundwater-level column.
+          EPA HydroNet series ''Groundwater Level'' / ''Day.Mean.Abs'', as stated in each
+          station export header. The export also carries a ''Quality Code Name'' column, which
+          FARMWISE does not currently read. Datum is not converted to a European reference.'
+        physical_meaning: daily mean groundwater level (elevation of the water table)
         reference: null
-        transformation: null
+        transformation: none - the published daily mean is returned unchanged
   farmwise_api.adapters.API_readers.geosphere.geosphere:
     dataset: Station Data-v2 (1 d), resource klima-v2-1d
     provider: GeoSphere Austria
-    reference: https://dataset.api.hub.geosphere.at/app/frontend/station/historical/klima-v2-1d
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    reference: https://doi.org/10.60669/gs6w-jd70
+    spatial_resolution: not applicable - irregular weather-station network
+    spatial_support: point observations at GeoSphere Austria weather-station locations
+    temporal_support: daily observations; dataset contains station-dependent historical records
+      from 1775 onward, while FARMWISE dispatch is restricted to 1950-01-01 through the current
+      day
     variables:
       rr:
-        native_unit: null
-        notes: null
+        native_unit: mm
+        notes: 24-hour precipitation sum
         reference: null
-        transformation: null
+        transformation: negative precipitation values are set to 0 mm; otherwise values are
+          passed through without unit conversion
       tl_mittel:
-        native_unit: null
-        notes: null
+        native_unit: °C
+        notes: mean air temperature at 2 m above the surface
         reference: null
-        transformation: null
+        transformation: none - values are passed through without unit conversion
   farmwise_api.adapters.API_readers.gios.gios_scraper:
-    dataset: null
+    dataset: Monitoring Chemizmu Gleb Ornych Polski
     provider: Główny Inspektorat Ochrony Środowiska (GIOŚ)
-    reference: null
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    reference: https://www.gov.pl/web/gios/monitoring-jakosci-gleby-i-ziemi
+    spatial_resolution: 'not applicable - network of 216 permanent soil monitoring points
+
+      '
+    spatial_support: 'composite soil samples collected at agricultural monitoring points;
+      each composite sample consists of 20 individual samples collected from a 100 m² area
+      at 0-20 cm depth
+
+      '
+    temporal_support: 'monitoring surveys conducted every five years: 1995, 2000, 2005, 2010,
+      2015, 2020 and 2025
+
+      '
     variables:
       Humus [%]:
         native_unit: null
@@ -828,10 +905,14 @@ sources:
         reference: null
         transformation: null
       Depth to Top of Aquifer Layer [m b.g.l.]:
-        native_unit: null
-        notes: null
+        native_unit: m below ground level (m p.p.t.)
+        notes: 'Source column ''Głębokość do stropu warstwy wodonośnej [m p.p.t.]''. This
+          describes the monitoring point''s aquifer, not the water table: it is not a groundwater
+          level and is not part of the shared groundwater-level column. It cannot be turned
+          into an elevation without the ground elevation at the point.'
+        physical_meaning: depth to the top of the aquifer layer below the ground surface
         reference: null
-        transformation: null
+        transformation: none
       EC [µS/cm]:
         native_unit: null
         notes: null
@@ -903,29 +984,35 @@ sources:
         reference: null
         transformation: null
   farmwise_api.adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm:
-    dataset: null
+    dataset: Hub'Eau niveaux_nappes API - groundwater level time series (ADES)
     provider: Office français de la biodiversité (OFB), BRGM, Service Central Vigicrues, and
       the producers identified by individual records
     reference: https://hubeau.eaufrance.fr/
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    spatial_resolution: not applicable - irregular piezometer network
+    spatial_support: point observations at ADES piezometers (BSS codes) selected from a local
+      station catalogue; stations falling in the same S2 cell are aggregated
+    temporal_support: one value per measurement date; frequency varies by piezometer, from
+      irregular manual readings to daily automatic records; only validated data are requested
     variables:
-      date_mesure:
-        native_unit: null
-        notes: null
-        reference: null
-        transformation: null
       niveau_nappe_eau:
-        native_unit: null
-        notes: null
-        reference: null
-        transformation: null
+        native_unit: m NGF (cote NGF)
+        notes: 'Output: Groundwater level [m a.s.l.] - shared FARMWISE groundwater-level column.
+          Hub''Eau field description: "Niveau de la nappe d''eau (cote NGF) (mètre)". Datum
+          is not converted to a European reference.'
+        physical_meaning: groundwater level (elevation of the water table)
+        reference: https://hubeau.eaufrance.fr/api/v1/niveaux_nappes/api-docs
+        transformation: none - returned in metres; earlier versions multiplied by 100 to centimetres,
+          which has been removed
       profondeur_nappe:
-        native_unit: null
-        notes: null
-        reference: null
-        transformation: null
+        native_unit: m below the local measuring reference
+        notes: 'Not a depth below ground: Hub''Eau defines it relative to the measuring reference,
+          which is often not the ground surface (negative values occur when water stands above
+          it). It is therefore neither comparable with depth-below-ground series nor convertible
+          to an elevation without the reference height, and is kept out of the shared level
+          column.'
+        physical_meaning: depth of the water level below the measuring reference
+        reference: https://hubeau.eaufrance.fr/api/v1/niveaux_nappes/api-docs
+        transformation: none - not requested by the adapter
   farmwise_api.adapters.API_readers.hubeau.hubeau_sw_quality_read:
     dataset: null
     provider: Office français de la biodiversité (OFB), BRGM, Service Central Vigicrues, and
@@ -1275,132 +1362,166 @@ sources:
         reference: null
         transformation: null
   farmwise_api.adapters.API_readers.imgw.imgw_api_synop_daily:
-    dataset: null
+    dataset: IMGW-PIB daily synoptic meteorological observations (dane meteorologiczne dobowe
+      - synop)
     provider: Instytut Meteorologii i Gospodarki Wodnej — Państwowy Instytut Badawczy (IMGW-PIB)
-    reference: https://danepubliczne.imgw.pl/datastore
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    reference: https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteorologiczne/dobowe/synop/
+    spatial_resolution: not applicable - irregular meteorological station network
+    spatial_support: point observations at IMGW-PIB synoptic meteorological stations in Poland
+    temporal_support: daily observations available in the current IMGW daily synoptic archive
+      from 1966 onward; availability of recent observations depends on the publication schedule
+      and station
     variables:
       Average daily temperature [°C]:
-        native_unit: null
-        notes: null
+        native_unit: °C
+        notes: daily mean air temperature reported by IMGW-PIB; the adapter currently does
+          not use the associated IMGW measurement-status field
         reference: null
-        transformation: null
+        transformation: none - values are passed through without unit conversion
       Daily precipitation total [mm]:
-        native_unit: null
-        notes: null
+        native_unit: mm
+        notes: daily precipitation total reported by IMGW-PIB; the adapter currently does
+          not use the associated IMGW measurement-status field
         reference: null
-        transformation: null
+        transformation: none - values are passed through without unit conversion
   farmwise_api.adapters.API_readers.imgw_hydro.imgw_api_hydro_daily:
-    dataset: null
+    dataset: IMGW-PIB daily hydrological observations
     provider: Instytut Meteorologii i Gospodarki Wodnej — Państwowy Instytut Badawczy (IMGW-PIB)
-    reference: https://danepubliczne.imgw.pl/datastore
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    reference: https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_hydrologiczne/dobowe/
+    spatial_resolution: not applicable - irregular hydrological station network
+    spatial_support: point observations at IMGW-PIB hydrological gauging stations in Poland
+    temporal_support: daily hydrological observations available from 1951 onward; publication
+      of completed annual archives occurs with a delay and the latest currently published
+      daily archive is 2025
     variables:
       Flow [m³/s]:
-        native_unit: null
-        notes: null
+        native_unit: m³/s
+        notes: daily river discharge; depending on station instrumentation, daily discharge
+          may represent a chronological mean of instantaneous values or a value corresponding
+          to the 06:00 UTC water-level observation
         reference: null
-        transformation: null
+        transformation: none - values are passed through without unit conversion
       Water level [cm]:
-        native_unit: null
-        notes: null
+        native_unit: cm
+        notes: daily water level at an IMGW-PIB hydrological gauging station
         reference: null
-        transformation: null
+        transformation: none - values are passed through without unit conversion
   farmwise_api.adapters.API_readers.irish_meteo.irish_ms_daily:
-    dataset: null
+    dataset: Met Éireann Daily Rainfall 1 x 1 km Grids
     provider: Met Éireann
-    reference: https://cli.fusio.net/cli/climate_data/webdata/
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    reference: https://clidata.met.ie/cli/grids_daily/
+    spatial_resolution: 1 km x 1 km
+    spatial_support: regular gridded rainfall estimates covering Ireland, derived by Met Éireann
+      from station observations and provided in the TM65 / Irish Grid coordinate system
+    temporal_support: daily rainfall totals; current latest release covers 1941-01-01 through
+      2025-12-31 and is updated annually
     variables:
       precipitation [mm]:
-        native_unit: null
-        notes: null
+        native_unit: 0.1 mm (integer-encoded tenths of a millimetre)
+        notes: daily rainfall total on the official Met Éireann 1 x 1 km interpolated rainfall
+          grid
         reference: null
-        transformation: null
+        transformation: divide source values by 10 to convert encoded tenths of a millimetre
+          to mm; grid coordinates are transformed from EPSG:29902 to WGS84 before assignment
+          to S2 cells
   farmwise_api.adapters.API_readers.soilgrids.soilgrids_call:
     dataset: SoilGrids 2.0 predicted soil-property maps
     provider: ISRIC — World Soil Information
-    reference: https://soilgrids.org/
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    reference: https://doi.org/10.5194/soil-7-217-2021
+    spatial_resolution: 250 m native SoilGrids resolution
+    spatial_support: global gridded model predictions; FARMWISE requests a WCS subset, resamples
+      it to dimensions determined by the requested S2 level, and aggregates values to S2 cells
+    temporal_support: static modelled soil-property product rather than a time series; SoilGrids
+      has no single observation year. FARMWISE currently replicates the same static soil values
+      across every day in the requested time interval
     variables:
       bdod:
-        native_unit: null
-        notes: null
+        native_unit: cg/cm³
+        notes: FARMWISE uses the mean SoilGrids prediction for 0-5 cm depth
+        physical_meaning: bulk density of the fine earth fraction
         reference: null
-        transformation: null
+        transformation: divide by 100 to convert cg/cm³ to kg/dm³
       cec:
-        native_unit: null
-        notes: null
+        native_unit: mmol(c)/kg
+        notes: FARMWISE uses the mean SoilGrids prediction for 0-5 cm depth
+        physical_meaning: cation exchange capacity buffered at pH 7
         reference: null
-        transformation: null
+        transformation: divide by 10 to convert mmol(c)/kg to cmol(c)/kg
       cfvo:
-        native_unit: null
-        notes: null
+        native_unit: cm³/dm³
+        notes: FARMWISE uses the mean SoilGrids prediction for 0-5 cm depth
+        physical_meaning: volumetric content of coarse fragments
         reference: null
-        transformation: null
+        transformation: divide by 10 to convert volumetric per-mille units to percent
       clay:
-        native_unit: null
-        notes: null
+        native_unit: g/kg
+        notes: FARMWISE uses the mean SoilGrids prediction for 0-5 cm depth
+        physical_meaning: clay content by mass
         reference: null
-        transformation: null
+        transformation: divide by 10 to convert g/kg to percent by mass
       nitrogen:
-        native_unit: null
-        notes: null
+        native_unit: cg/kg
+        notes: FARMWISE uses the mean SoilGrids prediction for 0-5 cm depth
+        physical_meaning: total soil nitrogen content
         reference: null
-        transformation: null
+        transformation: divide by 100 to convert cg/kg to g/kg
       ocd:
-        native_unit: null
-        notes: null
+        native_unit: hg/m³
+        notes: FARMWISE uses the mean SoilGrids prediction for 0-5 cm depth
+        physical_meaning: soil organic carbon density
         reference: null
-        transformation: null
+        transformation: divide by 10 to convert hg/m³ to kg/m³
       ocs:
-        native_unit: null
-        notes: null
+        native_unit: t/ha
+        notes: FARMWISE uses the mean SoilGrids prediction for the integrated 0-30 cm layer
+        physical_meaning: soil organic carbon stock
         reference: null
-        transformation: null
+        transformation: divide by 10 to convert t/ha to kg/m²
       phh2o:
-        native_unit: null
-        notes: null
+        native_unit: pH x 10
+        notes: FARMWISE uses the mean SoilGrids prediction for 0-5 cm depth
+        physical_meaning: soil pH measured in water
         reference: null
-        transformation: null
+        transformation: divide by 10 to obtain pH
       sand:
-        native_unit: null
-        notes: null
+        native_unit: g/kg
+        notes: FARMWISE uses the mean SoilGrids prediction for 0-5 cm depth
+        physical_meaning: sand content by mass
         reference: null
-        transformation: null
+        transformation: divide by 10 to convert g/kg to percent by mass
       silt:
-        native_unit: null
-        notes: null
+        native_unit: g/kg
+        notes: FARMWISE uses the mean SoilGrids prediction for 0-5 cm depth
+        physical_meaning: silt content by mass
         reference: null
-        transformation: null
+        transformation: divide by 10 to convert g/kg to percent by mass
       soc:
-        native_unit: null
-        notes: null
+        native_unit: dg/kg
+        notes: FARMWISE uses the mean SoilGrids prediction for 0-5 cm depth
+        physical_meaning: soil organic carbon content
         reference: null
-        transformation: null
+        transformation: divide by 10 to convert dg/kg to g/kg
   farmwise_api.adapters.API_readers.wetterdienst.wetterdienst_dwd:
-    dataset: DWD Climate Data Center/Open Data observations accessed through Wetterdienst
+    dataset: Daily station observations (temperature, pressure, precipitation, sunshine duration,
+      etc.) for Germany
     provider: Deutscher Wetterdienst (DWD)
-    reference: https://opendata.dwd.de/climate_environment/CDC/
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    reference: https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/DESCRIPTION_obsgermany-climate-daily-kl_en.pdf
+    spatial_resolution: not applicable - irregular weather-station network
+    spatial_support: point observations at DWD and partner weather-station locations in Germany
+    temporal_support: daily observations; source records extend back to 1781 depending on
+      station, while FARMWISE dispatch is restricted to 1950-01-01 through the current day;
+      historical records have completed quality control whereas recent records may not yet
+      have completed quality control
     variables:
       precipitation_height:
-        native_unit: null
-        notes: null
+        native_unit: mm
+        notes: daily precipitation height; Wetterdienst parameter precipitation_height, original
+          DWD parameter RSK
         reference: null
-        transformation: null
+        transformation: none - values are passed through without unit conversion
       temperature_air_mean_2m:
-        native_unit: null
-        notes: null
+        native_unit: °C
+        notes: daily mean air temperature at 2 m above ground; Wetterdienst parameter temperature_air_mean_2m,
+          original DWD parameter TMK
         reference: null
-        transformation: null
+        transformation: none - values are passed through without unit conversion
