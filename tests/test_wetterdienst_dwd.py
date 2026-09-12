@@ -100,9 +100,11 @@ async def test_read_data(mock_dwd_request, mock_prepare_coordinates):
         ]
     }
 
-    # Mock prepare_coordinates
+    # Mock prepare_coordinates. One cell per surviving row: the adapter now
+    # keeps a row when *some* parameter is present, so the row count is no
+    # longer fixed at one.
     def mock_prepare(df, spatial_range, level):
-        df["S2CELL"] = ["cell1"]
+        df["S2CELL"] = [f"cell{index}" for index in range(1, len(df) + 1)]
         return df
 
     mock_prepare_coordinates.side_effect = mock_prepare
