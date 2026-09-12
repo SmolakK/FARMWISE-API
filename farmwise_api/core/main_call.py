@@ -272,6 +272,12 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     elif bounding_box is None:
         raise ValueError("You must provide either a 'bounding_box' or a 'country' parameter.")
 
+    if time_from is not None and time_to is not None:
+        if pd.Timestamp(time_from) > pd.Timestamp(time_to):
+            raise ValueError(
+                f"time_from ({time_from}) must not be after time_to ({time_to})."
+            )
+
     precheck_started = perf_counter()
     effective_disabled_sources = _default_disabled_sources()
     if disabled_sources:
@@ -402,85 +408,96 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
         api_reports = list(await asyncio.gather(*quality_tasks))
     quality_wait_seconds = perf_counter() - quality_wait_started
 
-    # Concatenate data if any DataFrames were retrieved
-    if data_storage:
-        try:
-            if separate_api:
-                combined_data = pd.concat(
-                    [data for _source, data, _types in data_storage]
+    metadata = {
+        "request_id": request_id,
+        "apis": api_metadata,
+        "quality_assessment": {
+            "enabled": assess_quality,
+            "sources_assessed": len(api_reports),
+            "final_wait_seconds": quality_wait_seconds,
+        },
+        "coverage_precheck": {
+            "candidate_sources": len(dispatch_plan),
+            "dispatched_sources": sum(
+                item["dispatched"] for item in dispatch_plan
+            ),
+            "requests_avoided": sum(
+                not item["dispatched"] for item in dispatch_plan
+            ),
+            "precheck_seconds": precheck_seconds,
+            "sources": dispatch_plan,
+        },
+        "dispatch": dispatch_metrics,
+        "harmonization": {
+            "enabled": not separate_api,
+            "source_weights": {
+                source: effective_source_weights.get(
+                    source, DEFAULT_SOURCE_WEIGHT
                 )
-                combined_data = _reduce_duplicate_timestamps(
-                    combined_data,
-                    data_storage,
-                    effective_within_source_methods,
-                )
-            else:
-                combined_data = harmonize_data(
-                    data_storage,
-                    source_weights=effective_source_weights,
-                    data_type_methods=effective_methods,
-                )
-            if interpolation:  # be aware this inserts values to NaNs
-                combined_data = interpolate(
-                    combined_data,
-                    bounding_box,
-                    level,
-                    categorical_columns=_categorical_columns(
-                        combined_data, data_storage, effective_methods
-                    ),
-                )
-            metadata = {
-                        "request_id": request_id,
-                        "apis": api_metadata,
-                        "quality_assessment": {
-                            "enabled": assess_quality,
-                            "sources_assessed": len(api_reports),
-                            "final_wait_seconds": quality_wait_seconds,
-                        },
-                        "coverage_precheck": {
-                            "candidate_sources": len(dispatch_plan),
-                            "dispatched_sources": sum(
-                                item["dispatched"] for item in dispatch_plan
-                            ),
-                            "requests_avoided": sum(
-                                not item["dispatched"] for item in dispatch_plan
-                            ),
-                            "precheck_seconds": precheck_seconds,
-                            "sources": dispatch_plan,
-                        },
-                        "dispatch": dispatch_metrics,
-                        "harmonization": {
-                            "enabled": not separate_api,
-                            "source_weights": {
-                                source: effective_source_weights.get(
-                                    source, DEFAULT_SOURCE_WEIGHT
-                                )
-                                for source, _data, _types in data_storage
-                            },
-                            "methods": effective_methods,
-                        },
-                        "within_source_aggregation": {
-                            "methods": effective_within_source_methods,
-                        },
-                    }
-            if assess_quality:
-                metadata["quality_reports"] = api_reports
+                for source, _data, _types in data_storage
+            },
+            "methods": effective_methods,
+        },
+        "within_source_aggregation": {
+            "methods": effective_within_source_methods,
+        },
+    }
+    if assess_quality:
+        metadata["quality_reports"] = api_reports
 
-            result = {
-                "data": combined_data,
-                "metadata": metadata,
-            }
-            if produce_map:
-                from farmwise_api.core.utils.map_ploter import create_folium_map
-                html_content = create_folium_map(combined_data,downsample_factor=1)
-                result['map'] = html_content
-            return result
-        except Exception as e:
-            logger.error(f'Error concatenating data: {e}')
-            return pd.DataFrame()  # Return an empty DataFrame if concatenation fails
-    else:
+    # Every outcome returns the same shape, so `result["data"]` - the usage the
+    # README documents - always works. This used to return a bare empty
+    # DataFrame when nothing was found or combining failed, which made that
+    # line raise KeyError and threw away the dispatch diagnostics explaining
+    # why there was no data.
+    if not data_storage:
         logger.warning("No data retrieved from available APIs")
-        return pd.DataFrame()
+        metadata["status"] = "no_data"
+        metadata["error"] = None
+        return {"data": pd.DataFrame(), "metadata": metadata}
+
+    try:
+        if separate_api:
+            combined_data = pd.concat(
+                [data for _source, data, _types in data_storage]
+            )
+            combined_data = _reduce_duplicate_timestamps(
+                combined_data,
+                data_storage,
+                effective_within_source_methods,
+            )
+        else:
+            combined_data = harmonize_data(
+                data_storage,
+                source_weights=effective_source_weights,
+                data_type_methods=effective_methods,
+            )
+        if interpolation:  # be aware this inserts values to NaNs
+            combined_data = interpolate(
+                combined_data,
+                bounding_box,
+                level,
+                categorical_columns=_categorical_columns(
+                    combined_data, data_storage, effective_methods
+                ),
+            )
+
+        metadata["status"] = "success"
+        metadata["error"] = None
+        result = {
+            "data": combined_data,
+            "metadata": metadata,
+        }
+        if produce_map:
+            from farmwise_api.core.utils.map_ploter import create_folium_map
+            html_content = create_folium_map(combined_data, downsample_factor=1)
+            result['map'] = html_content
+        return result
+    except Exception as e:
+        logger.error(f'Error concatenating data: {e}')
+        metadata["status"] = "error"
+        metadata["error"] = str(e)
+        return {"data": pd.DataFrame(), "metadata": metadata}
 
 # Example using bounding box
 if __name__ == "__main__":
