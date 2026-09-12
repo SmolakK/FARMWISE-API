@@ -69,8 +69,7 @@ def test_assess_data_quality_reports_completeness_and_implausible_values(
 
     pd.testing.assert_frame_equal(frame, original)
     assert report["S2_completeness"] == 0.5
-    assert report["total_missing_values"] == pytest.approx(1 / 6)
-    assert report["missing_days"] == pytest.approx(1 / 3)
+    assert report["incomplete_day_rate"] == pytest.approx(1 / 3)
     assert report["factor_missing_value_rates"]["Temperature [C]"] == pytest.approx(
         1 / 3
     )
@@ -104,7 +103,7 @@ def test_assess_data_quality_handles_no_intersection_or_data(monkeypatch):
     )
 
     assert report["S2_completeness"] is None
-    assert report["total_missing_values"] is None
+    assert report["factor_missing_values"] is None
     assert report["error_values"] is None
 
 
@@ -208,9 +207,9 @@ def test_long_expected_period_uses_counts_for_missing_rates(monkeypatch):
     expected_days = (
         pd.Timestamp("2100-12-31") - pd.Timestamp("1900-01-01")
     ).days + 1
-    assert report["total_missing_values"] == pytest.approx(
+    assert report["factor_missing_values"] == pytest.approx(
         1 - 2 / expected_days
     )
-    assert report["missing_days"] == pytest.approx(
+    assert report["incomplete_day_rate"] == pytest.approx(
         1 - 2 / expected_days
     )
