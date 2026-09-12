@@ -16,6 +16,7 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype
 
 from farmwise_api.core.utils.coordinates_to_cells import get_s2_cells
+from farmwise_api.core.utils.overlap_checks import resolve_range_date
 from farmwise_api.core.utils.paths import CACHE_ROOT
 
 
@@ -44,8 +45,8 @@ def assess_data_quality(df, metadata, ranges, req_ranges):
     api_bbox = ranges[0]
     api_time = ranges[1]
     api_factors = list(ranges[2])
-    api_start = pd.Timestamp(api_time[0])
-    api_end = pd.Timestamp(api_time[1])
+    api_start = pd.Timestamp(resolve_range_date(api_time[0]))
+    api_end = pd.Timestamp(resolve_range_date(api_time[1]))
 
     req_bbox = req_ranges["bbox"]
     req_level = req_ranges["level"]
