@@ -127,7 +127,12 @@ async def collect(
             tracemalloc.stop()
             peak_memory_mb = peak / (1024 * 1024)
 
-            if not isinstance(result, dict):
+            # read_data always returns {"data", "metadata"}; an empty frame is
+            # the no-data outcome. A bare DataFrame is still accepted for
+            # results recorded by older versions.
+            no_data = not isinstance(result, dict) or result["data"].empty
+            if no_data:
+                result_metadata = result.get("metadata", {}) if isinstance(result, dict) else {}
                 runs.append(
                     {
                         "request": request,
@@ -136,8 +141,10 @@ async def collect(
                         "status": "no-data",
                         "request_wall_seconds": elapsed,
                         "peak_traced_memory_mb": peak_memory_mb,
-                        "coverage_precheck": fallback_coverage,
-                        "dispatch": [],
+                        "coverage_precheck": result_metadata.get(
+                            "coverage_precheck", fallback_coverage
+                        ),
+                        "dispatch": result_metadata.get("dispatch", []),
                     }
                 )
                 continue
