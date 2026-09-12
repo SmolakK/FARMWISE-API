@@ -1,3 +1,8 @@
+# Available phosphorus (P2O5, Egner-Riehm) was previously listed as a second
+# 'Available Ammonium Nitrogen'. PARAMETER_VALUES labels the GIOS table rows by
+# position, so both rows got the same name and were averaged together; the
+# phosphorus values disappeared into the ammonium column. Confirm the label
+# against https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
 # list of parameters in the parameter column
 PARAMETER_VALUES = [
     'Soil Granularity: 1.0-0.1 mm [%]',
@@ -23,7 +28,7 @@ PARAMETER_VALUES = [
     'Soil S [cmol(+)*kg-1]',
     'Soil T [cmol(+)*kg-1]',
     'Soil V [%]',
-    'Soil Available Ammonium Nitrogen [NNH4 mg*kg-1]',
+    'Soil Available Phosphorus [mg P2O5*100g-1]',
     'Soil Available Potassium [mg K2O*100g-1]',
     'Soil Available Magnesium [mg Mg*100g-1]',
     'Soil Available Sulphur [mg S-SO4*100g-1]',
@@ -110,7 +115,7 @@ PARAMETER_SELECTION = [
     'Soil S [cmol(+)*kg-1]',
     'Soil T [cmol(+)*kg-1]',
     'Soil V [%]',
-    'Soil Available Ammonium Nitrogen [NNH4 mg*kg-1]',
+    'Soil Available Phosphorus [mg P2O5*100g-1]',
     'Soil Available Potassium [mg K2O*100g-1]',
     'Soil Available Magnesium [mg Mg*100g-1]',
     'Soil Available Sulphur [mg S-SO4*100g-1]',
@@ -196,7 +201,7 @@ DATA_ALIASES = {
     'Soil S [cmol(+)*kg-1]': 'soil',
     'Soil T [cmol(+)*kg-1]': 'soil',
     'Soil V [%]': 'soil',
-    'Soil Available Ammonium Nitrogen [NNH4 mg*kg-1]': 'soil',
+    'Soil Available Phosphorus [mg P2O5*100g-1]': 'soil',
     'Soil Available Potassium [mg K2O*100g-1]': 'soil',
     'Soil Available Magnesium [mg Mg*100g-1]': 'soil',
     'Soil Available Sulphur [mg S-SO4*100g-1]': 'soil',

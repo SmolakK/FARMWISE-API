@@ -99,8 +99,7 @@ MAPPING = {
     'Acide perfluoroundecane sulfonique': 'GW Perfluoroundecane sulfonic acid (µg/L)',
     'Acide sulfonique de perfluorobutane': 'GW Perfluorobutane sulfonic acid (µg/L)',
 
-    'Acide sulfonique de perfluorooctane': 'GW Perfluorooctane sulfonic acid (mµg/L)', # TODO maybe 'mµg/L' is wrong units? In ADES database = "µg/L"
-    'Sulfonate de perfluorooctane': 'GW Perfluorooctane sulfonate (mµg/L)',            # TODO maybe 'mµg/L' is wrong units? In ADES database = "µg/L"
+    'Acide sulfonique de perfluorooctane': 'GW Perfluorooctane sulfonic acid (µg/L)',  # Hub'Eau reports this determinand in µg/L (verified against the API)
 
     'Arsenic': 'GW Arsenic (µg/L)',
     'Cadmium': 'GW Cadmium (µg/L)',

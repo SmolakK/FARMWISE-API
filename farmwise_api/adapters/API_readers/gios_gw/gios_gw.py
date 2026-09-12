@@ -17,9 +17,6 @@ from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
 
 logger = logging.getLogger(__name__)
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 # Initialize transformer for coordinate conversion
 transformer = Transformer.from_crs("EPSG:2180", "EPSG:4326", always_xy=True)
 URL = 'https://mjwp.gios.gov.pl/wyniki-badan/wyniki-badan-2023.html'

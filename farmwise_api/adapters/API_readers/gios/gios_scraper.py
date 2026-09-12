@@ -127,8 +127,14 @@ async def read_data(spatial_range, time_range, data_range, level,
     if not between_years:
         warnings.warn("GIOS has no measurements in the requested time range")
         return None
-    lowest_range = min([x[0] for x in between_years])
-    highest_range = max([x[1] for x in between_years])
+    # Use the latest survey on or before the request start (the value in force
+    # then) plus every survey inside the request. The previous half-open
+    # window [lowest, highest) dropped a survey held in the requested year
+    # itself, e.g. the 2025 survey for a 2025 request.
+    survey_years = [start for start, _end in avail_years] + [avail_years[-1][1]]
+    earlier = [year for year in survey_years if year <= time_from]
+    lowest_range = max(earlier) if earlier else min(survey_years)
+    highest_range = time_to
 
     coors = await asyncio.to_thread(
         pd.read_csv,
@@ -167,7 +173,7 @@ async def read_data(spatial_range, time_range, data_range, level,
         df = df.loc[:, columns_to_select]
         # Filter time range
         df.year = df.year.astype(int)
-        df = df[(df.year >= lowest_range) & (df.year < highest_range)]
+        df = df[(df.year >= lowest_range) & (df.year <= highest_range)]
         all_dataframes.append(df)
 
     # Combine all dataframes into one
@@ -181,7 +187,9 @@ async def read_data(spatial_range, time_range, data_range, level,
 
     # To numeric
     final_dataframe_numeric = final_dataframe.loc[:, constant_columns_numeric]
-    final_dataframe_numeric = final_dataframe_numeric.apply(pd.to_numeric, errors='coerce').fillna(0)
+    # Keep unmeasured values ('n.o.') as NaN. Filling them with 0 recorded a
+    # concentration of zero and pulled every S2-cell mean towards it.
+    final_dataframe_numeric = final_dataframe_numeric.apply(pd.to_numeric, errors='coerce')
     final_dataframe = pd.concat((final_dataframe.drop(constant_columns_numeric, axis=1), final_dataframe_numeric),
                                 axis=1)
 
