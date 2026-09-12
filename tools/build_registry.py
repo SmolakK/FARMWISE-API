@@ -144,7 +144,19 @@ def _load_yaml(path: Path) -> dict:
         )
     if not path.exists():
         return {"sources": {}}
-    return yaml.safe_load(path.read_text(encoding="utf-8")) or {"sources": {}}
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {"sources": {}}
+    # A lost indent under `sources:` still parses: the first source becomes a
+    # top-level key and every later source nests inside it, so `sources` reads
+    # as empty. Seeding from that would rewrite the file and strand all the
+    # authored metadata, so refuse to continue instead.
+    misplaced = [key for key in data if str(key).startswith("farmwise_api.")]
+    if data.get("sources") is None or misplaced:
+        raise SystemExit(
+            f"{path} is malformed: every source must be indented under "
+            f"'sources:'. Found at top level: {misplaced or 'nothing under sources'}. "
+            "Fix the indentation before running the builder."
+        )
+    return data
 
 
 def _dump_yaml(data: dict, path: Path) -> None:
@@ -271,6 +283,11 @@ def collect_rows(authored: dict | None = None) -> list[Row]:
             # No per-variable table in code. Emit one row per declared factor
             # so the source is still represented and its gaps are visible.
             keys = [f"({factor})" for factor in source_factors] or ["(unspecified)"]
+
+        # Mapping tables also rename index columns (e.g. Hub'Eau's
+        # date_mesure -> Timestamp); those are not observed variables.
+        if descr:
+            keys = [key for key in keys if descr.get(key) != "Timestamp"]
 
         for key in keys:
             factor = None
@@ -447,6 +464,17 @@ def seed_authored(rows: list[Row]) -> dict:
     for gone in sorted(set(sources) - live):
         del sources[gone]
         print(f"removed registry entry for retired source: {gone}")
+
+    # Likewise for variables a source no longer returns, e.g. after a column
+    # rename - otherwise the authored metadata sits under a dead key.
+    live_variables: dict[str, set[str]] = {}
+    for row in rows:
+        live_variables.setdefault(row.source, set()).add(row.native_variable)
+    for source, entry in sources.items():
+        variables = (entry or {}).get("variables") or {}
+        for gone in sorted(set(variables) - live_variables.get(source, set())):
+            del variables[gone]
+            print(f"removed registry entry for retired variable: {source} / {gone}")
 
     for row in rows:
         entry = sources.setdefault(row.source, {})
