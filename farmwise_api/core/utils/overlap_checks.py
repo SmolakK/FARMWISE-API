@@ -1,4 +1,22 @@
-from datetime import datetime
+from datetime import date, datetime, time, timedelta
+import re
+
+_RELATIVE_DATE = re.compile(r"^today(?:-(\d+)d)?$")
+
+
+def resolve_range_date(value) -> datetime:
+    """Turn a coverage-range bound into a datetime.
+
+    Accepts ISO dates and the relative forms ``'today'`` and ``'today-Nd'``
+    used for continuously updated sources, which are evaluated now rather
+    than when the mapping module was imported.
+    """
+    if isinstance(value, str):
+        match = _RELATIVE_DATE.match(value.strip())
+        if match:
+            days = int(match.group(1) or 0)
+            return datetime.combine(date.today() - timedelta(days=days), time.min)
+    return datetime.fromisoformat(str(value))
 
 
 def spatial_ranges_overlap(range1, range2):
@@ -33,8 +51,8 @@ def time_ranges_overlap(range1, range2):
     Returns:
         bool: True if the time ranges overlap, False otherwise.
     """
-    start1, end1 = map(datetime.fromisoformat, range1)
-    start2, end2 = map(datetime.fromisoformat, range2)
+    start1, end1 = map(resolve_range_date, range1)
+    start2, end2 = map(resolve_range_date, range2)
 
     # Check if ranges overlap
     if start1 <= end2 and end1 >= start2:
