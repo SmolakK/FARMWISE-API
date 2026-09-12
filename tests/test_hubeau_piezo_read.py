@@ -74,6 +74,7 @@ async def test_read_data(
 
     assert isinstance(result, pd.DataFrame)
     assert not result.empty
-    assert "Groundwater Level [cm]" in result.columns.get_level_values(0)
-    assert result["Groundwater Level [cm]"].iloc[0, 0] == 200
+    assert "Groundwater level [m a.s.l.]" in result.columns.get_level_values(0)
+    # niveau_nappe_eau is already metres NGF; it must not be rescaled to cm.
+    assert result["Groundwater level [m a.s.l.]"].iloc[0, 0] == pytest.approx(2.0)
     mock_init_api.assert_called_once_with("piezometry")

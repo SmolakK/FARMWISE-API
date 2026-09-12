@@ -1,6 +1,7 @@
 import logging
 import pandas as pd
 from farmwise_api.adapters.API_readers.hubeau.hubeau_mappings.hubeau_mapping_piezo import MAPPING
+from farmwise_api.adapters.mappings.units import GROUNDWATER_LEVEL_COLUMN
 from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
 import warnings
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
@@ -295,17 +296,17 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     # FARMWISE-specific renaming:
     df = df.rename(MAPPING, axis=1)
 
-    # Change m to cm
-    df[['Groundwater Level [cm]']] *= 100
+    # niveau_nappe_eau is already in metres NGF, which is the shared
+    # groundwater-level convention; it is no longer rescaled to centimetres.
 
     # Column names of df at this stage :
-    #   point_id  Timestamp        lat       lon  "Groundwater Level [cm]"
+    #   point_id  Timestamp        lat       lon  "Groundwater level [m a.s.l.]"
 
     # To S2CELLs
     # (This adds a column 'S2CELL' to df.)
     df = prepare_coordinates(df, spatial_range, level)
     df = aggregate_to_s2(
-        df[['S2CELL', 'Timestamp', 'Groundwater Level [cm]', 'lon', 'lat']],
+        df[['S2CELL', 'Timestamp', GROUNDWATER_LEVEL_COLUMN, 'lon', 'lat']],
         logical_data_types=data_range,
         methods=(within_source_aggregation_methods
                  or WITHIN_SOURCE_AGGREGATION_METHODS),

@@ -18,7 +18,7 @@ API_PATH_RANGES = {
         ((49.0, 46.0, 17.2, 9.5),
          ('1950-01-01', CURRENT_DAY),
          ['temperature', 'precipitation'],
-         'none',
+         'daily',
          1,
          1)
     ),
@@ -26,7 +26,7 @@ API_PATH_RANGES = {
         ((54.98, 47.30, 15.02, 5.99),
          ('1950-01-01', CURRENT_DAY),
          ['temperature', 'precipitation'],
-         'none',
+         'daily',
          1,
          1)
     ),
@@ -48,7 +48,7 @@ API_PATH_RANGES = {
     ),
     'farmwise_api.adapters.API_readers.imgw.imgw_api_synop_daily': (
         ((54.8396, 49.0023, 24.1453, 14.1226),
-         ('1960-01-01', CURRENT_DAY),
+         ('1966-01-01', CURRENT_DAY),
          ['temperature', 'precipitation'],
          'daily',
          1,
@@ -64,15 +64,15 @@ API_PATH_RANGES = {
     ),
     'farmwise_api.adapters.API_readers.imgw_hydro.imgw_api_hydro_daily': (
         ((54.8396, 49.0023, 24.1453, 14.1226),
-         ('1951-01-01', CURRENT_DAY),
+         ('1951-01-01', '2025-12-31'),
          ['surface water quantity'],
          'daily',
          1,
          1)
     ),
-    'farmwise_api.adapters.API_readers.corine.corine_read': (  # 6 datasets
+    'farmwise_api.adapters.API_readers.corine.corine_read': (  # 5 CLC status layers
         ((71, 34, 45, -25),
-         ('1990-01-01', CURRENT_DAY),
+         ('1990-01-01', '2018-12-31'),
          ['land cover'],
          'none',
          2,
@@ -131,7 +131,7 @@ API_PATH_RANGES = {
          ('1941-01-01', '2025-12-31'),
          ['precipitation'],
          'daily',
-         1,
+         2,
          1)
     ),
     'farmwise_api.adapters.API_readers.hubeau.hubeau_sw_quality_read': (

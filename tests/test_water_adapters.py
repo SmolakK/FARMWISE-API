@@ -40,19 +40,33 @@ async def test_ukrainian_download_file_content_checks_response():
 
 
 def _zip_payload():
+    """An EPA Hydronet export: 7 metadata lines, then a ';'-separated table."""
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w") as archive:
         archive.writestr(
             "data.csv",
-            "\n" * 7
-            + "timestamp;level\n"
-            + "2024-01-01;95.5\n",
+            "#Station Name;DUFFYS CROSSROADS\n"
+            "#Station Number;IE_EA_G_0002_1400_0007\n"
+            "#Station Parameter Name;Groundwater Level\n"
+            "#Timeseries Name;Day.Mean.Abs\n"
+            "#Unit Symbol;m\n"
+            "#WEB_GW_height_system_suffix;m OD Malin (OSGM02)\n"
+            "#Rows;2\n"
+            "#Timestamp;Value;Quality Code Name\n"
+            "2024-01-01 01:00:00;83.231;Good\n"
+            "2024-01-02 01:00:00;;\n",
         )
     return buffer.getvalue()
 
 
 @pytest.mark.asyncio
-async def test_epa_process_link_reads_zip_and_calculates_depth():
+async def test_epa_process_link_reads_the_published_groundwater_level():
+    """The adapter returns the level EPA publishes, above Ordnance Datum.
+
+    It used to derive depth below ground as measuring-point height minus
+    level. That needs a surveyed reference height per station; the published
+    level does not, so it is returned unchanged.
+    """
     response = MagicMock()
     response.aread = AsyncMock(return_value=_zip_payload())
 
@@ -66,18 +80,21 @@ async def test_epa_process_link_reads_zip_and_calculates_depth():
     client = SimpleNamespace(stream=lambda *_args, **_kwargs: Stream())
     row = pd.Series(
         {
-            "id": "station",
+            "id": "IE_EA_G_0002_1400_0007",
             "download_link": "https://example.test/data.zip",
-            "lat": 50.0,
-            "lon": 17.0,
-            "measuring_point_height": 100.0,
+            "lat": 53.9,
+            "lon": -7.1,
+            "measuring_point_height": 88.05,
         }
     )
 
     result = await epa_gw.process_link(client, row)
 
-    assert result.loc[0, "groundwater level [m]"] == 95.5
-    assert result.loc[0, "groundwater depth [m b.g.l]"] == 4.5
+    assert result.loc[0, "groundwater level [m OD Malin]"] == pytest.approx(83.231)
+    assert "groundwater depth [m b.g.l]" not in result.columns
+    assert pd.isna(result.loc[1, "groundwater level [m OD Malin]"]), (
+        "an empty reading must stay missing, not become zero"
+    )
     response.raise_for_status.assert_called_once_with()
 
 
@@ -96,46 +113,15 @@ async def test_epa_read_data_returns_empty_without_downloads(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_epa_read_data_filters_and_converts_depth_to_cm(monkeypatch):
+async def test_epa_read_data_filters_time_and_keeps_level_in_metres(monkeypatch):
+    """Levels are returned in m OD, not rescaled; out-of-range dates dropped."""
     downloaded = pd.DataFrame(
         {
             "timestamp": pd.to_datetime(["2024-01-01", "2025-01-01"]),
-            "groundwater level [m]": [95.5, 95.0],
-            "groundwater depth [m b.g.l]": [4.5, 5.0],
+            "groundwater level [m OD Malin]": [83.231, 82.9],
             "id": ["station", "station"],
-            "lat": [50.0, 50.0],
-            "lon": [17.0, 17.0],
-        }
-    )
-    monkeypatch.setattr(
-        epa_gw, "fetch_all_data", AsyncMock(return_value=[downloaded])
-    )
-
-    def prepare(coordinates, **_kwargs):
-        return coordinates.assign(S2CELL="cell")
-
-    monkeypatch.setattr(epa_gw, "prepare_coordinates", prepare)
-
-    result = await epa_gw.read_data(
-        (51.0, 49.0, 18.0, 16.0),
-        ("2024-01-01", "2024-01-02"),
-        ["groundwater quantity"],
-        10,
-    )
-
-    assert result.iloc[0, 0] == 450.0
-
-
-@pytest.mark.asyncio
-async def test_epa_read_data_applies_groundwater_policy(monkeypatch):
-    downloaded = pd.DataFrame(
-        {
-            "timestamp": pd.to_datetime(["2024-01-01"] * 3),
-            "groundwater level [m]": [99.0, 97.0, 0.0],
-            "groundwater depth [m b.g.l]": [1.0, 3.0, 100.0],
-            "id": ["a", "b", "c"],
-            "lat": [50.0, 50.1, 50.2],
-            "lon": [17.0, 17.1, 17.2],
+            "lat": [53.9, 53.9],
+            "lon": [-7.1, -7.1],
         }
     )
     monkeypatch.setattr(
@@ -148,7 +134,64 @@ async def test_epa_read_data_applies_groundwater_policy(monkeypatch):
     )
 
     result = await epa_gw.read_data(
-        (51.0, 49.0, 18.0, 16.0),
+        (54.5, 53.5, -6.5, -7.5),
+        ("2024-01-01", "2024-01-02"),
+        ["groundwater quantity"],
+        10,
+    )
+
+    assert list(result.columns.get_level_values(0)) == ["Groundwater level [m a.s.l.]"]
+    assert len(result) == 1, "the 2025 reading is outside the request"
+    assert result.iloc[0, 0] == pytest.approx(83.231), (
+        "a level in metres must not be multiplied by 100"
+    )
+
+
+@pytest.mark.asyncio
+async def test_epa_read_data_skips_stations_without_any_level(monkeypatch):
+    """A station whose series is entirely empty contributes nothing."""
+    empty = pd.DataFrame(
+        {
+            "timestamp": pd.to_datetime(["2024-01-01"]),
+            "groundwater level [m OD Malin]": [float("nan")],
+            "id": ["silent"], "lat": [53.9], "lon": [-7.1],
+        }
+    )
+    monkeypatch.setattr(epa_gw, "fetch_all_data", AsyncMock(return_value=[empty]))
+
+    result = await epa_gw.read_data(
+        (54.5, 53.5, -6.5, -7.5),
+        ("2024-01-01", "2024-01-02"),
+        ["groundwater quantity"],
+        10,
+    )
+
+    assert result.empty
+
+
+@pytest.mark.asyncio
+async def test_epa_read_data_applies_groundwater_policy(monkeypatch):
+    """Stations sharing a cell are reduced with the configured method."""
+    downloaded = pd.DataFrame(
+        {
+            "timestamp": pd.to_datetime(["2024-01-01"] * 3),
+            "groundwater level [m OD Malin]": [99.0, 97.0, 0.0],
+            "id": ["a", "b", "c"],
+            "lat": [53.9, 53.91, 53.92],
+            "lon": [-7.1, -7.11, -7.12],
+        }
+    )
+    monkeypatch.setattr(
+        epa_gw, "fetch_all_data", AsyncMock(return_value=[downloaded])
+    )
+    monkeypatch.setattr(
+        epa_gw,
+        "prepare_coordinates",
+        lambda coordinates, **_kwargs: coordinates.assign(S2CELL="cell"),
+    )
+
+    result = await epa_gw.read_data(
+        (54.5, 53.5, -6.5, -7.5),
         ("2024-01-01", "2024-01-02"),
         ["groundwater quantity"],
         10,
@@ -158,7 +201,8 @@ async def test_epa_read_data_applies_groundwater_policy(monkeypatch):
         },
     )
 
-    assert result.iloc[0, 0] == 300.0
+    # median of 99, 97, 0 - a mean would give 65.33
+    assert result.iloc[0, 0] == pytest.approx(97.0)
 
 
 @pytest.mark.asyncio

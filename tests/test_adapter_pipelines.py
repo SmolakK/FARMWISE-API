@@ -138,7 +138,7 @@ async def test_correctiv_read_data_runs_transformation_pipeline(monkeypatch):
     )
 
     assert result.loc[pd.Timestamp("2024-01-01"), (
-        "Mean Groundwater Depth [a.s.l]",
+        "Mean groundwater level [m a.s.l.]",
         "cell",
     )] == 2.0
 
