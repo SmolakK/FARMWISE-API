@@ -83,9 +83,14 @@ async def read_data(
             if cleaned_df is not None:
                 all_data.append(cleaned_df)
 
-    # Combine all DataFrames into a single DataFrame
+    if not all_data:
+        logger.warning("No Ukrainian surface water CSV files could be read.")
+        return pd.DataFrame()
+
+    # Combine all DataFrames into a single DataFrame. The blank-row drop used
+    # to target the last per-file frame, leaving blank rows in the result.
     combined_df = pd.concat(all_data, ignore_index=True)
-    cleaned_df.dropna(how='all', inplace=True)
+    combined_df.dropna(how='all', inplace=True)
 
     if len(combined_df.columns) == len(new_headers):
         combined_df.columns = new_headers
