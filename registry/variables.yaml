@@ -169,90 +169,124 @@ sources:
     dataset: state monitoring observations for Ukrainian surface waters
     provider: State Agency of Water Resources of Ukraine
     reference: https://data.gov.ua/dataset/surface-water-monitoring
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    spatial_resolution: not applicable - irregular monitoring post network
+    spatial_support: point observations at surface-water monitoring posts (Post_ID) with the
+      published WGS84 latitude/longitude; posts in the same S2 cell are aggregated
+    temporal_support: one value per control date ('Controle_Date'); published as period CSV
+      files, which on 2026-09-12 spanned 2003-01-01 to 2026-08-31
     variables:
       BOD5:
         native_unit: null
-        notes: null
+        notes: Source column 'BSK5' (columns are matched by position). The published CSV states
+          no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       COD:
         native_unit: null
-        notes: null
+        notes: Source column 'HSK' (columns are matched by position). The published CSV states
+          no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       SPAR:
         native_unit: null
-        notes: null
+        notes: Source column 'SPAR' (columns are matched by position). The published CSV states
+          no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       altrazine:
         native_unit: null
-        notes: null
+        notes: Source column 'Atrazin' (columns are matched by position). The published CSV
+          states no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       ammonium:
         native_unit: null
-        notes: null
+        notes: Source column 'Amoniy' (columns are matched by position). The published CSV
+          states no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       chloride:
         native_unit: null
-        notes: null
+        notes: Source column 'Hlorid' (columns are matched by position). The published CSV
+          states no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       nitrate:
         native_unit: null
-        notes: null
+        notes: Source column 'Nitrat' (columns are matched by position). The published CSV
+          states no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       nitrite:
         native_unit: null
-        notes: null
+        notes: Source column 'Nitrit' (columns are matched by position). The published CSV
+          states no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       nitrogen:
         native_unit: null
-        notes: null
+        notes: Source column 'Azot' (columns are matched by position). The published CSV states
+          no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       oxygen:
         native_unit: null
-        notes: null
+        notes: Source column 'Kisen' (columns are matched by position). The published CSV
+          states no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       permanganate:
         native_unit: null
-        notes: null
+        notes: Source column 'Permanganat' (columns are matched by position). The published
+          CSV states no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       phosphate:
         native_unit: null
-        notes: null
+        notes: Source column 'Fosfat' (columns are matched by position). The published CSV
+          states no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       phytoplankton:
         native_unit: null
-        notes: null
+        notes: Source column 'Fitoplan' (columns are matched by position). The published CSV
+          states no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       simazine:
         native_unit: null
-        notes: null
+        notes: Source column 'Simazin' (columns are matched by position). The published CSV
+          states no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       sulfate:
         native_unit: null
-        notes: null
+        notes: Source column 'Sulfat' (columns are matched by position). The published CSV
+          states no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
       suspended_solids:
         native_unit: null
-        notes: null
+        notes: Source column 'Zavisli' (columns are matched by position). The published CSV
+          states no units.
         reference: null
-        transformation: null
+        transformation: no unit conversion; values are parsed as numbers and non-numeric entries
+          such as NULL become missing
   farmwise_api.adapters.API_readers.cds.cds_single_levels:
     dataset: reanalysis-era5-single-levels
     provider: Copernicus Climate Change Service (C3S), implemented by ECMWF
@@ -468,442 +502,881 @@ sources:
     variables:
       Humus [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Al [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Al [cmol(+)*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Anthracene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil As [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Available Ammonium Nitrogen [NNH4 mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Available Magnesium [mg Mg*100g-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Available Nitrate Nitrogen [NNO3 mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
+      Soil Available Phosphorus [mg P2O5*100g-1]:
+        native_unit: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
+        reference: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Available Potassium [mg K2O*100g-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Available Sulphur [mg S-SO4*100g-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Ba [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Be [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Benzo(a)Anthracene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Benzo(a)Fluoranthene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Benzo(a)Pyrene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Benzo(b)Fluoranthene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Benzo(ghi)Perylene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Benzo(k)Fluoranthene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil C/N [-]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Ca [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Ca2+ [cmol(+)*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil CaCo3 [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Cd [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Chrysene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Co [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Cr [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Cu [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Dibenzo(a,h)Anthracene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Electrical Conductivity [mS*m-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Fe [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Fluoranthene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Fluorene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       'Soil Granularity: 0.05-0.002 mm [%]':
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       'Soil Granularity: 0.1-0.02 mm [%]':
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       'Soil Granularity: 1.0-0.1 mm [%]':
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       'Soil Granularity: 2.0-0.05 mm [%]':
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       'Soil Granularity: < 0.002 mm [%]':
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       'Soil Granularity: < 0.02 mm [%]':
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Hg [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Hh [cmol(+)*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Hw [cmol(+)*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Indeno(1,2,3-cd)Pyrene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil K [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil K+ [cmol(+)*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil La [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Li [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Mg [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Mg2+ [cmol(+)*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Mn [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Na [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Na+ [cmol(+)*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Naphthalene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Ni [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Organic Carbon [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Organochlorine Pesticides Aldrin [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Organochlorine Pesticides Alfa-HCH [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Organochlorine Pesticides Beta-HCH [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Organochlorine Pesticides DDT/DDE/DDD [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Organochlorine Pesticides Dieldrin [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Organochlorine Pesticides Endrin [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Organochlorine Pesticides Gamma-HCH [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil P [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil PAH Sum 13 [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Pb [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Pesticides Non Chlorinated Compounds Atrazin [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Pesticides Non Chlorinated Compounds Carbaryl [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Pesticides Non Chlorinated Compounds Carbofuran [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Pesticides Non Chlorinated Compounds Maneb [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Phenanthrene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Pyrene [µg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Radioactivity [Bq*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil S [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil S [cmol(+)*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Salinity [mg KCl*100g-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Sr [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil T [cmol(+)*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Total Nitrogen [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil V [%]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil V [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil Zn [mg*kg-1]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil pH H2O [pH]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
       Soil pH KCl [pH]:
         native_unit: null
-        notes: null
+        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
+          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
+          (GIOŚ servers unreachable on 2026-09-12).
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
+          determined) becomes missing; the survey in force at the request start and any later
+          surveys in the request are averaged per S2 cell and repeated for every requested
+          day
   farmwise_api.adapters.API_readers.gios_gw.gios_gw:
-    dataset: null
+    dataset: GIOŚ State Environmental Monitoring (PMŚ) groundwater quality monitoring results,
+      published as annual XLSX result tables
     provider: Główny Inspektorat Ochrony Środowiska (GIOŚ)
-    reference: null
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    reference: https://mjwp.gios.gov.pl/wyniki-badan/wyniki-badan-2023.html
+    spatial_resolution: not applicable - irregular groundwater monitoring network
+    spatial_support: point observations at groundwater monitoring points identified by their
+      MONBADA number; PUWG 1992 (EPSG:2180) coordinates are transformed to WGS84 and points
+      falling in the same S2 cell are aggregated
+    temporal_support: one value per sampling date ('Data poboru próbki'); sampling is periodic
+      and point-dependent, and results are published per survey year
     variables:
       Arsenic [mgAs/l]:
-        native_unit: null
-        notes: null
+        native_unit: mgAs/l
+        notes: Source column 'Arsen [mgAs/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
+      Bifenthrin [mg/l]:
+        native_unit: mg/l
+        notes: Source column 'Bifentryna [mg/l]'.
+        reference: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Cadmium [mgCd/l]:
-        native_unit: null
-        notes: null
+        native_unit: mgCd/l
+        notes: Source column 'Kadm [mgCd/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Calcium [mgCa/l]:
-        native_unit: null
-        notes: null
+        native_unit: mgCa/l
+        notes: Source column 'Wapń [mgCa/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Chlorides [mgCl/l]:
-        native_unit: null
-        notes: null
+        native_unit: mgCl/l
+        notes: Source column 'Chlorki [mgCl/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Depth to Top of Aquifer Layer [m b.g.l.]:
         native_unit: m below ground level (m p.p.t.)
         notes: 'Source column ''Głębokość do stropu warstwy wodonośnej [m p.p.t.]''. This
@@ -914,75 +1387,104 @@ sources:
         reference: null
         transformation: none
       EC [µS/cm]:
-        native_unit: null
-        notes: null
+        native_unit: µS/cm
+        notes: Source column 'Przewodność elektrolityczna właściwa w 20°C - wartość terenowa
+          [µS/cm]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Flonicamid (IKI-220) [mg/l]:
-        native_unit: null
-        notes: null
+        native_unit: mg/l
+        notes: Source column 'Flonikamid (IKI-220) [mg/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Flufenacet [mg/l]:
-        native_unit: null
-        notes: null
+        native_unit: mg/l
+        notes: Source column 'Flufenacet [mg/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Fluopyram [mg/l]:
-        native_unit: null
-        notes: null
+        native_unit: mg/l
+        notes: Source column 'Fluopyram [mg/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Lead [mgPb/l]:
-        native_unit: null
-        notes: null
+        native_unit: mgPb/l
+        notes: Source column 'Ołów [mgPb/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Magnesium [mgMg/l]:
-        native_unit: null
-        notes: null
+        native_unit: mgMg/l
+        notes: Source column 'Magnez [mgMg/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Novaluron [mg/l]:
-        native_unit: null
-        notes: null
+        native_unit: mg/l
+        notes: Source column 'Nowaluron [mg/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       PFOS [mg/l]:
-        native_unit: null
-        notes: null
+        native_unit: mg/l
+        notes: Source column 'PFOS [mg/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Phosphates [mgPO4/l]:
-        native_unit: null
-        notes: null
+        native_unit: mgPO4/l
+        notes: Source column 'Fosforany[mgPO4 / l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Potassium [mgK/l]:
-        native_unit: null
-        notes: null
+        native_unit: mgK/l
+        notes: Source column 'Potas [mgK/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Sodium [mgNa/l]:
-        native_unit: null
-        notes: null
+        native_unit: mgNa/l
+        notes: Source column 'Sód [mgNa/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Trifloxystrobin [mg/l]:
-        native_unit: null
-        notes: null
+        native_unit: mg/l
+        notes: Source column 'Trifloksystrobina [mg/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       Zinc [mgZn/l]:
-        native_unit: null
-        notes: null
+        native_unit: mgZn/l
+        notes: Source column 'Cynk [mgZn/l]'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
       pH:
-        native_unit: null
-        notes: null
+        native_unit: pH units (dimensionless)
+        notes: Source column 'Odczyn pH - wartość laboratoryjna'.
         reference: null
-        transformation: null
+        transformation: no unit conversion; decimal commas are read as points and a leading
+          '<' is removed, so a result reported below the limit of quantification enters as
+          the limit value itself
   farmwise_api.adapters.API_readers.hubeau.hubeau_piezo_read_vbrgm:
     dataset: Hub'Eau niveaux_nappes API - groundwater level time series (ADES)
     provider: Office français de la biodiversité (OFB), BRGM, Service Central Vigicrues, and
@@ -1014,353 +1516,555 @@ sources:
         reference: https://hubeau.eaufrance.fr/api/v1/niveaux_nappes/api-docs
         transformation: none - not requested by the adapter
   farmwise_api.adapters.API_readers.hubeau.hubeau_sw_quality_read:
-    dataset: null
+    dataset: Hub'Eau 'qualite_rivieres' API - physico-chemical analyses of river water (Naïades)
     provider: Office français de la biodiversité (OFB), BRGM, Service Central Vigicrues, and
       the producers identified by individual records
     reference: https://hubeau.eaufrance.fr/
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    spatial_resolution: not applicable - irregular monitoring network
+    spatial_support: point observations at river quality monitoring stations; water support
+      only (code_support 3); stations falling in the same S2 cell are aggregated
+    temporal_support: one value per sampling date ('date_debut_prelevement'); results qualified
+      as incorrect or uncertain are excluded (code_qualification 0, 1, 4 kept)
     variables:
       Acide pentacosafluorotridecanoique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-dodecanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-n-butanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-n-heptanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-n-nonanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-n-pentanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-n-undecanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-octanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluorodecane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluorododecane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoroheptane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluorononane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoropentane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluorotridecane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoroundecane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide sulfonique de perfluorobutane:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide sulfonique de perfluorooctane:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Arsenic:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Cadmium:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Calcium:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Chlorures:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Conductivité à 25°C:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µS/cm
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Magnésium:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Nitrates:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Perfluorohexanesulfonic acid:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Phosphore total:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Plomb:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Potassium:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Potentiel en Hydrogène (pH):
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in pH
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Sodium:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Somme des pesticides totaux:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Sulfonate de perfluorooctane:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Zinc:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-cours-deau
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
   farmwise_api.adapters.API_readers.hubeau.hubeau_wq_read:
-    dataset: null
+    dataset: Hub'Eau 'qualite_nappes' API - groundwater quality analyses (ADES)
     provider: Office français de la biodiversité (OFB), BRGM, Service Central Vigicrues, and
       the producers identified by individual records
     reference: https://hubeau.eaufrance.fr/
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    spatial_resolution: not applicable - irregular monitoring network
+    spatial_support: point observations at groundwater quality monitoring points (BSS codes);
+      points falling in the same S2 cell are aggregated
+    temporal_support: one value per sampling date ('date_debut_prelevement'); only results
+      flagged valid are requested
     variables:
       Acide pentacosafluorotridecanoique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-dodecanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-n-butanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-n-heptanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-n-nonanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-n-pentanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-n-undecanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoro-octanoïque:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluorodecane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluorododecane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoroheptane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluorononane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoropentane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluorotridecane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide perfluoroundecane sulfonique:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide sulfonique de perfluorobutane:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Acide sulfonique de perfluorooctane:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Arsenic:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Cadmium:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Calcium:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Chlorures:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Conductivité à 25°C:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µS/cm
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Magnésium:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Nitrates:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Perfluorohexanesulfonic acid:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Phosphore total:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Plomb:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Potassium:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Potentiel en Hydrogène (pH):
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in pH
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Sodium:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in mg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Somme des pesticides totaux:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Sulfonate de perfluorooctane:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
       Zinc:
-        native_unit: null
+        native_unit: reported per result in Hub'Eau 'symbole_unite'; FARMWISE labels the output
+          in µg/L
         notes: null
-        reference: null
-        transformation: null
+        reference: https://hubeau.eaufrance.fr/page/api-qualite-nappes
+        transformation: no unit conversion except 'Phosphore total' reported as mg(P2O5)/L,
+          multiplied by 0.436 to mg(P)/L; the unit column is then dropped, so results in differing
+          units for one parameter are not reconciled
   farmwise_api.adapters.API_readers.imgw.imgw_api_synop_daily:
     dataset: IMGW-PIB daily synoptic meteorological observations (dane meteorologiczne dobowe
       - synop)
