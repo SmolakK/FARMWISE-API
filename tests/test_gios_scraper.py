@@ -88,3 +88,32 @@ async def test_read_data_returns_none_when_gios_has_no_point_ids(
         )
 
     assert result is None
+
+
+@pytest.mark.asyncio
+@patch("farmwise_api.adapters.API_readers.gios.gios_scraper.extract_point_ids")
+@patch("farmwise_api.adapters.API_readers.gios.gios_scraper.scrape_point_data")
+@patch("farmwise_api.adapters.API_readers.gios.gios_scraper.prepare_coordinates")
+@patch("farmwise_api.adapters.API_readers.gios.gios_scraper.pd.read_csv")
+async def test_read_data_uses_survey_in_requested_year_and_keeps_missing_as_nan(
+    mock_read_csv, mock_prepare_coordinates, mock_scrape_point_data, mock_extract_point_ids
+):
+    coordinates = pd.DataFrame({"id": [123], "S2CELL": ["cell1"]})
+    mock_extract_point_ids.return_value = "123"
+    mock_prepare_coordinates.return_value = coordinates
+    mock_read_csv.return_value = coordinates
+    mock_scrape_point_data.return_value = pd.DataFrame({
+        "point_id": [123, 123],
+        "year": [2020, 2025],
+        "Humus [%]": [9.0, 2.0],
+        "Soil CaCo3 [%]": [9.0, None],  # 'n.o.' (not determined) in 2025
+    })
+
+    result = await read_data((50, 40, 10, 20), ("2025-01-01", "2025-01-02"), ["soil"], 8)
+
+    # The 2025 survey alone is in force; the 2020 values must not be mixed in.
+    assert result[("Humus [%]", "cell1")].tolist() == [2.0, 2.0]
+    # A missing determination stays missing instead of becoming 0.
+    assert ("Soil CaCo3 [%]", "cell1") not in result.columns or result[
+        ("Soil CaCo3 [%]", "cell1")
+    ].isna().all()
