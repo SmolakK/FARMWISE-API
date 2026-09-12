@@ -1,8 +1,10 @@
-from datetime import datetime, timedelta
-
-# Constants defining the current day and a date five days prior
-CURRENT_DAY = datetime.now().strftime('%Y-%m-%d')
-FIVE_BEFORE = (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')
+# Relative end dates for sources that are updated continuously. They are
+# resolved against the clock each time coverage is checked (see
+# farmwise_api.core.utils.overlap_checks.resolve_range_date). They used to be
+# formatted once at import, which froze 'today' for the life of the process:
+# a server started on Monday rejected Tuesday's dates until it was restarted.
+CURRENT_DAY = 'today'
+FIVE_BEFORE = 'today-5d'
 
 # Dictionary mapping API paths to their corresponding parameters
 # Each entry contains a tuple with:
@@ -55,8 +57,10 @@ API_PATH_RANGES = {
          1)
     ),
     'farmwise_api.adapters.API_readers.gios.gios_scraper': (
+        # Surveys every five years, 1995-2025. The adapter already lists the
+        # 2025 survey; the range used to stop at 2020, so it was never used.
         ((54.8396, 49.0023, 24.1453, 14.1226),
-         ('1995-01-01', '2020-12-31'),
+         ('1995-01-01', '2025-12-31'),
          ['soil'],
          'yearly',
          1,
