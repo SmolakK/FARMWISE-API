@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 from typing import Dict, List, Tuple, Optional
 from datetime import datetime
 from farmwise_api.adapters.mappings.data_source_mapping import PUBLIC_SERVER_API_PATH_RANGES
@@ -96,6 +96,17 @@ class ReadDataRequest(BaseModel):
         except ValueError:
             raise ValueError("Date must be in YYYY-MM-DD format")
         return value
+
+    @model_validator(mode="after")
+    def check_time_order(self) -> "ReadDataRequest":
+        # Reject a reversed range here so the client gets a 422 naming the
+        # problem, instead of the request being queued and failing later.
+        # Compare parsed dates: strptime also accepts "2024-1-5", which sorts
+        # after "2024-01-10" as a string.
+        parse = lambda value: datetime.strptime(value, "%Y-%m-%d")  # noqa: E731
+        if parse(self.time_from) > parse(self.time_to):
+            raise ValueError("time_from must not be after time_to")
+        return self
 
     @field_validator("bounding_box")
     def validate_bounding_box(cls, value) -> Optional[Tuple[float, float, float, float]]:
