@@ -24,6 +24,19 @@ def _has_no_data(result) -> bool:
     return data is None or getattr(data, "empty", False)
 
 
+def _public_base_url() -> str:
+    """Return PUBLIC_BASE_URL with a scheme, accepting a bare host or a URL.
+
+    The email route expected a full URL and the other two routes a bare host,
+    so one setting always produced broken links on one of them.
+    """
+    load_dotenv(PROJECT_ROOT / "public_host.env")
+    base_url = os.getenv("PUBLIC_BASE_URL", "localhost:8000").rstrip("/")
+    if "://" not in base_url:
+        base_url = f"http://{base_url}"
+    return base_url
+
+
 # Dependency to check for client disconnection
 async def monitor_client_disconnection(request: Request, stop_event: asyncio.Event) -> None:
     """
@@ -94,13 +107,12 @@ async def process_and_send_email(request_body, request, user_email) -> None:
 
         # Save metadata
         metadata_file = tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode='w+', dir=temp_dir)
-        with open(metadata_file.name, 'w') as mf:
-            json.dump(metadata, mf, indent=4)
+        with open(metadata_file.name, 'w', encoding='utf-8') as mf:
+            json.dump(metadata, mf, indent=4, default=str)
         metadata_file.close()
 
         # Generate download links
-        load_dotenv(PROJECT_ROOT / "public_host.env")
-        base_url = os.getenv("PUBLIC_BASE_URL")
+        base_url = _public_base_url()
         data_download_link = f"{base_url}/download/{os.path.basename(data_file.name)}"
         metadata_download_link = f"{base_url}/download/{os.path.basename(metadata_file.name)}"
 
@@ -174,8 +186,8 @@ async def read_data_endpoint(
 
         # Save metadata
         metadata_file = tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode='w+', dir=temp_dir)
-        with open(metadata_file.name, 'w') as mf:
-            json.dump(metadata, mf, indent=4)
+        with open(metadata_file.name, 'w', encoding='utf-8') as mf:
+            json.dump(metadata, mf, indent=4, default=str)
         metadata_file.close()
 
         map_file = None
@@ -189,13 +201,12 @@ async def read_data_endpoint(
                 map_file.close()
 
         # Generate download links
-        load_dotenv(PROJECT_ROOT / "public_host.env")
-        base_url = os.getenv("PUBLIC_BASE_URL", "localhost:8000")
-        data_download_link = f"http://{base_url}/download/{os.path.basename(data_file.name)}"
-        metadata_download_link = f"http://{base_url}/download/{os.path.basename(metadata_file.name)}"
+        base_url = _public_base_url()
+        data_download_link = f"{base_url}/download/{os.path.basename(data_file.name)}"
+        metadata_download_link = f"{base_url}/download/{os.path.basename(metadata_file.name)}"
         map_download_link = None
         if request_body.produce_map and map_file is not None:
-            map_download_link = f"http://{base_url}/download/{os.path.basename(map_file.name)}"
+            map_download_link = f"{base_url}/download/{os.path.basename(map_file.name)}"
 
         # Send the email
         email_content = (
@@ -322,8 +333,8 @@ async def read_data_direct(
         metadata_file = tempfile.NamedTemporaryFile(
             delete=False, suffix=".json", mode="w+", dir=temp_dir
         )
-        with open(metadata_file.name, "w") as mf:
-            json.dump(metadata, mf, indent=4)
+        with open(metadata_file.name, "w", encoding="utf-8") as mf:
+            json.dump(metadata, mf, indent=4, default=str)
         metadata_file.close()
 
         # --- OPTIONAL MAP ---
@@ -332,22 +343,22 @@ async def read_data_direct(
             map_html = result.get("map")
             if map_html:
                 map_file = tempfile.NamedTemporaryFile(
-                    delete=False, suffix=".html", mode="w+", dir=temp_dir
+                    delete=False, suffix=".html", mode="w+", dir=temp_dir,
+                    encoding="utf-8",
                 )
                 map_file.write(map_html)
                 map_file.close()
                 map_url = f"/download/{os.path.basename(map_file.name)}"
 
         # --- BASE URL ---
-        load_dotenv(PROJECT_ROOT / "public_host.env")
-        base_url = os.getenv("PUBLIC_BASE_URL", "localhost:8000")
+        base_url = _public_base_url()
 
         # --- BUILD RESPONSE ---
         response = {
             "status": "success",
-            "data_url": f"http://{base_url}/download/{os.path.basename(data_file.name)}",
-            "metadata_url": f"http://{base_url}/download/{os.path.basename(metadata_file.name)}",
-            "map_url": f"http://{base_url}/download/{os.path.basename(map_file.name)}"
+            "data_url": f"{base_url}/download/{os.path.basename(data_file.name)}",
+            "metadata_url": f"{base_url}/download/{os.path.basename(metadata_file.name)}",
+            "map_url": f"{base_url}/download/{os.path.basename(map_file.name)}"
             if map_url else None
         }
 
