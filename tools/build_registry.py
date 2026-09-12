@@ -64,6 +64,10 @@ class Shape:
     descr: str | None = "GLOBAL_MAPPING"
     key_is: str = "native"
     extra: tuple[str, ...] = ()
+    # Most labels put the unit in square brackets and use parentheses for
+    # ordinary text, e.g. "environmental data (EEA)" or "(meadows and
+    # pastures)". Hub'Eau's mappings put the unit in parentheses instead.
+    paren_units: bool = False
 
 
 SHAPES: dict[str, Shape] = {
@@ -85,8 +89,9 @@ SHAPES: dict[str, Shape] = {
     "EuroCropV2.EuroCropV2_read": Shape(aliases=None),
     # Hub'Eau: MAPPING is native determinand -> output name; the logical factor
     # comes from the registry entry for the source, not from a per-variable map.
-    "hubeau.hubeau_wq_read": Shape(aliases=None, descr="MAPPING"),
-    "hubeau.hubeau_sw_quality_read": Shape(aliases=None, descr="MAPPING"),
+    "hubeau.hubeau_wq_read": Shape(aliases=None, descr="MAPPING", paren_units=True),
+    "hubeau.hubeau_sw_quality_read": Shape(
+        aliases=None, descr="MAPPING", paren_units=True),
     "hubeau.hubeau_piezo_read_vbrgm": Shape(aliases=None, descr="MAPPING"),
     # No per-variable table in code: land-cover classes / adapter absent.
     "corine.corine_read": Shape(aliases=None, descr=None),
@@ -101,7 +106,8 @@ AUTHORED_SOURCE_FIELDS = (
     "temporal_support", "reference",
 )
 
-UNIT_RE = re.compile(r"[\[(]([^\])]+)[\])]\s*$")
+BRACKET_UNIT_RE = re.compile(r"\[([^\]]+)\]\s*$")
+PAREN_UNIT_RE = re.compile(r"[\[(]([^\])]+)[\])]\s*$")
 
 
 @dataclass
@@ -212,12 +218,31 @@ def _symbol(source: str, name: str) -> dict | None:
     return None
 
 
-def split_meaning_unit(label: str) -> tuple[str, str | None]:
+def split_meaning_unit(
+    label: str, paren_units: bool = False
+) -> tuple[str, str | None]:
     """Split 'Temperature [°C]' into ('Temperature', '°C')."""
-    match = UNIT_RE.search(label)
+    pattern = PAREN_UNIT_RE if paren_units else BRACKET_UNIT_RE
+    match = pattern.search(label)
     if not match:
         return label.strip(), None
     return label[: match.start()].strip(), match.group(1).strip()
+
+
+def _flatten_text(value):
+    """Collapse runs of whitespace, including newlines, in authored text.
+
+    YAML `>` and `|` blocks keep line breaks (and a trailing newline). In a
+    markdown table a newline ends the row, splitting one entry across two
+    broken lines, so every authored string is folded to a single line.
+    """
+    if isinstance(value, str):
+        return " ".join(value.split())
+    if isinstance(value, dict):
+        return {key: _flatten_text(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_flatten_text(item) for item in value]
+    return value
 
 
 def collect_rows(authored: dict | None = None) -> list[Row]:
@@ -268,7 +293,7 @@ def collect_rows(authored: dict | None = None) -> list[Row]:
             name: _symbol(source, name) for name in shape.extra
         }
 
-        src_meta = authored.get(source) or {}
+        src_meta = _flatten_text(authored.get(source) or {})
         var_meta_all = src_meta.get("variables") or {}
 
         keys: list[str]
@@ -302,11 +327,11 @@ def collect_rows(authored: dict | None = None) -> list[Row]:
                     factor = var_meta_all.get(key, {}).get("factor")
             label = (descr or {}).get(key)
             meaning, output_unit = (
-                split_meaning_unit(label) if isinstance(label, str) else (None, None)
+                split_meaning_unit(label, shape.paren_units) if isinstance(label, str) else (None, None)
             )
             if shape.key_is == "output" and output_unit is None:
                 # e.g. 'Water level [cm]' - the key itself carries the unit
-                meaning, output_unit = split_meaning_unit(key)
+                meaning, output_unit = split_meaning_unit(key, shape.paren_units)
 
             var_meta = var_meta_all.get(key) or {}
             transformation = var_meta.get("transformation")
@@ -516,7 +541,7 @@ def render_csv(rows: list[Row]) -> str:
 def _cell(value) -> str:
     if value is None or value == "":
         return "_not supplied_"
-    return str(value).replace("|", "\\|")
+    return " ".join(str(value).split()).replace("|", "\\|")
 
 
 def render_markdown(rows: list[Row]) -> str:
