@@ -196,7 +196,16 @@ async def read_data(spatial_range, time_range, data_range, level,
         columns='parameter',
         values='value',
     ).reset_index()
-    df = df[~df.isna().any(axis=1)]
+    # Drop a row only when it carries no observation at all. The check has to
+    # be restricted to the parameter columns: station_id and date are never
+    # null after reset_index(), so testing the whole row would never drop
+    # anything, while testing with .any() would discard a day that reported
+    # temperature but no precipitation.
+    observation_columns = [
+        column for column in df.columns if column not in ('station_id', 'date')
+    ]
+    if observation_columns:
+        df = df[~df[observation_columns].isna().all(axis=1)]
 
     # get stations locations
     df = df.merge(df_stations, left_on='station_id', right_on='station_id')

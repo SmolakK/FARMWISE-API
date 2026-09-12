@@ -95,7 +95,16 @@ async def read_data(spatial_range, time_range, data_range, level,
         return None
 
     # CLEAN
-    data_df = data_df[~data_df.isna().any(axis=1)]
+    # Drop a row only when it carries no observation at all. The check is
+    # restricted to the requested parameter columns: `station` and `time` come
+    # from the CSV and are never null, so testing the whole row would never
+    # drop anything, while testing with .any() would discard a day that
+    # reported temperature but no precipitation.
+    observation_columns = [
+        column for column in data_requested if column in data_df.columns
+    ]
+    if observation_columns:
+        data_df = data_df[~data_df[observation_columns].isna().all(axis=1)]
     if 'precipitation' in data_range:
         data_df.loc[data_df["rr"] < 0, "rr"] = 0
 
