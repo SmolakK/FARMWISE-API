@@ -115,7 +115,7 @@ def harmonize_data(
     output_series = []
 
     for column in columns:
-        series_by_source = []
+        raw_series = []
         column_weights = []
         available_types: list[str] = []
 
@@ -125,13 +125,21 @@ def harmonize_data(
             series = frame[column]
             if isinstance(series, pd.DataFrame):
                 series = series.bfill(axis=1).iloc[:, 0]
-            series_by_source.append(_collapse_duplicate_index(series).rename(source))
+            raw_series.append((source, series))
             column_weights.append(weights.get(source, DEFAULT_SOURCE_WEIGHT))
             available_types.extend(logical_types)
 
-        values = pd.concat(series_by_source, axis=1)
+        # Resolve the data type before collapsing repeated timestamps, so a
+        # categorical column is reduced by its mode. Collapsing first averaged
+        # every numeric column, turning CORINE classes 211 and 312 into 261.5.
         data_type = resolve_data_type(column, available_types, methods)
         method = methods.get(data_type, default_method)
+        categorical = "mode" in method
+        series_by_source = [
+            _collapse_duplicate_index(series, categorical=categorical).rename(source)
+            for source, series in raw_series
+        ]
+        values = pd.concat(series_by_source, axis=1)
         output_series.append(
             _aggregate(values, column_weights, method).rename(column)
         )
@@ -193,12 +201,22 @@ def _restore_column_index(
     return pd.Index(columns, name=first_columns.name)
 
 
-def _collapse_duplicate_index(series: pd.Series) -> pd.Series:
+def _collapse_duplicate_index(
+    series: pd.Series, *, categorical: bool = False
+) -> pd.Series:
     if not series.index.has_duplicates:
         return series
+    if categorical:
+        return series.groupby(level=0).agg(_series_mode)
     if is_numeric_dtype(series.dtype):
         return series.groupby(level=0).mean()
     return series.groupby(level=0).agg(_first_non_null)
+
+
+def _series_mode(values: pd.Series) -> Any:
+    """Most frequent non-null value; the first on a tie, NaN if none."""
+    modes = values.dropna().mode()
+    return modes.iloc[0] if not modes.empty else np.nan
 
 
 def _first_non_null(values: pd.Series) -> Any:
