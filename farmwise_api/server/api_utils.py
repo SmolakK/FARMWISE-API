@@ -2,6 +2,7 @@ import os
 import time
 from farmwise_api.server.logging_config import logger
 
+OUTPUT_SUFFIXES = (".csv", ".json", ".html")
 
 def cleanup_old_files(folder_path, max_age_in_seconds) -> None:
     """
@@ -15,7 +16,9 @@ def cleanup_old_files(folder_path, max_age_in_seconds) -> None:
 
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
-        if os.path.isfile(file_path) and '.csv' in filename:
+        # Every download the routers write: data (.csv), metadata (.json) and
+        # map (.html). Matching only '.csv' left the other two to accumulate.
+        if os.path.isfile(file_path) and filename.lower().endswith(OUTPUT_SUFFIXES):
             file_age = time.time() - os.path.getmtime(file_path)
             if file_age > max_age_in_seconds:
                 os.remove(file_path)
