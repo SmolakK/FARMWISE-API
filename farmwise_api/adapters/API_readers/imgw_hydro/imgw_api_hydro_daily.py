@@ -47,8 +47,8 @@ async def read_data(spatial_range, time_range, data_range, level,
         return None
 
     years = get_years_between_dates(*time_range)
-    data_requested = set([k for k, v in DATA_ALIASES.items() if v in data_range])
-
+    data_requested = {k for k, v in DATA_ALIASES.items() if v in data_range}
+    water_selection = list(data_requested.intersection(set(WATER_SELECTED)))
     async with httpx.AsyncClient(follow_redirects=True) as client:
         response = await client.get(URL)
         if response.status_code == 200:
@@ -57,7 +57,18 @@ async def read_data(spatial_range, time_range, data_range, level,
             links = soup.find_all('a')
             folders = [link['href'].replace('/', '') for link in links if link['href'].endswith('/')]
             folders = [year for year in folders if re.match(r'^\d{4}(_\d{4})?$', year)]
-            read_urls = [urljoin(URL + '/', x) for x in years]
+            available_years = set(folders)
+
+            requested_years = [
+                str(year)
+                for year in years
+                if str(year) in available_years
+            ]
+
+            read_urls = [
+                urljoin(URL + "/", year + "/")
+                for year in requested_years
+            ]
         else:
             warnings.warn("IMGW server not responding")
             return None
@@ -76,12 +87,22 @@ async def read_data(spatial_range, time_range, data_range, level,
                 links = soup.find_all('a')
 
                 # Extract file names
-                file_names = [link['href'] for link in links if '.' in link['href']]
+                file_names = [
+                    link["href"]
+                    for link in links
+                    if link["href"].lower().endswith(".zip")
+                       and "codz" in link["href"].lower()
+                ]
 
                 # Read files from the year
                 for file_name in file_names:
                     zip_url = urljoin(url + '/', file_name)
                     zip_response = await client.get(zip_url)
+                    try:
+                        zip_response.raise_for_status()
+                    except httpx.HTTPStatusError:
+                        logger.warning("Failed to download IMGW archive: %s", zip_url)
+                        continue
 
                     # Process zip files asynchronously
                     with ZipFile(io.BytesIO(zip_response.content)) as zip_ref:
@@ -91,15 +112,14 @@ async def read_data(spatial_range, time_range, data_range, level,
                                     lambda: pd.read_csv(zip_ref.open(name), encoding='windows-1250',
                                                         names=WATER_COLUMNS)
                                 )
-                                water_selection = list(data_requested.intersection(set(WATER_SELECTED)))
                                 water_selection_spacetime = water_selection + SPACE_TIME_COLUMNS
                                 water_data = water_data.loc[:,
                                              water_data.columns.intersection(water_selection_spacetime)]
                                 water_files.append(water_data)
-                else:
-                    warnings.warn("IMGW server not responding")
 
         # Concatenate dataframes asynchronously
+    if not water_files:
+        return pd.DataFrame()
     water_files = await asyncio.to_thread(pd.concat, water_files)
     water_files = water_files.rename({'Calendar month': 'Month', 'Hydrological year': 'Year'}, axis=1)
     water_files['Timestamp'] = await asyncio.to_thread(lambda: water_files.apply(create_timestamp_from_row, axis=1))
@@ -111,6 +131,17 @@ async def read_data(spatial_range, time_range, data_range, level,
     # Get numerical values and convert them asynchronously
     water_files_values = water_files.loc[:, water_selection]
     water_files_values = await asyncio.to_thread(lambda: water_files_values.apply(pd.to_numeric, errors='coerce'))
+    if "Water level [cm]" in water_files_values.columns:
+        water_files_values["Water level [cm]"] = (
+            water_files_values["Water level [cm]"]
+            .replace(9999, float("nan"))
+        )
+
+    if "Flow [m³/s]" in water_files_values.columns:
+        water_files_values["Flow [m³/s]"] = (
+            water_files_values["Flow [m³/s]"]
+            .replace([9999, 99999.999], float("nan"))
+        )
     water_files_spacetime = water_files.loc[:, columns_excluded]
     water_files = pd.concat([water_files_values, water_files_spacetime], axis=1)
 

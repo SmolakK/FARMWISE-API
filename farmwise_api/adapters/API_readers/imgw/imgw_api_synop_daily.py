@@ -22,7 +22,68 @@ logger = logging.getLogger(__name__)
 
 URL = "https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteorologiczne/dobowe/synop"
 SPACE_TIME_COLUMNS = ['Station code', 'Year', 'Month', 'Day', 'Code', 'lat', 'lon', 'Name']
+_MONTHLY_ARCHIVE_RE = re.compile(
+    r"^(?P<year>\d{4})_(?P<month>0[1-9]|1[0-2])_s\.zip$",
+    re.IGNORECASE,
+)
 
+_STATION_ARCHIVE_RE = re.compile(
+    r"^(?:\d{4}(?:_\d{4})?)_(?P<station>\d{3,})_s\.zip$",
+    re.IGNORECASE,
+)
+
+
+def _select_synop_archives(file_names, station_keys, time_range):
+    """Select IMGW SYNOP archives for both station- and month-based layouts."""
+
+    requested_months = {
+        (period.year, period.month)
+        for period in pd.period_range(
+            time_range[0],
+            time_range[1],
+            freq="M",
+        )
+    }
+
+    selected = []
+
+    for file_name in file_names:
+        basename = file_name.rsplit("/", 1)[-1]
+
+        # New layout, e.g. 2026_08_s.zip:
+        # one archive contains all SYNOP stations for one month.
+        monthly_match = _MONTHLY_ARCHIVE_RE.fullmatch(basename)
+
+        if monthly_match:
+            year_month = (
+                int(monthly_match.group("year")),
+                int(monthly_match.group("month")),
+            )
+
+            if year_month in requested_months:
+                selected.append(file_name)
+
+            continue
+
+        # Historical layout, e.g.
+        # 2025_100_s.zip
+        # 1966_1970_100_s.zip
+        station_match = _STATION_ARCHIVE_RE.fullmatch(basename)
+
+        if station_match:
+            station = station_match.group("station")
+
+            if not station_keys or station in station_keys:
+                selected.append(file_name)
+
+            continue
+
+        # Future-proof fallback: if IMGW introduces another _s.zip layout,
+        # do not silently discard it. Spatial filtering still happens later.
+        if basename.lower().endswith("_s.zip"):
+            selected.append(file_name)
+
+    return selected
 
 async def _get_with_retries(client, url, attempts=3):
     """Fetch an IMGW directory or archive with bounded transport retries."""
@@ -89,10 +150,12 @@ async def read_data(spatial_range, time_range, data_range, level,
         if any(year not in expanded_years for year in years):
             warnings.warn("Requested year is not available from IMGW")
             return None
-        read_urls = [urljoin(URL+'/', expanded_years[x]) for x in years]
+        read_urls = list(dict.fromkeys(
+            urljoin(URL + '/', expanded_years[x])
+            for x in years
+        ))
 
     s_d_files = []
-    s_d_t_files = []
 
     # Process URLs
     station_keys = {
@@ -114,15 +177,11 @@ async def read_data(spatial_range, time_range, data_range, level,
                 # Recent IMGW folders contain one archive per station.  Only
                 # fetch stations retained by the spatial preselection rather
                 # than every station in Poland.
-                matching_files = [
-                    file_name
-                    for file_name in file_names
-                    if not station_keys
-                    or any(
-                        re.search(rf"_{re.escape(key)}_s\.zip$", file_name)
-                        for key in station_keys
-                    )
-                ]
+                matching_files = _select_synop_archives(
+                    file_names,
+                    station_keys,
+                    time_range,
+                )
 
                 for file_name in matching_files:
                     zip_url = urljoin(url + '/', file_name)
@@ -136,39 +195,37 @@ async def read_data(spatial_range, time_range, data_range, level,
                     with ZipFile(io.BytesIO(zip_response.content)) as zip_ref:
                         for name in zip_ref.namelist():
                             if '_t' in name:
-                                s_d_t_file = pd.read_csv(zip_ref.open(name), encoding='windows-1250', names=s_d_t_COLUMNS)
-                                data_selection = list(data_requested.intersection(set(s_d_t_SELECTION)))
-                                data_selection += SPACE_TIME_COLUMNS
-                                s_d_t_file = s_d_t_file.loc[:, s_d_t_file.columns.intersection(data_selection)]
-                                s_d_t_files.append(s_d_t_file)
-                            else:
-                                s_d_file = pd.read_csv(zip_ref.open(name), encoding='windows-1250', names=s_d_COLUMNS)
-                                data_selection = list(data_requested.intersection(set(s_d_SELECTION)))
-                                data_selection += SPACE_TIME_COLUMNS
-                                s_d_file = s_d_file.loc[:, s_d_file.columns.intersection(data_selection)]
-                                s_d_files.append(s_d_file)
+                                continue
+
+                            s_d_file = pd.read_csv(zip_ref.open(name), encoding='windows-1250', names=s_d_COLUMNS)
+                            data_selection = list(data_requested.intersection(set(s_d_SELECTION)))
+                            data_selection += SPACE_TIME_COLUMNS
+                            s_d_file = s_d_file.loc[:, s_d_file.columns.intersection(data_selection)]
+                            s_d_files.append(s_d_file)
             except (httpx.TransportError, httpx.HTTPStatusError) as error:
                 warnings.warn(f"IMGW server not responding for {url}: {error}")
 
     # Concatenate dataframes
-    if not s_d_files or not s_d_t_files:
+    if not s_d_files:
         return pd.DataFrame()
-    s_d = pd.concat(s_d_files)
-    s_d_t = pd.concat(s_d_t_files)
 
-    # Process timestamps and merge data asynchronously
-    s_d['Timestamp'] = s_d.apply(create_timestamp_from_row, axis=1)
-    s_d_t['Timestamp'] = s_d_t.apply(create_timestamp_from_row, axis=1)
+    s_d = pd.concat(
+        s_d_files,
+        ignore_index=True,
+    )
+
+    s_d['Timestamp'] = s_d.apply(
+        create_timestamp_from_row,
+        axis=1,
+    )
+
     s_d['Timestamp'] = s_d['Timestamp'].dt.date
-    s_d_t['Timestamp'] = s_d_t['Timestamp'].dt.date
 
-    # Merge dataframes
-    s_d_merged = s_d.merge(coordinates, left_on='Station code', right_on='Code')
-    s_d_merged = s_d_t.merge(s_d_merged, left_on=['Timestamp', 'Station code'], right_on=['Timestamp', 'Station code'],
-                             suffixes=(None, '_right'))
-
-    # Drop overlapping columns
-    s_d_merged = s_d_merged.loc[:, [col for col in s_d_merged.columns if '_right' not in col]]
+    s_d_merged = s_d.merge(
+        coordinates,
+        left_on='Station code',
+        right_on='Code',
+    )
     # ``Value`` is the station identifier from IMGW's station catalogue.  It
     # is used to select archives but is metadata, not an observed factor.
     s_d_merged.drop(['Unnamed: 0', 'Value'], axis=1, errors='ignore', inplace=True)

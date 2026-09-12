@@ -21,12 +21,18 @@ async def test_read_data(
     # Mock the imgw_coordinates.csv file
     def mock_read_csv_side_effect(file, *args, **kwargs):
         if isinstance(file, zipfile.ZipExtFile):  # This handles reading from the mocked ZIP
+            # Column names must match WATER_COLUMNS exactly - "Water level",
+            # not "Water Level" - or the adapter selects nothing at all and
+            # the test silently asserts against an empty frame.
             return pd.DataFrame({
-                "Station code": [250180460],
-                "Hydrological year": [2020],
-                "Calendar month": [1],
-                "Day": [1],
-                "Water Level [cm]": [120],
+                "Station code": [250180460, 254230010],
+                "Hydrological year": [2020, 2020],
+                "Calendar month": [1, 1],
+                "Day": [1, 1],
+                # 9999 / 99999.999 are IMGW's "no observation" sentinels, not
+                # a 100-metre river stage and a 100000 m3/s discharge.
+                "Water level [cm]": [120, 9999],
+                "Flow [m³/s]": [5.5, 99999.999],
             })
         else:  # Handles other CSV files (e.g., imgw_coordinates.csv)
             return pd.DataFrame({
@@ -48,8 +54,10 @@ async def test_read_data(
     # Create a valid in-memory ZIP file
     zip_buffer = BytesIO()
     with zipfile.ZipFile(zip_buffer, mode="w") as zf:
-        zf.writestr("_codz.csv", "Station code,Hydrological year,Calendar month,Day,Water Level [cm]\n"
-                                     "250180460,2020,1,1,120")
+        # Only the member name matters here: pd.read_csv is mocked above, so
+        # the archive contents are never parsed. The name must contain "codz"
+        # because that is what the adapter looks for.
+        zf.writestr("_codz.csv", "placeholder")
     zip_buffer.seek(0)
 
     # Define the dynamic mock_get function
@@ -60,13 +68,21 @@ async def test_read_data(
                 status_code=200,
                 text="<a href='2020/'>2020/</a><a href='2021/'>2021/</a>"
             )
-        elif ("/2020" in url or "/2021" in url) and not 'file' in url:
-            # Simulate the response for a specific year folder listing files
+        elif url.endswith(".zip"):
+            # Simulate downloading the archive itself. Checked before the
+            # folder branch because the archive URL also contains the year.
             return AsyncMock(
                 status_code=200,
-                text="<a href='file1.zip'>file1.zip</a>"
+                content=zip_buffer.getvalue()
             )
-        elif url.endswith("file1.zip"):
+        elif "/2020" in url or "/2021" in url:
+            # A year folder listing. The adapter selects only IMGW's
+            # `codz_*` daily archives, so the name has to be realistic.
+            return AsyncMock(
+                status_code=200,
+                text="<a href='codz_2020_01.zip'>codz_2020_01.zip</a>"
+            )
+        elif url.endswith("never-matched.zip"):
             # Simulate the response for downloading zip files
             return AsyncMock(
                 status_code=200,
@@ -85,7 +101,9 @@ async def test_read_data(
     # Test parameters
     spatial_range = (50.0, 40.0, 10.0, 0.0)
     time_range = ("2020-01-01", "2021-12-31")
-    data_range = ["precipitation", "temperature"]
+    # This adapter serves surface water quantity; asking for meteorological
+    # factors selects no value columns and the test asserts nothing.
+    data_range = ["surface water quantity"]
     level = 8
 
     # Call the function under test
@@ -95,3 +113,12 @@ async def test_read_data(
     assert result is not None
     assert "S2CELL" in result.columns.names
     assert isinstance(result, pd.DataFrame)
+    # IMGW writes 9999 for "no observation". It must arrive as NaN, not as a
+    # 100-metre river stage that would skew every downstream statistic.
+    values = pd.to_numeric(
+        pd.Series(result.to_numpy().ravel()), errors="coerce"
+    ).dropna()
+    assert not values.empty, "the real observation should have survived"
+    assert values.max() <= 120, (
+        f"IMGW no-data sentinel leaked into the output: max={values.max()}"
+    )
