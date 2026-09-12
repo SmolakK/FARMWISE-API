@@ -149,7 +149,9 @@ async def test_read_data_skips_non_overlapping_sources(monkeypatch):
         factors=["temperature"],
     )
 
-    assert result.empty
+    assert result["data"].empty
+    assert result["metadata"]["status"] == "no_data"
+    assert result["metadata"]["coverage_precheck"]["dispatched_sources"] == 0
     import_module.assert_not_called()
 
 
@@ -178,7 +180,10 @@ async def test_read_data_isolates_adapter_failures(monkeypatch, failure):
         timeout=0.1,
     )
 
-    assert result.empty
+    assert result["data"].empty
+    assert result["metadata"]["status"] == "no_data"
+    failed = [item for item in result["metadata"]["dispatch"] if item["status"] != "success"]
+    assert failed, "the failing adapter must be recorded in the dispatch metrics"
 
 
 @pytest.mark.asyncio
@@ -259,7 +264,9 @@ async def test_read_data_returns_empty_frame_when_concatenation_fails(monkeypatc
         factors=["temperature"],
     )
 
-    assert result.empty
+    assert result["data"].empty
+    assert result["metadata"]["status"] == "error"
+    assert result["metadata"]["error"], "the failure reason must be reported"
 
 
 @pytest.mark.asyncio
