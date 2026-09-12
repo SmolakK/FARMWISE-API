@@ -280,3 +280,17 @@ def test_download_route_allows_direct_link_without_authentication(tmp_path):
     assert response.status_code == 200
     assert response.content == file_path.read_bytes()
     assert 'filename="result.csv"' in response.headers["content-disposition"]
+
+
+@pytest.mark.asyncio
+async def test_read_data_direct_accepts_base_url_with_scheme(monkeypatch, tmp_path):
+    # PUBLIC_BASE_URL is one setting shared by every route; a full URL must
+    # not be turned into "http://https://...".
+    monkeypatch.setattr(data_call, "read_data", AsyncMock(return_value=_result()))
+    monkeypatch.setenv("PUBLIC_BASE_URL", "https://farmwise.test/")
+
+    response = await _endpoint(data_call.read_data_direct)(
+        _body(), _request(tmp_path), SimpleNamespace(email="user@example.test")
+    )
+
+    assert response["data_url"].startswith("https://farmwise.test/download/")
