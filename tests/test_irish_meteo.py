@@ -1,277 +1,192 @@
-import asyncio
-from datetime import date
-import importlib
-import io
-import zipfile
-from types import SimpleNamespace
-from unittest.mock import AsyncMock, MagicMock
+"""Met Éireann daily rainfall, read from the official annual grids.
 
-import httpx
+This adapter used to download one archive per station and stitch them
+together. It now reads Met Éireann's published annual rainfall grid
+(``IRL_DLY_RR_<year>_grid.csv.gz``), which is projected in Irish Grid (TM65,
+EPSG:29902), stores one column per day named ``X<YYYYMMDD>``, and publishes
+values in tenths of a millimetre.
+"""
+
+import gzip
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import AsyncMock
+
 import pandas as pd
 import pytest
 
-daily = importlib.import_module(
-    "farmwise_api.adapters.API_readers.irish_meteo.irish_ms_daily"
-)
+from farmwise_api.adapters.API_readers.irish_meteo import irish_ms_daily as daily
+
+# TM65 eastings/northings for real places, so the bounding-box filter is
+# exercised against coordinates the adapter would actually meet.
+DUBLIN = (315920.0, 234694.1)      # 53.35 N, 6.26 W
+CORK = (167698.4, 72025.4)         # 51.90 N, 8.47 W
+DONEGAL = (84574.8, 407297.8)      # 54.90 N, 9.80 W - outside the test bbox
+
+# A bounding box around Dublin only (N, S, E, W).
+DUBLIN_BBOX = (53.6, 53.1, -6.0, -6.5)
 
 
-def _zip_file(name, content):
-    buffer = io.BytesIO()
-    with zipfile.ZipFile(buffer, "w") as archive:
-        archive.writestr(name, content)
-    return buffer.getvalue()
+def _grid_file(tmp_path, rows, columns):
+    """Write a gzipped annual grid in Met Éireann's published layout."""
+    frame = pd.DataFrame(rows, columns=columns)
+    path = Path(tmp_path) / "IRL_DLY_RR_2018_grid.csv.gz"
+    with gzip.open(path, "wt", newline="") as handle:
+        frame.to_csv(handle, index=False)
+    return path
 
 
-def test_daily_generate_links_builds_urls_and_marks_invalid_station(tmp_path):
-    stations = tmp_path / "stations.csv"
-    pd.DataFrame(
-        {
-            "station name": ["123", None],
-            "latitude": [50.0, 51.0],
-            "longitude": [-8.0, -7.0],
-        }
-    ).to_csv(stations, index=False)
+def test_grid_subset_selects_the_bounding_box_and_converts_units():
+    """Only cells inside the box survive, and tenths of a mm become mm."""
+    import tempfile
 
-    result = daily.generate_links(stations)
-
-    assert result.loc[0, "download_link"].endswith("dly123.zip")
-    assert result.loc[1, "download_link"] == "Invalid station name"
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("module", [daily])
-async def test_check_link_returns_status(module):
-    response = SimpleNamespace(status_code=200)
-    client = SimpleNamespace(head=AsyncMock(return_value=response))
-
-    assert await module.check_link(client, "https://example.test") == (
-        "https://example.test",
-        200,
-    )
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("module", [daily])
-async def test_check_link_returns_zero_on_network_error(module):
-    client = SimpleNamespace(
-        head=AsyncMock(side_effect=httpx.RequestError("offline"))
-    )
-
-    assert await module.check_link(client, "https://example.test") == (
-        "https://example.test",
-        0,
-    )
-
-
-@pytest.mark.asyncio
-async def test_daily_download_and_process_reads_station_archive():
-    payload = _zip_file(
-        "dly123.csv",
-        "station metadata\n"
-        "date,rain,temp\n"
-        "01-Jan-2024,2.5,10\n",
-    )
-    response = MagicMock(content=payload)
-    client = SimpleNamespace(get=AsyncMock(return_value=response))
-    row = pd.Series(
-        {
-            "download_link": "https://example.test/dly123.zip",
-            "station name": "123",
-            "latitude": 50.0,
-            "longitude": -8.0,
-        }
-    )
-
-    result = await daily.download_and_process(client, row)
-
-    assert result.loc[0, "date"] == pd.Timestamp("2024-01-01")
-    assert result.loc[0, "precipitation [mm]"] == 2.5
-    assert result.loc[0, "id"] == "123"
-
-
-@pytest.mark.asyncio
-async def test_daily_download_and_process_retries_network_errors(monkeypatch):
-    client = SimpleNamespace(
-        get=AsyncMock(side_effect=httpx.RequestError("offline"))
-    )
-    sleep = AsyncMock()
-    monkeypatch.setattr(daily.asyncio, "sleep", sleep)
-    row = pd.Series(
-        {
-            "download_link": "https://example.test/dly123.zip",
-            "station name": "123",
-            "latitude": 50.0,
-            "longitude": -8.0,
-        }
-    )
-
-    result = await daily.download_and_process(client, row)
-
-    assert result.empty
-    assert client.get.await_count == 3
-    assert sleep.await_count == 2
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("module", [daily])
-async def test_download_and_process_rejects_archive_without_station_csv(module):
-    prefix = "dly" if module is daily else "mly"
-    response = MagicMock(content=_zip_file("other.csv", "data"))
-    client = SimpleNamespace(get=AsyncMock(return_value=response))
-    row = pd.Series(
-        {
-            "download_link": f"https://example.test/{prefix}123.zip",
-            "station name": 123,
-            "latitude": 50.0,
-            "longitude": -8.0,
-        }
-    )
-
-    assert (await module.download_and_process(client, row)).empty
-
-
-class _ClientContext:
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, *_args):
-        return False
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("module", [daily])
-async def test_process_working_links_returns_empty_without_status_200(module):
-    result = await module.process_working_links(
-        pd.DataFrame(
-            {
-                "station name": [123],
-                "download_link": ["https://example.test"],
-                "status": [404],
-            }
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _grid_file(
+            tmp,
+            [
+                [DUBLIN[0], DUBLIN[1], 123, 0],
+                [CORK[0], CORK[1], 250, 40],
+                [DONEGAL[0], DONEGAL[1], 999, 10],
+            ],
+            ["east", "north", "X20180101", "X20180102"],
         )
-    )
+        dates = pd.to_datetime(["2018-01-01", "2018-01-02"])
 
-    assert result.empty
+        frame = daily._read_grid_subset(path, dates, DUBLIN_BBOX)
+
+    assert not frame.empty
+    assert set(frame.columns) >= {"lat", "lon", "Timestamp", "precipitation [mm]"}
+
+    # Cork and Donegal are outside the requested box.
+    assert frame["lat"].between(53.1, 53.6).all()
+    assert frame["lon"].between(-6.5, -6.0).all()
+
+    # 123 tenths of a millimetre is 12.3 mm.
+    first_day = frame[frame["Timestamp"] == pd.Timestamp("2018-01-01").date()]
+    assert first_day["precipitation [mm]"].iloc[0] == pytest.approx(12.3)
+
+    # A published zero stays a zero rather than being dropped as falsy.
+    second_day = frame[frame["Timestamp"] == pd.Timestamp("2018-01-02").date()]
+    assert second_day["precipitation [mm]"].iloc[0] == pytest.approx(0.0)
 
 
-@pytest.mark.asyncio
-@pytest.mark.parametrize("module", [daily])
-async def test_process_working_links_combines_successful_results(
-    monkeypatch, module
-):
-    monkeypatch.setattr(module.httpx, "AsyncClient", _ClientContext)
-    processed = pd.DataFrame(
-        {
-            "id": [123],
-            "lat": [50.0],
-            "lon": [-8.0],
-            "date": pd.to_datetime(["2024-01-01"]),
-            "precipitation [mm]": [2.0],
-        }
-    )
-    monkeypatch.setattr(
-        module, "download_and_process", AsyncMock(return_value=processed)
-    )
-    if module is daily:
-        async def gather(*tasks, **_kwargs):
-            return await asyncio.gather(*tasks)
+def test_grid_subset_reads_only_the_requested_days():
+    """A year holds 365 day columns; only the requested ones are melted."""
+    import tempfile
 
-        monkeypatch.setattr(module.tqdm, "gather", gather)
-
-    result = await module.process_working_links(
-        pd.DataFrame(
-            {
-                "station name": [123],
-                "download_link": ["https://example.test"],
-                "status": [200],
-            }
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _grid_file(
+            tmp,
+            [[DUBLIN[0], DUBLIN[1], 10, 20, 30]],
+            ["east", "north", "X20180101", "X20180102", "X20180103"],
         )
-    )
+        dates = pd.to_datetime(["2018-01-02"])
 
-    assert result.equals(processed)
+        frame = daily._read_grid_subset(path, dates, DUBLIN_BBOX)
+
+    assert list(frame["Timestamp"].unique()) == [
+        pd.Timestamp("2018-01-02").date()
+    ]
+    assert frame["precipitation [mm]"].iloc[0] == pytest.approx(2.0)
+
+
+def test_grid_subset_returns_an_empty_frame_outside_ireland():
+    """A request that meets no grid cell must not raise."""
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _grid_file(
+            tmp,
+            [[DONEGAL[0], DONEGAL[1], 50]],
+            ["east", "north", "X20180101"],
+        )
+
+        frame = daily._read_grid_subset(
+            path, pd.to_datetime(["2018-01-01"]), DUBLIN_BBOX
+        )
+
+    assert frame.empty
+    assert list(frame.columns) == [
+        "lat", "lon", "Timestamp", "precipitation [mm]"
+    ]
+
+
+def test_missing_values_are_dropped_not_zero_filled():
+    """An absent reading must not be read as no rainfall."""
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _grid_file(
+            tmp,
+            [[DUBLIN[0], DUBLIN[1], "", 55]],
+            ["east", "north", "X20180101", "X20180102"],
+        )
+
+        frame = daily._read_grid_subset(
+            path, pd.to_datetime(["2018-01-01", "2018-01-02"]), DUBLIN_BBOX
+        )
+
+    assert set(frame["Timestamp"]) == {pd.Timestamp("2018-01-02").date()}
+    assert frame["precipitation [mm]"].iloc[0] == pytest.approx(5.5)
 
 
 @pytest.mark.asyncio
-async def test_daily_read_data_filters_space_and_time(monkeypatch):
-    monkeypatch.setattr(
-        daily, "_download_grid", AsyncMock(return_value="grid.csv.gz")
-    )
-    grid = pd.DataFrame(
-        {
-            "lat": [50.0, 50.0],
-            "lon": [-8.0, -8.0],
-            "Timestamp": [date(2024, 1, 1), date(2024, 1, 1)],
-            "precipitation [mm]": [2.0, 4.0],
-        }
-    )
-    monkeypatch.setattr(
-        daily, "_read_grid_subset", lambda *_args: grid
+async def test_download_grid_reuses_the_cached_annual_file(tmp_path, monkeypatch):
+    """The annual grid is large; it must be fetched once and then reused."""
+    cached = tmp_path / "IRL_DLY_RR_2018_grid.csv.gz"
+    cached.write_bytes(b"already here")
+    monkeypatch.setattr(daily, "adapter_cache", lambda *_parts: tmp_path)
+
+    client = SimpleNamespace(
+        stream=AsyncMock(side_effect=AssertionError("must not download again"))
     )
 
-    def prepare(frame, *_args, **_kwargs):
-        return frame.assign(S2CELL="cell")
+    path = await daily._download_grid(client, 2018)
 
-    monkeypatch.setattr(daily, "prepare_coordinates", prepare)
-
-    result = await daily.read_data(
-        (51.0, 49.0, -7.0, -9.0),
-        ("2024-01-01", "2024-01-02"),
-        ["precipitation"],
-        10,
-    )
-
-    assert result.iloc[0, 0] == 3.0
+    assert path == cached
+    client.stream.assert_not_called()
 
 
 @pytest.mark.asyncio
-async def test_daily_read_data_returns_empty_when_downloads_fail(monkeypatch):
+async def test_read_data_spans_every_requested_year(monkeypatch, tmp_path):
+    """A request crossing a year boundary reads one grid per year."""
+    requested_years = []
+
+    async def fake_download(_client, year):
+        requested_years.append(year)
+        return tmp_path / f"IRL_DLY_RR_{year}_grid.csv.gz"
+
+    def fake_subset(_path, dates, _spatial_range):
+        return pd.DataFrame({
+            "lat": [53.35] * len(dates),
+            "lon": [-6.26] * len(dates),
+            "Timestamp": [d.date() for d in dates],
+            "precipitation [mm]": [1.0] * len(dates),
+        })
+
+    monkeypatch.setattr(daily, "_download_grid", fake_download)
+    monkeypatch.setattr(daily, "_read_grid_subset", fake_subset)
     monkeypatch.setattr(
-        daily, "_download_grid", AsyncMock(return_value="grid.csv.gz")
-    )
-    monkeypatch.setattr(
-        daily,
-        "_read_grid_subset",
-        lambda *_args: pd.DataFrame(
-            columns=["lat", "lon", "Timestamp", "precipitation [mm]"]
+        daily, "prepare_coordinates",
+        lambda frame, spatial_range, level: frame.assign(
+            S2CELL=["cell-1"] * len(frame)
         ),
     )
 
     result = await daily.read_data(
-        (51.0, 49.0, -7.0, -9.0),
-        ("2024-01-01", "2024-01-02"),
-        ["precipitation"],
-        10,
+        DUBLIN_BBOX, ("2017-12-30", "2018-01-02"), ["precipitation"], 10
     )
 
-    assert result.empty
-
-
-def test_daily_grid_reader_converts_tm65_subset_and_tenths_mm(
-    monkeypatch, tmp_path
-):
-    grid_path = tmp_path / "grid.csv.gz"
-    pd.DataFrame(
-        {
-            "east": [10.0, 30.0],
-            "north": [50.0, 70.0],
-            "X20240101": [123, 999],
-        }
-    ).to_csv(grid_path, index=False, compression="gzip")
-
-    class IdentityTransformer:
-        def transform(self, first, second):
-            return first, second
-
-    monkeypatch.setattr(
-        daily.Transformer,
-        "from_crs",
-        lambda *_args, **_kwargs: IdentityTransformer(),
+    assert requested_years == [2017, 2018], (
+        "every year the request spans must be read"
     )
+    assert not result.empty
+    assert "S2CELL" in result.columns.names
 
-    result = daily._read_grid_subset(
-        grid_path,
-        pd.date_range("2024-01-01", "2024-01-01"),
-        (51.0, 49.0, 11.0, 9.0),
-    )
 
-    assert result["precipitation [mm]"].tolist() == [12.3]
-    assert result["Timestamp"].tolist() == [date(2024, 1, 1)]
+@pytest.mark.asyncio
+async def test_read_data_rejects_a_reversed_time_range():
+    with pytest.raises(ValueError, match="must not be after"):
+        await daily.read_data(
+            DUBLIN_BBOX, ("2018-06-02", "2018-06-01"), ["precipitation"], 10
+        )
