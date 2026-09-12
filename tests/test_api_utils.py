@@ -31,6 +31,21 @@ def test_cleanup_old_files(temp_folder):
     assert os.path.exists(new_file), "New file was incorrectly deleted"
 
 
+def test_cleanup_old_files_removes_metadata_and_map_outputs(temp_folder):
+    old = time.time() - 10000
+    stale = [os.path.join(temp_folder, name) for name in ("m.json", "map.html")]
+    unrelated = os.path.join(temp_folder, "keep.txt")
+    for path in (*stale, unrelated):
+        with open(path, "w"):
+            pass
+        os.utime(path, (old, old))
+
+    cleanup_old_files(temp_folder, max_age_in_seconds=5000)
+
+    assert not any(os.path.exists(path) for path in stale)
+    assert os.path.exists(unrelated)
+
+
 def test_cleanup_old_files_empty_folder(temp_folder):
     cleanup_old_files(temp_folder, max_age_in_seconds=5000)
     # Should not raise errors on empty directory
