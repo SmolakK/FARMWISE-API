@@ -98,16 +98,23 @@ def test_locating_bundled_data_does_not_import_rasterio():
     import subprocess
     import sys
 
+    # The result is signalled by the exit code, not by stdout: importing the
+    # package pulls in tqdm/colorama, which can append an ANSI reset sequence
+    # to the captured output and defeat any string comparison.
+    IMPORTED, NOT_IMPORTED = 3, 0
     probe = (
         "import sys;"
         "from farmwise_api.core.utils.proj_env import _bundled_proj_data;"
         "_bundled_proj_data();"
-        "print('rasterio' in sys.modules)"
+        f"sys.exit({IMPORTED} if 'rasterio' in sys.modules else {NOT_IMPORTED})"
     )
     result = subprocess.run(
         [sys.executable, "-c", probe], capture_output=True, text=True,
     )
-    assert result.returncode == 0, result.stderr
-    assert result.stdout.strip().endswith("False"), (
+
+    assert result.returncode in (IMPORTED, NOT_IMPORTED), (
+        f"the probe itself failed ({result.returncode}):\n{result.stderr}"
+    )
+    assert result.returncode == NOT_IMPORTED, (
         "_bundled_proj_data imported rasterio, which defeats the guard"
     )
