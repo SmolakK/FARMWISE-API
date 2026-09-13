@@ -68,8 +68,17 @@ async def scrape_point_data(
     table_data = await asyncio.to_thread(lambda: [td.text.strip() for td in soup.find_all('td')[3:]])
 
     # Processing data into DataFrames asynchronously
-    smaller_columns = [table_headers[i:i + 8] for i in range(0, len(table_headers), 8)]
-    smaller_rows = [table_data[i:i + 8] for i in range(0, len(table_data), 8)]
+    # Each table row is: parameter name, unit, one value per survey year. Read
+    # the width from the year headers instead of assuming six surveys, so a
+    # newly published survey column does not shift every value by one.
+    year_headers = []
+    for header in table_headers[2:]:
+        if not re.fullmatch(r"\d{4}", header):
+            break
+        year_headers.append(header)
+    width = 2 + len(year_headers)
+    smaller_columns = [table_headers[i:i + width] for i in range(0, len(table_headers), width)]
+    smaller_rows = [table_data[i:i + width] for i in range(0, len(table_data), width)]
 
     headers_list = [';'.join(headers) for headers in smaller_columns]
     rows_list = [';'.join(row) for row in smaller_rows]
