@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-import argparse
-import asyncio
 from pathlib import Path
 import re
 
 import pandas as pd
 
-from farmwise_api.core.main_call import read_data
 from farmwise_api.core.utils.paths import PACKAGE_ROOT
 
 
@@ -18,6 +15,7 @@ SOURCE_NAMES = {
     "imgw_api_synop_daily": "IMGW",
     "wetterdienst_dwd": "DWD",
     "geosphere": "GeoSphere",
+    "irish_ms_daily": "Met Éireann",
 }
 
 def separate_frame_to_observations(frame: pd.DataFrame) -> pd.DataFrame:
