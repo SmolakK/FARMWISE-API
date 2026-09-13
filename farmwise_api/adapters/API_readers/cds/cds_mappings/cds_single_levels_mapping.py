@@ -21,6 +21,14 @@ DATA_ALIASES = {
     "volumetric_soil_water_layer_1": 'soil humidity'
 }
 
+# CDS request names differ from the netCDF variable names the download
+# contains; this links the two so each request maps to its output label.
+NETCDF_SHORT_NAMES = {
+    '2m_temperature': 't2m',
+    'total_precipitation': 'tp',
+    'volumetric_soil_water_layer_1': 'swvl1',
+}
+
 # global mapping of parameter codes to descriptions and units
 GLOBAL_MAPPING = {
     't2m': "Temperature [°C]",
