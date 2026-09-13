@@ -1,3 +1,5 @@
+from farmwise_api.adapters.API_readers.hubeau.hubeau_units import output_labels
+
 # BETA copy of .py file for GW (groundwater) but here for SW (surface water) QUALITY monitoring data
 # TODO Those two mappings should probably be combined or simplified some way, but that would need some discussion (2025?) to adjust with other data sources & countries.
 
@@ -48,79 +50,13 @@ CODES = {
     'Pentacosafluorotridecanoic acid (PFTriDA)': ['6549']
 }
 
-COLUMNS = ['lat', 'lon', 'Timestamp',
-           'Acide pentacosafluorotridecanoique',
-           'Acide perfluoro-dodecanoïque',
-           'Acide perfluoro-n-butanoïque',
-           'Acide perfluoro-n-heptanoïque',
-           'Acide perfluoro-n-nonanoïque',
-           'Acide perfluoro-n-pentanoïque',
-           'Acide perfluoro-n-undecanoïque',
-           'Acide perfluoro-octanoïque',
-           'Acide perfluorodecane sulfonique',
-           'Acide perfluorododecane sulfonique',
-           'Acide perfluoroheptane sulfonique',
-           'Acide perfluorononane sulfonique',
-           'Acide perfluoropentane sulfonique',
-           'Acide perfluorotridecane sulfonique',
-           'Acide perfluoroundecane sulfonique',
-           'Acide sulfonique de perfluorobutane',
-           'Acide sulfonique de perfluorooctane',
-           'Arsenic',
-           'Cadmium',
-           'Calcium',
-           'Chlorures',
-           'Conductivité à 25°C',
-           'Magnésium',
-           'Nitrates',
-           'Perfluorohexanesulfonic acid',
-           'Phosphore total',
-           'Plomb',
-           'Potassium',
-           'Potentiel en Hydrogène (pH)',
-           'Sodium',
-           'Somme des pesticides totaux',
-           'Sulfonate de perfluorooctane',
-           'Zinc']
-
-# To translate original French (ADES, Sandre reference) to English FARMWISE names
-MAPPING = {
-    'Acide pentacosafluorotridecanoique': 'SW Pentacosafluorotridecanoic acid (µg/L)',
-    'Acide perfluoro-dodecanoïque': 'SW Perfluorododecanoic acid (µg/L)',
-    'Acide perfluoro-n-butanoïque': 'SW Perfluorobutanoic acid (µg/L)',
-    'Acide perfluoro-n-heptanoïque': 'SW Perfluoroheptanoic acid (µg/L)',
-    'Acide perfluoro-n-nonanoïque': 'SW Perfluorononanoic acid (µg/L)',
-    'Acide perfluoro-n-pentanoïque': 'SW Perfluoropentanoic acid (µg/L)',
-    'Acide perfluoro-n-undecanoïque': 'SW Perfluoroundecanoic acid (µg/L)',
-    'Acide perfluoro-octanoïque': 'SW Perfluorooctanoic acid (µg/L)',
-    'Acide perfluorodecane sulfonique': 'SW Perfluorodecane sulfonic acid (µg/L)',
-    'Acide perfluorododecane sulfonique': 'SW Perfluorododecane sulfonic acid (µg/L)',
-    'Acide perfluoroheptane sulfonique': 'SW Perfluoroheptane sulfonic acid (µg/L)',
-    'Acide perfluorononane sulfonique': 'SW Perfluorononane sulfonic acid (µg/L)',
-    'Acide perfluoropentane sulfonique': 'SW Perfluoropentane sulfonic acid (µg/L)',
-    'Acide perfluorotridecane sulfonique': 'SW Perfluorotridecane sulfonic acid (µg/L)',
-    'Acide perfluoroundecane sulfonique': 'SW Perfluoroundecane sulfonic acid (µg/L)',
-    'Acide sulfonique de perfluorobutane': 'SW Perfluorobutane sulfonic acid (µg/L)',
-
-    'Acide sulfonique de perfluorooctane': 'SW Perfluorooctane sulfonic acid (µg/L)',  # Hub'Eau reports this determinand in µg/L (verified against the API)
-
-    'Arsenic': 'SW Arsenic (µg/L)',
-    'Cadmium': 'SW Cadmium (µg/L)',
-    'Calcium': 'SW Calcium (mg/L)',
-    'Chlorures': 'SW Chlorides (mg/L)',
-    'Conductivité à 25°C': 'SW Conductivity at 25°C (µS/cm)',
-    'Magnésium': 'SW Magnesium (mg/L)',
-    'Nitrates': 'SW Nitrates (mg/L)',
-    'Perfluorohexanesulfonic acid': 'SW Perfluorohexanesulfonic acid (µg/L)',
-    'Phosphore total': 'SW Total Phosphorus (mg/L)',
-    'Plomb': 'SW Lead (µg/L)',
-    'Potassium': 'SW Potassium (mg/L)',
-    'Potentiel en Hydrogène (pH)': 'SW Hydrogen Potential (pH)',
-    'Sodium': 'SW Sodium (mg/L)',
-    'Somme des pesticides totaux': 'SW Total Pesticides (µg/L)',
-    'Sulfonate de perfluorooctane': 'SW Perfluorooctane sulfonate (µg/L)',
-    'Zinc': 'SW Zinc (µg/L)'
-}
+# Output labels keyed by 'SANDRE parameter code:SANDRE fraction code'. The
+# adapter labels each result from its codes, not from the French parameter
+# name: Hub'Eau's names vary between the groundwater and river APIs and over
+# time, and an unmatched name used to pass through with no unit at all. Each
+# label ends in the unit every value under it has been converted to; see
+# hubeau_units for the conversions and the results that are dropped.
+MAPPING = output_labels("SW")
 
 PARAMETERS_MAPPING = {
     'phosphorus': CODES['Phosphorus'],

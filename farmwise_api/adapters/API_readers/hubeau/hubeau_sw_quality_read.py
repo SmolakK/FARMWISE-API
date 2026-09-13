@@ -1,6 +1,7 @@
 import logging
 import pandas as pd
-from farmwise_api.adapters.API_readers.hubeau.hubeau_mappings.hubeau_mapping_sw_quality import MAPPING, PARAMETERS_MAPPING
+from farmwise_api.adapters.API_readers.hubeau.hubeau_mappings.hubeau_mapping_sw_quality import PARAMETERS_MAPPING
+from farmwise_api.adapters.API_readers.hubeau.hubeau_units import normalise_results, sampling_day
 from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
 import warnings
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
@@ -41,6 +42,10 @@ async def fetch_data(api, pt_id, he_period_bounds, data_requested_codes, verbose
             # that is why we use the HubEau online API official argument names here:
             date_debut_prelevement=he_period_bounds[0],
             date_fin_prelevement=he_period_bounds[1],
+            # Hub'Eau now returns sampling times ('...T11:00:00Z'); the
+            # library's default '%Y-%m-%d' failed on every point, and the
+            # error was swallowed below, so no results came back at all.
+            date_fmt='ISO8601',
             # Ignore data qualified of Incorrect ou Uncertain:
             code_qualification='0,1,4'
             # NOT AVAILABLE in hub lib for this type of data: only_valid_data=True
@@ -49,14 +54,15 @@ async def fetch_data(api, pt_id, he_period_bounds, data_requested_codes, verbose
         # Ensure proper DataFrame formatting
         if not df.empty:
             df = df.rename_axis('date_debut_prelevement').reset_index()
+            df['date_debut_prelevement'] = sampling_day(df['date_debut_prelevement'])
             if verbose_level >= 2:
                 logger.debug(
                     "Data fetched for point %s:\n%s", pt_id, df.head()
                 )
         return df
     except Exception as e:
-        if verbose_level >= 1:
-            logger.warning("Error fetching data for point %s: %s", pt_id, e)
+        # Always reported: a failure here silently removes the point's data.
+        logger.warning("Error fetching data for point %s: %s", pt_id, e)
         return None
 
 
@@ -281,9 +287,10 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     # NOT NEEDED anymore I think: df.set_index(['latitude', 'longitude', 'date_debut_prelevement'])
 
     # Selecting columns to discard some columns that are not used anymore (for now)
-    df = df[['point_id', 'latitude', 'longitude', 'code_param', 'nom_param', 'resultat', 'symbole_unite', 'code_remarque', 'date_debut_prelevement', 'libelle_support', 'libelle_fraction']]
+    df = df[['point_id', 'latitude', 'longitude', 'code_param', 'nom_param', 'resultat', 'symbole_unite', 'code_remarque', 'date_debut_prelevement', 'libelle_support', 'code_fraction', 'libelle_fraction']]
     # Remarks:
-    # * The libelle_fraction field is kept temporarily just to allow a more detailed inspection of the data we got, although all "fractions" are kept.
+    # * The analysed fraction decides the output column: dissolved, raw water and unspecified water fractions are
+    #   kept apart, and sediment or suspended-matter fractions are dropped (see hubeau_units.FRACTIONS).
     # * TODO (Marc) We should USE the 'code_remarque' info ... but HOW, and what to do then in .pivot_table() !? (TO discuss in 2025)
     #   This 'code_remarque' --> 'mnemo_remarque' text field, indicates whether the result is quantitative (>LOQ) or censored data (<LOQ or <LOD), or other special cases.
 
@@ -306,52 +313,30 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
             df_ref_coords,
         )
 
-    # Aggregate repeated laboratory results with the configured surface-water
-    # quality policy; units remain categorical metadata and use their mode.
+    # Convert every result to its parameter's output unit and label it by
+    # parameter and analysed fraction BEFORE anything is aggregated. Hub'Eau
+    # reports a unit per result and one parameter can arrive in several
+    # (mg(As)/L next to µg(As)/L, nitrate as N next to NO3); averaging those
+    # under one label changed the meaning of the numbers. Results that cannot
+    # be converted without guessing are dropped and counted in the report.
+    df, unit_report = normalise_results(df, prefix="SW")
+    if df.empty:
+        return None
+
     df = aggregate_to_s2(
-        df[['point_id', 'date_debut_prelevement', 'nom_param',
-            'resultat', 'symbole_unite']],
-        group_by=('point_id', 'date_debut_prelevement', 'nom_param'),
+        df[['point_id', 'date_debut_prelevement', 'parameter', 'resultat']],
+        group_by=('point_id', 'date_debut_prelevement', 'parameter'),
         logical_data_types=data_range,
         methods=(within_source_aggregation_methods
                  or WITHIN_SOURCE_AGGREGATION_METHODS),
         column_data_types={'resultat': 'surface water quality'},
-        column_aggregations={'symbole_unite': 'mode'},
     ).reset_index().pivot(
         index=['point_id', 'date_debut_prelevement'],
-        columns='nom_param',
-        values=['resultat', 'symbole_unite'],
+        columns='parameter',
+        values='resultat',
     ).reset_index()
-    df = df.rename({'point_id': 'point_id', 'date_debut_prelevement': 'Timestamp'}, axis=1)
-
-    # Reminder of the DataFrame format at this stage:
-    # It looks like this (example):
-    #
-    #                point_id  Timestamp resultat                 symbole_unite
-    #    nom_param                        Nitrates Phosphore total      Nitrates Phosphore total
-    #    0          BSS000QSNW 2020-05-19     64.0             NaN     mg(NO3)/L             NaN
-    #    1          BSS000QSNW 2020-06-03     64.0           0.080     mg(NO3)/L         mg(P)/L
-    #
-    # That is, the columns have two levels: two outer 'groups' (resultat, symbole_unite) and
-    # as many inner columns inside those groups as there are parameters (here = 2 substances).
-
-    # TODO Marc please CHECK if relevant for Naiades SW quality data?? First tests suggest that symbole_unite = mg/L (no molecule detail) for 'Phosphore total' (code 1350).
-    phosphore_column = [x for x in df.columns if "Phosphore total" in x]
-    if len(phosphore_column) > 0:  # P2O5 to P
-        df.loc[df.loc[:, ('symbole_unite', 'Phosphore total')] == 'mg(P2O5)/L', (
-        'resultat', 'Phosphore total')] *= 0.436  # (inplace multiplication)
-        df.loc[df.loc[:, ('symbole_unite', 'Phosphore total')] == 'mg(P2O5)/L', (
-        'symbole_unite', 'Phosphore total')] = "mg(P)/L"  # (updating the unit)
-
-    # Simplifying the DataFrame:
-    # TODO (TO discuss in 2025) Marc thinks it would be better & more robust workflow if we included the units info in the output. But for now, it is removed here:
-    df = df[[x for x in df.columns if 'unite' not in x[0]]]  # drop columns having a name "*unite*"
-    df = df.droplevel(0, axis=1)  # clear the "resultat" columns' grouping (multi-indexing) to get normal columns
-    df.columns = ['point_id', 'Timestamp'] + list(df.columns[
-                                                  2:])  # setting names for the first columns and use the others' (Reminder: column index starts at [0])
-
-    df = df.rename(MAPPING,
-                   axis=1)  # Map the values-of-interest columns with Parameter names, to English FARMWISE-defined parameter names
+    df.columns.name = None
+    df = df.rename({'date_debut_prelevement': 'Timestamp'}, axis=1)
 
     # Computing S2CELLs from the point coordinates:
     tmp_prep_coords_df = prepare_coordinates(df_ref_coords, spatial_range, level)
@@ -378,8 +363,9 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     df = df.set_index("Timestamp").groupby('S2CELL').resample('1D').first()
     # TODO QUESTION: What is this for? Is it really important that the time series in df have a regular 1-day time step here???
 
-    df = df.drop('S2CELL',
-                 axis=1)  # to remove the redundant not-index S2CELL column (now that a duplicate is included in the multi-index)
+    # pandas < 3 kept a copy of the grouping column next to the S2CELL index
+    # level; pandas 3 does not, and the unconditional drop raised KeyError.
+    df = df.drop(columns='S2CELL', errors='ignore')
     df = df.reset_index()
     df.Timestamp = pd.to_datetime(df.Timestamp).dt.date
 
@@ -404,5 +390,6 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     # Pivot the DataFrame (to return a DataFrame with distinct increasing Dates in Rows,
     # observed Parameter names as Column GROUPS, and S2CELLs (with some data for that paramter) as Columns in that group
     df = df.pivot(index='Timestamp', columns='S2CELL')
+    df.attrs["unit_normalisation"] = unit_report
 
     return df
