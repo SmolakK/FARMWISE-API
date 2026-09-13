@@ -327,6 +327,9 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
             if api_response_data.empty:
                 dispatch_status = "empty"
                 continue
+            # Adapters may attach a record of what they converted or dropped
+            # (e.g. Hub'Eau unit conversion); keep it with the source metadata.
+            adapter_notes = dict(api_response_data.attrs)
             api_response_data = normalize_temporal_index(api_response_data)
 
             api_columns = list(
@@ -348,6 +351,7 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                 "status": "success",
                 "error": None,
             }
+            meta.update(adapter_notes)
             api_metadata.append(meta)
 
             request_ranges = {

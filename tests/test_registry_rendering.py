@@ -98,14 +98,15 @@ def test_parenthesised_text_is_not_reported_as_a_unit():
     )
     assert wrong == [], f"label text reported as a unit: {wrong}"
 
-    hubeau = [
+    # Hub'Eau labels carry the fraction in parentheses and the unit, with its
+    # chemical form, in brackets: only the bracketed part is the unit.
+    nitrate = [
         row for row in rows
         if row["source_short"] == "hubeau.hubeau_wq_read"
-        and row["output_name"].endswith("(mg/L)")
+        and row["native_variable"] == "1340:23"
     ]
-    assert hubeau and hubeau[0]["output_unit"] == "mg/L", (
-        "Hub'Eau units are written in parentheses and must still be read"
-    )
+    assert nitrate and nitrate[0]["output_unit"] == "mg(NO3)/L"
+    assert nitrate[0]["physical_meaning"] == "GW Nitrates (raw water)"
 
 
 def test_output_units_come_from_labels_or_authored_fallback():

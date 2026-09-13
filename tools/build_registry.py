@@ -71,6 +71,10 @@ class Shape:
     # Dict symbol mapping an alias key to its key in `descr`, for adapters
     # whose two tables use different names for the same variable.
     join: str | None = None
+    # Mapping module (relative to the adapter's package) to search first.
+    # Needed where a package holds several mapping modules defining the same
+    # symbol, e.g. Hub'Eau's groundwater, river and piezometer MAPPING tables.
+    mapping_module: str | None = None
 
 
 SHAPES: dict[str, Shape] = {
@@ -90,11 +94,14 @@ SHAPES: dict[str, Shape] = {
     "correctiv.correctiv_read": Shape(aliases=None),
     "eea.eea_read": Shape(aliases=None),
     "EuroCropV2.EuroCropV2_read": Shape(aliases=None),
-    # Hub'Eau: MAPPING is native determinand -> output name; the logical factor
-    # comes from the registry entry for the source, not from a per-variable map.
-    "hubeau.hubeau_wq_read": Shape(aliases=None, descr="MAPPING", paren_units=True),
+    # Hub'Eau quality: MAPPING is 'SANDRE parameter code:fraction code' ->
+    # output name, ending in the unit every value was converted to.
+    "hubeau.hubeau_wq_read": Shape(
+        aliases=None, descr="MAPPING",
+        mapping_module="hubeau_mappings.hubeau_mapping_wq"),
     "hubeau.hubeau_sw_quality_read": Shape(
-        aliases=None, descr="MAPPING", paren_units=True),
+        aliases=None, descr="MAPPING",
+        mapping_module="hubeau_mappings.hubeau_mapping_sw_quality"),
     "hubeau.hubeau_piezo_read_vbrgm": Shape(aliases=None, descr="MAPPING"),
     # No per-variable table in code: land-cover classes / adapter absent.
     "corine.corine_read": Shape(aliases=None, descr=None),
@@ -202,10 +209,12 @@ def _dump_yaml(data: dict, path: Path) -> None:
         handle.write(header + text)
 
 
-def _iter_mapping_modules(source: str):
+def _iter_mapping_modules(source: str, preferred: str | None = None):
     """Yield the adapter module and any mapping submodules beside it."""
-    yield source
     package = source.rsplit(".", 1)[0]
+    if preferred:
+        yield f"{package}.{preferred}"
+    yield source
     try:
         parent = importlib.import_module(package)
     except Exception:
@@ -215,9 +224,9 @@ def _iter_mapping_modules(source: str):
             yield module.name
 
 
-def _symbol(source: str, name: str) -> dict | None:
+def _symbol(source: str, name: str, preferred: str | None = None) -> dict | None:
     """Find a mapping dict for `source`, preferring the adapter module."""
-    for module_name in _iter_mapping_modules(source):
+    for module_name in _iter_mapping_modules(source, preferred):
         try:
             module = importlib.import_module(module_name)
         except Exception:
@@ -290,9 +299,10 @@ def collect_rows(authored: dict | None = None) -> list[Row]:
             temporal_resolution = str(ranges[3])
             spatial_type = {1: "point", 2: "grid"}.get(ranges[4], str(ranges[4]))
 
-        aliases = _symbol(source, shape.aliases) if shape.aliases else None
-        descr = _symbol(source, shape.descr) if shape.descr else None
-        join = (_symbol(source, shape.join) if shape.join else None) or {}
+        preferred = shape.mapping_module
+        aliases = _symbol(source, shape.aliases, preferred) if shape.aliases else None
+        descr = _symbol(source, shape.descr, preferred) if shape.descr else None
+        join = (_symbol(source, shape.join, preferred) if shape.join else None) or {}
         # Some adapters key the two tables differently - ERA5 lists request
         # names ("2m_temperature") in DATA_ALIASES but netCDF short names
         # ("t2m") in GLOBAL_MAPPING - so meaning and unit cannot be joined to
