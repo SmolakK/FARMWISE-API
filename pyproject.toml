@@ -98,6 +98,9 @@ evaluation = [
     # evaluation workflow can be installed by name. Jupyter itself is not
     # declared here: install it separately to run the analysis notebook.
     "matplotlib>=3.10,<4",
+    # Peak process RSS, the primary memory metric of the empirical evaluation.
+    # Without it the collector still runs but records only tracemalloc peaks.
+    "psutil>=7,<8",
 ]
 release = [
     "build>=1.2,<2",
