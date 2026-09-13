@@ -1,16 +1,42 @@
-"""Collect live empirical inputs for analysis in the evaluation notebooks."""
+"""Collect raw, frozen empirical outputs for the FARMWISE evaluation.
+
+This module only *executes* the experiments defined in
+:mod:`evaluation.scenarios` and writes what it measured. It computes no
+statistics: summaries, uncertainty intervals, tables and figures belong to the
+analysis layer (:mod:`evaluation.analysis` and the notebook), which reads the
+frozen files and never queries live APIs.
+
+Each collection is written to its own directory and is never overwritten::
+
+    empirical_input/<collection-id>/
+        manifest.json                   provenance + complete configuration
+        empirical_runs.json             one record per measured request
+        cross_source_observations.csv   long-format separate-source values
+        quality/                        per-source quality reports
+
+Experiments, in execution order:
+
+1. ``coverage``         pre-check vs factor-only routing, quality off
+2. ``cross-source``     separate-source values for agreement analysis
+3. ``quality-overhead`` one request with quality assessment off vs on
+4. ``scaling``          S2 level, spatial extent and temporal extent sweeps
+
+Within an experiment, warm-up executions run first and are excluded from
+``runs`` (they are listed separately in ``warmup_runs``); the measured
+executions then run in an order shuffled with ``RANDOM_SEED``.
+"""
 
 from __future__ import annotations
 
 import asyncio
 from contextlib import nullcontext
+from dataclasses import dataclass
 from datetime import datetime, timezone
 import json
 from pathlib import Path
 import random
 import sys
 from time import perf_counter
-import tracemalloc
 
 import pandas as pd
 from tqdm import tqdm
@@ -20,250 +46,366 @@ from farmwise_api.core.utils.access_policy import (
     acknowledged_private_noncommercial_imgw,
     private_noncommercial_imgw_enabled,
 )
+from evaluation import scenarios as config
 from evaluation.collect_cross_source import (
     separate_frame_to_observations,
     summarise_source_comparison,
     validate_private_output,
 )
-from evaluation.scenarios import (
-    CROSS_SOURCE_SCENARIOS,
-    LIVE_SCALING_SCENARIOS,
-    REQUEST_SCENARIOS,
-)
+from evaluation.coverage_baseline import coverage_counts, factor_only_routing
+from evaluation.measurement import MemoryMonitor, provenance
+from evaluation.workload import request_workload, result_workload, source_timings
 
-
-OUTPUT_DIR = Path(__file__).resolve().parent / "empirical_input"
-SCALING_REPEATS = 3
-REQUEST_TIMEOUT_SECONDS = 600
-# File-level opt-in for this academic evaluation. This affects only direct
+OUTPUT_ROOT = Path(__file__).resolve().parent / "empirical_input"
+# File-level opt-in for this academic evaluation. It affects only direct
 # execution of this collector; the public FARMWISE server continues to block
 # IMGW through its own source policy.
 INCLUDE_IMGW_RESEARCH = True
 
+IMGW_ATTRIBUTION = (
+    "Źródłem pochodzenia danych jest Instytut Meteorologii i Gospodarki "
+    "Wodnej – Państwowy Instytut Badawczy. Dane Instytutu Meteorologii i "
+    "Gospodarki Wodnej – Państwowego Instytutu Badawczego zostały przetworzone."
+)
+OBSERVATION_COLUMNS = [
+    "timestamp", "cell", "variable", "source", "value", "scenario", "region", "period",
+]
 
-async def collect(
-    scenarios=REQUEST_SCENARIOS,
-    scaling_scenarios=LIVE_SCALING_SCENARIOS,
-    cross_scenarios=CROSS_SOURCE_SCENARIOS,
-    scaling_repeats=SCALING_REPEATS,
+
+@dataclass(frozen=True)
+class WorkItem:
+    """One execution of one request."""
+    experiment: str
+    request: dict
+    repeat: int            # 1-based for measured runs, 0 for warm-ups
+    mode: str | None = None
+    warmup: bool = False
+
+    @property
+    def assess_quality(self) -> bool:
+        if self.experiment == "cross-source":
+            return True
+        if self.experiment == "quality-overhead":
+            return config.QUALITY_MODES[self.mode][0]
+        return False
+
+    @property
+    def persist_quality_reports(self) -> bool:
+        if self.experiment == "cross-source":
+            return True
+        if self.experiment == "quality-overhead":
+            return config.QUALITY_MODES[self.mode][1]
+        return False
+
+    @property
+    def separate_api(self) -> bool:
+        return self.experiment in {"coverage", "cross-source"}
+
+
+def _phase(items_measured, items_warmup, rng) -> list[WorkItem]:
+    warmups = list(items_warmup)
+    measured = list(items_measured)
+    rng.shuffle(warmups)
+    rng.shuffle(measured)
+    return warmups + measured
+
+
+def build_work_plan(
     *,
-    output_dir=OUTPUT_DIR,
-    timeout=REQUEST_TIMEOUT_SECONDS,
-) -> dict:
-    """Collect raw request, scaling, cross-source, and quality measurements."""
-    if scaling_repeats < 1:
-        raise ValueError("scaling_repeats must be at least 1")
+    coverage_scenarios=config.REQUEST_SCENARIOS,
+    cross_scenarios=config.CROSS_SOURCE_SCENARIOS,
+    quality_scenario=config.QUALITY_OVERHEAD_SCENARIO,
+    scaling_scenarios=config.LIVE_SCALING_SCENARIOS,
+    coverage_repeats=config.COVERAGE_REPEATS,
+    coverage_warmups=config.COVERAGE_WARMUPS,
+    quality_repeats=config.QUALITY_OVERHEAD_REPEATS,
+    quality_warmups=config.QUALITY_OVERHEAD_WARMUPS,
+    scaling_repeats=config.SCALING_REPEATS,
+    scaling_warmups=config.SCALING_WARMUPS,
+    seed=config.RANDOM_SEED,
+) -> list[WorkItem]:
+    """Deterministic execution order for a whole collection."""
+    for name, value in (
+        ("coverage_repeats", coverage_repeats),
+        ("quality_repeats", quality_repeats),
+        ("scaling_repeats", scaling_repeats),
+    ):
+        if value < 1:
+            raise ValueError(f"{name} must be at least 1")
+    rng = random.Random(seed)
+    plan: list[WorkItem] = []
 
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    collection_started = datetime.now(timezone.utc)
-    quality_run_name = collection_started.strftime("%Y%m%dT%H%M%S%fZ")
-    quality_dir = output_dir / "quality" / quality_run_name
-    observations_frames = []
-    runs = []
-
-    work_items = [
-        (request, "coverage", 1) for request in scenarios
-    ]
-    work_items.extend(
-        (request, "cross-source", 1) for request in cross_scenarios
+    plan += _phase(
+        [
+            WorkItem("coverage", request, repeat, mode)
+            for request in coverage_scenarios
+            for mode in config.COVERAGE_MODES
+            for repeat in range(1, coverage_repeats + 1)
+        ],
+        [
+            WorkItem("coverage", request, 0, mode, warmup=True)
+            for request in coverage_scenarios
+            for mode in config.COVERAGE_MODES
+            for _ in range(coverage_warmups)
+        ],
+        rng,
     )
-
-    scaling_items = [
-        (request, "live-scaling", repeat)
-        for repeat in range(1, scaling_repeats + 1)
-        for request in scaling_scenarios
-    ]
-    random.Random(42).shuffle(scaling_items)
-    work_items.extend(scaling_items)
-
-    progress = tqdm(
-        work_items,
-        desc="Live empirical collection",
-        unit="request",
-        dynamic_ncols=True,
-        file=sys.stdout,
+    # Cross-source runs are single observational collections, not timings.
+    plan += [WorkItem("cross-source", request, 1) for request in cross_scenarios]
+    if quality_scenario is not None:
+        plan += _phase(
+            [
+                WorkItem("quality-overhead", quality_scenario, repeat, mode)
+                for mode in config.QUALITY_MODES
+                for repeat in range(1, quality_repeats + 1)
+            ],
+            [
+                WorkItem("quality-overhead", quality_scenario, 0, mode, warmup=True)
+                for mode in config.QUALITY_MODES
+                for _ in range(quality_warmups)
+            ],
+            rng,
+        )
+    plan += _phase(
+        [
+            WorkItem("scaling", request, repeat)
+            for request in scaling_scenarios
+            for repeat in range(1, scaling_repeats + 1)
+        ],
+        [
+            WorkItem("scaling", request, 0, warmup=True)
+            for request in scaling_scenarios
+            for _ in range(scaling_warmups)
+        ],
+        rng,
     )
-    for request, run_kind, repeat in progress:
-        progress.set_postfix_str(
-            f"{request['scenario']} ({repeat})", refresh=True
-        )
-        precheck_started = perf_counter()
-        dispatch_plan = plan_source_dispatch(
-            request["bounding_box"],
-            request["time_from"],
-            request["time_to"],
-            request["factors"],
-        )
-        fallback_coverage = {
-            "candidate_sources": len(dispatch_plan),
-            "dispatched_sources": sum(
-                item["dispatched"] for item in dispatch_plan
-            ),
-            "requests_avoided": sum(
-                not item["dispatched"] for item in dispatch_plan
-            ),
-            "precheck_seconds": perf_counter() - precheck_started,
-            "sources": dispatch_plan,
-        }
-        started = perf_counter()
-        peak_memory_mb = None
-        tracemalloc.start()
-        try:
+    return plan
+
+
+async def execute(item: WorkItem, *, timeout, quality_dir, rss_interval) -> tuple[dict, pd.DataFrame | None]:
+    """Run one work item and return its record and returned frame."""
+    request = item.request
+    # Planned routing and workload are computed before, and excluded from,
+    # the timed section.
+    plan = plan_source_dispatch(
+        request["bounding_box"], request["time_from"], request["time_to"],
+        request["factors"],
+    )
+    record = {
+        "experiment": item.experiment,
+        "scenario": request["scenario"],
+        "dimension": request.get("dimension"),
+        "input_value": request.get("input_value"),
+        "mode": item.mode,
+        "repeat": item.repeat,
+        "request": request,
+        "settings": {
+            "assess_quality": item.assess_quality,
+            "persist_quality_reports": item.persist_quality_reports,
+            "separate_api": item.separate_api,
+            "routing": item.mode if item.experiment == "coverage" else "precheck",
+            "timeout_seconds": timeout,
+        },
+        "workload": request_workload(request),
+        "planned_coverage": coverage_counts(plan),
+        "started_utc": datetime.now(timezone.utc).isoformat(),
+    }
+    routing = (
+        factor_only_routing()
+        if item.experiment == "coverage" and item.mode == "factor-only"
+        else nullcontext()
+    )
+    frame = None
+    monitor = MemoryMonitor(interval_seconds=rss_interval)
+    started = perf_counter()
+    try:
+        with routing, monitor:
             result = await read_data(
                 bounding_box=request["bounding_box"],
                 level=request["level"],
                 time_from=request["time_from"],
                 time_to=request["time_to"],
                 factors=request["factors"],
-                separate_api=run_kind in {"coverage", "cross-source"},
+                separate_api=item.separate_api,
                 timeout=timeout,
-                assess_quality=True,
-                persist_quality_reports=True,
+                assess_quality=item.assess_quality,
+                persist_quality_reports=item.persist_quality_reports,
                 quality_report_dir=quality_dir,
             )
-            elapsed = perf_counter() - started
-            _current, peak = tracemalloc.get_traced_memory()
-            tracemalloc.stop()
-            peak_memory_mb = peak / (1024 * 1024)
+        record["request_wall_seconds"] = perf_counter() - started
+        metadata = result.get("metadata", {}) if isinstance(result, dict) else {}
+        frame = result.get("data") if isinstance(result, dict) else None
+        record["status"] = (
+            "success" if frame is not None and not frame.empty else "no-data"
+        )
+        record["error"] = metadata.get("error")
+        record["coverage_precheck"] = metadata.get("coverage_precheck")
+        record["dispatch"] = metadata.get("dispatch", [])
+        record["quality_assessment"] = metadata.get("quality_assessment")
+        record["quality_report_count"] = len(metadata.get("quality_reports", []))
+    except Exception as error:  # noqa: BLE001 - every failure is data here
+        record["request_wall_seconds"] = perf_counter() - started
+        record["status"] = "error"
+        record["error"] = f"{type(error).__name__}: {error}"
+        record["coverage_precheck"] = None
+        record["dispatch"] = []
+        record["quality_assessment"] = None
+        record["quality_report_count"] = 0
+    record["memory"] = monitor.result
+    record["workload"].update(result_workload(frame))
+    record.update(source_timings(record["dispatch"]))
+    return record, frame
 
-            # read_data always returns {"data", "metadata"}; an empty frame is
-            # the no-data outcome. A bare DataFrame is still accepted for
-            # results recorded by older versions.
-            no_data = not isinstance(result, dict) or result["data"].empty
-            if no_data:
-                result_metadata = result.get("metadata", {}) if isinstance(result, dict) else {}
-                runs.append(
-                    {
-                        "request": request,
-                        "run_kind": run_kind,
-                        "repeat": repeat,
-                        "status": "no-data",
-                        "request_wall_seconds": elapsed,
-                        "peak_traced_memory_mb": peak_memory_mb,
-                        "coverage_precheck": result_metadata.get(
-                            "coverage_precheck", fallback_coverage
-                        ),
-                        "dispatch": result_metadata.get("dispatch", []),
-                    }
-                )
-                continue
 
-            metadata = result["metadata"]
-            frame = result["data"]
-            if isinstance(frame.columns, pd.MultiIndex):
-                returned_cells = len(
-                    frame.columns.get_level_values(1).unique()
-                )
-                returned_factors = len(
-                    frame.columns.get_level_values(0).unique()
-                )
-            else:
-                returned_cells = len(frame.columns)
-                returned_factors = len(frame.columns)
+async def collect(
+    *,
+    coverage_scenarios=config.REQUEST_SCENARIOS,
+    cross_scenarios=config.CROSS_SOURCE_SCENARIOS,
+    quality_scenario=config.QUALITY_OVERHEAD_SCENARIO,
+    scaling_scenarios=config.LIVE_SCALING_SCENARIOS,
+    coverage_repeats=config.COVERAGE_REPEATS,
+    coverage_warmups=config.COVERAGE_WARMUPS,
+    quality_repeats=config.QUALITY_OVERHEAD_REPEATS,
+    quality_warmups=config.QUALITY_OVERHEAD_WARMUPS,
+    scaling_repeats=config.SCALING_REPEATS,
+    scaling_warmups=config.SCALING_WARMUPS,
+    seed=config.RANDOM_SEED,
+    output_root=OUTPUT_ROOT,
+    collection_id: str | None = None,
+    timeout=config.REQUEST_TIMEOUT_SECONDS,
+    rss_interval=config.RSS_SAMPLING_INTERVAL_SECONDS,
+) -> dict:
+    """Execute every configured experiment and write one frozen collection."""
+    started_at = datetime.now(timezone.utc)
+    collection_id = collection_id or started_at.strftime("%Y%m%dT%H%M%SZ")
+    output_dir = Path(output_root) / collection_id
+    if output_dir.exists() and any(output_dir.iterdir()):
+        raise FileExistsError(
+            f"{output_dir} already holds a collection; frozen outputs are never "
+            "overwritten. Choose another collection_id."
+        )
+    output_dir.mkdir(parents=True, exist_ok=True)
+    quality_dir = output_dir / "quality"
 
-            runs.append(
-                {
-                    "request": request,
-                    "run_kind": run_kind,
-                    "repeat": repeat,
-                    "status": "success",
-                    "request_wall_seconds": elapsed,
-                    "peak_traced_memory_mb": peak_memory_mb,
-                    "returned_row_count": len(frame),
-                    "returned_column_count": len(frame.columns),
-                    "returned_cell_count": returned_cells,
-                    "returned_factor_count": returned_factors,
-                    "non_null_value_count": int(frame.count().sum()),
-                    "coverage_precheck": metadata["coverage_precheck"],
-                    "dispatch": metadata["dispatch"],
-                    "quality_report_count": len(
-                        metadata.get("quality_reports", [])
-                    ),
-                }
+    plan = build_work_plan(
+        coverage_scenarios=coverage_scenarios, cross_scenarios=cross_scenarios,
+        quality_scenario=quality_scenario, scaling_scenarios=scaling_scenarios,
+        coverage_repeats=coverage_repeats, coverage_warmups=coverage_warmups,
+        quality_repeats=quality_repeats, quality_warmups=quality_warmups,
+        scaling_repeats=scaling_repeats, scaling_warmups=scaling_warmups,
+        seed=seed,
+    )
+    run_config = {
+        **config.evaluation_config(),
+        "random_seed": seed,
+        "request_timeout_seconds": timeout,
+        "rss_sampling_interval_seconds": rss_interval,
+    }
+    run_config["coverage"].update(
+        repeats=coverage_repeats, warmups_per_scenario_and_mode=coverage_warmups,
+        scenarios=coverage_scenarios,
+    )
+    run_config["cross_source"]["scenarios"] = cross_scenarios
+    run_config["quality_overhead"].update(
+        repeats=quality_repeats, warmups_per_mode=quality_warmups,
+        scenario=quality_scenario,
+    )
+    run_config["scaling"].update(
+        repeats=scaling_repeats, warmups_per_scenario=scaling_warmups,
+        scenarios=scaling_scenarios,
+    )
+    manifest = provenance(run_config, started_at=started_at)
+    manifest["collection_id"] = collection_id
+    manifest["imgw_research_use_enabled"] = private_noncommercial_imgw_enabled()
+    manifest["execution_order"] = [
+        {"experiment": i.experiment, "scenario": i.request["scenario"],
+         "mode": i.mode, "repeat": i.repeat, "warmup": i.warmup}
+        for i in plan
+    ]
+    manifest_path = output_dir / "manifest.json"
+    _write_json(manifest_path, manifest)
+
+    runs, warmup_runs, observation_frames = [], [], []
+    progress = tqdm(plan, desc="Empirical collection", unit="request",
+                    dynamic_ncols=True, file=sys.stdout)
+    for item in progress:
+        progress.set_postfix_str(
+            f"{item.experiment}:{item.request['scenario']}"
+            f"{':' + item.mode if item.mode else ''}"
+            f"{' warm-up' if item.warmup else f' #{item.repeat}'}",
+            refresh=True,
+        )
+        record, frame = await execute(
+            item, timeout=timeout, quality_dir=quality_dir, rss_interval=rss_interval,
+        )
+        if item.warmup:
+            warmup_runs.append({
+                key: record.get(key) for key in (
+                    "experiment", "scenario", "mode", "status", "error",
+                    "request_wall_seconds", "started_utc",
+                )
+            })
+            continue
+        record["run_id"] = len(runs) + 1
+        if item.experiment == "cross-source" and record["status"] == "success":
+            observations = separate_frame_to_observations(frame)
+            record["cross_source_comparison"] = summarise_source_comparison(
+                observations, required_sources=item.request.get("required_sources", []),
             )
-
-            if run_kind == "cross-source":
-                observations = separate_frame_to_observations(frame)
-                runs[-1]["cross_source_comparison"] = (
-                    summarise_source_comparison(
-                        observations,
-                        required_sources=request.get(
-                            "required_sources", []
-                        ),
-                    )
-                )
-                if not observations.empty:
-                    observations["scenario"] = request["scenario"]
-                    observations_frames.append(observations)
-        except Exception as error:
-            if tracemalloc.is_tracing():
-                _current, peak = tracemalloc.get_traced_memory()
-                tracemalloc.stop()
-                peak_memory_mb = peak / (1024 * 1024)
-            runs.append(
-                {
-                    "request": request,
-                    "run_kind": run_kind,
-                    "repeat": repeat,
-                    "status": "error",
-                    "request_wall_seconds": perf_counter() - started,
-                    "peak_traced_memory_mb": peak_memory_mb,
-                    "error": str(error),
-                    "coverage_precheck": fallback_coverage,
-                    "dispatch": [],
-                }
-            )
+            if not observations.empty:
+                observations["scenario"] = item.request["scenario"]
+                observations["region"] = item.request.get("region")
+                observations["period"] = item.request.get("period")
+                observation_frames.append(observations)
+        runs.append(record)
 
     observations = (
-        pd.concat(observations_frames, ignore_index=True)
-        if observations_frames
-        else pd.DataFrame(
-            columns=[
-                "timestamp",
-                "cell",
-                "variable",
-                "source",
-                "value",
-                "scenario",
-            ]
-        )
+        pd.concat(observation_frames, ignore_index=True)
+        if observation_frames else pd.DataFrame(columns=OBSERVATION_COLUMNS)
     )
-    observations_path = output_dir / "cross_source_observations_live.csv"
+    observations_path = output_dir / "cross_source_observations.csv"
     validate_private_output(observations_path, observations)
     observations.to_csv(observations_path, index=False)
 
+    finished_at = datetime.now(timezone.utc)
     payload = {
-        "mode": "empirical-live",
-        "collected_at": collection_started.isoformat(),
+        "schema_version": 2,
+        "collection_id": collection_id,
+        "collected_at": started_at.isoformat(),
+        "finished_at": finished_at.isoformat(),
+        "manifest": manifest_path.name,
         "imgw_research_use_enabled": private_noncommercial_imgw_enabled(),
         "imgw_attribution": (
-            "Źródłem pochodzenia danych jest Instytut Meteorologii i "
-            "Gospodarki Wodnej – Państwowy Instytut Badawczy. Dane "
-            "Instytutu Meteorologii i Gospodarki Wodnej – Państwowego "
-            "Instytutu Badawczego zostały przetworzone."
-            if private_noncommercial_imgw_enabled()
-            else None
+            IMGW_ATTRIBUTION if private_noncommercial_imgw_enabled() else None
         ),
-        "quality_report_dir": f"quality/{quality_run_name}",
-        "live_scaling_repeats": scaling_repeats,
+        "quality_report_dir": "quality",
         "runs": runs,
+        "warmup_runs": warmup_runs,
     }
     runs_path = output_dir / "empirical_runs.json"
-    runs_path.write_text(
-        json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8"
-    )
+    _write_json(runs_path, payload)
+    manifest["collection_finished_utc"] = finished_at.isoformat()
+    _write_json(manifest_path, manifest)
     return {
+        "collection_dir": output_dir,
+        "manifest": manifest_path,
         "runs": runs_path,
         "observations": observations_path,
         "quality_reports": quality_dir,
         "request_count": len(runs),
+        "warmup_count": len(warmup_runs),
         "observation_count": len(observations),
     }
 
 
+def _write_json(path: Path, payload: dict) -> None:
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, default=str), encoding="utf-8"
+    )
+
+
 def main() -> None:
-    """Collect the scenarios configured in ``evaluation.scenarios``."""
+    """Collect every configured experiment into a new frozen collection."""
     # The acknowledgement is scoped to this collection run. Leaving it set
     # would silently open the IMGW licence gate for anything else running
     # later in the same process.
@@ -273,18 +415,12 @@ def main() -> None:
         else nullcontext()
     )
     with acknowledgement:
-        result = asyncio.run(
-            collect(
-                scenarios=REQUEST_SCENARIOS,
-                scaling_scenarios=LIVE_SCALING_SCENARIOS,
-                cross_scenarios=CROSS_SOURCE_SCENARIOS,
-                scaling_repeats=SCALING_REPEATS,
-            )
-        )
+        result = asyncio.run(collect())
     print(
-        f"Collected {result['request_count']} live requests and "
+        f"Collected {result['request_count']} measured requests "
+        f"({result['warmup_count']} warm-ups excluded) and "
         f"{result['observation_count']} cross-source observations in "
-        f"{OUTPUT_DIR}."
+        f"{result['collection_dir']}."
     )
 
 

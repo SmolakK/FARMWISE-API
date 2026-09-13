@@ -1,16 +1,20 @@
 """Collect all live empirical inputs used by the evaluation notebooks.
 
-The analysis itself lives in the notebooks.  This module is intentionally a
-small convenience entry point: running it executes the request, cross-source,
-and live-scaling scenarios configured in :mod:`evaluation.scenarios` and
-writes the raw artifacts under ``evaluation/empirical_input``.
+The analysis itself lives in :mod:`evaluation.analysis` and the notebook.
+This module is intentionally a small convenience entry point: running it
+executes the experiments configured in :mod:`evaluation.scenarios` and writes
+one frozen collection under ``evaluation/empirical_input/<collection-id>``.
+
+Unlike ``python -m evaluation.collect_empirical``, it does not acknowledge the
+IMGW research-use terms, so IMGW sources are only included when that gate is
+already open in the environment.
 """
 
 from __future__ import annotations
 
 import asyncio
 
-from evaluation.collect_empirical import OUTPUT_DIR, collect
+from evaluation.collect_empirical import collect
 
 
 def run_all() -> dict:
@@ -22,9 +26,9 @@ def main() -> None:
     """Collect raw data and print the paths consumed by the notebooks."""
     result = run_all()
     print(
-        f"Collected {result['request_count']} live requests and "
+        f"Collected {result['request_count']} measured requests and "
         f"{result['observation_count']} cross-source observations in "
-        f"{OUTPUT_DIR}."
+        f"{result['collection_dir']}."
     )
 
 
