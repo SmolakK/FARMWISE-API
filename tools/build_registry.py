@@ -68,10 +68,13 @@ class Shape:
     # ordinary text, e.g. "environmental data (EEA)" or "(meadows and
     # pastures)". Hub'Eau's mappings put the unit in parentheses instead.
     paren_units: bool = False
+    # Dict symbol mapping an alias key to its key in `descr`, for adapters
+    # whose two tables use different names for the same variable.
+    join: str | None = None
 
 
 SHAPES: dict[str, Shape] = {
-    "cds.cds_single_levels": Shape(),
+    "cds.cds_single_levels": Shape(join="NETCDF_SHORT_NAMES"),
     "epa_ireland.epa_gw": Shape(key_is="output"),
     "geosphere.geosphere": Shape(),
     "imgw.imgw_api_synop_daily": Shape(key_is="output"),
@@ -101,6 +104,10 @@ SHAPES: dict[str, Shape] = {
 
 # Fields a domain author must supply; used for the completeness report.
 AUTHORED_VARIABLE_FIELDS = ("native_unit", "transformation", "reference", "notes")
+# Read from the adapter label when it has one ("Temperature [°C]"). Only a
+# variable whose label carries no unit - categorical codes, index rasters -
+# needs `output_unit` authored in the YAML.
+AUTHORED_FALLBACK_FIELDS = ("output_unit",)
 AUTHORED_SOURCE_FIELDS = (
     "provider", "dataset", "spatial_support", "spatial_resolution",
     "temporal_support", "reference",
@@ -137,6 +144,7 @@ class Row:
     reference: str | None
     notes: str | None = None
     unjoined_tables: bool = False
+    output_unit_from_code: bool = False
     missing: tuple[str, ...] = field(default_factory=tuple)
 
 
@@ -179,7 +187,9 @@ def _dump_yaml(data: dict, path: Path) -> None:
         "# units, spatial/temporal support, and literature references. Everything\n"
         "# else (variable names, output units, aggregation and harmonisation\n"
         "# rules, coverage) is read live from the adapters by\n"
-        "# tools/build_registry.py and must not be duplicated here.\n"
+        "# tools/build_registry.py and must not be duplicated here. The one\n"
+        "# exception is `output_unit`, seeded only for variables whose adapter\n"
+        "# label carries no unit (categorical codes, index rasters).\n"
         "#\n"
         "# `null` means NOT YET SUPPLIED. It is reported as missing, never\n"
         "# guessed. Fill these in from provider documentation and cite the\n"
@@ -282,12 +292,14 @@ def collect_rows(authored: dict | None = None) -> list[Row]:
 
         aliases = _symbol(source, shape.aliases) if shape.aliases else None
         descr = _symbol(source, shape.descr) if shape.descr else None
+        join = (_symbol(source, shape.join) if shape.join else None) or {}
         # Some adapters key the two tables differently - ERA5 lists request
         # names ("2m_temperature") in DATA_ALIASES but netCDF short names
         # ("t2m") in GLOBAL_MAPPING - so meaning and unit cannot be joined to
         # the variable automatically. Record it instead of showing a silent gap.
         unjoinable = bool(
-            aliases and descr and not (set(aliases) & set(descr))
+            aliases and descr
+            and not ({join.get(key, key) for key in aliases} & set(descr))
         )
         extras = {
             name: _symbol(source, name) for name in shape.extra
@@ -325,7 +337,7 @@ def collect_rows(authored: dict | None = None) -> list[Row]:
                     factor = source_factors[0]
                 else:
                     factor = var_meta_all.get(key, {}).get("factor")
-            label = (descr or {}).get(key)
+            label = (descr or {}).get(join.get(key, key))
             meaning, output_unit = (
                 split_meaning_unit(label, shape.paren_units) if isinstance(label, str) else (None, None)
             )
@@ -334,6 +346,19 @@ def collect_rows(authored: dict | None = None) -> list[Row]:
                 meaning, output_unit = split_meaning_unit(key, shape.paren_units)
 
             var_meta = var_meta_all.get(key) or {}
+            code_output_unit = output_unit
+            authored_output_unit = var_meta.get("output_unit")
+            if output_unit is None:
+                output_unit = authored_output_unit
+            elif authored_output_unit not in (None, "") and (
+                authored_output_unit != output_unit
+            ):
+                print(
+                    f"warning: {short}/{key}: authored output_unit "
+                    f"{authored_output_unit!r} ignored; the adapter label "
+                    f"says {output_unit!r}",
+                    file=sys.stderr,
+                )
             transformation = var_meta.get("transformation")
             if transformation is None and extras.get("CONVERSION_DIVISORS"):
                 divisor = extras["CONVERSION_DIVISORS"].get(key)
@@ -353,6 +378,8 @@ def collect_rows(authored: dict | None = None) -> list[Row]:
                 if name not in ("notes", "reference")
                 and var_meta.get(name) in (None, "")
             ]
+            if output_unit in (None, ""):
+                missing.append("output_unit")
             missing += [
                 f"source.{name}" for name in AUTHORED_SOURCE_FIELDS
                 if src_meta.get(name) in (None, "")
@@ -386,6 +413,7 @@ def collect_rows(authored: dict | None = None) -> list[Row]:
                 reference=var_meta.get("reference") or src_meta.get("reference"),
                 notes=var_meta.get("notes"),
                 unjoined_tables=unjoinable,
+                output_unit_from_code=code_output_unit is not None,
                 missing=tuple(sorted(set(missing))),
             ))
     return rows
@@ -512,6 +540,11 @@ def seed_authored(rows: list[Row]) -> dict:
         var = variables.setdefault(row.native_variable, {})
         for name in AUTHORED_VARIABLE_FIELDS:
             var.setdefault(name, None)
+        if row.output_unit_from_code:
+            if var.get("output_unit") in (None, ""):
+                var.pop("output_unit", None)
+        else:
+            var.setdefault("output_unit", None)
     return data
 
 
