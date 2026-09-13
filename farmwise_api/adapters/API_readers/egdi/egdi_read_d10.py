@@ -43,7 +43,11 @@ async def read_data(spatial_range, time_range, data_range, level,
             win_transform = rasterio.windows.transform(window, dataset.transform)
 
             # Read the data within the window
-            data = dataset.read(1, window=window)
+            # Mask the raster's nodata value so fill pixels (sea, areas
+            # outside the mapped extent) do not enter the S2-cell averages
+            # as if they were index scores.
+            data = dataset.read(1, window=window, masked=True)
+            data = np.ma.filled(data.astype(float), np.nan)
 
             # Column and row coordinates within the window
             cols = np.arange(data.shape[1])
