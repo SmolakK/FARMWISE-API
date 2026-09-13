@@ -9,6 +9,7 @@ stray paragraph. Separately, text in parentheses such as
 
 import csv
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -105,3 +106,36 @@ def test_parenthesised_text_is_not_reported_as_a_unit():
     assert hubeau and hubeau[0]["output_unit"] == "mg/L", (
         "Hub'Eau units are written in parentheses and must still be read"
     )
+
+
+def test_output_units_come_from_labels_or_authored_fallback():
+    import csv as csv_module
+
+    with open(ROOT / "docs" / "registry.csv", encoding="utf-8", newline="") as handle:
+        rows = {
+            (row["source_short"], row["native_variable"]): row
+            for row in csv_module.DictReader(handle)
+        }
+
+    # ERA5 request names are joined to the netCDF labels that carry the unit.
+    era5 = {name: rows[("cds.cds_single_levels", name)]["output_unit"]
+            for name in ("2m_temperature", "total_precipitation",
+                         "volumetric_soil_water_layer_1")}
+    assert era5 == {"2m_temperature": "°C", "total_precipitation": "mm",
+                    "volumetric_soil_water_layer_1": "%"}
+    # A label without a unit falls back to the authored value.
+    assert rows[("corine.corine_read", "(land cover)")]["output_unit"].startswith("none")
+
+
+def test_authored_output_unit_does_not_override_the_adapter_label(capsys):
+    sys.path.insert(0, str(ROOT / "tools"))
+    import build_registry
+
+    source = "farmwise_api.adapters.API_readers.cds.cds_single_levels"
+    authored = {source: {"variables": {"2m_temperature": {"output_unit": "K"}}}}
+    row = next(
+        r for r in build_registry.collect_rows(authored)
+        if r.source == source and r.native_variable == "2m_temperature"
+    )
+    assert row.output_unit == "°C"
+    assert "authored output_unit 'K' ignored" in capsys.readouterr().err
