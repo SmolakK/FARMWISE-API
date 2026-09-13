@@ -4,7 +4,9 @@
 # units, spatial/temporal support, and literature references. Everything
 # else (variable names, output units, aggregation and harmonisation
 # rules, coverage) is read live from the adapters by
-# tools/build_registry.py and must not be duplicated here.
+# tools/build_registry.py and must not be duplicated here. The one
+# exception is `output_unit`, seeded only for variables whose adapter
+# label carries no unit (categorical codes, index rasters).
 #
 # `null` means NOT YET SUPPLIED. It is reported as missing, never
 # guessed. Fill these in from provider documentation and cite the
@@ -36,6 +38,7 @@ sources:
           uses the modal code when multiple records fall within the same S2 cell.
 
           '
+        output_unit: none - categorical cultivation code
         reference: null
         transformation: 'no numerical unit conversion; annual categorical cultivation codes
           are aggregated within S2 cells using mode and the annual value is repeated for requested
@@ -53,116 +56,139 @@ sources:
       ARA:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       AraShare:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       BOVINE:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       FllwShr:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       GOATS:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       GrassShare:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       HOLDING:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       HldnPK2:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       IrrShare:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       J0000T:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       LSU:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       LSUdensity:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       OrgShar:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       PECR:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       PIGS:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       POULTRY:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       PecrShare:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       Q0000T:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       SHEEP:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       SO_EURO:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       UAA:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       UAAXK00:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
       UAA_IB:
         native_unit: null
         notes: null
+        output_unit: null
         reference: null
         transformation: null
   farmwise_api.adapters.API_readers.UA_sw_quality.ukrainian_surface_water:
@@ -176,115 +202,148 @@ sources:
       files, which on 2026-09-12 spanned 2003-01-01 to 2026-08-31
     variables:
       BOD5:
-        native_unit: null
-        notes: Source column 'BSK5' (columns are matched by position). The published CSV states
-          no units.
-        reference: null
+        native_unit: mgO₂/dm³
+        notes: 'Source column ''BSK5'': Біохімічне споживання кисню за 5 діб (BOD5). Unit
+          as stated in the provider''s structure file; columns are matched by position.'
+        output_unit: mgO₂/dm³
+        physical_meaning: Біохімічне споживання кисню за 5 діб (BOD5)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       COD:
-        native_unit: null
-        notes: Source column 'HSK' (columns are matched by position). The published CSV states
-          no units.
-        reference: null
+        native_unit: mgO₂/dm³
+        notes: 'Source column ''HSK'': Хімічне споживання кисню (COD). Unit as stated in the
+          provider''s structure file; columns are matched by position.'
+        output_unit: mgO₂/dm³
+        physical_meaning: Хімічне споживання кисню (COD)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       SPAR:
-        native_unit: null
-        notes: Source column 'SPAR' (columns are matched by position). The published CSV states
-          no units.
-        reference: null
+        native_unit: mg/dm³
+        notes: 'Source column ''SPAR'': Синтетичні поверхнево-активні речовини (synthetic
+          surfactants). Unit as stated in the provider''s structure file; columns are matched
+          by position.'
+        output_unit: mg/dm³
+        physical_meaning: Синтетичні поверхнево-активні речовини (synthetic surfactants)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       altrazine:
-        native_unit: null
-        notes: Source column 'Atrazin' (columns are matched by position). The published CSV
-          states no units.
-        reference: null
+        native_unit: mg/dm³
+        notes: 'Source column ''Atrazin'': Атразин (atrazine). Unit as stated in the provider''s
+          structure file; columns are matched by position.'
+        output_unit: mg/dm³
+        physical_meaning: Атразин (atrazine)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       ammonium:
-        native_unit: null
-        notes: Source column 'Amoniy' (columns are matched by position). The published CSV
-          states no units.
-        reference: null
+        native_unit: mg/dm³
+        notes: 'Source column ''Amoniy'': Амоній-іони (ammonium ions). Unit as stated in the
+          provider''s structure file; columns are matched by position.'
+        output_unit: mg/dm³
+        physical_meaning: Амоній-іони (ammonium ions)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       chloride:
-        native_unit: null
-        notes: Source column 'Hlorid' (columns are matched by position). The published CSV
-          states no units.
-        reference: null
+        native_unit: mg/dm³
+        notes: 'Source column ''Hlorid'': Хлорид-іони (chloride ions). Unit as stated in the
+          provider''s structure file; columns are matched by position.'
+        output_unit: mg/dm³
+        physical_meaning: Хлорид-іони (chloride ions)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       nitrate:
-        native_unit: null
-        notes: Source column 'Nitrat' (columns are matched by position). The published CSV
-          states no units.
-        reference: null
+        native_unit: mg/dm³
+        notes: 'Source column ''Nitrat'': Нітрат-іони (nitrate ions). Unit as stated in the
+          provider''s structure file; columns are matched by position.'
+        output_unit: mg/dm³
+        physical_meaning: Нітрат-іони (nitrate ions)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       nitrite:
-        native_unit: null
-        notes: Source column 'Nitrit' (columns are matched by position). The published CSV
-          states no units.
-        reference: null
+        native_unit: mg/dm³
+        notes: 'Source column ''Nitrit'': Нітрит-іони (nitrite ions). Unit as stated in the
+          provider''s structure file; columns are matched by position.'
+        output_unit: mg/dm³
+        physical_meaning: Нітрит-іони (nitrite ions)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       nitrogen:
-        native_unit: null
-        notes: Source column 'Azot' (columns are matched by position). The published CSV states
-          no units.
-        reference: null
+        native_unit: mg/dm³
+        notes: 'Source column ''Azot'': Азот загальний (total nitrogen). Unit as stated in
+          the provider''s structure file; columns are matched by position.'
+        output_unit: mg/dm³
+        physical_meaning: Азот загальний (total nitrogen)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       oxygen:
-        native_unit: null
-        notes: Source column 'Kisen' (columns are matched by position). The published CSV
-          states no units.
-        reference: null
+        native_unit: mg/dm³
+        notes: 'Source column ''Kisen'': Кисень розчинений (dissolved oxygen). Unit as stated
+          in the provider''s structure file; columns are matched by position.'
+        output_unit: mg/dm³
+        physical_meaning: Кисень розчинений (dissolved oxygen)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       permanganate:
-        native_unit: null
-        notes: Source column 'Permanganat' (columns are matched by position). The published
-          CSV states no units.
-        reference: null
+        native_unit: mgO₂/dm³
+        notes: 'Source column ''Permanganat'': Перманганатна окислюваність (permanganate oxidisability).
+          Unit as stated in the provider''s structure file; columns are matched by position.'
+        output_unit: mgO₂/dm³
+        physical_meaning: Перманганатна окислюваність (permanganate oxidisability)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       phosphate:
-        native_unit: null
-        notes: Source column 'Fosfat' (columns are matched by position). The published CSV
-          states no units.
-        reference: null
+        native_unit: mg/dm³
+        notes: 'Source column ''Fosfat'': Фосфат-іони (поліфосфати) (phosphate ions, polyphosphates).
+          Unit as stated in the provider''s structure file; columns are matched by position.'
+        output_unit: mg/dm³
+        physical_meaning: Фосфат-іони (поліфосфати) (phosphate ions, polyphosphates)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       phytoplankton:
-        native_unit: null
-        notes: Source column 'Fitoplan' (columns are matched by position). The published CSV
-          states no units.
-        reference: null
+        native_unit: thousand cells/dm³
+        notes: 'Source column ''Fitoplan'': Фітопланктон (phytoplankton). Unit as stated in
+          the provider''s structure file; columns are matched by position.'
+        output_unit: thousand cells/dm³
+        physical_meaning: Фітопланктон (phytoplankton)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       simazine:
-        native_unit: null
-        notes: Source column 'Simazin' (columns are matched by position). The published CSV
-          states no units.
-        reference: null
+        native_unit: mg/dm³
+        notes: 'Source column ''Simazin'': Симазин (simazine). Unit as stated in the provider''s
+          structure file; columns are matched by position.'
+        output_unit: mg/dm³
+        physical_meaning: Симазин (simazine)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       sulfate:
-        native_unit: null
-        notes: Source column 'Sulfat' (columns are matched by position). The published CSV
-          states no units.
-        reference: null
+        native_unit: mg/dm³
+        notes: 'Source column ''Sulfat'': Сульфат-іони (sulfate ions). Unit as stated in the
+          provider''s structure file; columns are matched by position.'
+        output_unit: mg/dm³
+        physical_meaning: Сульфат-іони (sulfate ions)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
       suspended_solids:
-        native_unit: null
-        notes: Source column 'Zavisli' (columns are matched by position). The published CSV
-          states no units.
-        reference: null
+        native_unit: mg/dm³
+        notes: 'Source column ''Zavisli'': Завислі (суспендовані) речовини (suspended solids).
+          Unit as stated in the provider''s structure file; columns are matched by position.'
+        output_unit: mg/dm³
+        physical_meaning: Завислі (суспендовані) речовини (suspended solids)
+        reference: https://data.gov.ua/dataset/133ce38c-9533-4fb0-b146-b211299a8731/resource/98be92f0-4e4d-491d-a471-50e584c27ae5/download/monitoring-structure-structure.csv
         transformation: no unit conversion; values are parsed as numbers and non-numeric entries
           such as NULL become missing
   farmwise_api.adapters.API_readers.cds.cds_single_levels:
@@ -339,6 +398,7 @@ sources:
           transcribed from the service legend. The returned row does not record which survey
           it came from: a request after 2018 is served the 2018 classification stamped with
           the requested date.'
+        output_unit: none - categorical level-3 class code
         physical_meaning: CORINE Land Cover level-3 class occupying the largest area of the
           S2 cell
         reference: https://image.discomap.eea.europa.eu/arcgis/rest/services/Corine/CLC2018_WM/MapServer/legend
@@ -404,39 +464,64 @@ sources:
           of Europe; values must not be interpreted as continuous measurements
 
           '
+        output_unit: none - categorical environmental-zone code
         reference: null
         transformation: 'no unit conversion; raster is reprojected using nearest-neighbour
           resampling and categorical values are aggregated to S2 cells
 
           '
   farmwise_api.adapters.API_readers.egdi.egdi_read_d10:
-    dataset: null
+    dataset: 'GeoERA HOVER WP7 - Pan-European Vulnerability to Pollution: D-Layer - Depth
+      to water table (10km Resolution), layer gewp7_peu1_d'
     provider: Federal Institute for Geosciences and Natural Resources (BGR), distributed through
       EGDI
-    reference: null
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    reference: https://metadata.europe-geology.eu/record/basic/610bfed1-5b08-4cac-bc7c-66820a010833
+    spatial_resolution: 10 km (INSPIRE reference grid)
+    spatial_support: raster compiled from national depth-to-water-table datasets, published
+      in ETRS89-LAEA (EPSG:3035); FARMWISE reads a local copy named gewp7_peu1_d10km_4326.tif,
+      takes pixel centres inside the bounding box and aggregates them to S2 cells
+    temporal_support: static layer (created 2021-08-31); not a time series. FARMWISE repeats
+      the value for every requested day
     variables:
       (unspecified):
-        native_unit: null
-        notes: null
+        native_unit: none - DRASTIC D index score 1-10 (dimensionless)
+        notes: Output column 'Depth to Watertable DRASTIC'. Published as 4-byte integer scores.
+          Higher scores mean a shallower water table. The adapter declares no factor in API_PATH_RANGES
+          because dispatch is disabled (not licensed for redistribution).
+        output_unit: none - DRASTIC D index score 1-10 (dimensionless)
+        physical_meaning: depth to the groundwater table from the surface, reclassified to
+          D index scores 1-10 using the class breaks of Aller et al. (1987)
         reference: null
-        transformation: null
+        transformation: no unit conversion; nodata pixels are masked, the ordinal scores of
+          pixels in each S2 cell are averaged with the configured within-source method (mean),
+          so an output value can fall between two index classes
   farmwise_api.adapters.API_readers.egdi.egdi_read_hc:
-    dataset: null
+    dataset: 'GeoERA HOVER WP7 - Pan-European Vulnerability to Pollution: C-Layer - Hydraulic
+      conductivity, layer gewp7_peu7_c'
     provider: Federal Institute for Geosciences and Natural Resources (BGR), distributed through
       EGDI
-    reference: null
-    spatial_resolution: null
-    spatial_support: null
-    temporal_support: null
+    reference: https://metadata.europe-geology.eu/record/basic/610d3918-fdb8-4f82-947e-2ee40a010833
+    spatial_resolution: raster conversion of IHME1500 (1:1,500,000) Level 2 legend units;
+      pixel size not stated in the EGDI metadata
+    spatial_support: hydraulic conductivity of IHME1500 Level 2 legend classes averaged from
+      literature data, published in ETRS89-LAEA (EPSG:3035); FARMWISE reads a local copy named
+      gewp7_peu7_4326.tif, takes pixel centres inside the bounding box and aggregates them
+      to S2 cells
+    temporal_support: static layer (created 2020-06-09); not a time series. FARMWISE repeats
+      the value for every requested day
     variables:
       (unspecified):
-        native_unit: null
-        notes: null
+        native_unit: none - DRASTIC C index score 1-10 (dimensionless)
+        notes: Output column 'Hydraulic Conductivity DRASTIC'. Published as 4-byte floating-point
+          scores. The adapter declares no factor in API_PATH_RANGES because dispatch is disabled
+          (not licensed for redistribution).
+        output_unit: none - DRASTIC C index score 1-10 (dimensionless)
+        physical_meaning: hydraulic conductivity of the aquifer class, expressed as a DRASTIC
+          C index score following the HOVER classification
         reference: null
-        transformation: null
+        transformation: no unit conversion; nodata pixels are masked, the ordinal scores of
+          pixels in each S2 cell are averaged with the configured within-source method (mean),
+          so an output value can fall between two index classes
   farmwise_api.adapters.API_readers.epa_ireland.epa_gw:
     dataset: EPA HydroNet groundwater-level daily mean time series
     provider: Environmental Protection Agency Ireland
@@ -501,831 +586,778 @@ sources:
       '
     variables:
       Humus [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Próchnica'. Unit from the GIOŚ 'Jednostka' column (checked against
+          the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Al [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Glin'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Al [cmol(+)*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: cmol(+)*kg-1
+        notes: GIOŚ row 'Glin wymienny "Al"'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Anthracene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - antracen'. Unit from the GIOŚ 'Jednostka' column (checked against
+          the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil As [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: As mg*kg-1
+        notes: GIOŚ row 'Arsen'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Available Ammonium Nitrogen [NNH4 mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: NNH4 mg*kg-1
+        notes: GIOŚ row 'Azot amonowy'. Unit from the GIOŚ 'Jednostka' column (checked against
+          the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Available Magnesium [mg Mg*100g-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg Mg*100g-1
+        notes: GIOŚ row 'Magnez przyswajalny'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Available Nitrate Nitrogen [NNO3 mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: NNO3 mg*kg-1
+        notes: GIOŚ row 'Azot azotanowy'. Unit from the GIOŚ 'Jednostka' column (checked against
+          the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Available Phosphorus [mg P2O5*100g-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg P2O5* 100g-1
+        notes: GIOŚ row 'Fosfor przyswajalny'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Available Potassium [mg K2O*100g-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg K2O*100g-1
+        notes: GIOŚ row 'Potas przyswajalny'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Available Sulphur [mg S-SO4*100g-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg S-SO4*100g-1
+        notes: GIOŚ row 'Siarka przyswajalna'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Ba [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Ba mg*kg-1
+        notes: GIOŚ row 'Bar'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Be [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Be mg*kg-1
+        notes: GIOŚ row 'Beryl'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Benzo(a)Anthracene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - benzo(a)antracen'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Benzo(a)Fluoranthene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - benzo(a)fluoranten'. Unit from the GIOŚ 'Jednostka' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Benzo(a)Pyrene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - benzo(a)piren'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Benzo(b)Fluoranthene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - benzo(b)fluoranten'. Unit from the GIOŚ 'Jednostka' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Benzo(ghi)Perylene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - benzo(ghi)perylen'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Benzo(k)Fluoranthene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - benzo(k)fluoranten'. Unit from the GIOŚ 'Jednostka' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil C/N [-]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: none - dimensionless ratio
+        notes: GIOŚ row 'Stosunek C/N'. Unit from the GIOŚ 'Jednostka' column (checked against
+          the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Ca [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Wapń'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Ca2+ [cmol(+)*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: cmol(+)*kg-1
+        notes: GIOŚ row 'Wapń wymianny (Ca2+)'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil CaCo3 [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Węglany (CaCO3)'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Cd [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Cd mg*kg-1
+        notes: GIOŚ row 'Kadm'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Chrysene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - chryzen'. Unit from the GIOŚ 'Jednostka' column (checked against
+          the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Co [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Co mg*kg-1
+        notes: GIOŚ row 'Kobalt'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Cr [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Cr mg*kg-1
+        notes: GIOŚ row 'Chrom'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Cu [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Cu mg*kg-1
+        notes: GIOŚ row 'Miedź'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Dibenzo(a,h)Anthracene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - dibenzo(a,h)antracen'. Unit from the GIOŚ 'Jednostka' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Electrical Conductivity [mS*m-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mS*m-1
+        notes: GIOŚ row 'Przewodnictwo elektryczne właściwe'. Unit from the GIOŚ 'Jednostka'
+          column (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Fe [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Żelazo'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Fluoranthene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - fluoranten'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Fluorene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - fluoren'. Unit from the GIOŚ 'Jednostka' column (checked against
+          the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       'Soil Granularity: 0.05-0.002 mm [%]':
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: udział w %
+        notes: 'GIOŚ row ''PTG 2008: 0,05-0,002 mm''. Unit from the GIOŚ ''Jednostka'' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.'
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       'Soil Granularity: 0.1-0.02 mm [%]':
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: udział w %
+        notes: 'GIOŚ row ''BN-78/9180-11: 0,1-0,02 mm''. Unit from the GIOŚ ''Jednostka''
+          column (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.'
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       'Soil Granularity: 1.0-0.1 mm [%]':
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: udział w %
+        notes: 'GIOŚ row ''BN-78/9180-11: 1,0-0,1 mm''. Unit from the GIOŚ ''Jednostka'' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.'
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       'Soil Granularity: 2.0-0.05 mm [%]':
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: udział w %
+        notes: 'GIOŚ row ''PTG 2008: 2,0-0,05 mm''. Unit from the GIOŚ ''Jednostka'' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.'
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       'Soil Granularity: < 0.002 mm [%]':
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: udział w %
+        notes: 'GIOŚ row ''PTG 2008: < 0.002 mm''. Unit from the GIOŚ ''Jednostka'' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.'
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       'Soil Granularity: < 0.02 mm [%]':
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: udział w %
+        notes: 'GIOŚ row ''BN-78/9180-11: < 0.02 mm''. Unit from the GIOŚ ''Jednostka'' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.'
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Hg [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Hg mg*kg-1
+        notes: GIOŚ row 'Rtec'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Hh [cmol(+)*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: cmol(+)*kg-1
+        notes: GIOŚ row 'Kwasowość hydrolityczna (Hh)'. Unit from the GIOŚ 'Jednostka' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Hw [cmol(+)*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: cmol(+)*kg-1
+        notes: GIOŚ row 'Kwasowośc wymienna (Hw)'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Indeno(1,2,3-cd)Pyrene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - indeno(1,2,3-cd)piren'. Unit from the GIOŚ 'Jednostka' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil K [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Potas'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil K+ [cmol(+)*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: cmol(+)*kg-1
+        notes: GIOŚ row 'Potas wymienny (K+)'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil La [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: La mg*kg-1
+        notes: GIOŚ row 'Lantan'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Li [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Li mg*kg-1
+        notes: GIOŚ row 'Lit'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Mg [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Magnez'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Mg2+ [cmol(+)*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: cmol(+)*kg-1
+        notes: GIOŚ row 'Magnez wymienny (Mg2+)'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Mn [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Mn mg*kg-1
+        notes: GIOŚ row 'Mangan'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Na [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Sód'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Na+ [cmol(+)*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: cmol(+)*kg-1
+        notes: GIOŚ row 'Sód wymienny (Na+)'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Naphthalene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - naftalen'. Unit from the GIOŚ 'Jednostka' column (checked against
+          the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Ni [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Ni mg*kg-1
+        notes: GIOŚ row 'Nikiel'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Organic Carbon [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Węgiel organiczny'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Organochlorine Pesticides Aldrin [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg*kg-1
+        notes: GIOŚ row 'Pestycydy chloroorganiczne - aldrin'. Unit from the GIOŚ 'Jednostka'
+          column (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Organochlorine Pesticides Alfa-HCH [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg*kg-1
+        notes: GIOŚ row 'Pestycydy chloroorganiczne - alfa-HCH'. Unit from the GIOŚ 'Jednostka'
+          column (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Organochlorine Pesticides Beta-HCH [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg*kg-1
+        notes: GIOŚ row 'Pestycydy chloroorganiczne - beta-HCH'. Unit from the GIOŚ 'Jednostka'
+          column (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Organochlorine Pesticides DDT/DDE/DDD [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg*kg-1
+        notes: GIOŚ row 'Pestycydy chloroorganiczne - DDT/DDE/DDD'. Unit from the GIOŚ 'Jednostka'
+          column (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Organochlorine Pesticides Dieldrin [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg*kg-1
+        notes: GIOŚ row 'Pestycydy chloroorganiczne - dieldrin'. Unit from the GIOŚ 'Jednostka'
+          column (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Organochlorine Pesticides Endrin [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg*kg-1
+        notes: GIOŚ row 'Pestycydy chloroorganiczne - endrin'. Unit from the GIOŚ 'Jednostka'
+          column (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Organochlorine Pesticides Gamma-HCH [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg*kg-1
+        notes: GIOŚ row 'Pestycydy chloroorganiczne - gamma-HCH'. Unit from the GIOŚ 'Jednostka'
+          column (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil P [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Fosfor'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil PAH Sum 13 [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'Wielopierscieniowe weglowodory aromatyczne suma 13 WWA'. Unit from
+          the GIOŚ 'Jednostka' column (checked against the archived point page, 2023-03-23);
+          the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Pb [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Pb mg*kg-1
+        notes: GIOŚ row 'Ołów'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Pesticides Non Chlorinated Compounds Atrazin [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg*kg-1
+        notes: GIOŚ row 'Pestycydy - zwiazki nie chlorowe - atrazin'. Unit from the GIOŚ 'Jednostka'
+          column (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Pesticides Non Chlorinated Compounds Carbaryl [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg*kg-1
+        notes: GIOŚ row 'Pestycydy - zwiazki nie chlorowe - carbaryl'. Unit from the GIOŚ
+          'Jednostka' column (checked against the archived point page, 2023-03-23); the row
+          label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Pesticides Non Chlorinated Compounds Carbofuran [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg*kg-1
+        notes: GIOŚ row 'Pestycydy - zwiazki nie chlorowe - carbofuran'. Unit from the GIOŚ
+          'Jednostka' column (checked against the archived point page, 2023-03-23); the row
+          label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Pesticides Non Chlorinated Compounds Maneb [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg*kg-1
+        notes: GIOŚ row 'Pestycydy - zwiazki nie chlorowe - maneb'. Unit from the GIOŚ 'Jednostka'
+          column (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Phenanthrene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - fenantren'. Unit from the GIOŚ 'Jednostka' column (checked
+          against the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Pyrene [µg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: µg*kg-1
+        notes: GIOŚ row 'WWA - piren'. Unit from the GIOŚ 'Jednostka' column (checked against
+          the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Radioactivity [Bq*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Bq*kg-1
+        notes: GIOŚ row 'Radioaktywność'. Unit from the GIOŚ 'Jednostka' column (checked against
+          the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil S [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Siarka'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil S [cmol(+)*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: cmol(+)*kg-1
+        notes: GIOŚ row 'Suma kationów wymiennych (S)'. Unit from the GIOŚ 'Jednostka' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Salinity [mg KCl*100g-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: mg KCl*100g-1
+        notes: GIOŚ row 'Zasolenie'. Unit from the GIOŚ 'Jednostka' column (checked against
+          the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Sr [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Sr mg*kg-1
+        notes: GIOŚ row 'Stront'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil T [cmol(+)*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: cmol(+)*kg-1
+        notes: GIOŚ row 'Pojemność sorpcyjna gleby (T)'. Unit from the GIOŚ 'Jednostka' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Total Nitrogen [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Azot ogólny'. Unit from the GIOŚ 'Jednostka' column (checked against
+          the archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil V [%]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: '%'
+        notes: GIOŚ row 'Wysycenie kompleksu sorpcyjnego kationami zasadowymi (V)'. Unit from
+          the GIOŚ 'Jednostka' column (checked against the archived point page, 2023-03-23);
+          the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil V [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: V mg*kg-1
+        notes: GIOŚ row 'Wanad'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil Zn [mg*kg-1]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: Zn mg*kg-1
+        notes: GIOŚ row 'Cynk'. Unit from the GIOŚ 'Jednostka' column (checked against the
+          archived point page, 2023-03-23); the row label is assigned by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil pH H2O [pH]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: pH
+        notes: GIOŚ row 'Odczyn "pH " w zawiesinie H2O'. Unit from the GIOŚ 'Jednostka' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
           day
       Soil pH KCl [pH]:
-        native_unit: null
-        notes: Row label assigned by position in the GIOŚ point table; the unit in the output
-          name is the adapter's and has not been checked against the GIOŚ 'Jednostka' column
-          (GIOŚ servers unreachable on 2026-09-12).
-        reference: null
+        native_unit: pH
+        notes: GIOŚ row 'Odczyn "pH " w zawiesinie KCl'. Unit from the GIOŚ 'Jednostka' column
+          (checked against the archived point page, 2023-03-23); the row label is assigned
+          by position.
+        reference: https://web.archive.org/web/20230323105957/https://www.gios.gov.pl/chemizm_gleb/index.php?mod=pomiary&p=1
         transformation: no unit conversion; decimal commas are read as points and 'n.o.' (not
           determined) becomes missing; the survey in force at the request start and any later
           surveys in the request are averaged per S2 cell and repeated for every requested
@@ -1481,6 +1513,7 @@ sources:
       pH:
         native_unit: pH units (dimensionless)
         notes: Source column 'Odczyn pH - wartość laboratoryjna'.
+        output_unit: pH units (dimensionless)
         reference: null
         transformation: no unit conversion; decimal commas are read as points and a leading
           '<' is removed, so a result reported below the limit of quantification enters as
