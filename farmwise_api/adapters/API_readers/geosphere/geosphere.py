@@ -2,7 +2,7 @@ import httpx
 import pandas as pd
 from io import StringIO
 from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
 from farmwise_api.adapters.API_readers.geosphere.geosphere_mapping.geosphere_mapping import GLOBAL_MAPPING, DATA_ALIASES
 import warnings
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
@@ -12,13 +12,36 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# httpx defaults to a 5 s timeout, which the GeoSphere data hub exceeds under
+# load; the failure then surfaced as an exception with an empty message.
+REQUEST_TIMEOUT = httpx.Timeout(60.0, connect=15.0)
 
+
+def _is_transient(error: BaseException) -> bool:
+    """Network errors, rate limiting and server errors are worth retrying."""
+    if isinstance(error, httpx.RequestError):
+        return True
+    if isinstance(error, httpx.HTTPStatusError):
+        status = error.response.status_code
+        return status == 429 or status >= 500
+    return False
+
+
+_retry_transient = retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=1, max=10),
+    retry=retry_if_exception(_is_transient),
+    reraise=True,  # surface the last real error, not tenacity's RetryError
+)
+
+
+@_retry_transient
 async def fetch_station_metadata(resource_id="klima-v2-1d"):
     """
     Fetch metadata for all stations.
     """
     url = f"https://dataset.api.hub.geosphere.at/v1/station/historical/{resource_id}/metadata"
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT) as client:
         response = await client.get(url)
         response.raise_for_status()
         data = response.json()['stations']
@@ -26,11 +49,7 @@ async def fetch_station_metadata(resource_id="klima-v2-1d"):
     return data[['id', 'name', 'lat', 'lon']]
 
 
-@retry(
-    stop=stop_after_attempt(5),  # Retry up to 5 times
-    wait=wait_exponential(multiplier=1, min=1, max=10),  # Exponential backoff
-    retry=retry_if_exception_type(httpx.RequestError),  # Retry on HTTP request errors
-)
+@_retry_transient
 async def fetch_station_data(resource_id, station_ids, time_range, parameters):
     """
     Fetch data for a list of stations.
@@ -44,7 +63,7 @@ async def fetch_station_data(resource_id, station_ids, time_range, parameters):
         "station_ids": ",".join(map(str, station_ids)),
         "output_format": 'csv'
     }
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT) as client:
         response = await client.get(url, params=params)
         response.raise_for_status()
         data = pd.read_csv(StringIO(response.text))
