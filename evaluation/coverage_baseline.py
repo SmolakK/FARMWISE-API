@@ -59,7 +59,17 @@ def factor_only_routing():
 
     def plan_without_coverage(*args, **kwargs):
         plan = original(*args, **kwargs)
-        return [{**decision, "dispatched": factor_eligible(decision)} for decision in plan]
+        # Keep the pre-check's own verdict next to the baseline's, so a record
+        # showing "dispatched" with a failed overlap flag explains itself.
+        return [
+            {
+                **decision,
+                "dispatched": factor_eligible(decision),
+                "precheck_dispatched": decision["dispatched"],
+                "routing": "factor-only",
+            }
+            for decision in plan
+        ]
 
     main_call.plan_source_dispatch = plan_without_coverage
     try:

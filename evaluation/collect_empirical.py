@@ -2,9 +2,7 @@
 
 This module only *executes* the experiments defined in
 :mod:`evaluation.scenarios` and writes what it measured. It computes no
-statistics: summaries, uncertainty intervals, tables and figures belong to the
-analysis layer (:mod:`evaluation.analysis` and the notebook), which reads the
-frozen files and never queries live APIs.
+statistics.
 
 Each collection is written to its own directory and is never overwritten::
 
@@ -28,6 +26,7 @@ executions then run in an order shuffled with ``RANDOM_SEED``.
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 from contextlib import nullcontext
 from dataclasses import dataclass
@@ -41,7 +40,11 @@ from time import perf_counter
 import pandas as pd
 from tqdm import tqdm
 
-from farmwise_api.core.main_call import plan_source_dispatch, read_data
+from farmwise_api.core.main_call import (
+    _default_disabled_sources,
+    plan_source_dispatch,
+    read_data,
+)
 from farmwise_api.core.utils.access_policy import (
     acknowledged_private_noncommercial_imgw,
     private_noncommercial_imgw_enabled,
@@ -53,7 +56,7 @@ from evaluation.collect_cross_source import (
     validate_private_output,
 )
 from evaluation.coverage_baseline import coverage_counts, factor_only_routing
-from evaluation.measurement import MemoryMonitor, provenance
+from evaluation.run_instrumentation import MemoryMonitor, provenance
 from evaluation.workload import request_workload, result_workload, source_timings
 
 OUTPUT_ROOT = Path(__file__).resolve().parent / "empirical_input"
@@ -67,6 +70,7 @@ IMGW_ATTRIBUTION = (
     "Wodnej – Państwowy Instytut Badawczy. Dane Instytutu Meteorologii i "
     "Gospodarki Wodnej – Państwowego Instytutu Badawczego zostały przetworzone."
 )
+EXPERIMENTS = ("coverage", "cross-source", "quality-overhead", "scaling")
 OBSERVATION_COLUMNS = [
     "timestamp", "cell", "variable", "source", "value", "scenario", "region", "period",
 ]
@@ -123,8 +127,14 @@ def build_work_plan(
     scaling_repeats=config.SCALING_REPEATS,
     scaling_warmups=config.SCALING_WARMUPS,
     seed=config.RANDOM_SEED,
+    experiments=None,
 ) -> list[WorkItem]:
-    """Deterministic execution order for a whole collection."""
+    """Deterministic execution order for a whole collection.
+
+    The full plan is always built first and then filtered to ``experiments``,
+    so a subset keeps the same seeded order it has within a full collection.
+    """
+    experiments = EXPERIMENTS if experiments is None else tuple(experiments)
     for name, value in (
         ("coverage_repeats", coverage_repeats),
         ("quality_repeats", quality_repeats),
@@ -179,17 +189,24 @@ def build_work_plan(
         ],
         rng,
     )
-    return plan
+    return [item for item in plan if item.experiment in experiments]
 
 
 async def execute(item: WorkItem, *, timeout, quality_dir, rss_interval) -> tuple[dict, pd.DataFrame | None]:
     """Run one work item and return its record and returned frame."""
     request = item.request
+    # A scenario may exclude sources (e.g. ERA5 from the single-backend scaling
+    # sweeps). read_data adds these to its default exclusions (licence gates,
+    # broken upstreams); the planned routing below must do the same.
+    extra_disabled = request.get("disabled_sources") or None
+    planning_disabled = (
+        {**_default_disabled_sources(), **extra_disabled} if extra_disabled else None
+    )
     # Planned routing and workload are computed before, and excluded from,
     # the timed section.
     plan = plan_source_dispatch(
         request["bounding_box"], request["time_from"], request["time_to"],
-        request["factors"],
+        request["factors"], disabled_sources=planning_disabled,
     )
     record = {
         "experiment": item.experiment,
@@ -205,6 +222,7 @@ async def execute(item: WorkItem, *, timeout, quality_dir, rss_interval) -> tupl
             "separate_api": item.separate_api,
             "routing": item.mode if item.experiment == "coverage" else "precheck",
             "timeout_seconds": timeout,
+            "disabled_sources": sorted(extra_disabled) if extra_disabled else [],
         },
         "workload": request_workload(request),
         "planned_coverage": coverage_counts(plan),
@@ -231,6 +249,7 @@ async def execute(item: WorkItem, *, timeout, quality_dir, rss_interval) -> tupl
                 assess_quality=item.assess_quality,
                 persist_quality_reports=item.persist_quality_reports,
                 quality_report_dir=quality_dir,
+                disabled_sources=extra_disabled,
             )
         record["request_wall_seconds"] = perf_counter() - started
         metadata = result.get("metadata", {}) if isinstance(result, dict) else {}
@@ -274,10 +293,29 @@ async def collect(
     collection_id: str | None = None,
     timeout=config.REQUEST_TIMEOUT_SECONDS,
     rss_interval=config.RSS_SAMPLING_INTERVAL_SECONDS,
+    experiments=EXPERIMENTS,
 ) -> dict:
-    """Execute every configured experiment and write one frozen collection."""
+    """Execute the selected experiments and write one frozen collection.
+
+    ``experiments`` selects a subset of ``EXPERIMENTS``, e.g. to re-collect
+    only ``("cross-source",)`` into a separate collection.
+    """
+    experiments = tuple(experiments)
+    unknown = set(experiments) - set(EXPERIMENTS)
+    if unknown or not experiments:
+        raise ValueError(f"experiments must be a non-empty subset of {EXPERIMENTS}; got {experiments}")
     started_at = datetime.now(timezone.utc)
     collection_id = collection_id or started_at.strftime("%Y%m%dT%H%M%SZ")
+    needs_imgw = "cross-source" in experiments and any(
+        "IMGW" in s.get("required_sources", []) for s in cross_scenarios
+    )
+    if needs_imgw and not private_noncommercial_imgw_enabled():
+        print(
+            "WARNING: IMGW research use is not acknowledged in this process, so "
+            "IMGW will not be dispatched and IMGW-ERA5 scenarios will lack IMGW. "
+            "Run `python -m evaluation.collect_empirical`, which opens the gate.",
+            file=sys.stderr,
+        )
     output_dir = Path(output_root) / collection_id
     if output_dir.exists() and any(output_dir.iterdir()):
         raise FileExistsError(
@@ -293,7 +331,7 @@ async def collect(
         coverage_repeats=coverage_repeats, coverage_warmups=coverage_warmups,
         quality_repeats=quality_repeats, quality_warmups=quality_warmups,
         scaling_repeats=scaling_repeats, scaling_warmups=scaling_warmups,
-        seed=seed,
+        seed=seed, experiments=experiments,
     )
     run_config = {
         **config.evaluation_config(),
@@ -301,6 +339,7 @@ async def collect(
         "request_timeout_seconds": timeout,
         "rss_sampling_interval_seconds": rss_interval,
     }
+    # UPDATE to anything that was changed within this call
     run_config["coverage"].update(
         repeats=coverage_repeats, warmups_per_scenario_and_mode=coverage_warmups,
         scenarios=coverage_scenarios,
@@ -316,6 +355,7 @@ async def collect(
     )
     manifest = provenance(run_config, started_at=started_at)
     manifest["collection_id"] = collection_id
+    manifest["experiments"] = list(experiments)
     manifest["imgw_research_use_enabled"] = private_noncommercial_imgw_enabled()
     manifest["execution_order"] = [
         {"experiment": i.experiment, "scenario": i.request["scenario"],
@@ -404,8 +444,24 @@ def _write_json(path: Path, payload: dict) -> None:
     )
 
 
-def main() -> None:
-    """Collect every configured experiment into a new frozen collection."""
+def main(argv=None) -> None:
+    """Collect the selected experiments into a new frozen collection.
+
+    python -m evaluation.collect_empirical
+    python -m evaluation.collect_empirical --experiments cross-source
+    """
+    parser = argparse.ArgumentParser(
+        description="Collect the selected experiments into a new frozen collection."
+    )
+    parser.add_argument(
+        "--experiments", nargs="+", choices=EXPERIMENTS, default=list(EXPERIMENTS),
+        help="experiments to run (default: all)",
+    )
+    parser.add_argument(
+        "--collection-id", default=None,
+        help="output directory name under empirical_input/ (default: UTC start time)",
+    )
+    args = parser.parse_args(argv)
     # The acknowledgement is scoped to this collection run. Leaving it set
     # would silently open the IMGW licence gate for anything else running
     # later in the same process.
@@ -415,7 +471,9 @@ def main() -> None:
         else nullcontext()
     )
     with acknowledgement:
-        result = asyncio.run(collect())
+        result = asyncio.run(collect(
+            experiments=tuple(args.experiments), collection_id=args.collection_id,
+        ))
     print(
         f"Collected {result['request_count']} measured requests "
         f"({result['warmup_count']} warm-ups excluded) and "
