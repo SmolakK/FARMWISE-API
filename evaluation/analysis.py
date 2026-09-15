@@ -1,8 +1,6 @@
 """Statistical analysis of frozen FARMWISE empirical collections.
 
 Everything here reads files written by :mod:`evaluation.collect_empirical`
-and never contacts a live API, so published tables and figures can be
-regenerated from the preserved collection alone.
 
 Statistics
 ----------
@@ -34,12 +32,17 @@ REFERENCE_SOURCE = "ERA5"
 DISPATCH_STATUSES = ("success", "empty", "failure", "timeout", "invalid_response")
 
 
-# ---------------------------------------------------------------------------
+
 # Loading
-# ---------------------------------------------------------------------------
+
 
 def load_collection(collection_dir) -> dict:
-    """Read one frozen collection directory."""
+    """Read one frozen collection directory.
+
+    ``cross_source_dir`` takes the cross-source runs and observations from a
+    second collection (for example one re-collected with
+    ``--experiments cross-source``), leaving both collections unmodified.
+    """
     collection_dir = Path(collection_dir)
     payload = json.loads((collection_dir / "empirical_runs.json").read_text(encoding="utf-8"))
     manifest_path = collection_dir / payload.get("manifest", "manifest.json")
@@ -60,7 +63,6 @@ def load_collection(collection_dir) -> dict:
         "observations": observations,
         "quality_dir": collection_dir / payload.get("quality_report_dir", "quality"),
     }
-
 
 def flatten_runs(payload: dict) -> pd.DataFrame:
     """One row per measured run with workload, memory and routing columns."""
@@ -118,17 +120,14 @@ def flatten_dispatch(payload: dict) -> pd.DataFrame:
             })
     return pd.DataFrame(rows)
 
-
-# ---------------------------------------------------------------------------
-# Robust summaries
-# ---------------------------------------------------------------------------
+# Summaries
 
 def bootstrap_median_ci(values, *, resamples=BOOTSTRAP_RESAMPLES, seed=BOOTSTRAP_SEED,
                         confidence=CONFIDENCE) -> tuple[float, float]:
     """Percentile bootstrap confidence interval for the median."""
     values = pd.to_numeric(pd.Series(values), errors="coerce").dropna().to_numpy()
     if len(values) < 2:
-        return (np.nan, np.nan)
+        return np.nan, np.nan
     rng = np.random.default_rng(seed)
     medians = np.median(
         rng.choice(values, size=(resamples, len(values)), replace=True), axis=1
@@ -165,9 +164,9 @@ def robust_summary(df: pd.DataFrame, by, value: str, **bootstrap) -> pd.DataFram
     return pd.DataFrame(rows)
 
 
-# ---------------------------------------------------------------------------
+
 # Scaling
-# ---------------------------------------------------------------------------
+
 
 WORKLOAD_COLUMNS = (
     "requested_s2_cells", "returned_s2_cells", "returned_values", "area_km2",
@@ -224,9 +223,9 @@ def scaling_fit(runs: pd.DataFrame, dimension: str, *, x: str, y: str = "request
             "r_squared": 1 - ss_res / ss_tot if ss_tot else np.nan}
 
 
-# ---------------------------------------------------------------------------
+
 # Coverage pre-check vs factor-only routing
-# ---------------------------------------------------------------------------
+
 
 def coverage_comparison(runs: pd.DataFrame) -> pd.DataFrame:
     """Per scenario and routing mode: dispatch counts, outcomes and runtime."""
@@ -292,9 +291,9 @@ def _bootstrap_median_difference(a, b, *, resamples=BOOTSTRAP_RESAMPLES,
     return (float(np.quantile(diffs, alpha)), float(np.quantile(diffs, 1 - alpha)))
 
 
-# ---------------------------------------------------------------------------
+
 # Quality-assessment overhead
-# ---------------------------------------------------------------------------
+
 
 def quality_overhead(runs: pd.DataFrame, **bootstrap) -> dict:
     """Runtime and memory with quality assessment off vs on for one request."""
@@ -320,9 +319,9 @@ def quality_overhead(runs: pd.DataFrame, **bootstrap) -> dict:
     return result
 
 
-# ---------------------------------------------------------------------------
+
 # Cross-source agreement
-# ---------------------------------------------------------------------------
+
 
 PAIR_KEY = ["scenario", "timestamp", "cell", "variable"]
 
