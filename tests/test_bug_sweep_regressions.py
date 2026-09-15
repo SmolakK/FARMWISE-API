@@ -137,3 +137,58 @@ def test_gios_groundwater_mapping_keys_agree():
     measurements = set(selected_columns.values()) - bookkeeping
     assert measurements <= set(schema)
     assert measurements == set(DATA_ALIASES)
+
+
+@pytest.mark.parametrize(
+    "box",
+    [
+        (50.5, 51.5, 10.5, 9.5),    # north and south swapped
+        (-10.0, 10.0, 10.5, 9.5),   # inverted latitude band
+        (51.5, 50.5, 9.5, 10.5),    # east and west swapped
+        (95.0, 50.0, 10.0, 9.0),    # latitude out of range
+        (51.5, 50.5, 10.5),         # not four values
+    ],
+)
+def test_malformed_bounding_boxes_are_rejected_before_dispatch(box):
+    # The overlap test assumes N >= S and E >= W; with swapped values it
+    # reported overlaps that do not exist and dispatched those sources.
+    from farmwise_api.core.main_call import plan_source_dispatch
+
+    with pytest.raises(ValueError, match="bounding_box"):
+        plan_source_dispatch(box, "2018-01-01", "2018-01-07", ["land cover"])
+
+
+@pytest.mark.asyncio
+async def test_read_data_rejects_a_malformed_bounding_box():
+    with pytest.raises(ValueError, match="bounding_box"):
+        await read_data(
+            bounding_box=(50.5, 51.5, 10.5, 9.5), level=10,
+            time_from="2018-01-01", time_to="2018-01-07", factors=["temperature"],
+        )
+
+
+def test_precheck_dispatches_exactly_when_every_requirement_holds():
+    import random
+    from datetime import date as _date
+
+    from farmwise_api.adapters.mappings.data_source_mapping import API_PATH_RANGES
+    from farmwise_api.core.main_call import plan_source_dispatch
+
+    factors = sorted({f for ranges in API_PATH_RANGES.values() for f in ranges[2]})
+    rng = random.Random(7)
+    for _ in range(500):
+        lat = sorted(rng.uniform(-30, 80) for _ in range(2))
+        lon = sorted(rng.uniform(-70, 60) for _ in range(2))
+        start = _date(1900, 1, 1) + timedelta(days=rng.randint(0, 46000))
+        end = start + timedelta(days=rng.randint(0, 4000))
+        plan = plan_source_dispatch(
+            (lat[1], lat[0], lon[1], lon[0]), start.isoformat(), end.isoformat(),
+            rng.sample(factors, rng.randint(1, 3)),
+        )
+        for decision in plan:
+            assert decision["dispatched"] == bool(
+                not decision["disabled_reason"]
+                and decision["spatial_overlap"]
+                and decision["temporal_overlap"]
+                and decision["factor_overlap"]
+            ), decision

@@ -107,3 +107,73 @@ async def test_fetch_station_data(mock_httpx_client):
     assert isinstance(result, pd.DataFrame)
     assert list(result.columns) == ["station", "time", "tl_mittel", "rr"]
     assert len(result) == 2
+
+
+@pytest.mark.asyncio
+async def test_station_metadata_retries_transient_failures_with_an_explicit_timeout(monkeypatch):
+    import httpx
+    from farmwise_api.adapters.API_readers.geosphere import geosphere
+
+    monkeypatch.setattr(geosphere.fetch_station_metadata.retry, "wait", lambda *_a, **_k: 0)
+    request = httpx.Request("GET", "https://example.test")
+    ok = MagicMock()
+    ok.json.return_value = {"stations": [{"id": 1, "name": "A", "lat": 48.0, "lon": 16.0}]}
+    responses = [
+        httpx.ReadTimeout("", request=request),
+        httpx.HTTPStatusError("busy", request=request, response=httpx.Response(503, request=request)),
+        ok,
+    ]
+    clients = []
+
+    class Client:
+        def __init__(self, **kwargs):
+            clients.append(kwargs)
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *_exc):
+            return False
+
+        async def get(self, _url):
+            response = responses.pop(0)
+            if isinstance(response, Exception):
+                raise response
+            return response
+
+    monkeypatch.setattr(geosphere.httpx, "AsyncClient", Client)
+
+    result = await geosphere.fetch_station_metadata()
+
+    assert len(result) == 1 and len(clients) == 3
+    assert all(kwargs["timeout"] is geosphere.REQUEST_TIMEOUT for kwargs in clients)
+
+
+@pytest.mark.asyncio
+async def test_station_metadata_does_not_retry_client_errors(monkeypatch):
+    import httpx
+    from farmwise_api.adapters.API_readers.geosphere import geosphere
+
+    monkeypatch.setattr(geosphere.fetch_station_metadata.retry, "wait", lambda *_a, **_k: 0)
+    request = httpx.Request("GET", "https://example.test")
+    calls = []
+
+    class Client:
+        def __init__(self, **_kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *_exc):
+            return False
+
+        async def get(self, _url):
+            calls.append(1)
+            raise httpx.HTTPStatusError("gone", request=request, response=httpx.Response(404, request=request))
+
+    monkeypatch.setattr(geosphere.httpx, "AsyncClient", Client)
+
+    with pytest.raises(httpx.HTTPStatusError):
+        await geosphere.fetch_station_metadata()
+    assert len(calls) == 1

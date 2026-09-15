@@ -359,3 +359,41 @@ async def test_gios_groundwater_read_data_returns_empty_without_pages(monkeypatc
     )
 
     assert result.empty
+
+
+@pytest.mark.asyncio
+async def test_epa_downloads_only_stations_inside_the_requested_box(monkeypatch):
+    catalogue = pd.DataFrame(
+        {
+            "id": ["inside", "outside"],
+            "lat": [53.5, 52.0],
+            "lon": [-7.5, -9.5],
+            "download_link": ["https://example.test/in.zip", "https://example.test/out.zip"],
+        }
+    )
+    monkeypatch.setattr(epa_gw, "initial_df", catalogue)
+    requested = []
+
+    async def fake_process_link(_client, row):
+        requested.append(row["id"])
+        return None
+
+    monkeypatch.setattr(epa_gw, "process_link", fake_process_link)
+
+    await epa_gw.fetch_all_data((54.0, 53.0, -7.0, -8.0))
+
+    assert requested == ["inside"]
+
+
+def test_epa_catalogue_links_follow_the_station_ids():
+    catalogue = epa_gw.initial_df
+    assert catalogue["id"].is_unique
+    pattern = (
+        r"^https://epawebapp\.epa\.ie/Hydronet/output/internet/stations/"
+        r"[A-Z]{3}/(?P<id>IE_[A-Z]{2}_G_\d{4}_\d{4}_\d{4})/GWL/complete_daymean\.zip$"
+    )
+    extracted = catalogue["download_link"].str.extract(pattern)["id"]
+    assert (extracted == catalogue["id"]).all()
+    # Ireland, including offshore islands.
+    assert catalogue["lat"].between(51.3, 55.5).all()
+    assert catalogue["lon"].between(-10.7, -5.9).all()

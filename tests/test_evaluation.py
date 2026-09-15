@@ -276,7 +276,7 @@ def test_collect_empirical_main_enables_file_level_imgw_opt_in(monkeypatch, tmp_
     monkeypatch.setattr(empirical_collector, "INCLUDE_IMGW_RESEARCH", True)
     _record_acknowledgement_during_collection(monkeypatch, tmp_path, observed)
 
-    empirical_collector.main()
+    empirical_collector.main([])
 
     assert observed["during"] == "1"
     assert IMGW_RESEARCH_USE_ENV not in os.environ
@@ -288,7 +288,7 @@ def test_collect_empirical_main_restores_a_pre_existing_acknowledgement(monkeypa
     monkeypatch.setattr(empirical_collector, "INCLUDE_IMGW_RESEARCH", True)
     _record_acknowledgement_during_collection(monkeypatch, tmp_path, observed)
 
-    empirical_collector.main()
+    empirical_collector.main([])
 
     assert observed["during"] == "1"
     assert os.environ[IMGW_RESEARCH_USE_ENV] == "yes"
@@ -300,7 +300,64 @@ def test_collect_empirical_main_leaves_imgw_disabled_without_opt_in(monkeypatch,
     monkeypatch.setattr(empirical_collector, "INCLUDE_IMGW_RESEARCH", False)
     _record_acknowledgement_during_collection(monkeypatch, tmp_path, observed)
 
-    empirical_collector.main()
+    empirical_collector.main([])
 
     assert observed["during"] is None
     assert IMGW_RESEARCH_USE_ENV not in os.environ
+
+
+def test_work_plan_subset_keeps_the_order_of_the_full_plan():
+    full = empirical_collector.build_work_plan()
+    subset = empirical_collector.build_work_plan(experiments=("cross-source",))
+
+    assert {item.experiment for item in subset} == {"cross-source"}
+    assert subset == [item for item in full if item.experiment == "cross-source"]
+
+
+@pytest.mark.asyncio
+async def test_collect_rejects_unknown_experiments(tmp_path):
+    with pytest.raises(ValueError, match="experiments"):
+        await empirical_collector.collect(output_root=tmp_path, experiments=("factor-count",))
+
+
+def test_main_passes_selected_experiments_and_collection_id(monkeypatch, tmp_path):
+    received = {}
+
+    async def fake_collect(**kwargs):
+        received.update(kwargs)
+        return {"request_count": 16, "warmup_count": 0, "observation_count": 1,
+                "collection_dir": tmp_path}
+
+    monkeypatch.setattr(empirical_collector, "collect", fake_collect)
+    monkeypatch.setattr(empirical_collector, "INCLUDE_IMGW_RESEARCH", False)
+
+    empirical_collector.main(["--experiments", "cross-source", "--collection-id", "imgw-rerun"])
+
+    assert received == {"experiments": ("cross-source",), "collection_id": "imgw-rerun"}
+
+
+def test_analysis_can_take_cross_source_data_from_a_second_collection(tmp_path):
+    from evaluation import analysis
+
+    def write(directory, runs, source):
+        directory.mkdir()
+        (directory / "empirical_runs.json").write_text(json.dumps({"runs": runs}), encoding="utf-8")
+        (directory / "manifest.json").write_text(json.dumps({"imgw_research_use_enabled": source == "IMGW"}),
+                                                 encoding="utf-8")
+        pd.DataFrame([{"timestamp": "2018-01-01", "cell": "c", "variable": "temperature",
+                       "source": source, "value": 1.0, "scenario": "x"}]).to_csv(
+            directory / "cross_source_observations.csv", index=False)
+
+    def run(run_id, experiment):
+        return {"run_id": run_id, "experiment": experiment, "scenario": experiment, "status": "success",
+                "dispatch": [{"source": f"a.{experiment}", "status": "success", "wall_seconds": 1.0}]}
+
+    write(tmp_path / "overnight", [run(1, "scaling"), run(2, "cross-source")], "ERA5")
+    write(tmp_path / "rerun", [run(1, "cross-source")], "IMGW")
+
+    collection = analysis.load_collection(tmp_path / "overnight", cross_source_dir=tmp_path / "rerun")
+
+    assert sorted(collection["runs"]["experiment"]) == ["cross-source", "scaling"]
+    assert len(collection["dispatch"]) == 2
+    assert set(collection["observations"]["source"]) == {"IMGW"}
+    assert collection["cross_source_manifest"]["imgw_research_use_enabled"] is True

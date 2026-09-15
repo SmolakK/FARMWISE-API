@@ -7,7 +7,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from evaluation import analysis, measurement, scenarios
+from evaluation import analysis, scenarios
+from evaluation import run_instrumentation as measurement
 from evaluation.collect_empirical import build_work_plan
 from evaluation.coverage_baseline import coverage_counts, factor_only_routing
 from evaluation.workload import (
@@ -27,28 +28,42 @@ from farmwise_api.core import main_call
 
 def test_scaling_has_no_factor_count_sweep_and_uses_one_fixed_factor_set():
     dimensions = {s["dimension"] for s in scenarios.LIVE_SCALING_SCENARIOS}
+    assert dimensions == set(scenarios.SCALING_DIMENSIONS)
     assert dimensions == {"S2 level", "Spatial extent", "Temporal extent"}
+    assert scenarios.SCALING_FACTORS
     assert all(
-        s["factors"] == ["temperature", "precipitation"]
+        s["factors"] == list(scenarios.SCALING_FACTORS)
         for s in scenarios.LIVE_SCALING_SCENARIOS
     )
 
 
 @pytest.mark.parametrize(
-    "dimension, varying",
+    "dimension, varying, values",
     [
-        ("S2 level", "level"),
-        ("Spatial extent", "bounding_box"),
-        ("Temporal extent", "time_to"),
+        ("S2 level", "level", scenarios.SCALING_LEVELS),
+        ("Spatial extent", "bounding_box", scenarios.SCALING_WIDTHS_DEG),
+        ("Temporal extent", "time_to", scenarios.SCALING_DURATIONS_DAYS),
     ],
 )
-def test_each_scaling_sweep_changes_exactly_one_request_parameter(dimension, varying):
+def test_each_scaling_sweep_changes_exactly_one_request_parameter(dimension, varying, values):
     sweep = [s for s in scenarios.LIVE_SCALING_SCENARIOS if s["dimension"] == dimension]
-    assert len(sweep) == 4
+    assert len(values) >= 2
+    assert [s["input_value"] for s in sweep] == list(values)
     fixed = {"level", "bounding_box", "time_from", "time_to", "factors", "country"} - {varying}
     for key in fixed:
         assert len({repr(s[key]) for s in sweep}) == 1, key
-    assert len({repr(s[varying]) for s in sweep}) == 4
+    assert len({repr(s[varying]) for s in sweep}) == len(values)
+
+
+def test_spatial_sweep_boxes_match_their_widths_around_the_centre():
+    sweep = [s for s in scenarios.LIVE_SCALING_SCENARIOS if s["dimension"] == "Spatial extent"]
+    lat, lon = scenarios.SCALING_CENTER
+    for s in sweep:
+        north, south, east, west = s["bounding_box"]
+        assert north - south == pytest.approx(s["input_value"])
+        assert east - west == pytest.approx(s["input_value"])
+        assert (north + south) / 2 == pytest.approx(lat)
+        assert (east + west) / 2 == pytest.approx(lon)
 
 
 def test_every_sweep_includes_the_shared_base_request():
@@ -66,8 +81,9 @@ def test_every_sweep_includes_the_shared_base_request():
 
 def test_temporal_sweep_spans_the_stated_inclusive_days():
     sweep = [s for s in scenarios.LIVE_SCALING_SCENARIOS if s["dimension"] == "Temporal extent"]
-    assert [duration_days(s["time_from"], s["time_to"]) for s in sweep] == [1, 7, 30, 90]
-    assert [s["input_value"] for s in sweep] == [1, 7, 30, 90]
+    expected = list(scenarios.SCALING_DURATIONS_DAYS)
+    assert [duration_days(s["time_from"], s["time_to"]) for s in sweep] == expected
+    assert [s["input_value"] for s in sweep] == expected
 
 
 def test_cross_source_covers_four_seasons_for_every_region():
@@ -84,7 +100,8 @@ def test_cross_source_covers_four_seasons_for_every_region():
 
 
 def test_repetition_and_warmup_settings():
-    assert scenarios.SCALING_REPEATS == 10
+    # At least 10 measured repeats per scaling scenario, after one warm-up.
+    assert scenarios.SCALING_REPEATS >= 10
     assert scenarios.SCALING_WARMUPS == 1
     assert scenarios.RANDOM_SEED == 42
 
@@ -97,12 +114,15 @@ def test_work_plan_is_reproducible_and_places_warmups_first():
     ]
     scaling = [i for i in first if i.experiment == "scaling"]
     warmups = [i for i in scaling if i.warmup]
-    assert len(warmups) == len(scenarios.LIVE_SCALING_SCENARIOS)
+    assert len(warmups) == scenarios.SCALING_WARMUPS * len(scenarios.LIVE_SCALING_SCENARIOS)
     assert scaling[: len(warmups)] == warmups
-    assert len(scaling) - len(warmups) == 10 * len(scenarios.LIVE_SCALING_SCENARIOS)
+    assert len(scaling) - len(warmups) == (
+        scenarios.SCALING_REPEATS * len(scenarios.LIVE_SCALING_SCENARIOS)
+    )
     # Measured runs are interleaved, not grouped by scenario.
     measured = [i.request["scenario"] for i in scaling if not i.warmup]
-    assert measured[:10] != [measured[0]] * 10
+    first_block = measured[: scenarios.SCALING_REPEATS]
+    assert first_block != [measured[0]] * len(first_block)
     assert all(not i.assess_quality and not i.persist_quality_reports for i in scaling)
 
 
@@ -379,3 +399,116 @@ def test_analysis_reads_a_collection_written_by_the_collector(tmp_path):
     assert row["requested_s2_cells"] == 136 and row["peak_rss_mb"] == 512.0
     assert row["unproductive_dispatches"] == 0
     assert collection["dispatch"].iloc[0]["source_short"] == "cds_single_levels"
+
+
+def test_evaluation_modules_do_not_shadow_installed_top_level_modules():
+    # Running a collector as a script puts evaluation/ first on sys.path, so a
+    # file named like an installed package replaces it for every import. A
+    # module called measurement.py broke wetterdienst, which imports the
+    # third-party "measurement" package.
+    import pkgutil
+    import sys
+    from pathlib import Path
+
+    evaluation_dir = Path(scenarios.__file__).resolve().parent
+    repo_root = evaluation_dir.parent
+    ours = {p.stem for p in evaluation_dir.glob("*.py") if p.stem != "__init__"}
+    search_path = [
+        entry for entry in sys.path
+        if entry and Path(entry).resolve() not in {evaluation_dir, repo_root}
+    ]
+    installed = {module.name for module in pkgutil.iter_modules(search_path)}
+    installed |= set(sys.builtin_module_names) | set(sys.stdlib_module_names)
+    assert not ours & installed, f"evaluation modules shadow installed modules: {sorted(ours & installed)}"
+
+
+def test_factor_only_records_keep_the_precheck_verdict(monkeypatch):
+    monkeypatch.setattr(main_call, "plan_source_dispatch", lambda *a, **k: [dict(d) for d in PLAN])
+
+    with factor_only_routing():
+        plan = main_call.plan_source_dispatch()
+    elsewhere = next(d for d in plan if d["source"] == "elsewhere")
+    assert elsewhere["dispatched"] is True
+    assert elsewhere["precheck_dispatched"] is False
+    assert elsewhere["routing"] == "factor-only"
+
+
+# ---------------------------------------------------------------------------
+# Single-backend scaling and the revised coverage/quality scenarios
+# ---------------------------------------------------------------------------
+
+def _dispatched(request):
+    """Sources read_data would dispatch for a scenario (defaults + its own exclusions)."""
+    disabled = {**main_call._default_disabled_sources(), **request.get("disabled_sources", {})}
+    plan = main_call.plan_source_dispatch(
+        request["bounding_box"], request["time_from"], request["time_to"],
+        request["factors"], disabled_sources=disabled,
+    )
+    return [d["source"] for d in plan if d["dispatched"]]
+
+
+def test_every_scaling_request_dispatches_exactly_the_single_scaling_backend():
+    requests = [*scenarios.LIVE_SCALING_SCENARIOS, scenarios.QUALITY_OVERHEAD_SCENARIO]
+    for request in requests:
+        assert request["disabled_sources"] == scenarios.SCALING_DISABLED_SOURCES
+        assert _dispatched(request) == [scenarios.SCALING_SOURCE], request["scenario"]
+
+
+def test_scaling_boxes_and_dates_stay_inside_the_backend_coverage():
+    from farmwise_api.adapters.mappings.data_source_mapping import API_PATH_RANGES
+    from farmwise_api.core.utils.overlap_checks import resolve_range_date
+
+    (north, south, east, west), (start, end) = API_PATH_RANGES[scenarios.SCALING_SOURCE][:2]
+    for request in scenarios.LIVE_SCALING_SCENARIOS:
+        n, s, e, w = request["bounding_box"]
+        assert s >= south and n <= north and w >= west and e <= east, request["scenario"]
+        assert resolve_range_date(start) <= resolve_range_date(request["time_from"])
+        assert resolve_range_date(request["time_to"]) <= resolve_range_date(end)
+    # One cached annual grid file covers every duration.
+    assert {r["time_to"][:4] for r in scenarios.LIVE_SCALING_SCENARIOS} == {
+        scenarios.SCALING_TIME_FROM[:4]
+    }
+
+
+def test_quality_overhead_uses_the_largest_spatial_extent_request():
+    widest = max(
+        (s for s in scenarios.LIVE_SCALING_SCENARIOS if s["dimension"] == "Spatial extent"),
+        key=lambda s: s["width_deg"],
+    )
+    quality = scenarios.QUALITY_OVERHEAD_SCENARIO
+    for key in ("bounding_box", "level", "time_from", "time_to", "factors", "disabled_sources"):
+        assert quality[key] == widest[key], key
+
+
+def test_negative_coverage_scenarios_dispatch_nothing():
+    for name in ("no-spatial-coverage", "no-temporal-coverage"):
+        request = next(s for s in scenarios.REQUEST_SCENARIOS if s["scenario"] == name)
+        assert _dispatched(request) == [], name
+
+
+@pytest.mark.asyncio
+async def test_collector_applies_scenario_disabled_sources_to_plan_and_request(monkeypatch):
+    from evaluation import collect_empirical
+
+    seen = {}
+
+    def fake_plan(*args, disabled_sources=None, **kwargs):
+        seen["plan_disabled"] = disabled_sources
+        return []
+
+    async def fake_read_data(**kwargs):
+        seen["read_disabled"] = kwargs.get("disabled_sources")
+        return {"data": pd.DataFrame(), "metadata": {"dispatch": []}}
+
+    monkeypatch.setattr(collect_empirical, "plan_source_dispatch", fake_plan)
+    monkeypatch.setattr(collect_empirical, "read_data", fake_read_data)
+    request = scenarios.LIVE_SCALING_SCENARIOS[0]
+    item = collect_empirical.WorkItem("scaling", request, 1)
+
+    record, _frame = await collect_empirical.execute(item, timeout=1, quality_dir=None, rss_interval=0.01)
+
+    assert seen["read_disabled"] == scenarios.SCALING_DISABLED_SOURCES
+    # Planning keeps the default exclusions (e.g. licence gates) as well.
+    assert set(scenarios.SCALING_DISABLED_SOURCES) <= set(seen["plan_disabled"])
+    assert set(main_call._default_disabled_sources()) <= set(seen["plan_disabled"])
+    assert record["settings"]["disabled_sources"] == sorted(scenarios.SCALING_DISABLED_SOURCES)

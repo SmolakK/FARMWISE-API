@@ -671,3 +671,29 @@ async def test_source_quality_assessments_run_concurrently(monkeypatch):
         report.get("status") != "error"
         for report in result["metadata"]["quality_reports"]
     )
+
+
+@pytest.mark.asyncio
+async def test_dispatch_error_names_the_exception_when_its_message_is_empty(monkeypatch):
+    # httpx timeouts are raised with an empty message; the record used to say
+    # nothing about why the source failed.
+    import httpx
+    from farmwise_api.core import main_call
+
+    module = MagicMock()
+    module.read_data = AsyncMock(side_effect=httpx.ReadTimeout(""))
+    monkeypatch.setattr(
+        main_call,
+        "API_PATH_RANGES",
+        {"provider.adapter": [(55, 49, 24, 14), ("2020-01-01", "2030-01-01"), ["temperature"]]},
+    )
+    monkeypatch.setattr(main_call, "spatial_ranges_overlap", lambda *_args: True)
+    monkeypatch.setattr(main_call, "time_ranges_overlap", lambda *_args: True)
+    monkeypatch.setattr(main_call.importlib, "import_module", lambda _name: module)
+
+    result = await main_call.read_data(
+        bounding_box=(55, 49, 24, 14), level=10,
+        time_from="2024-01-01", time_to="2024-01-02", factors=["temperature"],
+    )
+
+    assert result["metadata"]["dispatch"][0]["error"] == "ReadTimeout"
