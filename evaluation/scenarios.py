@@ -16,10 +16,11 @@ cross-source
     regions, each in four seasonal months (``SEASONAL_PERIODS``).
 scaling
     ``LIVE_SCALING_SCENARIOS`` - one-dimension-at-a-time sweeps of S2 level,
-    spatial extent and temporal extent with a fixed factor set.
+    spatial extent and temporal extent with a fixed factor set and a single
+    backend (Met Éireann gridded precipitation over Ireland).
 quality overhead
-    ``QUALITY_OVERHEAD_SCENARIO`` - one representative request with quality
-    assessment off and on (``QUALITY_MODES``).
+    ``QUALITY_OVERHEAD_SCENARIO`` - the largest spatial-extent request with
+    quality assessment off and on (``QUALITY_MODES``).
 """
 
 from __future__ import annotations
@@ -31,8 +32,8 @@ from datetime import date, timedelta
 # ---------------------------------------------------------------------------
 
 RANDOM_SEED = 42
-SCALING_REPEATS = 10
-SCALING_WARMUPS = 1
+SCALING_REPEATS = 15
+SCALING_WARMUPS = 1 # warm-up is used to make timings fair and avoid caching-related impact
 COVERAGE_REPEATS = 3
 COVERAGE_WARMUPS = 1
 QUALITY_OVERHEAD_REPEATS = 10
@@ -88,8 +89,7 @@ REQUEST_SCENARIOS = [
         "time_to": "2020-03-31",
         "factors": ["groundwater quantity"],
     },
-    # Static / land-cover integration. 2020 allows CORINE + EuroCropV2 +
-    # IFSGRID temporal eligibility.
+    # Static / land-cover integration. 2020 allows CORINE + EuroCropV2
     {
         "scenario": "germany-land-cover",
         "country": "Germany",
@@ -109,12 +109,14 @@ REQUEST_SCENARIOS = [
         "time_to": "2018-01-07",
         "factors": ["soil"],
     },
-    # Negative case - the factor exists, but no groundwater source covers
-    # Germany. Should be eliminated by the coverage pre-check.
+    # Negative case - the factor exists, but no groundwater source covers this
+    # part of Germany. The box lies east of 9.56° E, where the Hub'Eau
+    # (France) coverage box ends; the earlier box at 9.5-10.5° E overlapped it
+    # by 0.06° and Hub'Eau was, correctly, dispatched.
     {
         "scenario": "no-spatial-coverage",
         "country": "Germany",
-        "bounding_box": (51.5, 50.5, 10.5, 9.5),
+        "bounding_box": (51.5, 50.5, 12.5, 11.5),
         "level": 10,
         "time_from": "2020-01-01",
         "time_to": "2020-01-07",
@@ -135,9 +137,9 @@ REQUEST_SCENARIOS = [
     },
 ]
 
-# "precheck": FARMWISE as shipped - sources are dispatched only when the
+# "precheck": FARMWISE as shipped, sources are dispatched only when the
 # registry says they overlap the request in space, time and factor.
-# "factor-only": baseline - every enabled source that provides a requested
+# "factor-only": baseline, every enabled source that provides a requested
 # factor is dispatched, regardless of its spatial and temporal coverage.
 COVERAGE_MODES = ("precheck", "factor-only")
 
@@ -208,22 +210,39 @@ CROSS_SOURCE_SCENARIOS = [
 # Scaling experiment
 # ---------------------------------------------------------------------------
 
-# One fixed factor set for every sweep, so each sweep changes exactly one
-# request dimension. Both factors are served by the same backends (DWD and
-# ERA5) over the German base box. A factor-count sweep is deliberately absent:
-# adding factors adds adapters and data types, which confounds workload size
-# with backend and processing differences.
-SCALING_FACTORS = ("temperature", "precipitation")
-SCALING_COUNTRY = "Germany"
-SCALING_CENTER = (51.0, 10.0)  # (lat, lon)
+# One fixed factor set and one backend for every sweep: daily precipitation
+# over Ireland from the Met Éireann 1 km grid.
+#
+# * Gridded, so returned values grow with area, S2 level and days. Station
+#   sources (e.g. EPA groundwater) return a few hundred values at most and do
+#   not exercise FARMWISE's processing.
+# * The adapter caches the annual grid files, so after the warm-up measured
+#   runs do not wait on the upstream server: they measure FARMWISE's own
+#   processing with cached input, not end-to-end latency (the coverage
+#   experiment covers live upstream behaviour).
+# * ERA5 also provides precipitation over Ireland; it is excluded through
+#   ``disabled_sources`` so that every sweep runs against the same single
+#   backend and no CDS queueing enters the timings.
+SCALING_FACTORS = ("precipitation",)
+SCALING_COUNTRY = "Ireland"
+SCALING_CENTER = (53.4, -8.2)
+SCALING_SOURCE = "farmwise_api.adapters.API_readers.irish_meteo.irish_ms_daily"
+SCALING_DISABLED_SOURCES = {
+    "farmwise_api.adapters.API_readers.cds.cds_single_levels": (
+        "excluded from the scaling experiment to measure a single backend"
+    ),
+}
 SCALING_BASE_WIDTH_DEG = 1.0
 SCALING_BASE_LEVEL = 10
+# All durations stay within 2018, i.e. within one cached annual grid file.
 SCALING_TIME_FROM = "2018-01-01"
 SCALING_BASE_DURATION_DAYS = 7
 
-SCALING_LEVELS = (6, 8, 10, 12)
-SCALING_WIDTHS_DEG = (0.25, 0.5, 1.0, 2.0)
-SCALING_DURATIONS_DAYS = (1, 7, 30, 90)
+SCALING_LEVELS = (6, 8, 10, 12, 14)
+# The Met Éireann coverage box spans about 3.9° of latitude and 4.5° of
+# longitude, so boxes wider than 3° around the centre would leave it.
+SCALING_WIDTHS_DEG = (0.25, 0.5, 1.0, 2.0, 3.0)
+SCALING_DURATIONS_DAYS = (1, 7, 14, 30, 60, 90,)
 
 SCALING_DIMENSIONS = ("S2 level", "Spatial extent", "Temporal extent")
 
@@ -232,7 +251,7 @@ def centred_bounding_box(width_deg, center=SCALING_CENTER):
     """Square (N, S, E, W) box of ``width_deg`` degrees around ``center``."""
     lat, lon = center
     half = width_deg / 2
-    return (lat + half, lat - half, lon + half, lon - half)
+    return lat + half, lat - half, lon + half, lon - half
 
 
 def inclusive_end_date(time_from, duration_days):
@@ -253,6 +272,7 @@ def _scaling_request(*, dimension, input_value, width_deg, level, duration_days)
         "time_from": SCALING_TIME_FROM,
         "time_to": inclusive_end_date(SCALING_TIME_FROM, duration_days),
         "factors": list(SCALING_FACTORS),
+        "disabled_sources": dict(SCALING_DISABLED_SOURCES),
     }
 
 
@@ -293,16 +313,19 @@ LIVE_SCALING_SCENARIOS = [
 # Quality-assessment overhead experiment
 # ---------------------------------------------------------------------------
 
-# The scaling base request: one mid-sized, two-backend case.
+# The largest request of the spatial-extent sweep (widest box, base level and
+# duration), so the assessment has a substantial result to check; on a small
+# request its cost was indistinguishable from run-to-run noise.
+QUALITY_OVERHEAD_WIDTH_DEG = max(SCALING_WIDTHS_DEG)
 QUALITY_OVERHEAD_SCENARIO = {
     **_scaling_request(
         dimension="Quality overhead",
-        input_value="base",
-        width_deg=SCALING_BASE_WIDTH_DEG,
+        input_value=QUALITY_OVERHEAD_WIDTH_DEG,
+        width_deg=QUALITY_OVERHEAD_WIDTH_DEG,
         level=SCALING_BASE_LEVEL,
         duration_days=SCALING_BASE_DURATION_DAYS,
     ),
-    "scenario": "quality-overhead-base",
+    "scenario": "quality-overhead-largest-spatial",
 }
 
 # (assess_quality, persist_quality_reports); "on" matches the server defaults.
@@ -340,6 +363,8 @@ def evaluation_config() -> dict:
             "persist_quality_reports": False,
             "separate_api": False,
             "factors": list(SCALING_FACTORS),
+            "source": SCALING_SOURCE,
+            "disabled_sources": dict(SCALING_DISABLED_SOURCES),
             "dimensions": list(SCALING_DIMENSIONS),
             "scenarios": LIVE_SCALING_SCENARIOS,
         },
