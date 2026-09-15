@@ -19,6 +19,33 @@ def resolve_range_date(value) -> datetime:
     return datetime.fromisoformat(str(value))
 
 
+def validate_bounding_box(bounding_box) -> tuple[float, float, float, float]:
+    """Return ``(north, south, east, west)`` as floats, rejecting malformed boxes.
+
+    The overlap test assumes north >= south and east >= west. With the values
+    swapped it still returns an answer, but a meaningless one: a box "from 10
+    north to -10 south" was reported as overlapping sources it does not touch,
+    and those sources were dispatched.
+    """
+    try:
+        north, south, east, west = (float(value) for value in bounding_box)
+    except (TypeError, ValueError):
+        raise ValueError(
+            f"bounding_box must be four numbers (north, south, east, west); got {bounding_box!r}"
+        ) from None
+    if not (-90 <= south <= north <= 90):
+        raise ValueError(
+            f"bounding_box latitudes must satisfy -90 <= south <= north <= 90; "
+            f"got north={north}, south={south}"
+        )
+    if not (-180 <= west <= east <= 180):
+        raise ValueError(
+            f"bounding_box longitudes must satisfy -180 <= west <= east <= 180; "
+            f"got east={east}, west={west}"
+        )
+    return north, south, east, west
+
+
 def spatial_ranges_overlap(range1, range2):
     """
     Check if two spatial ranges overlap.
