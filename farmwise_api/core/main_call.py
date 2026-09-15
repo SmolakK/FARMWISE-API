@@ -19,7 +19,11 @@ from farmwise_api.core.within_source_aggregation import (
     _aggregator as within_source_aggregator,
     validate_within_source_methods,
 )
-from farmwise_api.core.utils.overlap_checks import spatial_ranges_overlap, time_ranges_overlap
+from farmwise_api.core.utils.overlap_checks import (
+    spatial_ranges_overlap,
+    time_ranges_overlap,
+    validate_bounding_box,
+)
 from farmwise_api.core.utils.interpolate_data import interpolate
 from farmwise_api.core.utils.cells_to_coordinates import extract_bbox
 from farmwise_api.core.utils.country_bboxes import return_country_bboxes
@@ -157,6 +161,7 @@ def plan_source_dispatch(
     disabled_sources=None,
 ):
     """Evaluate the coverage pre-check for every configured source."""
+    validate_bounding_box(bounding_box)
     using_default_sources = source_ranges is None
     source_ranges = API_PATH_RANGES if using_default_sources else source_ranges
     if disabled_sources is None:
@@ -271,6 +276,8 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
 
     elif bounding_box is None:
         raise ValueError("You must provide either a 'bounding_box' or a 'country' parameter.")
+
+    bounding_box = validate_bounding_box(bounding_box)
 
     if time_from is not None and time_to is not None:
         if pd.Timestamp(time_from) > pd.Timestamp(time_to):
@@ -395,8 +402,13 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
             dispatch_error = f"Timed out after {timeout} seconds"
             logger.error(f"Request to {api_name_suffix} timed out")
         except Exception as error:
-            dispatch_error = str(error)
-            logger.error(f"Failed to retrieve data from {api_name}: {error}")
+            # Some exceptions (httpx timeouts among them) have an empty
+            # message; the type keeps the record and the log diagnosable.
+            message = str(error)
+            dispatch_error = (
+                f"{type(error).__name__}: {message}" if message else type(error).__name__
+            )
+            logger.error(f"Failed to retrieve data from {api_name}: {dispatch_error}")
         finally:
             dispatch_metrics.append(
                 {
