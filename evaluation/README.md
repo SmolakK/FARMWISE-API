@@ -4,7 +4,7 @@ The evaluation is split into two layers that never mix:
 
 | Layer | Files | Contacts live APIs | Computes statistics |
 |---|---|---|---|
-| Collection | `scenarios.py`, `collect_empirical.py`, `workload.py`, `measurement.py`, `coverage_baseline.py`, `collect_cross_source.py` | yes | no |
+| Collection | `scenarios.py`, `collect_empirical.py`, `workload.py`, `run_instrumentation.py`, `coverage_baseline.py`, `collect_cross_source.py` | yes | no |
 | Analysis | `analysis.py`, `Evaluation summariser.ipynb` | no | yes |
 
 Collection writes **frozen** raw outputs. Analysis reads only those files, so
@@ -21,7 +21,22 @@ python -m evaluation.collect_empirical
 ```
 
 `python -m evaluation.run_all` runs the same collection but does not
-acknowledge the IMGW research-use terms (see below).
+acknowledge the IMGW research-use terms (see below). Calling `collect()`
+directly from an IDE or notebook does not acknowledge them either; the
+collector prints a warning when an IMGW scenario would run without IMGW.
+
+To collect only some experiments into a separate collection, for example to
+repeat the cross-source experiment with IMGW enabled:
+
+```powershell
+python -m evaluation.collect_empirical --experiments cross-source --collection-id <new-id>
+```
+
+The analysis can then combine two collections without modifying either: set
+`COLLECTION_ID` to the full collection and `CROSS_SOURCE_COLLECTION_ID` to the
+cross-source collection in the notebook (or pass `cross_source_dir` to
+`analysis.load_collection`). Cross-source runs, dispatch records and
+observations are then taken from the second collection.
 
 Every run creates a new directory and refuses to overwrite an existing one:
 
@@ -49,17 +64,24 @@ configuration is saved into every `manifest.json`.
 
 ### 1. Scaling
 
-The scaling experiment measures FARMWISE's own work: retrieval, processing,
-spatial/temporal harmonisation and aggregation.
+The scaling experiment measures FARMWISE's own work: processing, spatial and
+temporal harmonisation and aggregation of the retrieved data.
 
 * **One dimension at a time.** Three sweeps around a shared base request over
-  central Germany (1° × 1° box centred on 51° N, 10° E, S2 level 10, 7 days
+  central Ireland (1° × 1° box centred on 53.4° N, 8.2° W, S2 level 10, 7 days
   from 2018-01-01):
-  * S2 level: 6, 8, 10, 12;
-  * spatial extent: square boxes 0.25°, 0.5°, 1°, 2° wide;
-  * temporal extent: 1, 7, 30, 90 inclusive days.
-* **Fixed factor set.** Every sweep requests `["temperature", "precipitation"]`,
-  served by the same two backends (DWD and ERA5).
+  * S2 level: 6, 8, 10, 12, 14;
+  * spatial extent: square boxes 0.25°, 0.5°, 1°, 2°, 3° wide (wider boxes
+    would leave the source's coverage);
+  * temporal extent: 1, 7, 14, 30, 60, 90 inclusive days, all within 2018.
+* **Fixed factor set, single backend.** Every sweep requests daily
+  `precipitation` from the Met Éireann 1 km rainfall grid. ERA5 also covers
+  precipitation over Ireland and is excluded through `disabled_sources`
+  (recorded per run under `settings.disabled_sources`), so every request is
+  served by the same single adapter.
+* **Why this workload.** The grid is dense, so the number of returned values
+  grows with area, S2 level and duration. A station-based source returns a few
+  hundred values at most and barely exercises the processing being measured.
 * **No factor-count sweep.** Requesting more factors also adds adapters, data
   models and processing steps, so a factor-count sweep confounds workload size
   with backend differences. It was removed and not replaced, because FARMWISE
@@ -68,17 +90,19 @@ spatial/temporal harmonisation and aggregation.
 * **Quality assessment off.** Scaling runs use `assess_quality=False` and
   `persist_quality_reports=False`; the quality cost is measured separately
   (experiment 3).
-* **Repetition.** 10 measured repeats per scenario. One warm-up per scenario
-  runs first and is excluded from `runs` (it is listed under `warmup_runs`).
-  Measured runs are executed in an order shuffled with `RANDOM_SEED = 42`.
+* **Repetition.** `SCALING_REPEATS` (15) measured repeats per scenario. One
+  warm-up per scenario runs first and is excluded from `runs` (it is listed
+  under `warmup_runs`). Measured runs are executed in an order shuffled with
+  `RANDOM_SEED = 42`.
 
-Neither backend used here caches data between requests (the ERA5 adapter
-downloads into a per-request scratch directory, and the DWD adapter disables
-the Wetterdienst directory-listing cache), so for these scenarios warm-ups
-mainly remove one-off costs (imports, lazy initialisation, in-process caches,
-connection set-up). Measured runs therefore describe warm-process
-performance; upstream latency (including CDS queueing for ERA5) remains part
-of the measurement and is separable through the per-source timings.
+The Met Éireann adapter caches each downloaded annual grid file, and all
+durations lie within one year. After the warm-ups, measured runs therefore
+read cached input: they describe FARMWISE's processing in a warm process, not
+end-to-end latency including the upstream download. Live upstream behaviour is
+part of the coverage and cross-source experiments.
+
+Before a full collection, time the largest scenarios once (S2 level 14, the 3°
+box, 90 days): dense grids at high S2 levels can produce very large results.
 
 ### 2. Cross-source agreement
 
@@ -102,10 +126,12 @@ truth.
 
 ### 3. Quality-assessment overhead
 
-The scaling base request is run 10 times with quality assessment off and 10
-times with assessment and report persistence on (the server's default), after
-one warm-up per mode, in shuffled order. This quantifies quality-control
-overhead independently of the scaling results.
+The largest request of the spatial-extent sweep (3° box, S2 level 10, 7 days,
+Met Éireann only) is run 10 times with quality assessment off and 10 times
+with assessment and report persistence on (the server's default), after one
+warm-up per mode, in shuffled order. A large request is used because on a
+small one the assessment cost was indistinguishable from run-to-run noise.
+This quantifies quality-control overhead independently of the scaling results.
 
 ### 4. Coverage pre-check
 
@@ -123,6 +149,14 @@ The baseline is implemented in `coverage_baseline.py` by replacing the routing
 decision `read_data` uses, inside the evaluation process only; the library is
 not modified. Disabled sources (licence restrictions, broken upstreams) stay
 excluded in both modes. Quality assessment is off in both modes.
+
+The spatial negative case uses a box at 11.5-12.5° E. An earlier box at
+9.5-10.5° E overlapped the Hub'Eau (France) coverage box, which ends at
+9.56° E, so Hub'Eau was dispatched and the case was not a true negative.
+
+Adapter calls avoided are deterministic and are the primary result. Total
+runtime differences between the modes are secondary: for scenarios involving
+ERA5, CDS queueing can dominate them.
 
 ## What is recorded
 
