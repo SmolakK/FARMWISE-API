@@ -87,8 +87,7 @@ temporal harmonisation and aggregation of the retrieved data.
   `RANDOM_SEED = 42`.
 
 The Met Éireann adapter caches each downloaded annual grid file, and all
-durations read the same two files (output day D comes from grid column D - 1,
-so 2018-01-01 is read from the 2017 grid). After the warm-ups, measured runs therefore
+durations lie within one year. After the warm-ups, measured runs therefore
 read cached input: they describe FARMWISE's processing in a warm process, not
 end-to-end latency including the upstream download. Live upstream behaviour is
 part of the coverage and cross-source experiments.
@@ -99,7 +98,13 @@ box, 90 days): dense grids at high S2 levels can produce very large results.
 ### 2. Cross-source agreement
 
 National sources are compared with ERA5 in four regions, each in four
-seasonal months of 2018 (January, April, July, October), at S2 level 10:
+seasonal months of 2018 (January, April, July, October), at S2 levels 8, 9
+and 10. Level 8 (cells of roughly 30-40 km) is the primary result: every cell
+contains ERA5 0.25° grid points, so every station location pairs. At level 10
+(~8 km) a station pairs only when a grid point falls in the same cell, which
+left 2-4 paired locations per station source. Levels 9 and 10 show how
+agreement depends on the spatial support; `analysis.pair_observations` uses
+the primary level unless `level` is given.
 
 | Region | Sources | Variables |
 |---|---|---|
@@ -129,7 +134,7 @@ This quantifies quality-control overhead independently of the scaling results.
 
 The eight coverage scenarios (six positive, one outside every groundwater
 source's spatial coverage, one before every source's temporal coverage) each
-run in two routing modes, 3 measured repeats each after one warm-up per
+run in two routing modes, 10 measured repeats each after one warm-up per
 scenario and mode, interleaved in shuffled order:
 
 * `precheck` - FARMWISE as shipped: a source is called only if its registry
@@ -142,9 +147,24 @@ decision `read_data` uses, inside the evaluation process only; the library is
 not modified. Disabled sources (licence restrictions, broken upstreams) stay
 excluded in both modes. Quality assessment is off in both modes.
 
-The spatial negative case uses a box at 11.5-12.5° E. An earlier box at
-9.5-10.5° E overlapped the Hub'Eau (France) coverage box, which ends at
-9.56° E, so Hub'Eau was dispatched and the case was not a true negative.
+Both negative cases are true negatives, i.e. no source holds data for them,
+not merely rejections by a configured window:
+
+* spatial: a box at 11.5-12.5° E lies outside every groundwater source's
+  coverage envelope. An earlier box at 9.5-10.5° E overlapped the Hub'Eau
+  (France) envelope, which ends at 9.56° E.
+* temporal: the week 1700-01-01 to 1700-01-07 predates the earliest documented
+  record of every temperature/precipitation source (GeoSphere 1775, DWD 1781).
+  The earlier 1900 request was rejected only by the configured 1950 dispatch
+  start; in factor-only mode DWD returned data for it.
+
+`tests/test_evaluation_design.py` checks both conditions.
+
+The land-cover scenario uses a box in North Rhine-Westphalia (7.5-8.5° E).
+EuroCrops holds parcels only for some German states and none in the
+9.5-10.5° E box of the other German scenarios, so EuroCropV2 returned no data
+there in either mode. With CORINE valid from 1990 onward, both modes dispatch
+the same two sources for this scenario, so no calls are avoided.
 
 Adapter calls avoided are deterministic and are the primary result. Total
 runtime differences between the modes are secondary: for scenarios involving
@@ -228,13 +248,16 @@ distribution list records what was actually used.
   slope; it is not a hypothesis test. Failed runs are excluded from the
   summaries and counted in `failed_runs`.
 * **Quality overhead**: median runtime with assessment on minus off, with a
-  bootstrap CI of the difference in medians.
+  bootstrap CI of the difference in medians, for wall-clock time and for
+  process CPU time (`request_cpu_seconds`: user + system time of all threads
+  in the collector process; network waits do not accrue CPU time).
 * **Coverage pre-check**: per scenario and mode, dispatched sources,
   requests avoided relative to factor-only routing, empty/failed/timed-out
   adapter calls, pre-check overhead (absolute and as a share of the request),
   and median runtime saved with a bootstrap CI.
 * **Cross-source agreement**: values are paired strictly on scenario,
-  timestamp, S2 cell and variable, with no interpolation or time shift.
+  timestamp, S2 cell and variable, with no interpolation or time shift, at
+  the primary S2 level (8) unless another level is selected.
   Differences are `national - ERA5`. Per region, variable and season (and
   pooled over seasons): number of pairs and cells, mean and median bias, MAE,
   RMSE, Pearson r and Spearman ρ. For precipitation additionally:
@@ -246,7 +269,10 @@ distribution list records what was actually used.
 
   National daily precipitation totals and ERA5 daily totals (summed over UTC
   days by the adapter) can use different daily accumulation windows. This is
-  not corrected and contributes to the disagreement.
+  not corrected and contributes to the disagreement. In particular, the Met
+  Éireann grid value for day D is the 09 UTC D to 09 UTC D+1 total (verified
+  against Met Éireann hourly station data), i.e. 15 h of UTC day D and 9 h of
+  D+1; labels are kept as published.
 
 Figures are written to `evaluation/analysis_output/<collection-id>/`.
 

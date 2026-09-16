@@ -86,16 +86,20 @@ def test_temporal_sweep_spans_the_stated_inclusive_days():
     assert [s["input_value"] for s in sweep] == expected
 
 
-def test_cross_source_covers_four_seasons_for_every_region():
+def test_cross_source_covers_four_seasons_for_every_region_and_level():
+    assert scenarios.CROSS_SOURCE_PRIMARY_LEVEL in scenarios.CROSS_SOURCE_LEVELS
+    names = [s["scenario"] for s in scenarios.CROSS_SOURCE_SCENARIOS]
+    assert len(names) == len(set(names))
     by_region = {}
     for s in scenarios.CROSS_SOURCE_SCENARIOS:
-        by_region.setdefault(s["region"], []).append(s["period"])
+        by_region.setdefault((s["region"], s["level"]), []).append(s["period"])
         start, end = date.fromisoformat(s["time_from"]), date.fromisoformat(s["time_to"])
         assert start.day == 1 and (end.month, end.year) == (start.month, start.year)
         assert len(s["required_sources"]) == 2 and "ERA5" in s["required_sources"]
-    assert set(by_region) == {
+    assert {region for region, _level in by_region} == {
         "germany-meteo", "austria-meteo", "ireland-precipitation", "poland-imgw-era5",
     }
+    assert {level for _region, level in by_region} == set(scenarios.CROSS_SOURCE_LEVELS)
     assert all(p == ["January", "April", "July", "October"] for p in by_region.values())
 
 
@@ -484,6 +488,43 @@ def test_negative_coverage_scenarios_dispatch_nothing():
     for name in ("no-spatial-coverage", "no-temporal-coverage"):
         request = next(s for s in scenarios.REQUEST_SCENARIOS if s["scenario"] == name)
         assert _dispatched(request) == [], name
+
+
+def _factor_sources(request):
+    from farmwise_api.adapters.mappings.data_source_mapping import API_PATH_RANGES
+
+    return {
+        source: ranges for source, ranges in API_PATH_RANGES.items()
+        if set(request["factors"]) & set(ranges[2])
+    }
+
+
+def test_spatial_negative_lies_outside_every_factor_source_envelope():
+    from farmwise_api.core.utils.overlap_checks import spatial_ranges_overlap
+
+    request = next(s for s in scenarios.REQUEST_SCENARIOS if s["scenario"] == "no-spatial-coverage")
+    for source, ranges in _factor_sources(request).items():
+        assert not spatial_ranges_overlap(request["bounding_box"], ranges[0]), source
+
+
+def test_temporal_negative_predates_every_documented_record():
+    """A true negative: earlier than any year named in the sources' documented temporal support,
+    not merely outside the configured dispatch window."""
+    import re
+    import yaml
+    from pathlib import Path
+
+    registry = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "registry" / "variables.yaml").read_text(encoding="utf-8")
+    )
+    entries = registry.get("sources", registry)
+    request = next(s for s in scenarios.REQUEST_SCENARIOS if s["scenario"] == "no-temporal-coverage")
+    request_year = int(request["time_to"][:4])
+    for source, ranges in _factor_sources(request).items():
+        documented = str(entries[source]["temporal_support"])
+        years = [int(y) for y in re.findall(r"\b(1[5-9]\d\d|20\d\d)\b", documented)]
+        earliest = min(years + [int(str(ranges[1][0])[:4])])
+        assert request_year < earliest, (source, earliest)
 
 
 @pytest.mark.asyncio

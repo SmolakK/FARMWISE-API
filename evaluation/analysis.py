@@ -87,6 +87,7 @@ def flatten_runs(payload: dict) -> pd.DataFrame:
             "status": run.get("status"),
             "error": run.get("error"),
             "request_wall_seconds": run.get("request_wall_seconds"),
+            "request_cpu_seconds": run.get("request_cpu_seconds"),
             "precheck_seconds": precheck.get("precheck_seconds"),
             "dispatched_sources": len(run.get("dispatch") or []),
             "dispatch_seconds_sum": run.get("dispatch_seconds_sum"),
@@ -319,6 +320,17 @@ def quality_overhead(runs: pd.DataFrame, **bootstrap) -> dict:
         "overhead_ci_low": low,
         "overhead_ci_high": high,
     }
+    if "request_cpu_seconds" in quality and quality["request_cpu_seconds"].notna().any():
+        cpu_low, cpu_high = _bootstrap_median_difference(
+            on["request_cpu_seconds"], off["request_cpu_seconds"], **bootstrap
+        )
+        result["cpu_off"] = robust_stats(off["request_cpu_seconds"], **bootstrap)
+        result["cpu_on"] = robust_stats(on["request_cpu_seconds"], **bootstrap)
+        result["median_cpu_overhead_seconds"] = (
+            on["request_cpu_seconds"].median() - off["request_cpu_seconds"].median()
+        )
+        result["cpu_overhead_ci_low"] = cpu_low
+        result["cpu_overhead_ci_high"] = cpu_high
     if "peak_rss_mb" in quality:
         result["peak_rss_off"] = robust_stats(off["peak_rss_mb"], **bootstrap)
         result["peak_rss_on"] = robust_stats(on["peak_rss_mb"], **bootstrap)
@@ -332,8 +344,13 @@ def quality_overhead(runs: pd.DataFrame, **bootstrap) -> dict:
 PAIR_KEY = ["scenario", "timestamp", "cell", "variable"]
 
 
-def pair_observations(observations: pd.DataFrame) -> pd.DataFrame:
+def pair_observations(observations: pd.DataFrame, level="primary") -> pd.DataFrame:
     """Pair values from two sources sharing scenario, timestamp, S2 cell and variable.
+
+    Collections with a ``level`` column hold the same requests at several S2
+    levels. ``level="primary"`` (default) keeps the primary level from
+    ``scenarios.CROSS_SOURCE_PRIMARY_LEVEL``, an integer keeps that level, and
+    ``None`` keeps all levels (group by ``level`` before summarising).
 
     Pairing is strict: nothing is interpolated or shifted in time. Duplicate
     values from one source for the same key are averaged and counted in
@@ -343,9 +360,14 @@ def pair_observations(observations: pd.DataFrame) -> pd.DataFrame:
     if observations.empty:
         return pd.DataFrame()
     obs = observations.copy()
+    if "level" in obs and level is not None:
+        from evaluation.scenarios import CROSS_SOURCE_PRIMARY_LEVEL
+
+        wanted = CROSS_SOURCE_PRIMARY_LEVEL if level == "primary" else int(level)
+        obs = obs[pd.to_numeric(obs["level"], errors="coerce") == wanted]
     obs["value"] = pd.to_numeric(obs["value"], errors="coerce")
     obs = obs.dropna(subset=["value"])
-    context = [c for c in ("region", "period") if c in obs]
+    context = [c for c in ("region", "period", "level") if c in obs]
     per_source = (
         obs.groupby(PAIR_KEY + context + ["source"], dropna=False)["value"]
         .agg(value="mean", records="size").reset_index()

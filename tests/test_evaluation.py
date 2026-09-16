@@ -147,6 +147,8 @@ async def test_collector_runs_every_experiment_and_excludes_warmups(monkeypatch,
     assert record["planned_coverage"]["requests_avoided_vs_factor_only"] == 1
     assert record["source_wall_seconds"] == {"fake.inside": 0.02}
     assert isinstance(record["memory"]["peak_traced_memory_mb"], float)
+    assert record["request_cpu_seconds"] >= 0
+    assert all("request_cpu_seconds" in r for r in payload["warmup_runs"])
 
     manifest = json.loads(result["manifest"].read_text(encoding="utf-8"))
     assert manifest["evaluation_config"]["scaling"]["repeats"] == 3
@@ -190,7 +192,9 @@ def test_separate_frame_conversion_extracts_source_and_logical_variable():
 def test_poland_cross_source_scenarios_require_imgw_and_era5():
     poland = [s for s in CROSS_SOURCE_SCENARIOS if s["region"] == "poland-imgw-era5"]
 
-    assert [s["period"] for s in poland] == ["January", "April", "July", "October"]
+    from evaluation.scenarios import CROSS_SOURCE_LEVELS
+
+    assert [s["period"] for s in poland] == ["January", "April", "July", "October"] * len(CROSS_SOURCE_LEVELS)
     for scenario in poland:
         assert scenario["country"] == "Poland"
         assert scenario["required_sources"] == ["IMGW", "ERA5"]
@@ -378,3 +382,21 @@ def test_no_tracked_evaluation_file_contains_row_level_imgw_values():
         frame = pd.read_csv(root / name, dtype=str)
         if "source" in frame.columns:
             assert "IMGW" not in set(frame["source"]), name
+
+
+def test_pairing_uses_the_primary_s2_level_unless_another_is_requested():
+    from evaluation.analysis import pair_observations
+    from evaluation.scenarios import CROSS_SOURCE_PRIMARY_LEVEL
+
+    rows = []
+    for level, cell in ((CROSS_SOURCE_PRIMARY_LEVEL, "coarse"), (10, "fine")):
+        for source, value in (("DWD", 1.0), ("ERA5", 2.0)):
+            rows.append({"scenario": f"s-l{level}", "timestamp": "2018-01-01", "cell": cell,
+                         "variable": "temperature", "source": source, "value": value,
+                         "region": "r", "period": "January", "level": level})
+    observations = pd.DataFrame(rows)
+
+    assert set(pair_observations(observations)["cell"]) == {"coarse"}
+    assert set(pair_observations(observations, level=10)["cell"]) == {"fine"}
+    both = pair_observations(observations, level=None)
+    assert set(both["level"]) == {CROSS_SOURCE_PRIMARY_LEVEL, 10}

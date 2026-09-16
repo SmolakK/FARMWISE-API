@@ -34,7 +34,7 @@ from datetime import date, timedelta
 RANDOM_SEED = 42
 SCALING_REPEATS = 15
 SCALING_WARMUPS = 1 # warm-up is used to make timings fair and avoid caching-related impact
-COVERAGE_REPEATS = 3
+COVERAGE_REPEATS = 10
 COVERAGE_WARMUPS = 1
 QUALITY_OVERHEAD_REPEATS = 10
 QUALITY_OVERHEAD_WARMUPS = 1
@@ -89,11 +89,14 @@ REQUEST_SCENARIOS = [
         "time_to": "2020-03-31",
         "factors": ["groundwater quantity"],
     },
-    # Static / land-cover integration. 2020 allows CORINE + EuroCropV2
+    # Static / land-cover integration: CORINE + EuroCropV2 in 2020. EuroCrops
+    # covers only some German states; this box (North Rhine-Westphalia) holds
+    # ~73,000 parcel points with a 2020 code, whereas the 9.5-10.5 deg E box
+    # used by the other German scenarios holds none in any year.
     {
         "scenario": "germany-land-cover",
         "country": "Germany",
-        "bounding_box": (51.5, 50.5, 10.5, 9.5),
+        "bounding_box": (51.5, 50.5, 8.5, 7.5),
         "level": 10,
         "time_from": "2020-01-01",
         "time_to": "2020-12-31",
@@ -122,17 +125,19 @@ REQUEST_SCENARIOS = [
         "time_to": "2020-01-07",
         "factors": ["groundwater quantity"],
     },
-    # Negative case - factors and area are supported, but no source reaches
-    # back to 1900 (the earliest coverage starts in 1941), so every candidate
-    # is rejected on temporal grounds alone. A request before any record
-    # exists keeps the case valid as sources come and go.
+    # Negative case - factors and area are supported, but the request predates
+    # every record any source holds, so no source can return data. The
+    # earliest documented records are GeoSphere (1775) and DWD (1781); both
+    # are dispatched only from 1950 by configuration, and DWD did return data
+    # for a 1900 request, so 1900 was a configured-window rejection rather
+    # than a true negative.
     {
         "scenario": "no-temporal-coverage",
         "country": "Germany",
         "bounding_box": (51.5, 50.5, 10.5, 9.5),
         "level": 10,
-        "time_from": "1900-01-01",
-        "time_to": "1900-01-07",
+        "time_from": "1700-01-01",
+        "time_to": "1700-01-07",
         "factors": ["temperature", "precipitation"],
     },
 ]
@@ -176,8 +181,7 @@ _CROSS_SOURCE_REGIONS = [
         "factors": ["precipitation"],
         "required_sources": ["Met Éireann", "ERA5"],
     },
-    # The two-degree box contains several IMGW synoptic stations and, at S2
-    # level 10, shares cells with the ERA5 grid for direct paired comparison.
+    # The two-degree box contains several IMGW synoptic stations.
     {
         "region": "poland-imgw-era5",
         "country": "Poland",
@@ -187,21 +191,30 @@ _CROSS_SOURCE_REGIONS = [
     },
 ]
 
-CROSS_SOURCE_LEVEL = 10
+# Pairing is on shared S2 cells. At level 10 (~8 km cells) a station pairs
+# only when an ERA5 0.25 deg grid point falls in the same cell, which left 2-4
+# paired locations per region for the station sources. At level 8 (~30-40 km)
+# every cell contains ERA5 grid points, so every station location pairs
+# (checked on collection 20260915T165341Z by aggregating level-10 cells to
+# their parents). Level 8 is the primary result; 9 and 10 are collected
+# natively to show how agreement depends on the S2 level.
+CROSS_SOURCE_PRIMARY_LEVEL = 8
+CROSS_SOURCE_LEVELS = (8, 9, 10)
 
 CROSS_SOURCE_SCENARIOS = [
     {
-        "scenario": f"cross-source-{region['region']}-{period.lower()}",
+        "scenario": f"cross-source-{region['region']}-{period.lower()}-l{level}",
         "region": region["region"],
         "period": period,
         "country": region["country"],
         "bounding_box": region["bounding_box"],
-        "level": CROSS_SOURCE_LEVEL,
+        "level": level,
         "time_from": time_from,
         "time_to": time_to,
         "factors": list(region["factors"]),
         "required_sources": list(region["required_sources"]),
     }
+    for level in CROSS_SOURCE_LEVELS
     for region in _CROSS_SOURCE_REGIONS
     for period, (time_from, time_to) in SEASONAL_PERIODS.items()
 ]
@@ -234,8 +247,7 @@ SCALING_DISABLED_SOURCES = {
 }
 SCALING_BASE_WIDTH_DEG = 1.0
 SCALING_BASE_LEVEL = 10
-# Output day D is read from grid column D - 1 (irish_ms_daily.GRID_TO_OUTPUT_DAY),
-# so every duration reads the cached 2017 and 2018 annual grid files.
+# All durations stay within 2018, i.e. within one cached annual grid file.
 SCALING_TIME_FROM = "2018-01-01"
 SCALING_BASE_DURATION_DAYS = 7
 
@@ -355,6 +367,8 @@ def evaluation_config() -> dict:
             "assess_quality": True,
             "separate_api": True,
             "seasonal_periods": SEASONAL_PERIODS,
+            "levels": list(CROSS_SOURCE_LEVELS),
+            "primary_level": CROSS_SOURCE_PRIMARY_LEVEL,
             "scenarios": CROSS_SOURCE_SCENARIOS,
         },
         "scaling": {

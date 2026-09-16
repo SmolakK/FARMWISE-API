@@ -37,7 +37,7 @@ import json
 from pathlib import Path
 import random
 import sys
-from time import perf_counter
+from time import perf_counter, process_time
 
 import pandas as pd
 from tqdm import tqdm
@@ -238,6 +238,10 @@ async def execute(item: WorkItem, *, timeout, quality_dir, rss_interval) -> tupl
     frame = None
     monitor = MemoryMonitor(interval_seconds=rss_interval)
     started = perf_counter()
+    # Process CPU time (user + system, all threads of this process). Network
+    # waits do not accrue CPU time, and parallel threads can make it exceed
+    # wall-clock time.
+    cpu_started = process_time()
     try:
         with routing, monitor:
             result = await read_data(
@@ -254,6 +258,7 @@ async def execute(item: WorkItem, *, timeout, quality_dir, rss_interval) -> tupl
                 disabled_sources=extra_disabled,
             )
         record["request_wall_seconds"] = perf_counter() - started
+        record["request_cpu_seconds"] = process_time() - cpu_started
         metadata = result.get("metadata", {}) if isinstance(result, dict) else {}
         frame = result.get("data") if isinstance(result, dict) else None
         record["status"] = (
@@ -266,6 +271,7 @@ async def execute(item: WorkItem, *, timeout, quality_dir, rss_interval) -> tupl
         record["quality_report_count"] = len(metadata.get("quality_reports", []))
     except Exception as error:  # noqa: BLE001 - every failure is data here
         record["request_wall_seconds"] = perf_counter() - started
+        record["request_cpu_seconds"] = process_time() - cpu_started
         record["status"] = "error"
         record["error"] = f"{type(error).__name__}: {error}"
         record["coverage_precheck"] = None
@@ -384,7 +390,7 @@ async def collect(
             warmup_runs.append({
                 key: record.get(key) for key in (
                     "experiment", "scenario", "mode", "status", "error",
-                    "request_wall_seconds", "started_utc",
+                    "request_wall_seconds", "request_cpu_seconds", "started_utc",
                 )
             })
             continue
@@ -398,6 +404,7 @@ async def collect(
                 observations["scenario"] = item.request["scenario"]
                 observations["region"] = item.request.get("region")
                 observations["period"] = item.request.get("period")
+                observations["level"] = item.request.get("level")
                 observation_frames.append(observations)
         runs.append(record)
 
