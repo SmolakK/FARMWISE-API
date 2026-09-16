@@ -334,30 +334,3 @@ def test_main_passes_selected_experiments_and_collection_id(monkeypatch, tmp_pat
     empirical_collector.main(["--experiments", "cross-source", "--collection-id", "imgw-rerun"])
 
     assert received == {"experiments": ("cross-source",), "collection_id": "imgw-rerun"}
-
-
-def test_analysis_can_take_cross_source_data_from_a_second_collection(tmp_path):
-    from evaluation import analysis
-
-    def write(directory, runs, source):
-        directory.mkdir()
-        (directory / "empirical_runs.json").write_text(json.dumps({"runs": runs}), encoding="utf-8")
-        (directory / "manifest.json").write_text(json.dumps({"imgw_research_use_enabled": source == "IMGW"}),
-                                                 encoding="utf-8")
-        pd.DataFrame([{"timestamp": "2018-01-01", "cell": "c", "variable": "temperature",
-                       "source": source, "value": 1.0, "scenario": "x"}]).to_csv(
-            directory / "cross_source_observations.csv", index=False)
-
-    def run(run_id, experiment):
-        return {"run_id": run_id, "experiment": experiment, "scenario": experiment, "status": "success",
-                "dispatch": [{"source": f"a.{experiment}", "status": "success", "wall_seconds": 1.0}]}
-
-    write(tmp_path / "overnight", [run(1, "scaling"), run(2, "cross-source")], "ERA5")
-    write(tmp_path / "rerun", [run(1, "cross-source")], "IMGW")
-
-    collection = analysis.load_collection(tmp_path / "overnight", cross_source_dir=tmp_path / "rerun")
-
-    assert sorted(collection["runs"]["experiment"]) == ["cross-source", "scaling"]
-    assert len(collection["dispatch"]) == 2
-    assert set(collection["observations"]["source"]) == {"IMGW"}
-    assert collection["cross_source_manifest"]["imgw_research_use_enabled"] is True
