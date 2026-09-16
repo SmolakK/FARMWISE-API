@@ -52,11 +52,30 @@ async def process_link(client: httpx.AsyncClient, row: pd.Series) -> Optional[pd
         return None
 
 
-# Async function to fetch all data
-async def fetch_all_data():
+def stations_in_box(catalogue: pd.DataFrame, spatial_range=None) -> pd.DataFrame:
+    """Catalogue rows whose station lies inside (N, S, E, W).
+
+    read_data filters spatially only after downloading, so a request for one
+    corner of Ireland used to download every station in the catalogue.
+    """
+    if spatial_range is None:
+        return catalogue
+    north, south, east, west = (float(value) for value in spatial_range)
+    lat = pd.to_numeric(catalogue["lat"], errors="coerce")
+    lon = pd.to_numeric(catalogue["lon"], errors="coerce")
+    return catalogue[lat.between(south, north) & lon.between(west, east)]
+
+
+# Async function to fetch data for the stations inside the requested box
+async def fetch_all_data(spatial_range=None):
+    stations = stations_in_box(initial_df, spatial_range)
+    logger.info(
+        "EPA: %s of %s catalogued stations lie inside the requested area",
+        len(stations), len(initial_df),
+    )
     async with httpx.AsyncClient(timeout=30.0) as client:
         tasks = []
-        for _, row in initial_df.iterrows():
+        for _, row in stations.iterrows():
             link = row['download_link']
             id = row['id']
 
@@ -80,7 +99,7 @@ async def read_data(
     within_source_aggregation_methods=None,
 ) -> pd.DataFrame:
     logger.info("DOWNLOADING: EPA GROUNDWATER QUANTITY DATA")
-    results = await fetch_all_data()
+    results = await fetch_all_data(spatial_range)
     all_data = []
 
     # Process each result and apply initial filters
