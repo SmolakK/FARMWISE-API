@@ -18,6 +18,29 @@ SOURCE_NAMES = {
     "irish_ms_daily": "Met Éireann",
 }
 
+# Sources whose row-level values may be used locally but must not be
+# committed or archived (IMGW: permitted private/academic use only). Their rows
+# go to a separate, git-ignored file next to the public observations.
+RESTRICTED_SOURCES = ("IMGW",)
+OBSERVATIONS_FILE = "cross_source_observations.csv"
+RESTRICTED_OBSERVATIONS_FILE = "cross_source_observations_restricted.csv"
+
+
+def write_observations(output_dir: Path, observations: pd.DataFrame) -> dict:
+    """Write public rows to the tracked file and restricted rows to a private one."""
+    output_dir = Path(output_dir)
+    restricted = observations.get("source", pd.Series(dtype=object)).isin(RESTRICTED_SOURCES)
+    public_path = output_dir / OBSERVATIONS_FILE
+    observations[~restricted].to_csv(public_path, index=False)
+    paths = {"public": public_path, "restricted": None}
+    if restricted.any():
+        restricted_path = output_dir / RESTRICTED_OBSERVATIONS_FILE
+        validate_private_output(restricted_path, observations[restricted])
+        observations[restricted].to_csv(restricted_path, index=False)
+        paths["restricted"] = restricted_path
+    return paths
+
+
 def separate_frame_to_observations(frame: pd.DataFrame) -> pd.DataFrame:
     """Convert ``separate_api=True`` output to canonical long observations."""
     records = []

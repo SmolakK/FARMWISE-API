@@ -50,10 +50,16 @@ def load_collection(collection_dir) -> dict:
         json.loads(manifest_path.read_text(encoding="utf-8"))
         if manifest_path.exists() else {}
     )
-    observations_path = collection_dir / "cross_source_observations.csv"
+    # Restricted (IMGW) rows live in a git-ignored file and are only present locally.
+    observation_frames = [
+        pd.read_csv(path, parse_dates=["timestamp"])
+        for path in (collection_dir / "cross_source_observations.csv",
+                     collection_dir / "cross_source_observations_restricted.csv")
+        if path.exists()
+    ]
     observations = (
-        pd.read_csv(observations_path, parse_dates=["timestamp"])
-        if observations_path.exists() else pd.DataFrame()
+        pd.concat(observation_frames, ignore_index=True)
+        if observation_frames else pd.DataFrame()
     )
     return {
         "manifest": manifest,

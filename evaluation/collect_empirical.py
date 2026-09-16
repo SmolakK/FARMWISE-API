@@ -10,6 +10,8 @@ Each collection is written to its own directory and is never overwritten::
         manifest.json                   provenance + complete configuration
         empirical_runs.json             one record per measured request
         cross_source_observations.csv   long-format separate-source values
+        cross_source_observations_restricted.csv
+                                        IMGW rows only; git-ignored, local use
         quality/                        per-source quality reports
 
 Experiments, in execution order:
@@ -53,7 +55,7 @@ from evaluation import scenarios as config
 from evaluation.collect_cross_source import (
     separate_frame_to_observations,
     summarise_source_comparison,
-    validate_private_output,
+    write_observations,
 )
 from evaluation.coverage_baseline import coverage_counts, factor_only_routing
 from evaluation.run_instrumentation import MemoryMonitor, provenance
@@ -403,9 +405,7 @@ async def collect(
         pd.concat(observation_frames, ignore_index=True)
         if observation_frames else pd.DataFrame(columns=OBSERVATION_COLUMNS)
     )
-    observations_path = output_dir / "cross_source_observations.csv"
-    validate_private_output(observations_path, observations)
-    observations.to_csv(observations_path, index=False)
+    observation_paths = write_observations(output_dir, observations)
 
     finished_at = datetime.now(timezone.utc)
     payload = {
@@ -430,7 +430,8 @@ async def collect(
         "collection_dir": output_dir,
         "manifest": manifest_path,
         "runs": runs_path,
-        "observations": observations_path,
+        "observations": observation_paths["public"],
+        "restricted_observations": observation_paths["restricted"],
         "quality_reports": quality_dir,
         "request_count": len(runs),
         "warmup_count": len(warmup_runs),
