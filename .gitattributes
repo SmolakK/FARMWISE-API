@@ -1,1 +1,2 @@
 requirements-lock.txt text eol=lf
+evaluation/empirical_input/**/cross_source_observations_restricted.csv export-ignore
