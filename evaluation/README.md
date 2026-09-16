@@ -32,12 +32,6 @@ repeat the cross-source experiment with IMGW enabled:
 python -m evaluation.collect_empirical --experiments cross-source --collection-id <new-id>
 ```
 
-The analysis can then combine two collections without modifying either: set
-`COLLECTION_ID` to the full collection and `CROSS_SOURCE_COLLECTION_ID` to the
-cross-source collection in the notebook (or pass `cross_source_dir` to
-`analysis.load_collection`). Cross-source runs, dispatch records and
-observations are then taken from the second collection.
-
 Every run creates a new directory and refuses to overwrite an existing one:
 
 ```text
@@ -45,17 +39,14 @@ evaluation/empirical_input/<collection-id>/      # UTC start time, e.g. 20261001
   manifest.json                   provenance and complete configuration
   empirical_runs.json             one record per measured request
   cross_source_observations.csv   separate-source values for agreement analysis
+  cross_source_observations_restricted.csv
+                                  IMGW rows only; git-ignored, local use only
   quality/                        per-source quality reports
 ```
 
 To analyse it, open the notebook and set `COLLECTION_ID` to that directory
 name. **Pin `COLLECTION_ID` for anything reported in the paper** and keep the
 directory under version control (subject to the IMGW restriction below).
-
-The files directly under `empirical_input/` (`empirical_runs.json`,
-`cross_source_observations_live.csv`, `quality/<timestamp>/`) come from the
-collection design before this revision. They are kept unchanged for
-traceability but are not read by the current notebook.
 
 ## Experimental design
 
@@ -96,7 +87,8 @@ temporal harmonisation and aggregation of the retrieved data.
   `RANDOM_SEED = 42`.
 
 The Met Éireann adapter caches each downloaded annual grid file, and all
-durations lie within one year. After the warm-ups, measured runs therefore
+durations read the same two files (output day D comes from grid column D - 1,
+so 2018-01-01 is read from the 2017 grid). After the warm-ups, measured runs therefore
 read cached input: they describe FARMWISE's processing in a warm process, not
 end-to-end latency including the upstream download. Live upstream behaviour is
 part of the coverage and cross-source experiments.
@@ -270,8 +262,15 @@ the file-level constant `INCLUDE_IMGW_RESEARCH = True`, scoped to the
 collection run; the public server keeps IMGW disabled. Research outputs must
 identify IMGW-PIB as the source and state that the observations were
 processed; the attribution is stored in `empirical_runs.json`. Do not bundle
-IMGW station files or downloaded source datasets in the Python package, and
-check the IMGW terms before publishing row-level IMGW values from
-`cross_source_observations.csv`.
+IMGW station files or downloaded source datasets in the Python package.
+
+Row-level IMGW values are written to `cross_source_observations_restricted.csv`,
+not to `cross_source_observations.csv`. The restricted file is git-ignored and
+marked `export-ignore`, so it is not committed, not included in GitHub release
+archives, and therefore not deposited on Zenodo; `analysis.load_collection`
+reads it when present, so local analyses still include IMGW. A test fails if
+any tracked evaluation CSV contains IMGW rows. Report IMGW results as
+aggregates only; anyone reproducing them must collect IMGW themselves under
+the IMGW terms.
 
 The collectors never execute or modify the notebook.
