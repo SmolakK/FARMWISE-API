@@ -80,3 +80,6 @@ eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif
 coverage.xml
 htmlcov/
 .mypy_cache/
+
+# Row-level IMGW observations: permitted local academic use only; never commit or archive.
+evaluation/empirical_input/**/cross_source_observations_restricted.csv
