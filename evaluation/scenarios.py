@@ -234,7 +234,8 @@ SCALING_DISABLED_SOURCES = {
 }
 SCALING_BASE_WIDTH_DEG = 1.0
 SCALING_BASE_LEVEL = 10
-# All durations stay within 2018, i.e. within one cached annual grid file.
+# Output day D is read from grid column D - 1 (irish_ms_daily.GRID_TO_OUTPUT_DAY),
+# so every duration reads the cached 2017 and 2018 annual grid files.
 SCALING_TIME_FROM = "2018-01-01"
 SCALING_BASE_DURATION_DAYS = 7
 
