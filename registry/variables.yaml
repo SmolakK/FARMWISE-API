@@ -3953,16 +3953,18 @@ sources:
     variables:
       Average daily temperature [°C]:
         native_unit: °C
-        notes: daily mean air temperature reported by IMGW-PIB; the adapter currently does
-          not use the associated IMGW measurement-status field
+        notes: daily mean air temperature reported by IMGW-PIB; status code 9 (phenomenon
+          did not occur) is kept as a published zero
         reference: null
-        transformation: none - values are passed through without unit conversion
+        transformation: no unit conversion; values with IMGW measurement status 8 (no measurement)
+          are set to missing
       Daily precipitation total [mm]:
         native_unit: mm
-        notes: daily precipitation total reported by IMGW-PIB; the adapter currently does
-          not use the associated IMGW measurement-status field
+        notes: daily precipitation total reported by IMGW-PIB; status code 9 (phenomenon did
+          not occur) is kept as a published zero
         reference: null
-        transformation: none - values are passed through without unit conversion
+        transformation: no unit conversion; values with IMGW measurement status 8 (no measurement)
+          are set to missing
   farmwise_api.adapters.API_readers.imgw_hydro.imgw_api_hydro_daily:
     dataset: IMGW-PIB daily hydrological observations
     provider: Instytut Meteorologii i Gospodarki Wodnej — Państwowy Instytut Badawczy (IMGW-PIB)
@@ -3992,8 +3994,9 @@ sources:
     spatial_resolution: 1 km x 1 km
     spatial_support: regular gridded rainfall estimates covering Ireland, derived by Met Éireann
       from station observations and provided in the TM65 / Irish Grid coordinate system
-    temporal_support: daily rainfall totals; current latest release covers 1941-01-01 through
-      2025-12-31 and is updated annually
+    temporal_support: daily rainfall totals; current latest release covers grid days 1941-01-01
+      through 2025-12-31 (FARMWISE output days 1941-01-02 through 2026-01-01) and is updated
+      annually
     variables:
       precipitation [mm]:
         native_unit: 0.1 mm (integer-encoded tenths of a millimetre)
@@ -4002,7 +4005,8 @@ sources:
         reference: null
         transformation: divide source values by 10 to convert encoded tenths of a millimetre
           to mm; grid coordinates are transformed from EPSG:29902 to WGS84 before assignment
-          to S2 cells
+          to S2 cells; the grid value labelled day D is returned as day D + 1, which aligns
+          it with ERA5 daily totals (lag correlation on 2018 central-Ireland data)
   farmwise_api.adapters.API_readers.soilgrids.soilgrids_call:
     dataset: SoilGrids 2.0 predicted soil-property maps
     provider: ISRIC — World Soil Information
