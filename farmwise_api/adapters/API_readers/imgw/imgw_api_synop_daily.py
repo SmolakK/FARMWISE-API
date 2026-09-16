@@ -33,6 +33,23 @@ _STATION_ARCHIVE_RE = re.compile(
 )
 
 
+# IMGW SYNOP status codes: "8" = no measurement, "9" = phenomenon did not occur
+# (value published as 0, which is a real zero). Each "Measurement status X"
+# column follows the value it describes.
+MISSING_MEASUREMENT_STATUS = 8
+
+
+def _mask_unmeasured(frame):
+    """Set values flagged "no measurement" to NaN so they are not read as 0."""
+    columns = list(frame.columns)
+    for value_column, status_column in zip(columns, columns[1:]):
+        if not str(status_column).startswith("Measurement status"):
+            continue
+        unmeasured = pd.to_numeric(frame[status_column], errors="coerce") == MISSING_MEASUREMENT_STATUS
+        frame[value_column] = frame[value_column].mask(unmeasured)
+    return frame
+
+
 def _select_synop_archives(file_names, station_keys, time_range):
     """Select IMGW SYNOP archives for both station- and month-based layouts."""
 
@@ -198,6 +215,7 @@ async def read_data(spatial_range, time_range, data_range, level,
                                 continue
 
                             s_d_file = pd.read_csv(zip_ref.open(name), encoding='windows-1250', names=s_d_COLUMNS)
+                            s_d_file = _mask_unmeasured(s_d_file)
                             data_selection = list(data_requested.intersection(set(s_d_SELECTION)))
                             data_selection += SPACE_TIME_COLUMNS
                             s_d_file = s_d_file.loc[:, s_d_file.columns.intersection(data_selection)]
