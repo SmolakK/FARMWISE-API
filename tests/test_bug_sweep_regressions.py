@@ -192,3 +192,30 @@ def test_precheck_dispatches_exactly_when_every_requirement_holds():
                 and decision["temporal_overlap"]
                 and decision["factor_overlap"]
             ), decision
+
+
+@pytest.mark.parametrize(
+    "time_from, time_to, expected",
+    [
+        ("1985-01-01", "1985-12-31", False),  # before the first CORINE edition
+        ("2018-06-01", "2018-06-30", True),
+        ("2020-06-01", "2020-06-30", True),   # after 2018: the 2018 edition is carried forward
+    ],
+)
+def test_static_corine_layer_is_valid_from_its_first_edition_onward(time_from, time_to, expected):
+    from farmwise_api.core.main_call import plan_source_dispatch
+
+    plan = plan_source_dispatch(
+        (54.0, 51.0, 12.0, 8.0), time_from, time_to, ["land cover"], disabled_sources={}
+    )
+    corine = next(row for row in plan if row["source"].endswith("corine.corine_read"))
+    assert corine["temporal_overlap"] is expected
+    assert corine["dispatched"] is expected
+
+
+def test_static_layers_serving_the_latest_edition_have_an_open_end():
+    from farmwise_api.adapters.mappings.data_source_mapping import LATEST_EDITION_ONWARD
+
+    for suffix in ("corine.corine_read", "soilgrids.soilgrids_call", "eea.eea_read"):
+        source = next(s for s in API_PATH_RANGES if s.endswith(suffix))
+        assert API_PATH_RANGES[source][1][1] == LATEST_EDITION_ONWARD

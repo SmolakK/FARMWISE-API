@@ -104,3 +104,21 @@ async def test_read_data(
         for call in mock_httpx_client.return_value.__aenter__.return_value.get.await_args_list
     ]
     assert not any(url.endswith("2020_999_s.zip") for url in requested_urls)
+
+
+def test_status_8_values_become_missing_while_status_9_zeros_stay():
+    import pandas as pd
+    from farmwise_api.adapters.API_readers.imgw import imgw_api_synop_daily as synop
+
+    frame = pd.DataFrame({
+        "Daily precipitation total [mm]": [0.0, 0.0, 3.4],
+        "Measurement status SMDB": [8.0, "9", None],  # read_csv may yield floats
+        "Type of precipitation [S/W/]": ["", "", "W"],
+    })
+
+    masked = synop._mask_unmeasured(frame)
+
+    values = masked["Daily precipitation total [mm]"]
+    assert pd.isna(values.iloc[0])            # no measurement
+    assert values.iloc[1] == 0.0              # phenomenon did not occur
+    assert values.iloc[2] == 3.4

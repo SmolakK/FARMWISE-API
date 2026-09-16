@@ -334,3 +334,47 @@ def test_main_passes_selected_experiments_and_collection_id(monkeypatch, tmp_pat
     empirical_collector.main(["--experiments", "cross-source", "--collection-id", "imgw-rerun"])
 
     assert received == {"experiments": ("cross-source",), "collection_id": "imgw-rerun"}
+
+
+def test_collector_writes_restricted_rows_to_a_separate_file(tmp_path):
+    from evaluation.collect_cross_source import (
+        OBSERVATIONS_FILE, RESTRICTED_OBSERVATIONS_FILE, write_observations,
+    )
+
+    observations = pd.DataFrame({
+        "timestamp": ["2018-01-01"] * 3,
+        "cell": ["c1"] * 3,
+        "variable": ["precipitation"] * 3,
+        "source": ["ERA5", "IMGW", "DWD"],
+        "value": [1.0, 2.0, 3.0],
+    })
+
+    paths = write_observations(tmp_path, observations)
+
+    public = pd.read_csv(tmp_path / OBSERVATIONS_FILE)
+    restricted = pd.read_csv(tmp_path / RESTRICTED_OBSERVATIONS_FILE)
+    assert paths["restricted"] == tmp_path / RESTRICTED_OBSERVATIONS_FILE
+    assert set(public["source"]) == {"ERA5", "DWD"}
+    assert set(restricted["source"]) == {"IMGW"}
+
+
+def test_no_tracked_evaluation_file_contains_row_level_imgw_values():
+    """IMGW rows may exist locally, but must never be committed (or archived)."""
+    import subprocess
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    try:
+        tracked = subprocess.run(
+            ["git", "ls-files", "evaluation"], cwd=root,
+            capture_output=True, text=True, check=True,
+        ).stdout.split()
+    except (OSError, subprocess.CalledProcessError):
+        pytest.skip("not a git checkout")
+    for name in tracked:
+        if not name.endswith(".csv"):
+            continue
+        assert "restricted" not in Path(name).name, name
+        frame = pd.read_csv(root / name, dtype=str)
+        if "source" in frame.columns:
+            assert "IMGW" not in set(frame["source"]), name

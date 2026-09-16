@@ -190,3 +190,41 @@ async def test_read_data_rejects_a_reversed_time_range():
         await daily.read_data(
             DUBLIN_BBOX, ("2018-06-02", "2018-06-01"), ["precipitation"], 10
         )
+
+
+@pytest.mark.asyncio
+async def test_read_data_labels_output_one_day_after_the_grid_column(monkeypatch, tmp_path):
+    """Grid column D becomes output day D + 1; 1 January comes from last year's file."""
+    requested = {}
+
+    async def fake_download(_client, year):
+        return tmp_path / f"IRL_DLY_RR_{year}_grid.csv.gz"
+
+    def fake_subset(path, dates, _spatial_range):
+        requested.setdefault(path.name, []).extend(d.date() for d in dates)
+        return pd.DataFrame({
+            "lat": [53.35] * len(dates),
+            "lon": [-6.26] * len(dates),
+            "Timestamp": [d.date() for d in dates],
+            "precipitation [mm]": [float(d.day) for d in dates],
+        })
+
+    monkeypatch.setattr(daily, "_download_grid", fake_download)
+    monkeypatch.setattr(daily, "_read_grid_subset", fake_subset)
+    monkeypatch.setattr(
+        daily, "prepare_coordinates",
+        lambda frame, spatial_range, level: frame.assign(S2CELL=["cell-1"] * len(frame)),
+    )
+
+    result = await daily.read_data(DUBLIN_BBOX, ("2018-01-01", "2018-01-02"), ["precipitation"], 10)
+
+    assert requested == {
+        "IRL_DLY_RR_2017_grid.csv.gz": [pd.Timestamp("2017-12-31").date()],
+        "IRL_DLY_RR_2018_grid.csv.gz": [pd.Timestamp("2018-01-01").date()],
+    }
+    series = result.xs("cell-1", axis=1, level="S2CELL").iloc[:, 0]
+    # Output 2018-01-01 carries the grid value labelled 2017-12-31 (day 31).
+    assert [pd.Timestamp(i).date() for i in series.index] == [
+        pd.Timestamp("2018-01-01").date(), pd.Timestamp("2018-01-02").date(),
+    ]
+    assert series.tolist() == [31.0, 1.0]
