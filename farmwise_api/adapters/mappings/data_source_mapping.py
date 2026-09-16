@@ -143,9 +143,8 @@ API_PATH_RANGES = {
     ),
     'farmwise_api.adapters.API_readers.irish_meteo.irish_ms_daily': (
         ((55.3822, 51.4476, -6.0024, -10.4781),
-         # Output days are the grid label + 1 (see irish_ms_daily.GRID_TO_OUTPUT_DAY):
-         # grids 1941-2025 serve 1941-01-02 to 2026-01-01.
-         ('1941-01-02', '2026-01-01'),
+         # Day D is the 09 UTC D -> 09 UTC D+1 total (see irish_ms_daily).
+         ('1941-01-01', '2025-12-31'),
          ['precipitation'],
          'daily',
          2,

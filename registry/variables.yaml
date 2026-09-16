@@ -23,7 +23,11 @@ sources:
     spatial_resolution: parcel-level agricultural field declarations; irregular parcel geometries
     spatial_support: 'agricultural parcels from national Geo-Spatial Application (GSA) datasets;
       FARMWISE uses a preprocessed point representation of parcel records for assignment to
-      S2 cells and selects the modal cultivation code within each S2 cell
+      S2 cells and selects the modal cultivation code within each S2 cell. Coverage is regional,
+      not continuous: only the states/regions and years contributed to EuroCrops are present
+      (e.g. no parcels at 50.5-51.5 N, 9.5-10.5 E in Germany in any year), while the dispatch
+      bounding box is the dataset-wide envelope, so a request inside the box can return no
+      data
 
       '
     temporal_support: 'annual crop declarations with dataset-wide coverage from 2008 through
@@ -3994,9 +3998,9 @@ sources:
     spatial_resolution: 1 km x 1 km
     spatial_support: regular gridded rainfall estimates covering Ireland, derived by Met Éireann
       from station observations and provided in the TM65 / Irish Grid coordinate system
-    temporal_support: daily rainfall totals; current latest release covers grid days 1941-01-01
-      through 2025-12-31 (FARMWISE output days 1941-01-02 through 2026-01-01) and is updated
-      annually
+    temporal_support: daily rainfall totals read at 09 UTC and assigned to the previous day,
+      so day D covers 09 UTC on D to 09 UTC on D+1; current latest release covers 1941-01-01
+      through 2025-12-31 and is updated annually
     variables:
       precipitation [mm]:
         native_unit: 0.1 mm (integer-encoded tenths of a millimetre)
@@ -4005,8 +4009,7 @@ sources:
         reference: null
         transformation: divide source values by 10 to convert encoded tenths of a millimetre
           to mm; grid coordinates are transformed from EPSG:29902 to WGS84 before assignment
-          to S2 cells; the grid value labelled day D is returned as day D + 1, which aligns
-          it with ERA5 daily totals (lag correlation on 2018 central-Ireland data)
+          to S2 cells; day labels are kept as published (09 UTC D to 09 UTC D+1)
   farmwise_api.adapters.API_readers.soilgrids.soilgrids_call:
     dataset: SoilGrids 2.0 predicted soil-property maps
     provider: ISRIC — World Soil Information

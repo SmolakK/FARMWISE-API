@@ -16,14 +16,14 @@ GRID_URL = (
     "IRL_DLY_RR_{year}_grid.csv.gz"
 )
 
-# The grid's daily totals are labelled with the day the morning-to-morning
-# observation period starts, so most of each accumulation falls on the next
-# UTC day. Output timestamps use that UTC day, consistent with ERA5 and the
-# other daily sources. Evidence: paired with ERA5 over central Ireland (2018,
-# four months), the grid value labelled D matched ERA5 day D+1 better than day
-# D (Pearson r 0.63 vs 0.53, MAE 1.92 vs 2.06 mm). The window still straddles
-# two UTC days, so no whole-day label can align it exactly.
-GRID_TO_OUTPUT_DAY = pd.Timedelta(days=1)
+# Day convention: Met Éireann reads the daily rainfall total at 09 UTC and
+# assigns it to the previous day, so the grid column ``X<D>`` holds the total
+# from 09 UTC on D to 09 UTC on D+1 (15 h on UTC day D, 9 h on D+1). Output
+# timestamps keep that published label. Checked against Met Éireann hourly
+# UTC observations (Mullingar, Dublin Airport, Athenry; 2017-2018): the grid
+# value labelled D equals the 09 UTC D -> 09 UTC D+1 hourly sum (r >= 0.998,
+# MAE <= 0.07 mm), and matches the station's 00-00 UTC day D better than day
+# D+1 in 8 of 9 station-years (2010, 2017, 2018) by MAE.
 
 
 async def read_data(
@@ -38,17 +38,12 @@ async def read_data(
     if requested_start > requested_end:
         raise ValueError("time_range start must not be after end")
 
-    # Output day D is the grid column labelled D - 1, which may sit in the
-    # previous year's file (1 January needs 31 December).
-    grid_start = requested_start - GRID_TO_OUTPUT_DAY
-    grid_end = requested_end - GRID_TO_OUTPUT_DAY
-
     yearly_frames = []
     async with httpx.AsyncClient(follow_redirects=True, timeout=120) as client:
-        for year in range(grid_start.year, grid_end.year + 1):
+        for year in range(requested_start.year, requested_end.year + 1):
             dates = pd.date_range(
-                max(grid_start, pd.Timestamp(year=year, month=1, day=1)),
-                min(grid_end, pd.Timestamp(year=year, month=12, day=31)),
+                max(requested_start, pd.Timestamp(year=year, month=1, day=1)),
+                min(requested_end, pd.Timestamp(year=year, month=12, day=31)),
                 freq="D",
             )
             grid_path = await _download_grid(client, year)
@@ -64,9 +59,6 @@ async def read_data(
     combined_df = pd.concat(yearly_frames, ignore_index=True)
     if combined_df.empty:
         return pd.DataFrame()
-    combined_df["Timestamp"] = (
-        pd.to_datetime(combined_df["Timestamp"]) + GRID_TO_OUTPUT_DAY
-    ).dt.date
     combined_df = prepare_coordinates(combined_df, spatial_range, level)
     if combined_df is None or combined_df.empty:
         return pd.DataFrame()

@@ -193,8 +193,8 @@ async def test_read_data_rejects_a_reversed_time_range():
 
 
 @pytest.mark.asyncio
-async def test_read_data_labels_output_one_day_after_the_grid_column(monkeypatch, tmp_path):
-    """Grid column D becomes output day D + 1; 1 January comes from last year's file."""
+async def test_read_data_keeps_the_published_day_label(monkeypatch, tmp_path):
+    """Grid column D (09 UTC D -> 09 UTC D+1) is returned as day D, from that year's file."""
     requested = {}
 
     async def fake_download(_client, year):
@@ -219,12 +219,12 @@ async def test_read_data_labels_output_one_day_after_the_grid_column(monkeypatch
     result = await daily.read_data(DUBLIN_BBOX, ("2018-01-01", "2018-01-02"), ["precipitation"], 10)
 
     assert requested == {
-        "IRL_DLY_RR_2017_grid.csv.gz": [pd.Timestamp("2017-12-31").date()],
-        "IRL_DLY_RR_2018_grid.csv.gz": [pd.Timestamp("2018-01-01").date()],
+        "IRL_DLY_RR_2018_grid.csv.gz": [
+            pd.Timestamp("2018-01-01").date(), pd.Timestamp("2018-01-02").date(),
+        ],
     }
     series = result.xs("cell-1", axis=1, level="S2CELL").iloc[:, 0]
-    # Output 2018-01-01 carries the grid value labelled 2017-12-31 (day 31).
     assert [pd.Timestamp(i).date() for i in series.index] == [
         pd.Timestamp("2018-01-01").date(), pd.Timestamp("2018-01-02").date(),
     ]
-    assert series.tolist() == [31.0, 1.0]
+    assert series.tolist() == [1.0, 2.0]
