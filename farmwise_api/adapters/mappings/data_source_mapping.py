@@ -6,6 +6,15 @@
 CURRENT_DAY = 'today'
 FIVE_BEFORE = 'today-5d'
 
+# Static layers whose adapter serves the latest edition for any later date are
+# valid from their first edition onward, so their coverage ends "now" rather
+# than in the year of the latest edition. CORINE's range used to end on
+# 2018-12-31: the pre-check rejected it for a 2020 request although the adapter
+# returns the 2018 classification for that date. Only use this where the adapter
+# really carries the latest edition forward; time series that stop, or annual
+# layers that are selected by year (e.g. EuroCropV2), keep a fixed end date.
+LATEST_EDITION_ONWARD = CURRENT_DAY
+
 # Dictionary mapping API paths to their corresponding parameters
 # Each entry contains a tuple with:
 # - Spatial range (bounding box) NSEW
@@ -34,7 +43,8 @@ API_PATH_RANGES = {
     ),
     'farmwise_api.adapters.API_readers.soilgrids.soilgrids_call': (  # 11 datasets
         ((71, 34, 45, -25),
-         ('1951-01-01', CURRENT_DAY),
+         # Static model predictions, served unchanged for any date.
+         ('1951-01-01', LATEST_EDITION_ONWARD),
          ['soil'],
          'none',
          2,
@@ -76,7 +86,8 @@ API_PATH_RANGES = {
     ),
     'farmwise_api.adapters.API_readers.corine.corine_read': (  # 5 CLC status layers
         ((71, 34, 45, -25),
-         ('1990-01-01', '2018-12-31'),
+         # Each edition is valid until the next; 2018 is carried forward.
+         ('1990-01-01', LATEST_EDITION_ONWARD),
          ['land cover'],
          'none',
          2,
@@ -132,7 +143,9 @@ API_PATH_RANGES = {
     ),
     'farmwise_api.adapters.API_readers.irish_meteo.irish_ms_daily': (
         ((55.3822, 51.4476, -6.0024, -10.4781),
-         ('1941-01-01', '2025-12-31'),
+         # Output days are the grid label + 1 (see irish_ms_daily.GRID_TO_OUTPUT_DAY):
+         # grids 1941-2025 serve 1941-01-02 to 2026-01-01.
+         ('1941-01-02', '2026-01-01'),
          ['precipitation'],
          'daily',
          2,
@@ -169,7 +182,8 @@ API_PATH_RANGES = {
     ),
     'farmwise_api.adapters.API_readers.eea.eea_read': (
         ((73, 24, 73, -56),
-         ('2018-01-01', CURRENT_DAY),
+         # Environmental Zones 2018, served unchanged for any later date.
+         ('2018-01-01', LATEST_EDITION_ONWARD),
          ['environmental data (EEA)'],
          'none',
          1,
