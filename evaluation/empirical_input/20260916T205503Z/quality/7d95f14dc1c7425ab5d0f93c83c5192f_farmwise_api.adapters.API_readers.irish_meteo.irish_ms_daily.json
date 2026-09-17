@@ -1,0 +1,32 @@
+{
+  "S2_completeness": 0.8283963227783453,
+  "S2_level": 10,
+  "api_name": "irish_ms_daily",
+  "created_at": "2026-09-16T22:25:51.057205+00:00",
+  "data_cutshort": 0.0,
+  "data_delay": 0.0,
+  "error_values": 0.0,
+  "expected_end": "2018-01-07T00:00:00",
+  "expected_s2_cells": 979,
+  "expected_start": "2018-01-01T00:00:00",
+  "factor_missing_value_rates": {
+    "Precipitation total [mm]": 0.0
+  },
+  "factor_missing_values": 0.0,
+  "factors_expected": [
+    "precipitation"
+  ],
+  "factors_returned": [
+    "Precipitation total [mm]"
+  ],
+  "factors_returned_completeness": 1.0,
+  "implausible_value_rates": {
+    "Precipitation total [mm]": 0.0
+  },
+  "incomplete_day_rate": 0.0,
+  "request_id": "7d95f14dc1c7425ab5d0f93c83c5192f",
+  "returned_end": "2018-01-07T00:00:00",
+  "returned_s2_cells": 811,
+  "returned_start": "2018-01-01T00:00:00",
+  "source": "farmwise_api.adapters.API_readers.irish_meteo.irish_ms_daily"
+}

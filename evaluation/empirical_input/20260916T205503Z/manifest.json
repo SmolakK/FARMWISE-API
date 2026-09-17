@@ -1,0 +1,5416 @@
+{
+  "collection_finished_utc": "2026-09-17T00:16:40.927511+00:00",
+  "collection_id": "20260916T205503Z",
+  "collection_started_utc": "2026-09-16T20:55:03.626240+00:00",
+  "evaluation_config": {
+    "coverage": {
+      "assess_quality": false,
+      "modes": [
+        "precheck",
+        "factor-only"
+      ],
+      "repeats": 10,
+      "scenarios": [
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "scenario": "germany-meteo-overlap",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "scenario": "austria-meteo-overlap",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 10,
+          "scenario": "ireland-precipitation-overlap",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "groundwater quantity"
+          ],
+          "level": 10,
+          "scenario": "ireland-groundwater",
+          "time_from": "2020-01-01",
+          "time_to": "2020-03-31"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            8.5,
+            7.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "land cover"
+          ],
+          "level": 10,
+          "scenario": "germany-land-cover",
+          "time_from": "2020-01-01",
+          "time_to": "2020-12-31"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "soil"
+          ],
+          "level": 10,
+          "scenario": "germany-soil",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            12.5,
+            11.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "groundwater quantity"
+          ],
+          "level": 10,
+          "scenario": "no-spatial-coverage",
+          "time_from": "2020-01-01",
+          "time_to": "2020-01-07"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "scenario": "no-temporal-coverage",
+          "time_from": "1700-01-01",
+          "time_to": "1700-01-07"
+        }
+      ],
+      "separate_api": true,
+      "warmups_per_scenario_and_mode": 1
+    },
+    "cross_source": {
+      "assess_quality": true,
+      "levels": [
+        8,
+        9,
+        10
+      ],
+      "primary_level": 8,
+      "repeats": 1,
+      "scenarios": [
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "January",
+          "region": "germany-meteo",
+          "required_sources": [
+            "DWD",
+            "ERA5"
+          ],
+          "scenario": "cross-source-germany-meteo-january-l8",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-31"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "April",
+          "region": "germany-meteo",
+          "required_sources": [
+            "DWD",
+            "ERA5"
+          ],
+          "scenario": "cross-source-germany-meteo-april-l8",
+          "time_from": "2018-04-01",
+          "time_to": "2018-04-30"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "July",
+          "region": "germany-meteo",
+          "required_sources": [
+            "DWD",
+            "ERA5"
+          ],
+          "scenario": "cross-source-germany-meteo-july-l8",
+          "time_from": "2018-07-01",
+          "time_to": "2018-07-31"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "October",
+          "region": "germany-meteo",
+          "required_sources": [
+            "DWD",
+            "ERA5"
+          ],
+          "scenario": "cross-source-germany-meteo-october-l8",
+          "time_from": "2018-10-01",
+          "time_to": "2018-10-31"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "January",
+          "region": "austria-meteo",
+          "required_sources": [
+            "GeoSphere",
+            "ERA5"
+          ],
+          "scenario": "cross-source-austria-meteo-january-l8",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-31"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "April",
+          "region": "austria-meteo",
+          "required_sources": [
+            "GeoSphere",
+            "ERA5"
+          ],
+          "scenario": "cross-source-austria-meteo-april-l8",
+          "time_from": "2018-04-01",
+          "time_to": "2018-04-30"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "July",
+          "region": "austria-meteo",
+          "required_sources": [
+            "GeoSphere",
+            "ERA5"
+          ],
+          "scenario": "cross-source-austria-meteo-july-l8",
+          "time_from": "2018-07-01",
+          "time_to": "2018-07-31"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "October",
+          "region": "austria-meteo",
+          "required_sources": [
+            "GeoSphere",
+            "ERA5"
+          ],
+          "scenario": "cross-source-austria-meteo-october-l8",
+          "time_from": "2018-10-01",
+          "time_to": "2018-10-31"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "January",
+          "region": "ireland-precipitation",
+          "required_sources": [
+            "Met \u00c9ireann",
+            "ERA5"
+          ],
+          "scenario": "cross-source-ireland-precipitation-january-l8",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-31"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "April",
+          "region": "ireland-precipitation",
+          "required_sources": [
+            "Met \u00c9ireann",
+            "ERA5"
+          ],
+          "scenario": "cross-source-ireland-precipitation-april-l8",
+          "time_from": "2018-04-01",
+          "time_to": "2018-04-30"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "July",
+          "region": "ireland-precipitation",
+          "required_sources": [
+            "Met \u00c9ireann",
+            "ERA5"
+          ],
+          "scenario": "cross-source-ireland-precipitation-july-l8",
+          "time_from": "2018-07-01",
+          "time_to": "2018-07-31"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "October",
+          "region": "ireland-precipitation",
+          "required_sources": [
+            "Met \u00c9ireann",
+            "ERA5"
+          ],
+          "scenario": "cross-source-ireland-precipitation-october-l8",
+          "time_from": "2018-10-01",
+          "time_to": "2018-10-31"
+        },
+        {
+          "bounding_box": [
+            52.5,
+            50.5,
+            21.0,
+            18.0
+          ],
+          "country": "Poland",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "January",
+          "region": "poland-imgw-era5",
+          "required_sources": [
+            "IMGW",
+            "ERA5"
+          ],
+          "scenario": "cross-source-poland-imgw-era5-january-l8",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-31"
+        },
+        {
+          "bounding_box": [
+            52.5,
+            50.5,
+            21.0,
+            18.0
+          ],
+          "country": "Poland",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "April",
+          "region": "poland-imgw-era5",
+          "required_sources": [
+            "IMGW",
+            "ERA5"
+          ],
+          "scenario": "cross-source-poland-imgw-era5-april-l8",
+          "time_from": "2018-04-01",
+          "time_to": "2018-04-30"
+        },
+        {
+          "bounding_box": [
+            52.5,
+            50.5,
+            21.0,
+            18.0
+          ],
+          "country": "Poland",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "July",
+          "region": "poland-imgw-era5",
+          "required_sources": [
+            "IMGW",
+            "ERA5"
+          ],
+          "scenario": "cross-source-poland-imgw-era5-july-l8",
+          "time_from": "2018-07-01",
+          "time_to": "2018-07-31"
+        },
+        {
+          "bounding_box": [
+            52.5,
+            50.5,
+            21.0,
+            18.0
+          ],
+          "country": "Poland",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 8,
+          "period": "October",
+          "region": "poland-imgw-era5",
+          "required_sources": [
+            "IMGW",
+            "ERA5"
+          ],
+          "scenario": "cross-source-poland-imgw-era5-october-l8",
+          "time_from": "2018-10-01",
+          "time_to": "2018-10-31"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "January",
+          "region": "germany-meteo",
+          "required_sources": [
+            "DWD",
+            "ERA5"
+          ],
+          "scenario": "cross-source-germany-meteo-january-l9",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-31"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "April",
+          "region": "germany-meteo",
+          "required_sources": [
+            "DWD",
+            "ERA5"
+          ],
+          "scenario": "cross-source-germany-meteo-april-l9",
+          "time_from": "2018-04-01",
+          "time_to": "2018-04-30"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "July",
+          "region": "germany-meteo",
+          "required_sources": [
+            "DWD",
+            "ERA5"
+          ],
+          "scenario": "cross-source-germany-meteo-july-l9",
+          "time_from": "2018-07-01",
+          "time_to": "2018-07-31"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "October",
+          "region": "germany-meteo",
+          "required_sources": [
+            "DWD",
+            "ERA5"
+          ],
+          "scenario": "cross-source-germany-meteo-october-l9",
+          "time_from": "2018-10-01",
+          "time_to": "2018-10-31"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "January",
+          "region": "austria-meteo",
+          "required_sources": [
+            "GeoSphere",
+            "ERA5"
+          ],
+          "scenario": "cross-source-austria-meteo-january-l9",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-31"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "April",
+          "region": "austria-meteo",
+          "required_sources": [
+            "GeoSphere",
+            "ERA5"
+          ],
+          "scenario": "cross-source-austria-meteo-april-l9",
+          "time_from": "2018-04-01",
+          "time_to": "2018-04-30"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "July",
+          "region": "austria-meteo",
+          "required_sources": [
+            "GeoSphere",
+            "ERA5"
+          ],
+          "scenario": "cross-source-austria-meteo-july-l9",
+          "time_from": "2018-07-01",
+          "time_to": "2018-07-31"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "October",
+          "region": "austria-meteo",
+          "required_sources": [
+            "GeoSphere",
+            "ERA5"
+          ],
+          "scenario": "cross-source-austria-meteo-october-l9",
+          "time_from": "2018-10-01",
+          "time_to": "2018-10-31"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "January",
+          "region": "ireland-precipitation",
+          "required_sources": [
+            "Met \u00c9ireann",
+            "ERA5"
+          ],
+          "scenario": "cross-source-ireland-precipitation-january-l9",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-31"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "April",
+          "region": "ireland-precipitation",
+          "required_sources": [
+            "Met \u00c9ireann",
+            "ERA5"
+          ],
+          "scenario": "cross-source-ireland-precipitation-april-l9",
+          "time_from": "2018-04-01",
+          "time_to": "2018-04-30"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "July",
+          "region": "ireland-precipitation",
+          "required_sources": [
+            "Met \u00c9ireann",
+            "ERA5"
+          ],
+          "scenario": "cross-source-ireland-precipitation-july-l9",
+          "time_from": "2018-07-01",
+          "time_to": "2018-07-31"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "October",
+          "region": "ireland-precipitation",
+          "required_sources": [
+            "Met \u00c9ireann",
+            "ERA5"
+          ],
+          "scenario": "cross-source-ireland-precipitation-october-l9",
+          "time_from": "2018-10-01",
+          "time_to": "2018-10-31"
+        },
+        {
+          "bounding_box": [
+            52.5,
+            50.5,
+            21.0,
+            18.0
+          ],
+          "country": "Poland",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "January",
+          "region": "poland-imgw-era5",
+          "required_sources": [
+            "IMGW",
+            "ERA5"
+          ],
+          "scenario": "cross-source-poland-imgw-era5-january-l9",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-31"
+        },
+        {
+          "bounding_box": [
+            52.5,
+            50.5,
+            21.0,
+            18.0
+          ],
+          "country": "Poland",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "April",
+          "region": "poland-imgw-era5",
+          "required_sources": [
+            "IMGW",
+            "ERA5"
+          ],
+          "scenario": "cross-source-poland-imgw-era5-april-l9",
+          "time_from": "2018-04-01",
+          "time_to": "2018-04-30"
+        },
+        {
+          "bounding_box": [
+            52.5,
+            50.5,
+            21.0,
+            18.0
+          ],
+          "country": "Poland",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "July",
+          "region": "poland-imgw-era5",
+          "required_sources": [
+            "IMGW",
+            "ERA5"
+          ],
+          "scenario": "cross-source-poland-imgw-era5-july-l9",
+          "time_from": "2018-07-01",
+          "time_to": "2018-07-31"
+        },
+        {
+          "bounding_box": [
+            52.5,
+            50.5,
+            21.0,
+            18.0
+          ],
+          "country": "Poland",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 9,
+          "period": "October",
+          "region": "poland-imgw-era5",
+          "required_sources": [
+            "IMGW",
+            "ERA5"
+          ],
+          "scenario": "cross-source-poland-imgw-era5-october-l9",
+          "time_from": "2018-10-01",
+          "time_to": "2018-10-31"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "January",
+          "region": "germany-meteo",
+          "required_sources": [
+            "DWD",
+            "ERA5"
+          ],
+          "scenario": "cross-source-germany-meteo-january-l10",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-31"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "April",
+          "region": "germany-meteo",
+          "required_sources": [
+            "DWD",
+            "ERA5"
+          ],
+          "scenario": "cross-source-germany-meteo-april-l10",
+          "time_from": "2018-04-01",
+          "time_to": "2018-04-30"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "July",
+          "region": "germany-meteo",
+          "required_sources": [
+            "DWD",
+            "ERA5"
+          ],
+          "scenario": "cross-source-germany-meteo-july-l10",
+          "time_from": "2018-07-01",
+          "time_to": "2018-07-31"
+        },
+        {
+          "bounding_box": [
+            51.5,
+            50.5,
+            10.5,
+            9.5
+          ],
+          "country": "Germany",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "October",
+          "region": "germany-meteo",
+          "required_sources": [
+            "DWD",
+            "ERA5"
+          ],
+          "scenario": "cross-source-germany-meteo-october-l10",
+          "time_from": "2018-10-01",
+          "time_to": "2018-10-31"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "January",
+          "region": "austria-meteo",
+          "required_sources": [
+            "GeoSphere",
+            "ERA5"
+          ],
+          "scenario": "cross-source-austria-meteo-january-l10",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-31"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "April",
+          "region": "austria-meteo",
+          "required_sources": [
+            "GeoSphere",
+            "ERA5"
+          ],
+          "scenario": "cross-source-austria-meteo-april-l10",
+          "time_from": "2018-04-01",
+          "time_to": "2018-04-30"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "July",
+          "region": "austria-meteo",
+          "required_sources": [
+            "GeoSphere",
+            "ERA5"
+          ],
+          "scenario": "cross-source-austria-meteo-july-l10",
+          "time_from": "2018-07-01",
+          "time_to": "2018-07-31"
+        },
+        {
+          "bounding_box": [
+            48.5,
+            47.5,
+            17.0,
+            16.0
+          ],
+          "country": "Austria",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "October",
+          "region": "austria-meteo",
+          "required_sources": [
+            "GeoSphere",
+            "ERA5"
+          ],
+          "scenario": "cross-source-austria-meteo-october-l10",
+          "time_from": "2018-10-01",
+          "time_to": "2018-10-31"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "January",
+          "region": "ireland-precipitation",
+          "required_sources": [
+            "Met \u00c9ireann",
+            "ERA5"
+          ],
+          "scenario": "cross-source-ireland-precipitation-january-l10",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-31"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "April",
+          "region": "ireland-precipitation",
+          "required_sources": [
+            "Met \u00c9ireann",
+            "ERA5"
+          ],
+          "scenario": "cross-source-ireland-precipitation-april-l10",
+          "time_from": "2018-04-01",
+          "time_to": "2018-04-30"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "July",
+          "region": "ireland-precipitation",
+          "required_sources": [
+            "Met \u00c9ireann",
+            "ERA5"
+          ],
+          "scenario": "cross-source-ireland-precipitation-july-l10",
+          "time_from": "2018-07-01",
+          "time_to": "2018-07-31"
+        },
+        {
+          "bounding_box": [
+            54.0,
+            53.0,
+            -7.0,
+            -8.0
+          ],
+          "country": "Ireland",
+          "factors": [
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "October",
+          "region": "ireland-precipitation",
+          "required_sources": [
+            "Met \u00c9ireann",
+            "ERA5"
+          ],
+          "scenario": "cross-source-ireland-precipitation-october-l10",
+          "time_from": "2018-10-01",
+          "time_to": "2018-10-31"
+        },
+        {
+          "bounding_box": [
+            52.5,
+            50.5,
+            21.0,
+            18.0
+          ],
+          "country": "Poland",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "January",
+          "region": "poland-imgw-era5",
+          "required_sources": [
+            "IMGW",
+            "ERA5"
+          ],
+          "scenario": "cross-source-poland-imgw-era5-january-l10",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-31"
+        },
+        {
+          "bounding_box": [
+            52.5,
+            50.5,
+            21.0,
+            18.0
+          ],
+          "country": "Poland",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "April",
+          "region": "poland-imgw-era5",
+          "required_sources": [
+            "IMGW",
+            "ERA5"
+          ],
+          "scenario": "cross-source-poland-imgw-era5-april-l10",
+          "time_from": "2018-04-01",
+          "time_to": "2018-04-30"
+        },
+        {
+          "bounding_box": [
+            52.5,
+            50.5,
+            21.0,
+            18.0
+          ],
+          "country": "Poland",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "July",
+          "region": "poland-imgw-era5",
+          "required_sources": [
+            "IMGW",
+            "ERA5"
+          ],
+          "scenario": "cross-source-poland-imgw-era5-july-l10",
+          "time_from": "2018-07-01",
+          "time_to": "2018-07-31"
+        },
+        {
+          "bounding_box": [
+            52.5,
+            50.5,
+            21.0,
+            18.0
+          ],
+          "country": "Poland",
+          "factors": [
+            "temperature",
+            "precipitation"
+          ],
+          "level": 10,
+          "period": "October",
+          "region": "poland-imgw-era5",
+          "required_sources": [
+            "IMGW",
+            "ERA5"
+          ],
+          "scenario": "cross-source-poland-imgw-era5-october-l10",
+          "time_from": "2018-10-01",
+          "time_to": "2018-10-31"
+        }
+      ],
+      "seasonal_periods": {
+        "April": [
+          "2018-04-01",
+          "2018-04-30"
+        ],
+        "January": [
+          "2018-01-01",
+          "2018-01-31"
+        ],
+        "July": [
+          "2018-07-01",
+          "2018-07-31"
+        ],
+        "October": [
+          "2018-10-01",
+          "2018-10-31"
+        ]
+      },
+      "separate_api": true
+    },
+    "quality_overhead": {
+      "modes": {
+        "off": {
+          "assess_quality": false,
+          "persist_quality_reports": false
+        },
+        "on": {
+          "assess_quality": true,
+          "persist_quality_reports": true
+        }
+      },
+      "repeats": 10,
+      "scenario": {
+        "bounding_box": [
+          54.9,
+          51.9,
+          -6.699999999999999,
+          -9.7
+        ],
+        "country": "Ireland",
+        "dimension": "Quality overhead",
+        "disabled_sources": {
+          "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+        },
+        "factors": [
+          "precipitation"
+        ],
+        "input_value": 3.0,
+        "level": 10,
+        "scenario": "quality-overhead-largest-spatial",
+        "time_from": "2018-01-01",
+        "time_to": "2018-01-07",
+        "width_deg": 3.0
+      },
+      "separate_api": false,
+      "warmups_per_mode": 1
+    },
+    "random_seed": 42,
+    "request_timeout_seconds": 600,
+    "rss_sampling_interval_seconds": 0.05,
+    "scaling": {
+      "assess_quality": false,
+      "dimensions": [
+        "S2 level",
+        "Spatial extent",
+        "Temporal extent"
+      ],
+      "disabled_sources": {
+        "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+      },
+      "factors": [
+        "precipitation"
+      ],
+      "persist_quality_reports": false,
+      "repeats": 15,
+      "scenarios": [
+        {
+          "bounding_box": [
+            53.9,
+            52.9,
+            -7.699999999999999,
+            -8.7
+          ],
+          "country": "Ireland",
+          "dimension": "S2 level",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 6,
+          "level": 6,
+          "scenario": "scaling-s2-level-6",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07",
+          "width_deg": 1.0
+        },
+        {
+          "bounding_box": [
+            53.9,
+            52.9,
+            -7.699999999999999,
+            -8.7
+          ],
+          "country": "Ireland",
+          "dimension": "S2 level",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 8,
+          "level": 8,
+          "scenario": "scaling-s2-level-8",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07",
+          "width_deg": 1.0
+        },
+        {
+          "bounding_box": [
+            53.9,
+            52.9,
+            -7.699999999999999,
+            -8.7
+          ],
+          "country": "Ireland",
+          "dimension": "S2 level",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 10,
+          "level": 10,
+          "scenario": "scaling-s2-level-10",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07",
+          "width_deg": 1.0
+        },
+        {
+          "bounding_box": [
+            53.9,
+            52.9,
+            -7.699999999999999,
+            -8.7
+          ],
+          "country": "Ireland",
+          "dimension": "S2 level",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 12,
+          "level": 12,
+          "scenario": "scaling-s2-level-12",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07",
+          "width_deg": 1.0
+        },
+        {
+          "bounding_box": [
+            53.9,
+            52.9,
+            -7.699999999999999,
+            -8.7
+          ],
+          "country": "Ireland",
+          "dimension": "S2 level",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 14,
+          "level": 14,
+          "scenario": "scaling-s2-level-14",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07",
+          "width_deg": 1.0
+        },
+        {
+          "bounding_box": [
+            53.525,
+            53.275,
+            -8.075,
+            -8.325
+          ],
+          "country": "Ireland",
+          "dimension": "Spatial extent",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 0.25,
+          "level": 10,
+          "scenario": "scaling-spatial-extent-0.25",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07",
+          "width_deg": 0.25
+        },
+        {
+          "bounding_box": [
+            53.65,
+            53.15,
+            -7.949999999999999,
+            -8.45
+          ],
+          "country": "Ireland",
+          "dimension": "Spatial extent",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 0.5,
+          "level": 10,
+          "scenario": "scaling-spatial-extent-0.5",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07",
+          "width_deg": 0.5
+        },
+        {
+          "bounding_box": [
+            53.9,
+            52.9,
+            -7.699999999999999,
+            -8.7
+          ],
+          "country": "Ireland",
+          "dimension": "Spatial extent",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 1.0,
+          "level": 10,
+          "scenario": "scaling-spatial-extent-1.0",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07",
+          "width_deg": 1.0
+        },
+        {
+          "bounding_box": [
+            54.4,
+            52.4,
+            -7.199999999999999,
+            -9.2
+          ],
+          "country": "Ireland",
+          "dimension": "Spatial extent",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 2.0,
+          "level": 10,
+          "scenario": "scaling-spatial-extent-2.0",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07",
+          "width_deg": 2.0
+        },
+        {
+          "bounding_box": [
+            54.9,
+            51.9,
+            -6.699999999999999,
+            -9.7
+          ],
+          "country": "Ireland",
+          "dimension": "Spatial extent",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 3.0,
+          "level": 10,
+          "scenario": "scaling-spatial-extent-3.0",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07",
+          "width_deg": 3.0
+        },
+        {
+          "bounding_box": [
+            53.9,
+            52.9,
+            -7.699999999999999,
+            -8.7
+          ],
+          "country": "Ireland",
+          "dimension": "Temporal extent",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 1,
+          "level": 10,
+          "scenario": "scaling-temporal-extent-1",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-01",
+          "width_deg": 1.0
+        },
+        {
+          "bounding_box": [
+            53.9,
+            52.9,
+            -7.699999999999999,
+            -8.7
+          ],
+          "country": "Ireland",
+          "dimension": "Temporal extent",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 7,
+          "level": 10,
+          "scenario": "scaling-temporal-extent-7",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-07",
+          "width_deg": 1.0
+        },
+        {
+          "bounding_box": [
+            53.9,
+            52.9,
+            -7.699999999999999,
+            -8.7
+          ],
+          "country": "Ireland",
+          "dimension": "Temporal extent",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 14,
+          "level": 10,
+          "scenario": "scaling-temporal-extent-14",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-14",
+          "width_deg": 1.0
+        },
+        {
+          "bounding_box": [
+            53.9,
+            52.9,
+            -7.699999999999999,
+            -8.7
+          ],
+          "country": "Ireland",
+          "dimension": "Temporal extent",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 30,
+          "level": 10,
+          "scenario": "scaling-temporal-extent-30",
+          "time_from": "2018-01-01",
+          "time_to": "2018-01-30",
+          "width_deg": 1.0
+        },
+        {
+          "bounding_box": [
+            53.9,
+            52.9,
+            -7.699999999999999,
+            -8.7
+          ],
+          "country": "Ireland",
+          "dimension": "Temporal extent",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 60,
+          "level": 10,
+          "scenario": "scaling-temporal-extent-60",
+          "time_from": "2018-01-01",
+          "time_to": "2018-03-01",
+          "width_deg": 1.0
+        },
+        {
+          "bounding_box": [
+            53.9,
+            52.9,
+            -7.699999999999999,
+            -8.7
+          ],
+          "country": "Ireland",
+          "dimension": "Temporal extent",
+          "disabled_sources": {
+            "farmwise_api.adapters.API_readers.cds.cds_single_levels": "excluded from the scaling experiment to measure a single backend"
+          },
+          "factors": [
+            "precipitation"
+          ],
+          "input_value": 90,
+          "level": 10,
+          "scenario": "scaling-temporal-extent-90",
+          "time_from": "2018-01-01",
+          "time_to": "2018-03-31",
+          "width_deg": 1.0
+        }
+      ],
+      "separate_api": false,
+      "source": "farmwise_api.adapters.API_readers.irish_meteo.irish_ms_daily",
+      "warmups_per_scenario": 1
+    }
+  },
+  "execution_order": [
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 0,
+      "scenario": "ireland-groundwater",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 0,
+      "scenario": "germany-land-cover",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 0,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 0,
+      "scenario": "ireland-groundwater",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 0,
+      "scenario": "no-temporal-coverage",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 0,
+      "scenario": "germany-soil",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 0,
+      "scenario": "no-spatial-coverage",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 0,
+      "scenario": "germany-land-cover",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 0,
+      "scenario": "germany-meteo-overlap",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 0,
+      "scenario": "austria-meteo-overlap",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 0,
+      "scenario": "no-spatial-coverage",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 0,
+      "scenario": "no-temporal-coverage",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 0,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 0,
+      "scenario": "germany-soil",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 0,
+      "scenario": "germany-meteo-overlap",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 0,
+      "scenario": "austria-meteo-overlap",
+      "warmup": true
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 9,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 7,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 6,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 5,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 4,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 6,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 9,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 2,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 4,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 10,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 3,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 3,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 6,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 3,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 4,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 4,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 3,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 7,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 3,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 4,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 7,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 3,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 5,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 1,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 3,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 1,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 1,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 3,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 10,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 2,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 8,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 2,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 10,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 9,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 5,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 5,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 9,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 5,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 1,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 2,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 7,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 6,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 10,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 6,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 5,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 6,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 10,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 9,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 7,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 4,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 2,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 3,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 5,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 9,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 4,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 4,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 1,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 3,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 7,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 3,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 1,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 5,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 4,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 10,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 5,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 4,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 8,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 8,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 4,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 9,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 1,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 8,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 4,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 7,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 1,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 3,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 8,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 4,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 6,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 2,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 8,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 5,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 6,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 8,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 2,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 9,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 5,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 6,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 2,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 3,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 10,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 7,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 2,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 9,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 2,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 7,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 8,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 10,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 3,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 6,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 10,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 5,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 6,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 1,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 6,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 8,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 9,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 7,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 7,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 2,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 9,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 6,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 9,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 3,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 1,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 1,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 10,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 1,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 8,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 9,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 10,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 5,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 6,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 9,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 1,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 8,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 4,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 3,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 6,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 1,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 7,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 2,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 8,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 2,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 8,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 9,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 2,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 5,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 8,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 4,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 7,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 7,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 6,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 10,
+      "scenario": "austria-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 10,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 8,
+      "scenario": "germany-land-cover",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 9,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 1,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 2,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 2,
+      "scenario": "ireland-groundwater",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 5,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 7,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 8,
+      "scenario": "germany-soil",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 10,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 1,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 4,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 7,
+      "scenario": "germany-meteo-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 5,
+      "scenario": "no-temporal-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "precheck",
+      "repeat": 10,
+      "scenario": "no-spatial-coverage",
+      "warmup": false
+    },
+    {
+      "experiment": "coverage",
+      "mode": "factor-only",
+      "repeat": 10,
+      "scenario": "ireland-precipitation-overlap",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-germany-meteo-january-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-germany-meteo-april-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-germany-meteo-july-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-germany-meteo-october-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-austria-meteo-january-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-austria-meteo-april-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-austria-meteo-july-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-austria-meteo-october-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-ireland-precipitation-january-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-ireland-precipitation-april-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-ireland-precipitation-july-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-ireland-precipitation-october-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-poland-imgw-era5-january-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-poland-imgw-era5-april-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-poland-imgw-era5-july-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-poland-imgw-era5-october-l8",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-germany-meteo-january-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-germany-meteo-april-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-germany-meteo-july-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-germany-meteo-october-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-austria-meteo-january-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-austria-meteo-april-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-austria-meteo-july-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-austria-meteo-october-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-ireland-precipitation-january-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-ireland-precipitation-april-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-ireland-precipitation-july-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-ireland-precipitation-october-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-poland-imgw-era5-january-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-poland-imgw-era5-april-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-poland-imgw-era5-july-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-poland-imgw-era5-october-l9",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-germany-meteo-january-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-germany-meteo-april-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-germany-meteo-july-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-germany-meteo-october-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-austria-meteo-january-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-austria-meteo-april-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-austria-meteo-july-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-austria-meteo-october-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-ireland-precipitation-january-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-ireland-precipitation-april-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-ireland-precipitation-july-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-ireland-precipitation-october-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-poland-imgw-era5-january-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-poland-imgw-era5-april-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-poland-imgw-era5-july-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "cross-source",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "cross-source-poland-imgw-era5-october-l10",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "on",
+      "repeat": 0,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": true
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "off",
+      "repeat": 0,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": true
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "off",
+      "repeat": 2,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "off",
+      "repeat": 7,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "off",
+      "repeat": 1,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "off",
+      "repeat": 4,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "off",
+      "repeat": 6,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "off",
+      "repeat": 5,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "off",
+      "repeat": 10,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "on",
+      "repeat": 1,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "on",
+      "repeat": 4,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "off",
+      "repeat": 8,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "on",
+      "repeat": 2,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "on",
+      "repeat": 7,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "on",
+      "repeat": 5,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "off",
+      "repeat": 9,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "on",
+      "repeat": 3,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "on",
+      "repeat": 8,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "on",
+      "repeat": 6,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "on",
+      "repeat": 10,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "off",
+      "repeat": 3,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "quality-overhead",
+      "mode": "on",
+      "repeat": 9,
+      "scenario": "quality-overhead-largest-spatial",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-s2-level-12",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-s2-level-14",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-s2-level-10",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-s2-level-6",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-s2-level-8",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 0,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": true
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 8,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-spatial-extent-1.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 15,
+      "scenario": "scaling-spatial-extent-0.5",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-temporal-extent-30",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 13,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 6,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-s2-level-10",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-spatial-extent-3.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 5,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 7,
+      "scenario": "scaling-temporal-extent-7",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-s2-level-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-spatial-extent-2.0",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-temporal-extent-90",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 10,
+      "scenario": "scaling-spatial-extent-0.25",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 11,
+      "scenario": "scaling-temporal-extent-60",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 9,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 3,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 14,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-temporal-extent-14",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 4,
+      "scenario": "scaling-s2-level-8",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 2,
+      "scenario": "scaling-s2-level-6",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 12,
+      "scenario": "scaling-s2-level-12",
+      "warmup": false
+    },
+    {
+      "experiment": "scaling",
+      "mode": null,
+      "repeat": 1,
+      "scenario": "scaling-temporal-extent-1",
+      "warmup": false
+    }
+  ],
+  "experiments": [
+    "coverage",
+    "cross-source",
+    "quality-overhead",
+    "scaling"
+  ],
+  "git": {
+    "branch": "main",
+    "commit_sha": "bae692c15104a7698dae554c0bda115e1ef460a1",
+    "tracked_changes_uncommitted": true,
+    "uncommitted_tracked_paths": [
+      "farmwise_api/core/utils/access_policy.py"
+    ]
+  },
+  "hardware": {
+    "cpu_logical_cores": 16,
+    "cpu_model": "Intel64 Family 6 Model 141 Stepping 1, GenuineIntel",
+    "cpu_physical_cores": 8,
+    "machine": "AMD64",
+    "os": "Windows",
+    "os_release": "11",
+    "os_version": "10.0.26200",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "total_ram_gb": 31.71
+  },
+  "imgw_research_use_enabled": true,
+  "software": {
+    "farmwise_api_version": "0.1.0",
+    "in_virtualenv": true,
+    "installed_distributions": {
+      "affine": "3.0.1",
+      "aiofiles": "25.1.0",
+      "aiohappyeyeballs": "2.7.1",
+      "aiohttp": "3.14.3",
+      "aiosignal": "1.4.0",
+      "annotated-doc": "0.0.5",
+      "annotated-types": "0.8.0",
+      "anyio": "4.15.1",
+      "apscheduler": "3.11.3",
+      "ast_serialize": "0.11.1",
+      "asttokens": "3.0.2",
+      "attrs": "26.1.0",
+      "bcrypt": "4.0.1",
+      "beautifulsoup4": "4.15.0",
+      "black": "26.5.1",
+      "bleach": "6.4.0",
+      "bmipy": "2.0.1",
+      "branca": "0.8.2",
+      "build": "1.6.1",
+      "cdsapi": "0.7.7",
+      "certifi": "2026.7.22",
+      "cffi": "2.1.1",
+      "cftime": "1.6.5",
+      "charset-normalizer": "3.5.1",
+      "click": "8.5.0",
+      "cloup": "3.1.0",
+      "colorama": "0.4.6",
+      "comm": "0.2.3",
+      "contourpy": "1.3.3",
+      "coverage": "7.16.0",
+      "cryptography": "50.0.1",
+      "cycler": "0.12.1",
+      "debugpy": "1.8.21",
+      "defusedxml": "0.7.1",
+      "deprecated": "1.3.1",
+      "diskcache": "5.6.3",
+      "dnspython": "2.8.0",
+      "duckdb": "1.5.5",
+      "ecmwf-datastores-client": "0.5.3",
+      "email-validator": "2.3.0",
+      "et_xmlfile": "2.0.0",
+      "executing": "2.2.1",
+      "farmwise-api": "0.1.0",
+      "fastapi": "0.141.1",
+      "fastexcel": "0.21.0",
+      "fastjsonschema": "2.22.2",
+      "folium": "0.20.0",
+      "fonttools": "4.65.0",
+      "frozenlist": "1.8.0",
+      "fsspec": "2026.7.0",
+      "future": "1.0.0",
+      "geographiclib": "2.1",
+      "geopandas": "1.1.4",
+      "geopy": "2.5.0",
+      "greenlet": "3.5.5",
+      "h11": "0.16.0",
+      "httpcore": "1.0.9",
+      "httptools": "0.8.0",
+      "httpx": "0.28.1",
+      "idna": "3.19",
+      "iniconfig": "2.3.0",
+      "ipykernel": "7.3.0",
+      "ipython": "9.17.1",
+      "ipython_pygments_lexers": "1.1.1",
+      "jedi": "0.20.0",
+      "jinja2": "3.1.6",
+      "jsonschema": "4.26.0",
+      "jsonschema-specifications": "2025.9.1",
+      "jupyter_client": "8.10.0",
+      "jupyter_core": "5.9.1",
+      "jupyterlab_pygments": "0.3.0",
+      "kiwisolver": "1.5.1",
+      "librt": "0.15.0",
+      "limits": "5.8.0",
+      "lxml": "6.1.3",
+      "markupsafe": "3.0.3",
+      "matplotlib": "3.11.1",
+      "matplotlib-inline": "0.2.2",
+      "measurement": "3.2.2",
+      "mistune": "3.3.4",
+      "mpmath": "1.3.0",
+      "multidict": "6.8.0",
+      "multiurl": "0.3.9",
+      "mypy": "2.3.1",
+      "mypy_extensions": "1.1.0",
+      "nbclient": "0.11.0",
+      "nbconvert": "7.17.1",
+      "nbformat": "5.11.1",
+      "nest-asyncio2": "1.7.2",
+      "netcdf4": "1.7.4",
+      "numpy": "2.5.3",
+      "openpyxl": "3.1.5",
+      "owslib": "0.36.0",
+      "packaging": "26.3",
+      "pandas": "3.0.5",
+      "pandocfilters": "1.5.1",
+      "parso": "0.8.7",
+      "passlib": "1.7.4",
+      "pathspec": "1.1.1",
+      "pillow": "12.3.0",
+      "pip": "26.2.1",
+      "platformdirs": "4.11.8",
+      "pluggy": "1.6.0",
+      "polars": "1.44.2",
+      "polars-runtime-32": "1.44.2",
+      "portion": "2.6.2",
+      "prompt_toolkit": "3.0.53",
+      "propcache": "0.5.2",
+      "psutil": "7.2.2",
+      "pure_eval": "0.2.4",
+      "pyarrow": "25.0.1",
+      "pycparser": "3.0",
+      "pydantic": "2.13.5",
+      "pydantic-extra-types": "2.11.1",
+      "pydantic-settings": "2.15.0",
+      "pydantic_core": "2.46.5",
+      "pygments": "2.21.0",
+      "pyjwt": "2.13.0",
+      "pyogrio": "0.13.0",
+      "pyparsing": "3.3.2",
+      "pyproj": "3.8.0",
+      "pyproject_hooks": "1.2.0",
+      "pytest": "9.1.1",
+      "pytest-asyncio": "1.4.0",
+      "pytest-cov": "7.1.0",
+      "python-dateutil": "2.9.0.post0",
+      "python-dotenv": "1.2.3",
+      "python-multipart": "0.0.32",
+      "pytokens": "0.4.1",
+      "pytz": "2026.3.post1",
+      "pyyaml": "6.0.3",
+      "pyzmq": "27.2.0",
+      "rapidfuzz": "3.14.6",
+      "rasterio": "1.5.1",
+      "referencing": "0.37.0",
+      "requests": "2.34.2",
+      "rioxarray": "0.23.0",
+      "rpds-py": "2026.6.3",
+      "s2sphere": "0.2.5",
+      "scipy": "1.18.1",
+      "seaborn": "0.13.2",
+      "setuptools": "84.0.0",
+      "shapely": "2.1.2",
+      "six": "1.17.0",
+      "slowapi": "0.1.10",
+      "soilgrids": "0.1.5",
+      "sortedcontainers": "2.4.0",
+      "soupsieve": "2.9.2",
+      "sqlalchemy": "2.0.52",
+      "stack-data": "0.6.3",
+      "stamina": "26.1.0",
+      "starlette": "1.6.0",
+      "sympy": "1.14.0",
+      "tabulate": "0.10.0",
+      "tenacity": "9.1.4",
+      "tinycss2": "1.5.1",
+      "tornado": "6.5.9",
+      "tqdm": "4.70.1",
+      "traitlets": "5.16.1",
+      "typing-inspection": "0.4.4",
+      "typing_extensions": "4.16.0",
+      "tzdata": "2026.3",
+      "tzfpy": "1.3.3",
+      "tzlocal": "5.4.4",
+      "urllib3": "2.7.0",
+      "uv": "0.12.13",
+      "uvicorn": "0.52.4",
+      "watchfiles": "1.2.0",
+      "wcwidth": "0.8.3",
+      "webencodings": "0.6.1",
+      "websockets": "17.1",
+      "wetterdienst": "0.136.0",
+      "wheel": "0.48.0",
+      "wrapt": "2.4.1",
+      "xarray": "2026.7.0",
+      "xyzservices": "2026.9.1",
+      "yarl": "1.24.5"
+    },
+    "lockfile": "requirements-lock.txt",
+    "lockfile_sha256": "bc76e950bedb38fbcc83cbcd121690576649b6b1091a8068eeb051bee3e4fa70",
+    "psutil_available": true,
+    "python_implementation": "CPython",
+    "python_version": "3.12.6"
+  }
+}
