@@ -18,7 +18,6 @@ def private_noncommercial_imgw_enabled() -> bool:
     ``FARMWISE_ENABLE_PRIVATE_IMGW`` is retained as a backwards-compatible
     alias.  Academic evaluation should use ``FARMWISE_ENABLE_RESEARCH_IMGW``.
     """
-    
     return any(
         os.getenv(name, "").strip().lower() in _TRUE_VALUES
         for name in (IMGW_RESEARCH_USE_ENV, IMGW_PRIVATE_USE_ENV)
