@@ -1,0 +1,13 @@
+{
+  "Belgium": {
+    "country_code": "BE",
+    "reports": [
+      {
+        "label": "Wallonia 2016-2019",
+        "period": ["2016-01-01", "2019-12-31"],
+        "stations": "https://cdr.eionet.europa.eu/be/eu/nid/envyknvlq/NiD_GW_Stat.xml",
+        "concentrations": "https://cdr.eionet.europa.eu/be/eu/nid/envyknvlq/NiD_GW_Conc.xml"
+      }
+    ]
+  }
+}

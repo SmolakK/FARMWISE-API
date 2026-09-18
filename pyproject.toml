@@ -107,6 +107,7 @@ exclude = ["farmwise_api.adapters.API_readers.egdi*"]
 include-package-data = false
 
 [tool.setuptools.package-data]
+"farmwise_api.adapters.API_readers.eionet_nid" = ["constants/eionet_nid_countries.json"]
 "farmwise_api.adapters.API_readers.epa_ireland" = ["constants/EPA_coordinates.csv"]
 "farmwise_api.adapters.API_readers.gios" = ["constants/gios_coordinates.csv"]
 "farmwise_api.adapters.API_readers.hubeau" = ["constants/*.csv"]
