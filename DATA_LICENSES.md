@@ -363,6 +363,23 @@ licence, access date, and modification notices listed below.
   aggregation.
 - **Redistribution status:** **Allowed**.
 
+### Eionet CDR Nitrates Directive groundwater reports
+
+- **Adapter:** `farmwise_api.adapters.API_readers.eionet_nid.eionet_nid_gw_read`
+- **Dataset/resource:** national Nitrates Directive (91/676/EEC) groundwater
+  deliveries, tables `NiD_GW_Stat` and `NiD_GW_Conc`.
+- **Local persistence:** table contents are processed in memory; derived server
+  exports and quality reports may be persisted.
+- **Provider:** European Environment Agency Reportnet
+- **Source:** <https://cdr.eionet.europa.eu/>
+- **Terms:** <https://cdr.eionet.europa.eu/legalnotice>
+- **Licence:** [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/)
+- **Required attribution:** identify European Environment Agency Reportnet and
+  the envelope, link the source and CC BY 4.0, state the access date, and
+  indicate FARMWISE joining and S2 aggregation.
+- **Redistribution status:** **Allowed** for publicly readable envelopes; some
+  are restricted by their provider.
+
 ## Generated FARMWISE artifacts
 
 ### Evaluation logs and figures
