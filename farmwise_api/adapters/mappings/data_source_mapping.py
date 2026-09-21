@@ -179,6 +179,17 @@ API_PATH_RANGES = {
          1,
          1)
     ),
+    # Countries and reporting cycles are declared in
+    # eionet_nid/constants/eionet_nid_countries.json. After adding one, call
+    # eionet_nid_config.registry_coverage() to recompute the values below.
+    'farmwise_api.adapters.API_readers.eionet_nid.eionet_nid_gw_read': (
+        ((51.5516667, 49.4969821, 6.408097, 2.3889137),
+         ('2016-01-01', '2019-12-31'),
+         ['groundwater quality'],
+         'none',
+         1,
+         1)
+    ),
     # 'farmwise_api.adapters.API_readers.quadica.quadica_read': (
     #     ((55.1, 47.3, 15, 6),
     #      ('1950-01-01', '2015-12-31'),
