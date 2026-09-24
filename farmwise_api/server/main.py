@@ -64,6 +64,10 @@ if __name__ == "__main__":
         "farmwise_api.server.main:app",
         host="0.0.0.0",
         port=8000,
-        workers=4,  # Number of worker processes
+        # One worker: asynchronous job records live in this process (see
+        # farmwise_api/server/jobs.py), so a poll handled by another worker
+        # would report the job as unknown. Raise this only once the registry
+        # is backed by a shared store.
+        workers=1,
         proxy_headers=True
     )
