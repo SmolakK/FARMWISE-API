@@ -185,7 +185,7 @@ API_PATH_RANGES = {
          ('2018-01-01', LATEST_EDITION_ONWARD),
          ['environmental data (EEA)'],
          'none',
-         1,
+         2,
          1)
     ),
     # 'farmwise_api.adapters.API_readers.quadica.quadica_read': (
