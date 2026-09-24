@@ -377,8 +377,52 @@ Authenticated clients can call `POST /read-data-direct`:
 }
 ```
 
-The response contains download links for the data CSV, metadata JSON, and,
-when requested, an HTML map with data visualization.
+Requests are authenticated with a bearer token obtained from `POST /token`.
+
+Every response carries an explicit `status`. In the default synchronous mode
+the call returns when processing has finished:
+
+```json
+{
+  "status": "success",
+  "data_url": "https://<host>/download/<name>.csv",
+  "metadata_url": "https://<host>/download/<name>.json",
+  "map_url": null
+}
+```
+
+A request that no source can serve returns HTTP 404, and an internal failure
+HTTP 500; both carry `status`, `error_code` (`no_data`, `internal_error`) and
+a message.
+
+Large requests take minutes, which is awkward for a client that must not block
+on one connection. Adding `"mode": "async"` makes the server accept the
+request and answer immediately with HTTP 202:
+
+```json
+{
+  "job_id": "5f2b...",
+  "status": "accepted",
+  "status_url": "https://<host>/jobs/5f2b...",
+  "poll_after_seconds": 5,
+  "created_utc": "2026-09-24T09:15:00+00:00"
+}
+```
+
+`GET /jobs/{job_id}` then reports `accepted`, `running`, and finally one of
+the terminal states `success` (with the same download links), `no_data` or
+`error`. A job is readable only by the user who created it; any other job id
+is reported as not found. Job records are kept for three hours.
+
+Rate limits are 10 requests per minute for `/read-data-direct` and 60 per
+minute for `/jobs/{job_id}`. Generated files are removed about an hour after
+they are written, so download them promptly. `/download/{file_name}` is not
+authenticated: the link itself is the only protection, and it must not be
+shared.
+
+The asynchronous job registry lives in the server process. Run the public
+server with a single worker, or replace `farmwise_api/server/jobs.py` with a
+shared store, before scaling to several workers.
 
 ## Web frontend
 
