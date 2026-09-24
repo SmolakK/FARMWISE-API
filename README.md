@@ -18,7 +18,7 @@ FARMWISE is dual-use:
 A request describes an area (a country or a bounding box), a date range, an S2
 cell level, and one or more factors. FARMWISE selects matching adapters,
 downloads their data, normalizes it to S2 cells, and returns the combined data
-with source metadata and an optional HTML map.
+with source metadata and an optional HTML map developed for quick data investigation.
 
 ## Project layout
 
