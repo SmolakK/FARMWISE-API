@@ -27,7 +27,7 @@ from __future__ import annotations
 REMOTE_DATA: dict[str, dict] = {
     "eea/eea_data/eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif": {
         "kind": "file",
-        "url": "https://sdi.eea.europa.eu/datastore/public?path=/eea_r_3035_1_km_env-zones_p_2018_v01_r00/#",
+        "url": "https://sdi.eea.europa.eu/datashare/s/sptXqwkQr5g7Bp5/download?path=%2Feea_r_3035_1_km_env-zones_p_2018_v01_r00&files=eea_r_3035_1_km_env-zones_p_2018_v01_r00.tif",
         "sha256": "4587A4ACCEE9053D8F7E5779A924911545EF75795F18FE846E082A6B453DDCB6",
         "size_mb": 57.2,
     },
