@@ -48,6 +48,7 @@ __all__ = [
     "CACHE_ROOT",
     "adapter_data",
     "adapter_cache",
+    "path_from_env",
     "scratch_file",
     "scratch_dir",
     "fetch_remote",
@@ -68,21 +69,35 @@ def _resolve_project_root() -> Path:
 
 PROJECT_ROOT: Path = _resolve_project_root()
 
-DATA_ROOT: Path = Path(
-    os.environ.get(
-        "FARMWISE_DATA_DIR",
-        PACKAGE_ROOT / "adapters" / "API_readers",
-    )
+
+def path_from_env(name: str) -> Path | None:
+    """Read a directory setting from the environment, or None when unset.
+
+    Surrounding whitespace and quotes are stripped: ``set VAR=C:\dir && ...``
+    in cmd.exe keeps the spaces before ``&&`` in the value, and Windows cannot
+    create a directory whose name ends in a space, so the value would fail far
+    from its cause.
+    """
+    raw = os.environ.get(name)
+    if raw is None:
+        return None
+    cleaned = raw.strip().strip('"').strip("'").rstrip()
+    return Path(cleaned) if cleaned else None
+
+
+DATA_ROOT: Path = (
+    path_from_env("FARMWISE_DATA_DIR")
+    or PACKAGE_ROOT / "adapters" / "API_readers"
 ).resolve()
 
 
 def _default_cache_root() -> Path:
-    override = os.environ.get("FARMWISE_CACHE_DIR")
+    override = path_from_env("FARMWISE_CACHE_DIR")
     if override:
-        return Path(override)
-    xdg = os.environ.get("XDG_CACHE_HOME")
+        return override
+    xdg = path_from_env("XDG_CACHE_HOME")
     if xdg:
-        return Path(xdg) / "farmwise"
+        return xdg / "farmwise"
     return Path.home() / ".cache" / "farmwise"
 
 

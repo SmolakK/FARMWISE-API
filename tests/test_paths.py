@@ -234,3 +234,20 @@ def test_scratch_dir_is_removed_after_context():
         assert created.is_dir()
 
     assert not created.exists()
+
+
+def test_directory_settings_tolerate_stray_whitespace_and_quotes(monkeypatch, tmp_path):
+    """`set VAR=C:\dir && ...` in cmd.exe keeps the spaces before the `&&`."""
+    from farmwise_api.core.utils.paths import path_from_env
+
+    monkeypatch.setenv("FARMWISE_TEST_DIR", f"{tmp_path} ")
+    assert path_from_env("FARMWISE_TEST_DIR") == tmp_path
+
+    monkeypatch.setenv("FARMWISE_TEST_DIR", f'"{tmp_path}"')
+    assert path_from_env("FARMWISE_TEST_DIR") == tmp_path
+
+    monkeypatch.setenv("FARMWISE_TEST_DIR", "   ")
+    assert path_from_env("FARMWISE_TEST_DIR") is None
+
+    monkeypatch.delenv("FARMWISE_TEST_DIR")
+    assert path_from_env("FARMWISE_TEST_DIR") is None

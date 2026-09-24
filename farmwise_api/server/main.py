@@ -14,12 +14,10 @@ import os
 import asyncio
 from pathlib import Path
 
-from farmwise_api.core.utils.paths import CACHE_ROOT, prefetch_all
+from farmwise_api.core.utils.paths import CACHE_ROOT, path_from_env, prefetch_all
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
-TEMP_DIR = Path(
-    os.getenv("FARMWISE_TEMP_DIR", CACHE_ROOT / "temp_files")
-).resolve()
+TEMP_DIR = (path_from_env("FARMWISE_TEMP_DIR") or CACHE_ROOT / "temp_files").resolve()
 
 # Create the database tables
 Base.metadata.create_all(bind=engine)
