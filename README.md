@@ -16,7 +16,7 @@ A request describes an area (a country or a bounding box), a date range, an S2 c
 Install the library:
 
 ```bash
-pip install "farmwise-api==0.1.0rc1"
+pip install "farmwise-api"
 ```
 
 Then request data:
@@ -64,16 +64,15 @@ All installed modules are contained under the `farmwise_api` namespace to avoid 
 
 Python 3.11 or newer is required.
 
-The library is now in the pre-release stage.
-Pre-releases are not installed by default, so pin the version:
+To install
 
 ```
-pip install "farmwise-api[server]==0.1.0rc1"
+pip install "farmwise-api[server]"
 ```
 
 Library only, without the server extra:
 ```
-pip install "farmwise-api==0.1.0rc1"
+pip install "farmwise-api"
 ```
 For development from a repository checkout:
 
