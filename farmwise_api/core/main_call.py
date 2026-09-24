@@ -517,6 +517,7 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
 
 # Example using bounding box
 if __name__ == "__main__":
+    pass
     # asyncio.run(read_data(
     #     bounding_box=(71, 34, 45, -25),
     #     level=10,
@@ -531,16 +532,14 @@ if __name__ == "__main__":
     #     ],
     #     produce_map=True
     # ))
-    asyncio.run(read_data(
-        country=['Poland'],
-        level=10,
-        time_from='2010-01-10',
-        time_to='2010-01-10',
-        factors=[
-            'temperature', 'precipitation','surface water quality','groundwater quantity','groundwater quality','soil',
-            'land cover', 'surface water quantity'],
-        assess_quality=True,
-    ))
+    # asyncio.run(read_data(
+    #     country=['Poland'],
+    #     level=10,
+    #     time_from='2018-01-10',
+    #     time_to='2019-02-10',
+    #     factors=['land cover'],
+    #     assess_quality=True,
+    # ))
 
 
 __all__ = ["plan_source_dispatch", "read_data"]
