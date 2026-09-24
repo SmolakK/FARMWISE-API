@@ -1,10 +1,13 @@
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends
+from fastapi.responses import JSONResponse
 from farmwise_api.server.schemas import ReadDataRequest, User
+from farmwise_api.server import jobs
 from farmwise_api.server.services import read_data
 from farmwise_api.server.api_utils import secure_filename
 from fastapi.responses import FileResponse
 import tempfile
 import os
+from time import perf_counter
 from farmwise_api.server.logging_config import logger
 from farmwise_api.server.security import limiter, get_current_active_user
 import asyncio
@@ -274,98 +277,201 @@ async def download_file(file_name: str, background_tasks: BackgroundTasks, reque
         logger.error(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
+def _persist_result(result, request_body, temp_dir) -> dict:
+    """Write the data, metadata and optional map, and return their download URLs.
+
+    The directory is recreated when missing: it is one fixed path shared by
+    every instance, and the scheduled cleanup, another instance shutting down,
+    or an operator clearing disk space can remove it while a request is in
+    flight. Losing minutes of work to a missing directory is not worth it.
+    """
+    os.makedirs(temp_dir, exist_ok=True)
+    df = result["data"]
+    metadata = result["metadata"]
+
+    data_file = tempfile.NamedTemporaryFile(
+        delete=False, suffix=".csv", mode="w+", dir=temp_dir
+    )
+    df.to_csv(data_file.name, index=True)
+    data_file.close()
+
+    metadata_file = tempfile.NamedTemporaryFile(
+        delete=False, suffix=".json", mode="w+", dir=temp_dir
+    )
+    with open(metadata_file.name, "w", encoding="utf-8") as mf:
+        json.dump(metadata, mf, indent=4, default=str)
+    metadata_file.close()
+
+    map_name = None
+    if request_body.produce_map:
+        map_html = result.get("map")
+        if map_html:
+            map_file = tempfile.NamedTemporaryFile(
+                delete=False, suffix=".html", mode="w+", dir=temp_dir,
+                encoding="utf-8",
+            )
+            map_file.write(map_html)
+            map_file.close()
+            map_name = os.path.basename(map_file.name)
+
+    base_url = _public_base_url()
+    return {
+        "data_url": f"{base_url}/download/{os.path.basename(data_file.name)}",
+        "metadata_url": f"{base_url}/download/{os.path.basename(metadata_file.name)}",
+        "map_url": f"{base_url}/download/{map_name}" if map_name else None,
+    }
+
+
+async def _read_data_for_request(request_body: ReadDataRequest):
+    """Run the core call with the parameters carried by one request body."""
+    return await read_data(
+        bounding_box=getattr(request_body, "bounding_box", None),
+        country=getattr(request_body, "country", None),
+        level=request_body.level,
+        time_from=request_body.time_from,
+        time_to=request_body.time_to,
+        factors=request_body.factors,
+        separate_api=request_body.separate_api,
+        interpolation=request_body.interpolation,
+        produce_map=request_body.produce_map,
+        source_weights=getattr(request_body, "source_weights", None),
+        harmonization_methods=getattr(request_body, "harmonization_methods", None),
+        within_source_aggregation_methods=getattr(
+            request_body, "within_source_aggregation_methods", None
+        ),
+        assess_quality=getattr(request_body, "assess_quality", True),
+        persist_quality_reports=getattr(request_body, "persist_quality_reports", True),
+    )
+
+
+async def run_direct_job(job_id: str, request_body: ReadDataRequest, temp_dir: str) -> None:
+    """Execute one accepted asynchronous request and record its outcome.
+
+    Every failure is stored on the job rather than raised: nothing is waiting
+    on this task, so an exception here would otherwise be lost.
+    """
+    jobs.registry.mark_running(job_id)
+    started = perf_counter()
+    try:
+        result = await _read_data_for_request(request_body)
+        if _has_no_data(result):
+            logger.info(
+                f"Asynchronous job {job_id} finished with no data "
+                f"after {perf_counter() - started:.1f} s"
+            )
+            jobs.registry.finish(
+                job_id, jobs.NO_DATA, error_code="no_data",
+                message="No data available for the selected parameters.",
+            )
+            return
+        links = _persist_result(result, request_body, temp_dir)
+        logger.info(
+            f"Asynchronous job {job_id} succeeded after "
+            f"{perf_counter() - started:.1f} s; data file "
+            f"{os.path.basename(links['data_url'])}"
+        )
+        jobs.registry.finish(job_id, jobs.SUCCESS, result=links)
+    except Exception as error:  # noqa: BLE001 - the client learns the outcome from the job
+        logger.error(
+            f"Asynchronous job {job_id} failed after "
+            f"{perf_counter() - started:.1f} s: {error}"
+        )
+        jobs.registry.finish(
+            job_id, jobs.ERROR, error_code="internal_error",
+            message="An internal error occurred during data processing.",
+        )
+
+
 @api_router.post("/read-data-direct", response_model=None)
 @limiter.limit("10/minute")
 async def read_data_direct(
     request_body: ReadDataRequest,
     request: Request,
     current_user: User = Depends(get_current_active_user)
-) -> dict:
+) -> dict | JSONResponse:
     """
-    Same as /read-data but returns direct REST download links instead of sending email.
+    Read data and return direct REST download links instead of sending email.
+
+    With ``"mode": "sync"`` (the default) the response is returned when
+    processing has finished. With ``"mode": "async"`` the server replies
+    immediately with HTTP 202, a ``job_id`` and ``status: "accepted"``; the
+    client then polls ``status_url`` until ``status`` is ``success``,
+    ``no_data`` or ``error``.
+
+    :param request_body: the request parameters, including the mode.
+    :param request: the HTTP request, used for the temporary directory.
+    :param current_user: the authenticated user; jobs are readable only by
+        the user who created them.
+    :return: download links, or the accepted job when running asynchronously.
     """
+    temp_dir = request.app.state.temp_dir
+
+    if getattr(request_body, "mode", "sync") == "async":
+        job = jobs.registry.create(owner=current_user.username)
+        logger.info(f"Accepted asynchronous data request as job {job.job_id}")
+        # Fire and forget: the task keeps a reference through the registry and
+        # reports its outcome there.
+        asyncio.create_task(run_direct_job(job.job_id, request_body, temp_dir))
+        payload = job.as_response()
+        payload["status_url"] = f"{_public_base_url()}/jobs/{job.job_id}"
+        payload["poll_after_seconds"] = 5
+        return JSONResponse(status_code=202, content=payload)
 
     logger.info("Started direct data processing request")
 
     try:
-        result = await read_data(
-            bounding_box=getattr(request_body, "bounding_box", None),
-            country=getattr(request_body, "country", None),
-            level=request_body.level,
-            time_from=request_body.time_from,
-            time_to=request_body.time_to,
-            factors=request_body.factors,
-            separate_api=request_body.separate_api,
-            interpolation=request_body.interpolation,
-            produce_map=request_body.produce_map,
-            source_weights=getattr(request_body, "source_weights", None),
-            harmonization_methods=getattr(
-                request_body, "harmonization_methods", None
-            ),
-            within_source_aggregation_methods=getattr(
-                request_body, "within_source_aggregation_methods", None
-            ),
-            assess_quality=getattr(request_body, "assess_quality", True),
-            persist_quality_reports=getattr(
-                request_body, "persist_quality_reports", True
-            ),
-        )
+        result = await _read_data_for_request(request_body)
 
         if _has_no_data(result):
             raise HTTPException(
                 status_code=404,
-                detail="No data available for the selected parameters."
+                detail={
+                    "status": jobs.NO_DATA,
+                    "error_code": "no_data",
+                    "message": "No data available for the selected parameters.",
+                },
             )
 
-        df = result["data"]
-        metadata = result["metadata"]
-
-        temp_dir = request.app.state.temp_dir
-
-        # --- SAVE CSV ---
-        data_file = tempfile.NamedTemporaryFile(
-            delete=False, suffix=".csv", mode="w+", dir=temp_dir
-        )
-        df.to_csv(data_file.name, index=True)
-        data_file.close()
-
-        # --- SAVE JSON METADATA ---
-        metadata_file = tempfile.NamedTemporaryFile(
-            delete=False, suffix=".json", mode="w+", dir=temp_dir
-        )
-        with open(metadata_file.name, "w", encoding="utf-8") as mf:
-            json.dump(metadata, mf, indent=4, default=str)
-        metadata_file.close()
-
-        # --- OPTIONAL MAP ---
-        map_url = None
-        if request_body.produce_map:
-            map_html = result.get("map")
-            if map_html:
-                map_file = tempfile.NamedTemporaryFile(
-                    delete=False, suffix=".html", mode="w+", dir=temp_dir,
-                    encoding="utf-8",
-                )
-                map_file.write(map_html)
-                map_file.close()
-                map_url = f"/download/{os.path.basename(map_file.name)}"
-
-        # --- BASE URL ---
-        base_url = _public_base_url()
-
-        # --- BUILD RESPONSE ---
-        response = {
-            "status": "success",
-            "data_url": f"{base_url}/download/{os.path.basename(data_file.name)}",
-            "metadata_url": f"{base_url}/download/{os.path.basename(metadata_file.name)}",
-            "map_url": f"{base_url}/download/{os.path.basename(map_file.name)}"
-            if map_url else None
-        }
-
+        response = {"status": jobs.SUCCESS}
+        response.update(_persist_result(result, request_body, temp_dir))
         return response
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error in /read-data-direct: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": jobs.ERROR,
+                "error_code": "internal_error",
+                "message": "An internal error occurred during data processing.",
+            },
+        )
+
+
+@api_router.get("/jobs/{job_id}", response_model=None)
+@limiter.limit("60/minute")
+async def read_job_status(
+    job_id: str,
+    request: Request,
+    current_user: User = Depends(get_current_active_user)
+) -> dict:
+    """
+    Report the state of one asynchronous request.
+
+    Returns ``accepted``, ``running``, ``success`` (with the download links),
+    ``no_data`` or ``error``. A job that does not exist, has expired, or
+    belongs to another user is reported as not found.
+    """
+    job = jobs.registry.get(job_id, owner=current_user.username)
+    if job is None:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": jobs.ERROR,
+                "error_code": "unknown_job",
+                "message": "No such job for this user; it may have expired.",
+            },
+        )
+    return job.as_response()

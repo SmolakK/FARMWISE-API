@@ -14,12 +14,16 @@ def test_start_scheduler(mock_scheduler, mock_cleanup_old_files):
     start_scheduler(temp_dir)
 
     # Assertions
-    mock_scheduler.add_job.assert_called_once_with(
+    mock_scheduler.add_job.assert_any_call(
         mock_cleanup_old_files,  # The function to be scheduled
         'interval',  # Job type
         minutes=60,  # Interval
         args=[temp_dir, 3600]  # Arguments for the job
     )
+    # Expired asynchronous job records are purged on their own interval.
+    from farmwise_api.server.jobs import registry
+    mock_scheduler.add_job.assert_any_call(registry.purge_expired, 'interval', minutes=30)
+    assert mock_scheduler.add_job.call_count == 2
     mock_scheduler.start.assert_called_once()  # Verify scheduler was started
 
 

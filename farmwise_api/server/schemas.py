@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Literal, Tuple, Optional
 from datetime import datetime
 from farmwise_api.adapters.mappings.data_source_mapping import PUBLIC_SERVER_API_PATH_RANGES
 from farmwise_api.core.harmonization import (
@@ -86,6 +86,14 @@ class ReadDataRequest(BaseModel):
         True,
         description=(
             "Run per-source quality assessment. Disable for lower latency."
+        )
+    )
+    mode: Literal["sync", "async"] = Field(
+        "sync",
+        description=(
+            "'sync' returns the download links when processing has finished. "
+            "'async' returns HTTP 202 with a job_id immediately; poll "
+            "GET /jobs/{job_id} for the result."
         )
     )
 
