@@ -48,7 +48,7 @@ Within-source aggregation: `mean` · cross-source harmonisation: `weighted_mean`
 
 | Source | Native variable | Physical meaning | Native unit | Output unit | Spatial support | Temporal support | Transformation | Weight | Status | Reference |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `eea.eea_read` | `value` | environmental data (EEA) | none - categorical environmental-zone code | none - categorical environmental-zone code | 100 m raster pixel size; derived from the Environmental Stratification of Europe with an original spatial resolution of 1 km (point) | static Environmental Zones 2018 classification; not a time series. FARMWISE currently repeats the 2018 classification for each requested day | no unit conversion; raster is reprojected using nearest-neighbour resampling and categorical values are aggregated to S2 cells | 1.0 | public | https://data.europa.eu/data/datasets/6ef007ab-1fcd-4c4f-bc96-14e8afbcb688 |
+| `eea.eea_read` | `value` | environmental data (EEA) | none - categorical environmental-zone code | none - categorical environmental-zone code | 100 m raster pixel size; derived from the Environmental Stratification of Europe with an original spatial resolution of 1 km (grid) | static Environmental Zones 2018 classification; not a time series. FARMWISE currently repeats the 2018 classification for each requested day | no unit conversion; raster is reprojected using nearest-neighbour resampling and categorical values are aggregated to S2 cells | 1.0 | public | https://data.europa.eu/data/datasets/6ef007ab-1fcd-4c4f-bc96-14e8afbcb688 |
 
 ## groundwater quality
 
