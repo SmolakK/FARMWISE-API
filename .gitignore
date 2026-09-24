@@ -83,3 +83,7 @@ htmlcov/
 
 # Row-level IMGW observations: permitted local academic use only; never commit or archive.
 evaluation/empirical_input/**/cross_source_observations_restricted.csv
+
+# Manuscript artefacts kept next to the code but not part of the package.
+/FARMWISE-API – Graphical abstract.pdf
+/farmwise_graphical_abstract*.html
