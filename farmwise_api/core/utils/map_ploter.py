@@ -269,16 +269,21 @@ def create_folium_map(
         control_scale=True
     )
 
+    # Leaflet shows the first layer added, so the default is the provider least
+    # likely to be filtered: OpenTopoMap serves from a/b/c subdomains, whereas
+    # tile.openstreetmap.org and basemaps.cartocdn.com are blocked on some
+    # institutional networks and by common browser extensions. The others stay
+    # available in the layer control.
     tile_layers = {
-        'OpenStreetMap': folium.TileLayer(
-            tiles='OpenStreetMap',
-            name='OpenStreetMap'
-        ),
         'Topographic': folium.TileLayer(
             tiles='https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
             attr='Map data: © OpenStreetMap contributors, SRTM | Map style: © OpenTopoMap',
             name='Topographic',
             max_zoom=17
+        ),
+        'OpenStreetMap': folium.TileLayer(
+            tiles='OpenStreetMap',
+            name='OpenStreetMap'
         ),
         'Light Map': folium.TileLayer(
             tiles='CartoDB positron',
@@ -362,8 +367,10 @@ def create_folium_map(
 
     # ---- Build base map radio buttons ----
     tile_radios_html = ""
+    # The first layer is the one Leaflet displays, so it is the one selected.
+    default_tile = next(iter(tile_layers))
     for name in tile_layers.keys():
-        checked = "checked" if name == 'OpenStreetMap' else ""
+        checked = "checked" if name == default_tile else ""
         tile_id = name.replace(' ', '_')
         tile_radios_html += f'''
           <label style="display: flex; align-items: center; margin: 5px 0; cursor: pointer;">
