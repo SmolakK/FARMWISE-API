@@ -105,3 +105,27 @@ def test_create_folium_map_rejects_data_without_valid_rasters(monkeypatch):
 
     with pytest.raises(ValueError, match="No valid rasters"):
         map_ploter.create_folium_map(dataset)
+
+
+def test_default_tile_layer_is_the_one_that_survives_network_filtering():
+    """OpenTopoMap is the default: tile.openstreetmap.org and cartocdn are blocked
+    on some institutional networks, leaving users with a blank map."""
+    import pandas as pd
+    from s2sphere import CellId, LatLng
+
+    from farmwise_api.core.utils.map_ploter import create_folium_map
+
+    cell = CellId.from_lat_lng(LatLng.from_degrees(52.0, 19.0)).parent(10)
+    frame = pd.DataFrame(
+        [[5.0]],
+        index=pd.to_datetime(["2024-01-01"]),
+        columns=pd.MultiIndex.from_tuples([("Temperature [C]", cell)]),
+    )
+
+    html = create_folium_map(frame, downsample_factor=1)
+
+    assert html.index("opentopomap.org") < html.index("tile.openstreetmap.org"), (
+        "OpenTopoMap must be added first so Leaflet shows it by default"
+    )
+    assert 'value="Topographic" id="tile_Topographic" checked' in html
+    assert 'value="OpenStreetMap" id="tile_OpenStreetMap" ' in html
