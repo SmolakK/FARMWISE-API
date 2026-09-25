@@ -7,7 +7,7 @@ type: software
 authors:
   - names: "Kamil Smolak, Dominik Teodorczyk, Jakub Misiewicz, Marc Laurencelle, Rambourg Damien, Wiesław Fiałkiewicz, Arkadiusz Głogowski"
     email: "kamil.smolak@upwr.edu.pl"
-version: 0.1.0
+version: 0.1.1
 repository-code: "https://github.com/SmolakK/FARMWISE-API"
 url: "https://github.com/SmolakK/FARMWISE-API"
 license: Apache-2.0
@@ -21,6 +21,6 @@ keywords:
   - geospatial data
   - S2 geometry
   - data harmonisation
-date-released: "2026-09-24"
+date-released: "2026-09-25"
 # doi: "10.5281/zenodo.REPLACE_WITH_RECORD_ID"
 # Citation will appear here
