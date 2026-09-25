@@ -63,6 +63,41 @@ async def fetch_data(api, pt_id, he_period_bounds, data_requested_codes, verbose
         return None
 
 
+async def fetch_bbox(api, spatial_range, he_period_bounds, data_requested_codes,
+                     verbose_level=0):
+    """Fetch every analysis inside the bounding box in one paginated query.
+
+    :param spatial_range: (N, S, E, W) in degrees; Hub'Eau expects
+        ``lon_min,lat_min,lon_max,lat_max``.
+    :return: the raw analyses frame, or None when the query fails.
+    """
+    north, south, east, west = spatial_range
+    bbox = f"{west},{south},{east},{north}"
+    if verbose_level >= 1:
+        logger.info("Fetching Hub'Eau analyses for bbox %s", bbox)
+
+    try:
+        frame = await asyncio.to_thread(
+            api.get_data,
+            bbox=bbox,
+            date_debut_prelevement=he_period_bounds[0],
+            date_fin_prelevement=he_period_bounds[1],
+            # Hub'Eau returns sampling times ('...T11:00:00Z').
+            date_fmt='ISO8601',
+            code_param=data_requested_codes,
+            # Exclude results qualified as incorrect (2) or uncertain (3),
+            # SANDRE nomenclature 414.
+            code_qualification='0,1,4',
+        )
+    except Exception as error:  # noqa: BLE001 - reported, never silent
+        logger.warning("Error fetching Hub'Eau analyses for bbox %s: %s", bbox, error)
+        return None
+
+    if frame is None or frame.empty:
+        return frame
+    return frame.rename_axis('date_debut_prelevement').reset_index()
+
+
 async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
                     verbose_level=0, within_source_aggregation_methods=None) -> pd.DataFrame | None:
     """
@@ -239,26 +274,28 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     # Initialisation of the hubeaupyutils API object
     api = hub.init_api('groundwater_qual')
 
-    # Prepare tasks for asynchronous data fetching
-    # Bounded fan-out: one request per point, a few at a time. Launching every
-    # point at once made Hub'Eau answer 503 and starved the shared thread pool.
-    responses = await gather_points(
-        lambda pt_id: fetch_data(
-            api, pt_id, he_period_bounds, data_requested_codes, verbose_level
-        ),
-        pt_ids_lst,
-        # Quality endpoints: slow per request and quick to refuse, and a wider
-        # limit buys no time (measured above).
-        concurrency=QUALITY_CONCURRENCY,
+    # One bounding-box query instead of one request per point. Hub'Eau serves
+    # the analyses endpoint by bbox and paginates the answer, so a box holding
+    # hundreds of points costs a handful of requests rather than hundreds:
+    # querying every point separately drew HTTP 503s and could not finish a
+    # country-sized request inside the timeout. The curated point list is still
+    # honoured - the returned rows are filtered to it below - so the selection
+    # of monitoring points does not change, only the number of requests.
+    df = await fetch_bbox(
+        api, spatial_range, he_period_bounds, data_requested_codes, verbose_level
     )
-
-    # Collect and process responses
-    accum_dfs = [df for df in responses if df is not None and not df.empty]
-
-    if not accum_dfs:
+    if df is None or df.empty:
         return None
 
-    df = pd.concat(accum_dfs, ignore_index=True)
+    selected_points = set(pt_ids_lst)
+    df = df[df["bss_id"].isin(selected_points)]
+    if df.empty:
+        if verbose_level >= 1:
+            logger.info(
+                "Hub'Eau returned data, but none for the %d selected points",
+                len(selected_points),
+            )
+        return None
 
     # If no data, there is nothing else to do:
     if (len(df) == 0):
