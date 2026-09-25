@@ -3715,6 +3715,13 @@ soupsieve==2.10 \
     --hash=sha256:8596eb8967d744174820280fa62b4542a2e955bfaccca73ed8a13c6eb8e9b502
     # via beautifulsoup4
 sqlalchemy==2.1.1 \
+    --hash=sha256:1abf1acecd4d0fc34d4ab7e9cda9e849ce95b647e1a5f76db7d2a5a0bea4e1e5 \
+    --hash=sha256:481d926922d9bff632955ed6f07e2b87066b0d1069eb67cbc8c35e27f7fe5e1e \
+    --hash=sha256:5516bdaacf5521b7de69a5c76961fde2cdc4edcb39730eccff16246a44cb8715 \
+    --hash=sha256:597e1edf9cbe6ce63974813000c02c7a44da3d21f1da47f07174732ba188e8ae \
+    --hash=sha256:af189bd861bd31a84f0ba244d6db0c8aeae9e56448c9001bf02ee6a93758b39e \
+    --hash=sha256:b04365ffe57cdeaf4d0f75630332d857dde3f91336bc4bdec76c810473c9c35e \
+    --hash=sha256:e08c92feb447b60e352c3581cc8a03119e36917b79362af62fd1a289c4d8e27b \
     --hash=sha256:fcf3cbb33bb23bad75d2150157c21804618745731e9931ab27e61879a9f6123b
     # via farmwise-api (pyproject.toml)
 stamina==26.1.0 \
