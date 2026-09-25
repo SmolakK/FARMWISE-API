@@ -95,7 +95,11 @@ async def fetch_bbox(api, spatial_range, he_period_bounds, data_requested_codes,
 
     if frame is None or frame.empty:
         return frame
-    return frame.rename_axis('date_debut_prelevement').reset_index()
+    frame = frame.rename_axis('date_debut_prelevement').reset_index()
+    # Same reduction to the sampling day as the per-point path: Hub'Eau returns
+    # sampling times, and values are aggregated per day, not per sample.
+    frame['date_debut_prelevement'] = sampling_day(frame['date_debut_prelevement'])
+    return frame
 
 
 async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
@@ -242,9 +246,6 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
         logger.debug(
             "GET: preparing the arguments for the api.get_data() calls..."
         )
-
-    # LIST of dataframes to accumulate what we get for the N points (inside the loop below)
-    accum_dfs = []
 
     # List of required fields in the output from HubEau, specified to reduce the nb of columns of data transmitted by
     # HubEau, and thus to make the get ops faster

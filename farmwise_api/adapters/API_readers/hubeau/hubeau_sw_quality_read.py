@@ -19,6 +19,50 @@ from farmwise_api._vendor import hubeaupyutils as hub
 logger = logging.getLogger(__name__)
 
 
+async def fetch_bbox(api, spatial_range, he_period_bounds, data_requested_codes,
+                     verbose_level=0):
+    """Fetch every analysis inside the bounding box in one paginated query.
+
+    Replaces one request per station: a box holding hundreds of stations cost
+    hundreds of requests, which drew HTTP 503s from the provider and returned a
+    different number of stations from run to run when individual requests
+    failed. The curated station list still decides what is kept; only the
+    number of requests changes.
+
+    :param spatial_range: (N, S, E, W) in degrees; Hub'Eau expects
+        ``lon_min,lat_min,lon_max,lat_max``.
+    :return: the raw analyses frame, or None when the query fails.
+    """
+    north, south, east, west = spatial_range
+    bbox = f"{west},{south},{east},{north}"
+    if verbose_level >= 1:
+        logger.info("Fetching Hub'Eau river analyses for bbox %s", bbox)
+
+    try:
+        frame = await asyncio.to_thread(
+            api.get_data,
+            bbox=bbox,
+            code_parametre=data_requested_codes,
+            code_support='3',  # Code 3 = 'Eau' (only data for water)
+            date_debut_prelevement=he_period_bounds[0],
+            date_fin_prelevement=he_period_bounds[1],
+            date_fmt='ISO8601',
+            # Ignore data qualified of Incorrect or Uncertain:
+            code_qualification='0,1,4',
+        )
+    except Exception as error:  # noqa: BLE001 - reported, never silent
+        logger.warning(
+            "Error fetching Hub'Eau river analyses for bbox %s: %s", bbox, error
+        )
+        return None
+
+    if frame is None or frame.empty:
+        return frame
+    frame = frame.rename_axis('date_debut_prelevement').reset_index()
+    frame['date_debut_prelevement'] = sampling_day(frame['date_debut_prelevement'])
+    return frame
+
+
 async def fetch_data(api, pt_id, he_period_bounds, data_requested_codes, verbose_level):
     """
     Asynchronous function to fetch data for a specific point.
@@ -209,9 +253,6 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
             "GET: preparing the arguments for the api.get_data() calls..."
         )
 
-    # LIST of dataframes to accumulate what we get for the N points (inside the loop below)
-    accum_dfs = []
-
     # Date (extraction period) parameters for the HubEau query:
     # (input argument should be text dates YYYY-mm-dd, else datetime/timestamp compatible types)
     he_period_bounds = [None, None]  # (list, not tuple)
@@ -238,31 +279,24 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     api = hub.init_api('river_qual', version=2) # (Important to use V2!)
 
     # Prepare tasks for asynchronous data fetching
-    # Bounded fan-out: one request per point, a few at a time. Launching every
-    # point at once made Hub'Eau answer 503 and starved the shared thread pool.
-    responses = await gather_points(
-        lambda pt_id: fetch_data(
-            api, pt_id, he_period_bounds, data_requested_codes, verbose_level
-        ),
-        pt_ids_lst,
-        # Quality endpoints: slow per request and quick to refuse, and a wider
-        # limit buys no time (measured above).
-        concurrency=QUALITY_CONCURRENCY,
+    # One bounding-box query instead of one request per station; the curated
+    # station list is applied to the returned rows below.
+    df = await fetch_bbox(
+        api, spatial_range, he_period_bounds, data_requested_codes, verbose_level
     )
-
-    # Collect and process responses
-    accum_dfs = [df for df in responses if (df is not None) and (not df.empty)]
-
-    if not accum_dfs:
+    if df is None or df.empty:
         return None
 
-    if (verbose_level >= 2):
-        logger.debug(
-            "Number of dataframes obtained (before concatenating them): %s",
-            len(accum_dfs),
-        )
+    selected_points = set(pt_ids_lst)
+    df = df[df["code_station"].isin(selected_points)]
+    if df.empty:
+        if verbose_level >= 1:
+            logger.info(
+                "Hub'Eau returned river data, but none for the %d selected stations",
+                len(selected_points),
+            )
+        return None
 
-    df = pd.concat(accum_dfs, ignore_index=True)
     # TODO (not essential, 2025 maybe?):
     # Could prevent a warning here, by pre-selecting only the useful columns inside accum_dfs creation from responses...
     # ...the warning being related to "empty or all-NA columns when determining the result dtypes".

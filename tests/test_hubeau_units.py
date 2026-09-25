@@ -154,7 +154,7 @@ async def test_read_data_never_averages_results_in_different_units(
     monkeypatch.setattr(module, "adapter_data", lambda *_args: "points.csv")
     monkeypatch.setattr(module.pd, "read_csv", lambda *_a, **_k: pd.DataFrame(points))
     monkeypatch.setattr(module.hub, "init_api", lambda *_a, **_k: object())
-    monkeypatch.setattr(module, "fetch_data", AsyncMock(return_value=frame))
+    monkeypatch.setattr(module, "fetch_bbox", AsyncMock(return_value=frame))
 
     result = await module.read_data(
         (50.5, 49.5, 2.5, 1.5), ("2024-01-01", "2024-01-03"), ["heavy metals"], 10,

@@ -162,7 +162,7 @@ async def test_read_data_limits_points_formats_dates_and_handles_empty_responses
     init_api = MagicMock(return_value=api)
     monkeypatch.setattr(module.hub, "init_api", init_api)
     fetch = AsyncMock(return_value=None)
-    monkeypatch.setattr(module, "fetch_data", fetch)
+    monkeypatch.setattr(module, "fetch_bbox", fetch)
 
     result = await module.read_data(
         (51.0, 49.0, 3.0, 1.0),
@@ -174,12 +174,69 @@ async def test_read_data_limits_points_formats_dates_and_handles_empty_responses
     )
 
     assert result is None
+    # One bounding-box query for the whole area, not one request per point.
     fetch.assert_awaited_once()
     args = fetch.await_args.args
-    assert args[1] == point_id
+    assert args[1] == (51.0, 49.0, 3.0, 1.0)
     assert args[2] == ["2024-01-01", "2024-01-02"]
     assert "1340" in args[3]
     if module is surface:
         init_api.assert_called_once_with("river_qual", version=2)
     else:
         init_api.assert_called_once_with("groundwater_qual")
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "module, points, id_column",
+    [
+        (
+            surface,
+            pd.DataFrame({"code_station": ["SW1"], "x_longitude": [2.0],
+                          "y_latitude": [50.0], "S2CELL": ["cell-1"]}),
+            "code_station",
+        ),
+        (
+            groundwater,
+            pd.DataFrame({"code_bss_new": ["GW1"], "lon": [2.0],
+                          "lat": [50.0], "S2CELL": ["cell-1"]}),
+            "bss_id",
+        ),
+    ],
+)
+async def test_bbox_results_are_filtered_to_the_curated_points(
+    monkeypatch, module, points, id_column
+):
+    """A bounding-box query returns every station in the box, curated or not.
+
+    The curated selection must still decide what is kept, otherwise switching
+    from per-point requests to one bbox query would silently widen the station
+    set and change the results.
+    """
+    returned = pd.DataFrame({
+        "date_debut_prelevement": [pd.Timestamp("2024-01-01")],
+        "latitude": [50.0], "longitude": [2.0],
+        "code_param": ["1340"], "code_parametre": ["1340"],
+        "nom_param": ["Nitrates"], "libelle_parametre": ["Nitrates"],
+        "resultat": [5.0], "symbole_unite": ["mg(NO3)/L"],
+        "code_fraction": ["3"], "libelle_fraction": [""],
+        "code_remarque": ["1"], "libelle_support": ["Eau"],
+    })
+    # A station that exists in the box but is not in the curated list.
+    returned[id_column] = "NOT-CURATED"
+
+    monkeypatch.setattr(module, "adapter_data", lambda *_args: "points.csv")
+    monkeypatch.setattr(module.pd, "read_csv", MagicMock(return_value=points))
+    monkeypatch.setattr(
+        module, "prepare_coordinates",
+        MagicMock(return_value=points.rename(
+            columns={"x_longitude": "lon", "y_latitude": "lat"})),
+    )
+    monkeypatch.setattr(module.hub, "init_api", MagicMock(return_value=object()))
+    monkeypatch.setattr(module, "fetch_bbox", AsyncMock(return_value=returned))
+
+    result = await module.read_data(
+        (51.0, 49.0, 3.0, 1.0), ("2024-01-01", "2024-01-02"), ["nitrate"], 10,
+    )
+
+    assert result is None
