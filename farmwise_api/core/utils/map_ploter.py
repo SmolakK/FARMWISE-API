@@ -295,7 +295,11 @@ def create_folium_map(
         )
     }
 
-    for layer in tile_layers.values():
+    # Every base layer is added so the switcher can find them, and Leaflet
+    # stacks them in insertion order. Add them in reverse so the default (the
+    # first entry) ends up on top: a provider blocked by the viewer's network
+    # would otherwise cover the working one with an empty layer.
+    for layer in reversed(list(tile_layers.values())):
         layer.add_to(m)
 
     # ---- 2nd pass: create raster overlays & encode as base64 PNG ----
@@ -618,6 +622,10 @@ def create_folium_map(
 
               console.log('Base layers found:', Object.keys(baseLayers));
 
+              // Drop every layer except the selected one. Leaving them stacked
+              // keeps fetching tiles that are never seen, and any blocked
+              // provider above the selected one shows as an empty background.
+              updateBaseLayer();
               updateLegend();
               updateDataLayer();
           }}

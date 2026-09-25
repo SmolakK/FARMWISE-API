@@ -124,8 +124,12 @@ def test_default_tile_layer_is_the_one_that_survives_network_filtering():
 
     html = create_folium_map(frame, downsample_factor=1)
 
-    assert html.index("opentopomap.org") < html.index("tile.openstreetmap.org"), (
-        "OpenTopoMap must be added first so Leaflet shows it by default"
+    # Leaflet stacks base layers in insertion order, so the default must be
+    # added last to sit on top of providers the viewer's network may block.
+    assert html.rindex("opentopomap.org") > html.rindex("basemaps.cartocdn.com"), (
+        "OpenTopoMap must be added last so it is painted above the others"
     )
+    # and the initialiser must drop the unselected layers.
+    assert "updateBaseLayer();" in html.split("function initializeMap")[1].split("function getTileLayerName")[0]
     assert 'value="Topographic" id="tile_Topographic" checked' in html
     assert 'value="OpenStreetMap" id="tile_OpenStreetMap" ' in html
