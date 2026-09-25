@@ -472,7 +472,8 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
         metadata["error"] = None
         return {"data": pd.DataFrame(), "metadata": metadata}
 
-    try:
+    def _combine() -> dict:
+        """Combine, interpolate and render: pure CPU work on pandas frames."""
         if separate_api:
             combined_data = pd.concat(
                 [data for _source, data, _types in data_storage]
@@ -497,17 +498,27 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
                     combined_data, data_storage, effective_methods
                 ),
             )
+        combined = {"data": combined_data}
+        if produce_map:
+            from farmwise_api.core.utils.map_ploter import create_folium_map
+            combined["map"] = create_folium_map(combined_data, downsample_factor=1)
+        return combined
+
+    try:
+        # Off the event loop: harmonisation, interpolation and map rendering are
+        # CPU-bound and can run for tens of seconds on a large request. Run in
+        # the loop they would block every other request served by this process,
+        # including the job-status polls of an asynchronous request.
+        combined = await asyncio.to_thread(_combine)
 
         metadata["status"] = "success"
         metadata["error"] = None
         result = {
-            "data": combined_data,
+            "data": combined["data"],
             "metadata": metadata,
         }
-        if produce_map:
-            from farmwise_api.core.utils.map_ploter import create_folium_map
-            html_content = create_folium_map(combined_data, downsample_factor=1)
-            result['map'] = html_content
+        if "map" in combined:
+            result["map"] = combined["map"]
         return result
     except Exception as e:
         logger.error(f'Error concatenating data: {e}')

@@ -697,3 +697,61 @@ async def test_dispatch_error_names_the_exception_when_its_message_is_empty(monk
     )
 
     assert result["metadata"]["dispatch"][0]["error"] == "ReadTimeout"
+
+
+@pytest.mark.asyncio
+async def test_combination_does_not_block_the_event_loop(monkeypatch):
+    """A slow harmonisation must not stall other work in the same process.
+
+    The server runs a single worker, so blocking the loop would freeze every
+    other request, including the job-status polls of an asynchronous request.
+    """
+    import asyncio
+    import time
+
+    from farmwise_api.core import main_call
+
+    cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
+    frame = pd.DataFrame(
+        [[5.0]],
+        index=pd.to_datetime(["2024-01-01"]),
+        columns=pd.MultiIndex.from_tuples([("Temperature", cell)]),
+    )
+    module = MagicMock()
+    module.read_data = AsyncMock(return_value=frame)
+    monkeypatch.setattr(
+        main_call,
+        "API_PATH_RANGES",
+        {"provider.adapter": [(55, 49, 24, 14), ("2020-01-01", "2030-01-01"), ["temperature"]]},
+    )
+    monkeypatch.setattr(main_call, "spatial_ranges_overlap", lambda *_args: True)
+    monkeypatch.setattr(main_call, "time_ranges_overlap", lambda *_args: True)
+    monkeypatch.setattr(main_call.importlib, "import_module", lambda _name: module)
+
+    def slow_harmonize(*_args, **_kwargs):
+        time.sleep(0.4)  # stands in for pandas work holding the thread
+        return frame
+
+    monkeypatch.setattr(main_call, "harmonize_data", slow_harmonize)
+
+    ticks = 0
+
+    async def heartbeat():
+        nonlocal ticks
+        while True:
+            await asyncio.sleep(0.02)
+            ticks += 1
+
+    beat = asyncio.create_task(heartbeat())
+    try:
+        result = await main_call.read_data(
+            bounding_box=(55, 49, 24, 14), level=10,
+            time_from="2024-01-01", time_to="2024-01-02",
+            factors=["temperature"], assess_quality=False,
+        )
+    finally:
+        beat.cancel()
+
+    assert result["metadata"]["status"] == "success"
+    # About 20 ticks fit into 0.4 s; in-loop harmonisation would allow none.
+    assert ticks >= 5, f"event loop blocked during combination ({ticks} ticks)"
