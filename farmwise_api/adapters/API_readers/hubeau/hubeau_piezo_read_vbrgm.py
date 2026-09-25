@@ -2,6 +2,7 @@ import logging
 import pandas as pd
 from farmwise_api.adapters.API_readers.hubeau.hubeau_mappings.hubeau_mapping_piezo import MAPPING
 from farmwise_api.adapters.mappings.units import GROUNDWATER_LEVEL_COLUMN
+from farmwise_api.adapters.API_readers.hubeau.hubeau_concurrency import gather_points
 from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
 import warnings
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
@@ -236,11 +237,14 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     api = hub.init_api('piezometry')
 
     # Prepare tasks for asynchronous data fetching
-    tasks = [
-        fetch_data(api, pt_id, he_period_bounds, data_requested_varnames, verbose_level)
-        for pt_id in pt_ids_lst
-    ]
-    responses = await asyncio.gather(*tasks)
+    # Bounded fan-out: one request per point, a few at a time. Launching every
+    # point at once made Hub'Eau answer 503 and starved the shared thread pool.
+    responses = await gather_points(
+        lambda pt_id: fetch_data(
+            api, pt_id, he_period_bounds, data_requested_varnames, verbose_level
+        ),
+        pt_ids_lst,
+    )
 
     # Collect and process responses
     accum_dfs = [df for df in responses if df is not None and not df.empty]

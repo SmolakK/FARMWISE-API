@@ -118,7 +118,7 @@ def assess_data_quality(df, metadata, ranges, req_ranges):
         "factors_expected": expected_factors,
         "factors_returned": returned_columns,
         "factors_returned_completeness": _factor_completeness(
-            expected_factors, returned_columns
+            expected_factors, returned_columns, api_factors
         ),
     }
 
@@ -251,7 +251,22 @@ def _missing_day_rate(
 def _factor_completeness(
     expected_factors: list[str],
     returned_columns: list[str],
+    source_factors: list[str] | None = None,
 ) -> float | None:
+    """Share of requested factors visible in the returned columns.
+
+    Output columns carry the provider's own variable names, which often share
+    no words with the logical factor: ERA5 answers "soil humidity" with
+    "Soil moisture [%]", and GIOS answers "groundwater quality" with one column
+    per determinand. Two rules are applied before giving up:
+
+    1. the column text matches the factor or one of its aliases;
+    2. the source advertises exactly one of the requested factors, so every
+       column it returned belongs to that factor.
+
+    When neither settles it the result is ``None`` - undetermined - rather than
+    0.0, which previously reported complete data as entirely missing.
+    """
     if not expected_factors:
         return None
     normalized_columns = [_normalize_factor_text(column) for column in returned_columns]
@@ -272,6 +287,13 @@ def _factor_completeness(
             "crop code",
             "crop type",
         ),
+        "soil humidity": (
+            "soil moisture",
+            "volumetric soil water",
+            "swvl",
+        ),
+        "soil": ("soil",),
+        "environmental data (eea)": ("environmental zone", "env zone", "eea"),
     }
     matched = {
         factor
@@ -285,6 +307,15 @@ def _factor_completeness(
             )
         )
     }
+    if not matched and returned_columns and source_factors:
+        # A source that provides exactly one of the requested factors cannot
+        # have returned columns belonging to any other factor.
+        single = sorted(set(source_factors).intersection(expected_factors))
+        if len(single) == 1:
+            matched = set(single)
+
+    if not matched:
+        return None
     return len(matched) / len(expected_factors)
 
 

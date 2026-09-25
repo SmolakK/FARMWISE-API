@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 from datetime import date, datetime, timedelta
 from collections import defaultdict
 from pyproj import Transformer
@@ -47,12 +49,19 @@ async def read_data(
     if start > end:
         raise ValueError("time_range start must not be after end")
 
-    cell_polygons = _s2_cell_polygons(spatial_range, level)
+    # Building the S2 cell polygons and matching them against the returned
+    # features is CPU-bound shapely work (measured at ~4 s for a one-degree
+    # box, and it grows with area). Run in the event loop it stalls every
+    # other request in the process, so both steps go to a worker thread while
+    # the HTTP calls stay asynchronous.
+    cell_polygons = await asyncio.to_thread(_s2_cell_polygons, spatial_range, level)
     frames = []
     async with httpx.AsyncClient(timeout=120) as client:
         for snapshot, period_start, period_end in _snapshot_periods(start, end):
             features = await _fetch_features(client, snapshot, spatial_range)
-            classes = _dominant_classes(cell_polygons, features, snapshot)
+            classes = await asyncio.to_thread(
+                _dominant_classes, cell_polygons, features, snapshot
+            )
             if not classes:
                 continue
             index = pd.date_range(period_start, period_end, freq="D").date

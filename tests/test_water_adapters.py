@@ -397,3 +397,85 @@ def test_epa_catalogue_links_follow_the_station_ids():
     # Ireland, including offshore islands.
     assert catalogue["lat"].between(51.3, 55.5).all()
     assert catalogue["lon"].between(-10.7, -5.9).all()
+
+
+@pytest.mark.asyncio
+async def test_hubeau_fan_out_is_bounded():
+    """Every point at once made Hub'Eau answer 503 and starved the thread pool."""
+    import asyncio
+
+    from farmwise_api.adapters.API_readers.hubeau.hubeau_concurrency import (
+        DEFAULT_CONCURRENCY, gather_points,
+    )
+
+    in_flight = 0
+    peak = 0
+
+    async def fetch(point_id):
+        nonlocal in_flight, peak
+        in_flight += 1
+        peak = max(peak, in_flight)
+        try:
+            await asyncio.sleep(0.01)
+            return point_id
+        finally:
+            in_flight -= 1
+
+    points = [f"BSS{i:04d}" for i in range(50)]
+    results = await gather_points(fetch, points, concurrency=4)
+
+    assert results == points, "results must keep the order of the requested points"
+    assert peak <= 4, f"{peak} requests were in flight at once"
+    assert DEFAULT_CONCURRENCY >= 1
+
+
+def test_hubeau_client_retries_provider_overload_responses(monkeypatch):
+    """A 503 previously vanished as an empty frame, silently dropping the point."""
+    from types import SimpleNamespace
+
+    from farmwise_api.adapters.API_readers.hubeau import hubeau_concurrency
+
+    attempts = []
+
+    def fake_get(url, *_args, **_kwargs):
+        attempts.append(url)
+        status = 503 if len(attempts) < 3 else 200
+        return SimpleNamespace(status_code=status, reason="", json=lambda: {})
+
+    monkeypatch.setattr(hubeau_concurrency.requests, "get", fake_get)
+    monkeypatch.setattr(hubeau_concurrency, "BACKOFF_SECONDS", 0)
+
+    response = hubeau_concurrency._retrying_get("https://hubeau.example/api")
+
+    assert response.status_code == 200
+    assert len(attempts) == 3
+
+
+def test_hubeau_client_gives_up_after_the_attempt_limit(monkeypatch):
+    from types import SimpleNamespace
+
+    from farmwise_api.adapters.API_readers.hubeau import hubeau_concurrency
+
+    calls = []
+
+    def always_refused(url, *_args, **_kwargs):
+        calls.append(url)
+        return SimpleNamespace(status_code=503, reason="", json=lambda: {})
+
+    monkeypatch.setattr(hubeau_concurrency.requests, "get", always_refused)
+    monkeypatch.setattr(hubeau_concurrency, "BACKOFF_SECONDS", 0)
+
+    response = hubeau_concurrency._retrying_get("https://hubeau.example/api")
+
+    assert response.status_code == 503
+    assert len(calls) == hubeau_concurrency.MAX_ATTEMPTS
+
+
+def test_the_vendored_client_uses_the_retrying_getter_without_touching_requests():
+    import requests
+
+    from farmwise_api._vendor.hubeaupyutils import hubeau as vendored
+    from farmwise_api.adapters.API_readers.hubeau import hubeau_concurrency
+
+    assert vendored.requests.get is hubeau_concurrency._retrying_get
+    assert requests.get is not hubeau_concurrency._retrying_get

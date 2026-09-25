@@ -8,6 +8,7 @@ import zipfile
 from farmwise_api.core.utils.paths import scratch_dir
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
+import asyncio
 import logging
 
 logger = logging.getLogger(__name__)
@@ -100,14 +101,21 @@ async def read_data(spatial_range, time_range, data_range, level,
             temp_file_path = folder_path / (
                 f"{dataset}_{chunk_start:%Y%m}_temp_data.nc"
             )
-            c.retrieve(dataset, request).download(str(temp_file_path))
-            downloaded_dataset = _open_downloaded_dataset(temp_file_path)
-            try:
-                downloaded_frames.append(
-                    downloaded_dataset.to_dataframe().reset_index()
-                )
-            finally:
-                downloaded_dataset.close()
+            def _retrieve_chunk(request=request, temp_file_path=temp_file_path):
+                """Submit, wait and decode: cdsapi is synchronous throughout.
+
+                The CDS queue wait is often minutes, and run in the event loop
+                it blocked every other request in the process - including the
+                job-status polls of an asynchronous request.
+                """
+                c.retrieve(dataset, request).download(str(temp_file_path))
+                downloaded_dataset = _open_downloaded_dataset(temp_file_path)
+                try:
+                    return downloaded_dataset.to_dataframe().reset_index()
+                finally:
+                    downloaded_dataset.close()
+
+            downloaded_frames.append(await asyncio.to_thread(_retrieve_chunk))
 
     df = pd.concat(downloaded_frames, ignore_index=True)
 

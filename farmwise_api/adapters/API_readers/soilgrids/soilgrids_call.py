@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from soilgrids import SoilGrids
@@ -52,6 +53,25 @@ async def read_data(spatial_range, time_range, data_range, level,
     """
     logger.info("DOWNLOADING: SoilGrids Data")
 
+    def _fetch_and_build() -> pd.DataFrame:
+        """Fetch the WCS rasters and build the frame: synchronous throughout.
+
+        The SoilGrids client is a blocking HTTP client and the per-pixel frame
+        construction is CPU-bound, measured at ~34 s for a one-degree box. Run
+        in the event loop this froze every other request in the process, so the
+        whole pipeline runs in a worker thread.
+        """
+        return _read_soilgrids(
+            spatial_range, time_range, data_range, level,
+            within_source_aggregation_methods,
+        )
+
+    return await asyncio.to_thread(_fetch_and_build)
+
+
+def _read_soilgrids(spatial_range, time_range, data_range, level,
+                    within_source_aggregation_methods=None) -> pd.DataFrame:
+    """Blocking SoilGrids read; call it through ``read_data``."""
     # Initialize the SoilGrids client
     soilgrids = SoilGrids()
 

@@ -564,7 +564,10 @@ async def test_read_data_persists_per_source_quality_report(monkeypatch, tmp_pat
     assert len(list(tmp_path.glob("*.json"))) == 1
     assert result["metadata"]["coverage_precheck"]["candidate_sources"] == 2
     assert result["metadata"]["coverage_precheck"]["dispatched_sources"] == 1
-    assert result["metadata"]["coverage_precheck"]["requests_avoided"] == 1
+    # "provider.unused" provides the requested factor but lies outside the box,
+    # so the pre-check genuinely avoided that call.
+    assert result["metadata"]["coverage_precheck"]["requests_avoided_vs_factor_only"] == 1
+    assert result["metadata"]["coverage_precheck"]["sources_not_dispatched"] == 1
     assert result["metadata"]["dispatch"][0]["status"] == "success"
 
 
@@ -755,3 +758,47 @@ async def test_combination_does_not_block_the_event_loop(monkeypatch):
     assert result["metadata"]["status"] == "success"
     # About 20 ticks fit into 0.4 s; in-loop harmonisation would allow none.
     assert ticks >= 5, f"event loop blocked during combination ({ticks} ticks)"
+
+
+@pytest.mark.asyncio
+async def test_avoided_requests_exclude_sources_without_the_requested_factor(monkeypatch):
+    """A factor-only router would not call a source that lacks the factor either.
+
+    Counting every undispatched source reported 15 avoided calls on a request
+    where only 2 were avoided by coverage checking.
+    """
+    from farmwise_api.core import main_call
+
+    cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
+    frame = pd.DataFrame(
+        [[5.0]],
+        index=pd.to_datetime(["2024-01-01"]),
+        columns=pd.MultiIndex.from_tuples([("Temperature", cell)]),
+    )
+    module = MagicMock()
+    module.read_data = AsyncMock(return_value=frame)
+    monkeypatch.setattr(
+        main_call,
+        "API_PATH_RANGES",
+        {
+            "provider.inside": [(55, 49, 24, 14), ("2020-01-01", "2030-01-01"), ["temperature"]],
+            # Same factor, wrong area: avoided by the coverage pre-check.
+            "provider.elsewhere": [(45, 40, 10, 5), ("2020-01-01", "2030-01-01"), ["temperature"]],
+            # Different factor: never called in either routing mode.
+            "provider.other_factor": [(55, 49, 24, 14), ("2020-01-01", "2030-01-01"), ["soil"]],
+        },
+    )
+    monkeypatch.setattr(main_call.importlib, "import_module", lambda _name: module)
+    monkeypatch.setattr(main_call, "extract_bbox", lambda _cells: (51, 51, 17, 17))
+
+    result = await main_call.read_data(
+        bounding_box=(55, 49, 24, 14), level=10,
+        time_from="2024-01-01", time_to="2024-01-02",
+        factors=["temperature"], assess_quality=False,
+    )
+
+    precheck = result["metadata"]["coverage_precheck"]
+    assert precheck["candidate_sources"] == 3
+    assert precheck["dispatched_sources"] == 1
+    assert precheck["requests_avoided_vs_factor_only"] == 1
+    assert precheck["sources_not_dispatched"] == 2

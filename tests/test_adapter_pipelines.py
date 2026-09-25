@@ -210,3 +210,44 @@ async def test_ifsgrid_read_data_maps_columns(monkeypatch):
     assert result.columns.tolist() == [
         ("Total utilised agricultural area", "cell")
     ]
+
+
+@pytest.mark.asyncio
+async def test_eurocrop_local_scan_does_not_block_the_event_loop(monkeypatch, tmp_path):
+    """The parcel scan is CPU-bound for tens of seconds; it must not stall the loop.
+
+    Measured at 35 s inline on a Slovakia land-cover request, which froze every
+    other request in the server process, job-status polls included.
+    """
+    import asyncio
+    import time
+
+    frame = pd.DataFrame({"lon": [19.0], "lat": [52.0], "cf2020": ["211"]})
+
+    def slow_scan(*_args):
+        time.sleep(0.4)  # stands in for the DuckDB scan of the parcel file
+        return frame
+
+    monkeypatch.setattr(EuroCropV2_read, "adapter_data", lambda *_args: str(tmp_path / "points.csv"))
+    monkeypatch.setattr(EuroCropV2_read, "extract_data_by_bbox", slow_scan)
+    monkeypatch.setattr(EuroCropV2_read, "extract_years", lambda f, _t: f)
+    monkeypatch.setattr(EuroCropV2_read, "data_agregation", lambda f, *_a, **_k: f)
+    monkeypatch.setattr(EuroCropV2_read, "data_melting", lambda _f, _t: pd.DataFrame())
+
+    ticks = 0
+
+    async def heartbeat():
+        nonlocal ticks
+        while True:
+            await asyncio.sleep(0.02)
+            ticks += 1
+
+    beat = asyncio.create_task(heartbeat())
+    try:
+        await EuroCropV2_read.read_data(
+            (53.0, 51.0, 20.0, 18.0), ("2020-01-01", "2020-12-31"), ["land cover"], 10
+        )
+    finally:
+        beat.cancel()
+
+    assert ticks >= 5, f"event loop blocked during the parcel scan ({ticks} ticks)"

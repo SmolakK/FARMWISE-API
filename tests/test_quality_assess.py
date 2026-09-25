@@ -121,10 +121,37 @@ def test_persist_quality_report_writes_standard_json(tmp_path):
     assert payload["api_name"] == "mock"
 
 
-def test_single_factor_is_not_counted_when_columns_are_unrelated():
+def test_unrelated_columns_are_undetermined_rather_than_missing():
+    """Columns that match no factor text leave the question open.
+
+    Reporting 0.0 claimed the data was absent; for most sources the output
+    columns are provider variable names that share no words with the logical
+    factor (ERA5 answers "soil humidity" with "Soil moisture [%]").
+    """
     assert quality_assess._factor_completeness(
         ["land cover"], ["CORINE R", "CORINE G", "CORINE B"]
-    ) == 0
+    ) is None
+
+
+def test_a_single_factor_source_accounts_for_all_its_columns():
+    """If the source provides only one requested factor, its columns are that factor."""
+    assert quality_assess._factor_completeness(
+        ["land cover"], ["CORINE R", "CORINE G", "CORINE B"], ["land cover"]
+    ) == 1.0
+
+
+def test_several_source_factors_with_unrelated_columns_stay_undetermined():
+    assert quality_assess._factor_completeness(
+        ["groundwater quality", "groundwater quantity"],
+        ["Arsenic [mgAs/l]"],
+        ["groundwater quality", "groundwater quantity"],
+    ) is None
+
+
+def test_soil_humidity_is_recognised_in_the_era5_column_name():
+    assert quality_assess._factor_completeness(
+        ["soil humidity"], ["Soil moisture [%]"]
+    ) == 1.0
 
 
 def test_factor_completeness_recognizes_quantity_aliases():

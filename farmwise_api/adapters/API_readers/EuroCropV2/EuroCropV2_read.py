@@ -1,3 +1,4 @@
+import asyncio
 import os
 import pandas as pd
 from typing import Tuple, List
@@ -53,23 +54,31 @@ async def read_data(
 
     data_path = adapter_data("EuroCropV2", "data", "points.csv")
 
-    extracted_data = extract_data_by_bbox(data_path, spatial_range)
+    def _read_local() -> pd.DataFrame:
+        """Scan the parcel file and aggregate it: seconds to minutes of CPU work.
 
-    if extracted_data.empty:
+        Run inline this blocked the caller's event loop for the whole scan - on
+        a server that stalls every other request, including job-status polls -
+        so the whole local pipeline runs in a worker thread.
+        """
+        extracted = extract_data_by_bbox(data_path, spatial_range)
+        if extracted.empty:
+            return pd.DataFrame()
+        extracted = extract_years(extracted, time_range)
+        aggregated = data_agregation(
+            extracted,
+            spatial_range,
+            level,
+            data_range,
+            within_source_aggregation_methods or WITHIN_SOURCE_AGGREGATION_METHODS,
+        )
+        if aggregated.empty:
+            return pd.DataFrame()
+        return data_melting(aggregated, time_range)
+
+    melted_data = await asyncio.to_thread(_read_local)
+    if melted_data.empty:
         return pd.DataFrame()
-    extracted_data = extract_years(extracted_data, time_range)
-    aggregated_data = data_agregation(
-        extracted_data,
-        spatial_range,
-        level,
-        data_range,
-        within_source_aggregation_methods or WITHIN_SOURCE_AGGREGATION_METHODS,
-    )
-
-    if aggregated_data.empty:
-        return pd.DataFrame()
-
-    melted_data = data_melting(aggregated_data, time_range)
     if isinstance(melted_data.columns, pd.MultiIndex):
         melted_data = melted_data.loc[
             :,
