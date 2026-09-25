@@ -437,7 +437,18 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
             "dispatched_sources": sum(
                 item["dispatched"] for item in dispatch_plan
             ),
-            "requests_avoided": sum(
+            # Only sources that provide a requested factor but fail the
+            # spatial or temporal check are avoided by the pre-check: a
+            # factor-only router would not call the others either. Counting
+            # every undispatched source overstated the saving (15 against 2
+            # on a France-wide soil-humidity request).
+            "requests_avoided_vs_factor_only": sum(
+                bool(item["factor_overlap"])
+                and not item["disabled_reason"]
+                and not item["dispatched"]
+                for item in dispatch_plan
+            ),
+            "sources_not_dispatched": sum(
                 not item["dispatched"] for item in dispatch_plan
             ),
             "precheck_seconds": precheck_seconds,
@@ -543,14 +554,14 @@ if __name__ == "__main__":
     #     ],
     #     produce_map=True
     # ))
-    # asyncio.run(read_data(
-    #     country=['Poland'],
-    #     level=10,
-    #     time_from='2018-01-10',
-    #     time_to='2019-02-10',
-    #     factors=['land cover'],
-    #     assess_quality=True,
-    # ))
+    asyncio.run(read_data(
+        country=['France'],
+        level=10,
+        time_from='2018-01-10',
+        time_to='2019-02-10',
+        factors=['groundwater quality'],
+        assess_quality=False,
+    ))
 
 
 __all__ = ["plan_source_dispatch", "read_data"]
