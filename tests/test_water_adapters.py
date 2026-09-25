@@ -479,3 +479,44 @@ def test_the_vendored_client_uses_the_retrying_getter_without_touching_requests(
 
     assert vendored.requests.get is hubeau_concurrency._retrying_get
     assert requests.get is not hubeau_concurrency._retrying_get
+
+
+def test_hubeau_requests_carry_a_timeout(monkeypatch):
+    """The vendored client passes none, so a stalled connection held a worker thread."""
+    from types import SimpleNamespace
+
+    from farmwise_api.adapters.API_readers.hubeau import hubeau_concurrency
+
+    seen = {}
+
+    def fake_get(url, *_args, **kwargs):
+        seen.update(kwargs)
+        return SimpleNamespace(status_code=200, reason="", json=lambda: {})
+
+    monkeypatch.setattr(hubeau_concurrency.requests, "get", fake_get)
+    hubeau_concurrency._retrying_get("https://hubeau.example/api")
+
+    assert seen["timeout"] == hubeau_concurrency.REQUEST_TIMEOUT_SECONDS
+
+
+def test_hubeau_retries_a_timed_out_request(monkeypatch):
+    import requests as requests_module
+    from types import SimpleNamespace
+
+    from farmwise_api.adapters.API_readers.hubeau import hubeau_concurrency
+
+    calls = []
+
+    def flaky_get(url, *_args, **_kwargs):
+        calls.append(url)
+        if len(calls) == 1:
+            raise requests_module.exceptions.ReadTimeout("stalled")
+        return SimpleNamespace(status_code=200, reason="", json=lambda: {})
+
+    monkeypatch.setattr(hubeau_concurrency.requests, "get", flaky_get)
+    monkeypatch.setattr(hubeau_concurrency, "BACKOFF_SECONDS", 0)
+
+    response = hubeau_concurrency._retrying_get("https://hubeau.example/api")
+
+    assert response.status_code == 200
+    assert len(calls) == 2

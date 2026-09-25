@@ -74,18 +74,37 @@ async def gather_points(
 RETRY_STATUSES = frozenset({429, 500, 502, 503, 504})
 MAX_ATTEMPTS = 3
 BACKOFF_SECONDS = 1.5
+# The vendored client passes no timeout, so a stalled connection held a worker
+# thread until the operating system gave up. Measured over repeated runs, that
+# produced a bimodal distribution: the same request took either ~4 s or ~124 s,
+# at every concurrency limit, which is the hang rather than the throughput.
+REQUEST_TIMEOUT_SECONDS = 30
 
 
 def _retrying_get(url, *args, **kwargs):
-    """``requests.get`` with bounded retries on the statuses Hub'Eau uses for overload.
+    """``requests.get`` with a timeout and bounded retries.
 
-    Called inside a worker thread, so sleeping here does not block the event
-    loop. Only the vendored client's reference to ``requests`` is replaced, so
-    no other adapter's HTTP behaviour changes.
+    Retries the statuses Hub'Eau uses for overload, and connection or read
+    timeouts. Called inside a worker thread, so sleeping here does not block
+    the event loop. Only the vendored client's reference to ``requests`` is
+    replaced, so no other adapter's HTTP behaviour changes.
     """
+    kwargs.setdefault("timeout", REQUEST_TIMEOUT_SECONDS)
     response = None
     for attempt in range(1, MAX_ATTEMPTS + 1):
-        response = requests.get(url, *args, **kwargs)
+        try:
+            response = requests.get(url, *args, **kwargs)
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as error:
+            if attempt == MAX_ATTEMPTS:
+                logger.warning(
+                    "Hub'Eau request failed after %d attempts (%s); "
+                    "this point contributes no data", MAX_ATTEMPTS, error,
+                )
+                raise
+            logger.info("Hub'Eau request failed (%s); retrying (%d/%d)",
+                        error, attempt, MAX_ATTEMPTS - 1)
+            time.sleep(BACKOFF_SECONDS * attempt)
+            continue
         if response.status_code not in RETRY_STATUSES:
             return response
         if attempt < MAX_ATTEMPTS:
