@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
-from farmwise_api.server.security import authenticate_user, create_access_token, get_current_active_user, ACCESS_TOKEN_EXPIRE_MINUTES
+from farmwise_api.server.security import authenticate_user, create_access_token, get_current_active_user, limiter, ACCESS_TOKEN_EXPIRE_MINUTES
 from farmwise_api.server.schemas import Token, User
 from datetime import timedelta
 from farmwise_api.server.user_database import get_db
@@ -10,9 +10,15 @@ auth_router = APIRouter()
 
 
 @auth_router.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)) -> dict[str, str]:
+# Password guessing was unthrottled while the service is reachable from the
+# public internet, where it is already enumerated by scanners. Ten attempts a
+# minute leaves room for a mistyped password and none for a dictionary.
+@limiter.limit("10/minute")
+async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)) -> dict[str, str]:
     """
     Authenticates a user and generates an access token.
+
+    :param request: the HTTP request, required by the rate limiter.
 
     This endpoint receives user credentials (username and password),
     authenticates the user, and returns a JWT access token if the credentials are valid.
