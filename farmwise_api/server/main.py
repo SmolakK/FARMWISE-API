@@ -41,8 +41,21 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         logger.info("Application shutdown completed.")
 
 
+# The interactive documentation and the schema behind it are unauthenticated:
+# on a public deployment they hand a complete map of the API to anyone,
+# including the scanners that already enumerate this host. They stay on by
+# default for development and can be switched off for a deployment.
+PUBLISH_API_DOCS = os.getenv("FARMWISE_PUBLISH_API_DOCS", "1").strip().lower() not in {
+    "0", "false", "no", "off",
+}
+
 # Create the FastAPI app with lifespan
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan,
+    docs_url="/docs" if PUBLISH_API_DOCS else None,
+    redoc_url="/redoc" if PUBLISH_API_DOCS else None,
+    openapi_url="/openapi.json" if PUBLISH_API_DOCS else None,
+)
 
 # Include API routers
 app.include_router(api_router)
