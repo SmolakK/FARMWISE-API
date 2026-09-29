@@ -3,7 +3,7 @@ import pandas as pd
 from farmwise_api.adapters.API_readers.hubeau.hubeau_mappings.hubeau_mapping_sw_quality import PARAMETERS_MAPPING
 from farmwise_api.adapters.API_readers.hubeau.hubeau_units import normalise_results, sampling_day
 from farmwise_api.adapters.API_readers.hubeau.hubeau_concurrency import (
-    QUALITY_CONCURRENCY, gather_points,
+    MAX_BBOX_RESULTS, QUALITY_CONCURRENCY, count_results, gather_points,
 )
 from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
 import warnings
@@ -17,6 +17,14 @@ import asyncio
 from farmwise_api._vendor import hubeaupyutils as hub
 
 logger = logging.getLogger(__name__)
+
+
+# Columns the pipeline reads, in this API's own naming.
+BBOX_FIELDS = [
+    'code_station', 'latitude', 'longitude', 'code_parametre',
+    'libelle_parametre', 'date_prelevement', 'resultat', 'symbole_unite',
+    'code_fraction', 'libelle_fraction', 'code_remarque', 'libelle_support',
+]
 
 
 async def fetch_bbox(api, spatial_range, he_period_bounds, data_requested_codes,
@@ -42,6 +50,8 @@ async def fetch_bbox(api, spatial_range, he_period_bounds, data_requested_codes,
         frame = await asyncio.to_thread(
             api.get_data,
             bbox=bbox,
+            # Only the columns used below; the full row set is many times larger.
+            fields=BBOX_FIELDS,
             code_parametre=data_requested_codes,
             code_support='3',  # Code 3 = 'Eau' (only data for water)
             date_debut_prelevement=he_period_bounds[0],
@@ -279,11 +289,42 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     api = hub.init_api('river_qual', version=2) # (Important to use V2!)
 
     # Prepare tasks for asynchronous data fetching
-    # One bounding-box query instead of one request per station; the curated
-    # station list is applied to the returned rows below.
-    df = await fetch_bbox(
-        api, spatial_range, he_period_bounds, data_requested_codes, verbose_level
-    )
+    # One bounding-box query when the answer fits inside Hub'Eau's 20 000-result
+    # cap; above it the service refuses to page further and the query would be
+    # silently truncated, so the adapter falls back to one query per station.
+    north, south, east, west = spatial_range
+    expected = count_results(url, {
+        "bbox": f"{west},{south},{east},{north}",
+        "code_parametre": data_requested_codes,
+        "code_support": "3",
+        "date_debut_prelevement": he_period_bounds[0],
+        "date_fin_prelevement": he_period_bounds[1],
+        "code_qualification": "0,1,4",
+    })
+
+    if expected is not None and expected <= MAX_BBOX_RESULTS:
+        if verbose_level >= 1:
+            logger.info("Fetching %s results in one bounding-box query", expected)
+        df = await fetch_bbox(
+            api, spatial_range, he_period_bounds, data_requested_codes, verbose_level
+        )
+    else:
+        logger.info(
+            "Hub'Eau would return %s results, above the %s cap for one query; "
+            "falling back to one query per station (%d stations)",
+            "an unknown number of" if expected is None else expected,
+            MAX_BBOX_RESULTS, len(pt_ids_lst),
+        )
+        responses = await gather_points(
+            lambda pt_id: fetch_data(
+                api, pt_id, he_period_bounds, data_requested_codes, verbose_level
+            ),
+            pt_ids_lst,
+            concurrency=QUALITY_CONCURRENCY,
+        )
+        frames = [frame for frame in responses if frame is not None and not frame.empty]
+        df = pd.concat(frames, ignore_index=True) if frames else None
+
     if df is None or df.empty:
         return None
 

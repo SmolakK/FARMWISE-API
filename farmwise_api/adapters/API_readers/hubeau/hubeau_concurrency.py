@@ -78,7 +78,15 @@ BACKOFF_SECONDS = 1.5
 # thread until the operating system gave up. Measured over repeated runs, that
 # produced a bimodal distribution: the same request took either ~4 s or ~124 s,
 # at every concurrency limit, which is the hang rather than the throughput.
-REQUEST_TIMEOUT_SECONDS = 30
+# Hub'Eau occasionally accepts a connection and never answers: one run in six
+# stalled in a repeated measurement, costing the whole timeout before the retry
+# succeeded in under a second. Filtered queries return in about 1 s and the
+# largest legitimate answer (a full page of results) in under 20 s, so the read
+# budget sits between the two: long enough for a slow page, short enough that a
+# stall does not dominate the request. Connecting is separate and quick.
+CONNECT_TIMEOUT_SECONDS = 10
+READ_TIMEOUT_SECONDS = 45
+REQUEST_TIMEOUT_SECONDS = (CONNECT_TIMEOUT_SECONDS, READ_TIMEOUT_SECONDS)
 
 
 def _retrying_get(url, *args, **kwargs):
@@ -127,3 +135,48 @@ _vendored_client.requests = SimpleNamespace(
     JSONDecodeError=requests.JSONDecodeError,
     exceptions=requests.exceptions,
 )
+
+
+# ---------------------------------------------------------------- result cap
+
+# Hub'Eau serves at most 20 000 results per query and refuses the "next" link
+# beyond that with HTTP 400, so a larger area cannot be fetched in one
+# bounding-box query: it would return the first page and silently drop the
+# rest. Requests above this threshold fall back to one query per monitoring
+# point, which stays well inside the cap.
+MAX_BBOX_RESULTS = 18_000
+
+
+def count_results(url: str, params: dict) -> int | None:
+    """Ask Hub'Eau how many results a query would return.
+
+    Costs one small request (``size=1``, ~0.2 s) and decides whether the
+    bounding-box query can return the complete answer.
+
+    :return: the number of results, or None when the probe fails - the caller
+        then chooses the safe path rather than assuming a small answer.
+    """
+    # Hub'Eau expects repeated values comma-joined in one parameter. Passing a
+    # list makes requests repeat the parameter instead, which the service reads
+    # differently: the probe then counts a different query from the one the
+    # adapter runs, and could report a small number for a query that is far
+    # above the cap.
+    probe = {
+        key: ",".join(str(item) for item in value)
+        if isinstance(value, (list, tuple, set)) else value
+        for key, value in params.items()
+        if value is not None
+    }
+    probe["size"] = 1
+    try:
+        response = _retrying_get(url, params=probe)
+        if response is None or response.status_code not in (200, 206):
+            logger.warning(
+                "Hub'Eau count probe returned %s for %s",
+                getattr(response, "status_code", "no response"), url,
+            )
+            return None
+        return int(response.json().get("count"))
+    except Exception as error:  # noqa: BLE001 - the caller falls back
+        logger.warning("Hub'Eau count probe failed for %s: %s", url, error)
+        return None

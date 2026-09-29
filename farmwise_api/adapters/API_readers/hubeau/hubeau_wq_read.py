@@ -3,7 +3,7 @@ import pandas as pd
 from farmwise_api.adapters.API_readers.hubeau.hubeau_mappings.hubeau_mapping_wq import PARAMETERS_MAPPING
 from farmwise_api.adapters.API_readers.hubeau.hubeau_units import normalise_results, sampling_day
 from farmwise_api.adapters.API_readers.hubeau.hubeau_concurrency import (
-    QUALITY_CONCURRENCY, gather_points,
+    MAX_BBOX_RESULTS, QUALITY_CONCURRENCY, count_results, gather_points,
 )
 from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
 import warnings
@@ -63,6 +63,15 @@ async def fetch_data(api, pt_id, he_period_bounds, data_requested_codes, verbose
         return None
 
 
+# Columns the pipeline reads: the selection below, the unit normaliser
+# (code_param, symbole_unite, code_fraction) and the point coordinates.
+BBOX_FIELDS = [
+    'bss_id', 'latitude', 'longitude', 'code_param', 'nom_param',
+    'date_debut_prelevement', 'resultat', 'symbole_unite', 'code_fraction',
+    'code_remarque_analyse',
+]
+
+
 async def fetch_bbox(api, spatial_range, he_period_bounds, data_requested_codes,
                      verbose_level=0):
     """Fetch every analysis inside the bounding box in one paginated query.
@@ -80,6 +89,9 @@ async def fetch_bbox(api, spatial_range, he_period_bounds, data_requested_codes,
         frame = await asyncio.to_thread(
             api.get_data,
             bbox=bbox,
+            # Only the columns used below: the full row set is 39 MB for a
+            # one-degree box over one month, against 2 MB for these fields.
+            fields=BBOX_FIELDS,
             date_debut_prelevement=he_period_bounds[0],
             date_fin_prelevement=he_period_bounds[1],
             # Hub'Eau returns sampling times ('...T11:00:00Z').
@@ -275,16 +287,43 @@ async def read_data(spatial_range, time_range, data_range, level, nmax_pts=None,
     # Initialisation of the hubeaupyutils API object
     api = hub.init_api('groundwater_qual')
 
-    # One bounding-box query instead of one request per point. Hub'Eau serves
-    # the analyses endpoint by bbox and paginates the answer, so a box holding
-    # hundreds of points costs a handful of requests rather than hundreds:
-    # querying every point separately drew HTTP 503s and could not finish a
-    # country-sized request inside the timeout. The curated point list is still
-    # honoured - the returned rows are filtered to it below - so the selection
-    # of monitoring points does not change, only the number of requests.
-    df = await fetch_bbox(
-        api, spatial_range, he_period_bounds, data_requested_codes, verbose_level
-    )
+    # One bounding-box query when the whole answer fits inside Hub'Eau's
+    # 20 000-result cap, which is the common case and costs a single request
+    # instead of one per point. Above the cap the service refuses to page
+    # further, so a bbox query would return a truncated answer without saying
+    # so; there the adapter falls back to one query per monitoring point.
+    north, south, east, west = spatial_range
+    expected = count_results(url, {
+        "bbox": f"{west},{south},{east},{north}",
+        "date_debut_prelevement": he_period_bounds[0],
+        "date_fin_prelevement": he_period_bounds[1],
+        "code_param": data_requested_codes,
+        "code_qualification": "0,1,4",
+    })
+
+    if expected is not None and expected <= MAX_BBOX_RESULTS:
+        if verbose_level >= 1:
+            logger.info("Fetching %s results in one bounding-box query", expected)
+        df = await fetch_bbox(
+            api, spatial_range, he_period_bounds, data_requested_codes, verbose_level
+        )
+    else:
+        logger.info(
+            "Hub'Eau would return %s results, above the %s cap for one query; "
+            "falling back to one query per monitoring point (%d points)",
+            "an unknown number of" if expected is None else expected,
+            MAX_BBOX_RESULTS, len(pt_ids_lst),
+        )
+        responses = await gather_points(
+            lambda pt_id: fetch_data(
+                api, pt_id, he_period_bounds, data_requested_codes, verbose_level
+            ),
+            pt_ids_lst,
+            concurrency=QUALITY_CONCURRENCY,
+        )
+        frames = [frame for frame in responses if frame is not None and not frame.empty]
+        df = pd.concat(frames, ignore_index=True) if frames else None
+
     if df is None or df.empty:
         return None
 
