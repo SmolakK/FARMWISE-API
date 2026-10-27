@@ -50,7 +50,7 @@ dependencies = [
     "numpy>=2.2,<3",
     "openpyxl>=3.1,<4",
     "pandas>=2.3,<4",
-    "pillow>=12.2,<13",
+    "pillow>=13.0,<14",
     "pyproj>=3.7,<4",
     "rasterio>=1.4,<2",
     "requests>=2.34,<3",
@@ -90,7 +90,7 @@ dev = [
     "setuptools>=77,<85",
     # uv resolves requirements-lock.txt (tools/make_lock.py). Bounded because
     # the resolver's output is what CI compares against the committed lock.
-    "uv>=0.12,<0.13",
+    "uv>=0.13.4,<0.14",
     "wheel>=0.48,<1",
 ]
 evaluation = [

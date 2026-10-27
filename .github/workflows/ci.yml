@@ -56,7 +56,7 @@ jobs:
       - name: Check the lock file still matches pyproject.toml
         run: |
           python -m pip install --upgrade pip
-          python -m pip install "uv>=0.12,<0.13"
+          python -m pip install "uv>=0.13.4,<0.14"
           python tools/make_lock.py --check
       - name: Install the locked environment
         run: |
