@@ -71,7 +71,7 @@ PROJECT_ROOT: Path = _resolve_project_root()
 
 
 def path_from_env(name: str) -> Path | None:
-    """Read a directory setting from the environment, or None when unset.
+    r"""Read a directory setting from the environment, or None when unset.
 
     Surrounding whitespace and quotes are stripped: ``set VAR=C:\dir && ...``
     in cmd.exe keeps the spaces before ``&&`` in the value, and Windows cannot

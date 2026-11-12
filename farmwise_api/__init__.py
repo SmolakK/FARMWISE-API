@@ -9,4 +9,4 @@ ensure_usable_proj_data()
 from farmwise_api.core.main_call import read_data  # noqa: E402
 
 __all__ = ["read_data"]
-__version__ = "0.1.0"
+__version__ = "0.1.5"
