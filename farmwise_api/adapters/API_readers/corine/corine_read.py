@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 
 from datetime import date, datetime, timedelta
 from collections import defaultdict
@@ -16,6 +17,7 @@ from shapely.strtree import STRtree
 
 from farmwise_api.core.utils.coordinates_to_cells import get_s2_cells
 
+logger = logging.getLogger(__name__)
 
 AVAILABLE_SNAPSHOTS = (1990, 2000, 2006, 2012, 2018)
 CLASS_FIELDS = {
@@ -26,7 +28,16 @@ CLASS_FIELDS = {
     2018: "Code_18",
 }
 OUTPUT_COLUMN = "CORINE land-cover class code"
-PAGE_SIZE = 2000
+# The EEA layers return at most 1000 features per page (a Europe-wide query
+# asking for 2000 got 1000 and moved on to offset 1000), so ask for what is
+# actually served.
+PAGE_SIZE = 1000
+# The EEA ArcGIS server can answer 500 for one page in the middle of a large
+# query. Without a retry that single page discarded every page fetched before
+# it and failed the whole source.
+RETRY_STATUSES = frozenset({500, 502, 503, 504})
+MAX_ATTEMPTS = 3
+BACKOFF_SECONDS = 2.0
 
 
 async def read_data(
@@ -107,22 +118,28 @@ async def _fetch_features(client, snapshot, spatial_range):
     features = []
     offset = 0
     while True:
-        response = await client.get(
-            url,
-            params={
-                "where": "1=1",
-                "geometry": f"{west},{south},{east},{north}",
-                "geometryType": "esriGeometryEnvelope",
-                "inSR": "4326",
-                "outSR": "4326",
-                "spatialRel": "esriSpatialRelIntersects",
-                "outFields": CLASS_FIELDS[snapshot],
-                "returnGeometry": "true",
-                "resultOffset": offset,
-                "resultRecordCount": PAGE_SIZE,
-                "f": "geojson",
-            },
-        )
+        params = {
+            "where": "1=1",
+            "geometry": f"{west},{south},{east},{north}",
+            "geometryType": "esriGeometryEnvelope",
+            "inSR": "4326",
+            "outSR": "4326",
+            "spatialRel": "esriSpatialRelIntersects",
+            "outFields": CLASS_FIELDS[snapshot],
+            "returnGeometry": "true",
+            "resultOffset": offset,
+            "resultRecordCount": PAGE_SIZE,
+            "f": "geojson",
+        }
+        for attempt in range(1, MAX_ATTEMPTS + 1):
+            response = await client.get(url, params=params)
+            if response.status_code not in RETRY_STATUSES or attempt == MAX_ATTEMPTS:
+                break
+            logger.info(
+                "CORINE %s page at offset %s returned %s; retrying (%d/%d)",
+                snapshot, offset, response.status_code, attempt, MAX_ATTEMPTS - 1,
+            )
+            await asyncio.sleep(BACKOFF_SECONDS * attempt)
         response.raise_for_status()
         payload = response.json()
         if "error" in payload:
