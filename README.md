@@ -62,7 +62,7 @@ All installed modules are contained under the `farmwise_api` namespace to avoid 
 
 ## Installation
 
-Python 3.11 or newer is required.
+Python 3.11.5 or newer is required.
 
 To install
 
@@ -131,7 +131,7 @@ keep it outside the repository and outside the installed `farmwise_api` package,
 
 Credential files are excluded from Git by `.gitignore` and from both wheel and source distributions; `tests/test_packaging.py` enforces this on every CI run. FARMWISE does not put credential paths in the errors it raises, so exception text can be logged or surfaced without revealing where secrets are kept.
 
-Large adapter datasets are intentionally excluded from both pip wheels and source distributions. This includes EuroCropV2, EEA, IFSGRID and QUADICA data. Supply redistributable datasets through `FARMWISE_DATA_DIR`, or configure a licence-compliant remote source with a real URL and checksum in `farmwise_api/core/utils/data_manifest.py`. Remote prefetching is disabled by default; enable it with `FARMWISE_PREFETCH_DATA=true` only after configuring that manifest.
+Large adapter datasets are intentionally excluded from both pip wheels and source distributions. This includes EuroCropV2, EEA, IFSGRID and QUADICA data. Supply redistributable datasets through `FARMWISE_DATA_DIR`, or configure a licence-compliant remote source with a real URL and checksum in `farmwise_api/core/utils/data_manifest.py`. The server prefetches every manifest entry in the background at startup, so a request does not spend its time limit downloading a dataset (EuroCropV2 alone is 7 GB); an entry that fails to download is logged and fetched on first use instead. Switch prefetching off with `FARMWISE_PREFETCH_DATA=0`.
 
 CORRECTIV.Lokal data is treated as protected: its Parquet file is absent from the repository, packages and remote-data manifest, and its adapter is disabled from dispatch. Do not publish or mirror source or derived row-level data without explicit written permission covering the exact dataset and use.
 

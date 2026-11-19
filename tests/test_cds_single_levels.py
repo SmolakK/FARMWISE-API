@@ -104,7 +104,83 @@ def test_open_downloaded_dataset_extracts_zip_wrapped_netcdf(tmp_path):
 
     opened_path = open_dataset.call_args.args[0]
     assert opened_path.name == "data.nc"
-    assert opened_path.parent.name == "extracted"
+    assert opened_path.parent.name == "era5_extracted"
+
+
+def test_open_downloaded_dataset_keeps_archives_with_same_members_apart(tmp_path):
+    """Concurrent monthly chunks share member names; each needs its own folder."""
+    import zipfile
+
+    archives = []
+    for month in ("01", "02"):
+        source = tmp_path / f"source-{month}.nc"
+        source.write_bytes(f"month-{month}".encode())
+        archive_path = tmp_path / f"era5_2017{month}_temp_data.nc"
+        with zipfile.ZipFile(archive_path, "w") as archive:
+            archive.write(source, arcname="data_stream-oper_stepType-instant.nc")
+        archives.append(archive_path)
+
+    with patch(
+        "farmwise_api.adapters.API_readers.cds.cds_single_levels.xr.open_dataset",
+        return_value=MagicMock(),
+    ) as open_dataset:
+        for archive_path in archives:
+            _open_downloaded_dataset(archive_path)
+
+    opened = [call.args[0] for call in open_dataset.call_args_list]
+    assert opened[0] != opened[1]
+    assert [path.read_bytes() for path in opened] == [b"month-01", b"month-02"]
+
+
+@pytest.mark.asyncio
+async def test_read_data_requests_monthly_chunks_concurrently():
+    """Months are queued at the CDS together, not one after another."""
+    import threading
+    from farmwise_api.adapters.API_readers.cds import cds_single_levels
+
+    in_flight = 0
+    peak = 0
+    lock = threading.Lock()
+    both_started = threading.Barrier(2, timeout=5)
+
+    def retrieve(dataset, request):
+        nonlocal in_flight, peak
+        with lock:
+            in_flight += 1
+            peak = max(peak, in_flight)
+        both_started.wait()
+        with lock:
+            in_flight -= 1
+        result = MagicMock()
+        result.download.side_effect = lambda path: None
+        return result
+
+    timestamps = pd.date_range("2023-01-31", periods=48, freq="h")
+    frame = pd.DataFrame({
+        "latitude": 50.0,
+        "longitude": 10.0,
+        "valid_time": timestamps,
+        "t2m": 273.15,
+    })
+    dataset = MagicMock()
+    dataset.to_dataframe.return_value = frame.set_index(["valid_time"])
+
+    def add_cell(df, spatial_range, level):
+        df["S2CELL"] = "cell1"
+        return df
+
+    with patch.object(cds_single_levels.cdsapi, "Client") as client, \
+            patch.object(cds_single_levels, "_open_downloaded_dataset",
+                         return_value=dataset), \
+            patch.object(cds_single_levels, "prepare_coordinates",
+                         side_effect=add_cell):
+        client.return_value.retrieve.side_effect = retrieve
+        await read_data(
+            (51, 49, 11, 9), ("2023-01-31", "2023-02-01"), ["temperature"], 10
+        )
+
+    assert client.return_value.retrieve.call_count == 2
+    assert peak == 2
 
 
 def test_open_downloaded_dataset_reuses_extraction_directory(tmp_path):
