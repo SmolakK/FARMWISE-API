@@ -133,3 +133,20 @@ def test_default_tile_layer_is_the_one_that_survives_network_filtering():
     assert "updateBaseLayer();" in html.split("function initializeMap")[1].split("function getTileLayerName")[0]
     assert 'value="Topographic" id="tile_Topographic" checked' in html
     assert 'value="OpenStreetMap" id="tile_OpenStreetMap" ' in html
+
+
+def test_create_folium_map_does_not_warn_for_days_without_values(caplog):
+    """Sparse days are normal; one warning per empty day flooded the server log."""
+    cell = CellId.from_lat_lng(LatLng.from_degrees(51.0, 17.0)).parent(10)
+    dataset = pd.DataFrame(
+        {("temperature", cell): [5.0] + [np.nan] * 30},
+        index=pd.date_range("2024-01-01", periods=31),
+    )
+    dataset.columns = pd.MultiIndex.from_tuples(dataset.columns)
+
+    with caplog.at_level("WARNING", logger=map_ploter.logger.name):
+        html = map_ploter.create_folium_map(dataset, downsample_factor=1)
+
+    assert "overlay_0_0" in html
+    assert "overlay_0_1" not in html
+    assert not caplog.records

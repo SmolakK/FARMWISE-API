@@ -10,8 +10,14 @@ from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGG
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
 import asyncio
 import logging
+import threading
 
 logger = logging.getLogger(__name__)
+
+# Monthly ERA5 chunks submitted to the CDS at the same time. The CDS limits
+# how many requests one user may have running and queues the rest, so a
+# higher number gains little and only lengthens that user's queue.
+MAX_CONCURRENT_CDS_REQUESTS = 4
 
 
 def _open_downloaded_dataset(path):
@@ -19,7 +25,10 @@ def _open_downloaded_dataset(path):
     if not zipfile.is_zipfile(path):
         return xr.open_dataset(path)
 
-    extract_dir = path.parent / "extracted"
+    # One directory per archive: monthly chunks are downloaded concurrently,
+    # and every ERA5 archive names its members the same way, so a shared
+    # directory let one month overwrite another's files mid-read.
+    extract_dir = path.parent / f"{path.stem}_extracted"
     extract_dir.mkdir(exist_ok=True)
     with zipfile.ZipFile(path) as archive:
         netcdf_members = [
@@ -65,8 +74,6 @@ async def read_data(spatial_range, time_range, data_range, level,
 
     dataset = 'reanalysis-era5-single-levels'
 
-    # Initialise the client
-    c = cdsapi.Client()
     north, south, east, west = spatial_range
     start, end = time_range
     start = datetime.strptime(start, '%Y-%m-%d').date()
@@ -81,8 +88,18 @@ async def read_data(spatial_range, time_range, data_range, level,
         if 'total_precipitation' in data_requested
         else end
     )
-    downloaded_frames = []
+    # Set when the caller gives up (the dispatcher's timeout). Worker threads
+    # cannot be interrupted, but they check this before downloading so an
+    # abandoned request stops instead of fetching into a deleted directory.
+    cancelled = threading.Event()
+    limit = asyncio.Semaphore(MAX_CONCURRENT_CDS_REQUESTS)
+
+    async def _fetch(retrieve):
+        async with limit:
+            return await asyncio.to_thread(retrieve)
+
     with scratch_dir("cds") as folder_path:
+        chunk_jobs = []
         for chunk_start, chunk_end in _monthly_periods(start, retrieval_end):
             request = {
                 'product_type': ["reanalysis"],
@@ -107,15 +124,33 @@ async def read_data(spatial_range, time_range, data_range, level,
                 The CDS queue wait is often minutes, and run in the event loop
                 it blocked every other request in the process - including the
                 job-status polls of an asynchronous request.
+
+                Each thread has its own client: chunks run concurrently and
+                the client keeps a per-instance HTTP session.
                 """
-                c.retrieve(dataset, request).download(str(temp_file_path))
+                if cancelled.is_set():
+                    return pd.DataFrame()
+                result = cdsapi.Client().retrieve(dataset, request)
+                if cancelled.is_set():
+                    return pd.DataFrame()
+                result.download(str(temp_file_path))
                 downloaded_dataset = _open_downloaded_dataset(temp_file_path)
                 try:
                     return downloaded_dataset.to_dataframe().reset_index()
                 finally:
                     downloaded_dataset.close()
 
-            downloaded_frames.append(await asyncio.to_thread(_retrieve_chunk))
+            chunk_jobs.append(_fetch(_retrieve_chunk))
+
+        # The CDS queues every request separately and a large area waits
+        # minutes per month. Submitted one after another, a three-month
+        # Europe-wide request needed ~12 minutes and hit the 600 s dispatch
+        # timeout; submitted together the waits overlap.
+        try:
+            downloaded_frames = await asyncio.gather(*chunk_jobs)
+        except BaseException:
+            cancelled.set()
+            raise
 
     df = pd.concat(downloaded_frames, ignore_index=True)
 

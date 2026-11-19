@@ -309,8 +309,15 @@ def create_folium_map(
     for param_idx, param in tqdm(enumerate(parameters),total=len(parameters)):
         rng = param_ranges[param]
         vmin, vmax = rng['min'], rng['max']
+        empty_days = 0
 
         for date_idx, day in enumerate(dates_index):
+            # A day without values for this parameter is normal (sparse
+            # station data) and has no overlay. Logging each one as a warning
+            # wrote thousands of lines per Europe-wide request.
+            if dataset.loc[day, param].isna().all():
+                empty_days += 1
+                continue
             try:
                 raster, _, bounds = create_raster(dataset, day, param)
 
@@ -336,6 +343,12 @@ def create_folium_map(
                 logger.debug("Processed: %s - %s", day, param)
             except Exception as e:
                 logger.warning("Error: %s - %s: %s", day, param, e)
+
+        if empty_days:
+            logger.debug(
+                "%s: no values on %d of %d days; those days have no overlay",
+                param, empty_days, len(dates_index),
+            )
 
     # ---- Plugins ----
     plugins.Fullscreen().add_to(m)

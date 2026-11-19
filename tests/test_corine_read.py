@@ -87,3 +87,42 @@ async def test_read_data_uses_latest_snapshot_not_later_than_request(
     )
 
     assert "CLC2012_WM/MapServer/0/query" in client.get.call_args.args[0]
+
+
+@pytest.mark.asyncio
+@patch("farmwise_api.adapters.API_readers.corine.corine_read.asyncio.sleep",
+       new_callable=AsyncMock)
+@patch("farmwise_api.adapters.API_readers.corine.corine_read._s2_cell_polygons")
+@patch("farmwise_api.adapters.API_readers.corine.corine_read.httpx.AsyncClient")
+async def test_read_data_retries_a_page_the_server_fails_once(
+    mock_httpx_client,
+    mock_s2_polygons,
+    mock_sleep,
+):
+    """A 500 on one page no longer throws away the whole source."""
+    mock_s2_polygons.return_value = {"cell": box(0, 0, 1, 1)}
+    failed = MagicMock(status_code=500)
+    failed.raise_for_status.side_effect = AssertionError("must not raise")
+    served = MagicMock(status_code=200)
+    served.json.return_value = {
+        "features": [
+            {
+                "geometry": mapping(box(0, 0, 1, 1)),
+                "properties": {"Code_18": "211"},
+            },
+        ]
+    }
+    client = AsyncMock()
+    client.get.side_effect = [failed, served]
+    mock_httpx_client.return_value.__aenter__.return_value = client
+
+    result = await read_data(
+        (1, 0, 1, 0),
+        ("2018-01-01", "2018-01-31"),
+        ["land cover"],
+        8,
+    )
+
+    assert client.get.call_count == 2
+    assert (result[(OUTPUT_COLUMN, "cell")] == 211).all()
+    mock_sleep.assert_awaited_once()
