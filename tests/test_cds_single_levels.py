@@ -8,6 +8,12 @@ from farmwise_api.adapters.API_readers.cds.cds_single_levels import (
 )
 
 
+def _era5_dataset(frame):
+    """An ERA5-shaped Dataset (valid_time x latitude x longitude) from rows."""
+    indexed = frame.set_index(["valid_time", "latitude", "longitude"])
+    return indexed.to_xarray()
+
+
 @pytest.mark.asyncio
 @patch("farmwise_api.adapters.API_readers.cds.cds_single_levels.cdsapi.Client")
 @patch("farmwise_api.adapters.API_readers.cds.cds_single_levels.xr.open_dataset")
@@ -17,11 +23,7 @@ async def test_read_data(mock_prepare_coordinates, mock_open_dataset, mock_cds_c
     mock_retrieve = MagicMock()
     mock_cds_client.return_value.retrieve = mock_retrieve
 
-    # Mock xarray Dataset
-    mock_dataset = MagicMock()
-    mock_open_dataset.return_value = mock_dataset
-
-    # Mock Dataset to DataFrame conversion
+    # A real (small) xarray Dataset: the reader slices it a day at a time.
     timestamps = pd.date_range("2023-01-01", periods=25, freq="h")
     mock_df = pd.DataFrame({
         'latitude': [50.0] * len(timestamps),
@@ -32,7 +34,7 @@ async def test_read_data(mock_prepare_coordinates, mock_open_dataset, mock_cds_c
         'expver': [1] * len(timestamps),
         'number': [0] * len(timestamps),
     })
-    mock_dataset.to_dataframe.return_value = mock_df
+    mock_open_dataset.return_value = _era5_dataset(mock_df)
 
     # Define a side effect for prepare_coordinates
     def add_s2cell_column(df, spatial_range, level):
@@ -162,8 +164,7 @@ async def test_read_data_requests_monthly_chunks_concurrently():
         "valid_time": timestamps,
         "t2m": 273.15,
     })
-    dataset = MagicMock()
-    dataset.to_dataframe.return_value = frame.set_index(["valid_time"])
+    dataset = _era5_dataset(frame)
 
     def add_cell(df, spatial_range, level):
         df["S2CELL"] = "cell1"
@@ -203,3 +204,57 @@ def test_open_downloaded_dataset_reuses_extraction_directory(tmp_path):
             _open_downloaded_dataset(archive_path)
 
     assert open_dataset.call_count == 2
+
+
+def test_daily_from_dataset_matches_whole_month_and_joins_midnight_precipitation():
+    """Day-by-day reduction gives the same daily values as the whole month.
+
+    The 00:00 precipitation accumulation belongs to the previous day, so each
+    day's total is split across two day blocks and must be added back up.
+    """
+    import numpy as np
+    from farmwise_api.adapters.API_readers.cds import cds_single_levels
+    from farmwise_api.adapters.mappings.data_source_mapping import (
+        WITHIN_SOURCE_AGGREGATION_METHODS,
+    )
+
+    rng = np.random.default_rng(0)
+    timestamps = pd.date_range("2023-01-01", periods=72, freq="h")
+    points = [(50.0, 10.0), (50.25, 10.0), (50.0, 10.25)]
+    rows = pd.DataFrame(
+        [(t, lat, lon) for t in timestamps for lat, lon in points],
+        columns=["valid_time", "latitude", "longitude"],
+    )
+    rows["t2m"] = rng.uniform(260, 290, len(rows))
+    rows["tp"] = rng.uniform(0, 0.002, len(rows))
+    dataset = _era5_dataset(rows)
+    data_range = ["temperature", "precipitation"]
+    methods = WITHIN_SOURCE_AGGREGATION_METHODS
+
+    instantaneous, accumulated = cds_single_levels._daily_from_dataset(
+        dataset, data_range, methods
+    )
+    assert len(instantaneous) == 3  # one part per calendar day
+    daily_t = pd.concat(instantaneous).set_index(["day", "lat", "lon"]).sort_index()
+    daily_p = (
+        pd.concat(accumulated)
+        .groupby(["day", "lat", "lon"])["Precipitation total [mm]"]
+        .sum(min_count=1)
+    )
+
+    whole_t, whole_p = cds_single_levels._daily_from_hourly(
+        dataset.to_dataframe().reset_index(), data_range, methods
+    )
+    whole_t = whole_t.set_index(["day", "lat", "lon"]).sort_index()
+    whole_p = whole_p.set_index(["day", "lat", "lon"])["Precipitation total [mm]"]
+
+    pd.testing.assert_frame_equal(daily_t, whole_t)
+    pd.testing.assert_series_equal(daily_p.sort_index(), whole_p.sort_index())
+    # 2 Jan: 01:00 to 23:00 of that day plus 00:00 of 3 Jan.
+    second = rows[
+        (rows.valid_time > "2023-01-02 00:00") & (rows.valid_time <= "2023-01-03 00:00")
+        & (rows.latitude == 50.0) & (rows.longitude == 10.0)
+    ]
+    assert daily_p.loc[(pd.Timestamp("2023-01-02"), 50.0, 10.0)] == pytest.approx(
+        second.tp.sum() * 1000
+    )

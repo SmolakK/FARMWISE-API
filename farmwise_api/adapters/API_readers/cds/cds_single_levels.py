@@ -1,4 +1,5 @@
 import cdsapi
+import numpy as np
 import xarray as xr
 import pandas as pd
 from datetime import datetime, timedelta
@@ -59,6 +60,95 @@ def _open_downloaded_dataset(path):
             dataset.close()
 
 
+PRECIPITATION_COLUMN = "Precipitation total [mm]"
+_DAILY_KEYS = ["day", "lat", "lon"]
+
+
+def _daily_from_hourly(hourly, data_range, methods):
+    """Reduce hourly ERA5 rows to daily values per grid point.
+
+    Returns ``(instantaneous, precipitation)``. Precipitation is a partial
+    sum: the 00:00 accumulation belongs to the previous day, so a day's total
+    is split across two calendar-day blocks and the parts are added up later.
+    """
+    df = hourly.drop(['expver', 'number'], axis=1, errors='ignore')
+    df = df.drop_duplicates()
+
+    # Naming
+    df = df.rename(GLOBAL_MAPPING, axis=1)
+    # ``valid_time`` in current CDS files, ``time`` in older ones.
+    time_column = 'valid_time' if 'valid_time' in df.columns else 'time'
+    df = df.rename(
+        {'latitude': 'lat', 'longitude': 'lon', time_column: 'Timestamp'},
+        axis=1,
+    )
+
+    # Convert source units before temporal aggregation. ERA5 ``tp`` contains
+    # hourly accumulated metres; ``swvl1`` is a volumetric fraction.
+    if "Temperature [°C]" in df.columns:
+        df["Temperature [°C]"] = df["Temperature [°C]"] - 273.15
+    if PRECIPITATION_COLUMN in df.columns:
+        df[PRECIPITATION_COLUMN] = df[PRECIPITATION_COLUMN] * 1000
+    if "Soil moisture [%]" in df.columns:
+        df["Soil moisture [%]"] = df["Soil moisture [%]"] * 100
+
+    keys = ['lat', 'lon']
+    timestamps = pd.to_datetime(df['Timestamp'])
+    value_columns = [
+        column for column in df.columns
+        if column not in {*keys, 'Timestamp'}
+    ]
+    instantaneous_columns = [
+        column for column in value_columns
+        if column != PRECIPITATION_COLUMN
+    ]
+    instantaneous = precipitation = None
+    if instantaneous_columns:
+        frame = df[keys + instantaneous_columns].copy()
+        frame['day'] = timestamps.dt.floor('D')
+        instantaneous = aggregate_to_s2(
+            frame,
+            group_by=_DAILY_KEYS,
+            logical_data_types=data_range,
+            methods=methods,
+            warn_on_aggregation=False,
+        ).reset_index()
+    if PRECIPITATION_COLUMN in df.columns:
+        frame = df[keys + [PRECIPITATION_COLUMN]].copy()
+        frame['day'] = (timestamps - pd.Timedelta(hours=1)).dt.floor('D')
+        precipitation = aggregate_to_s2(
+            frame,
+            group_by=_DAILY_KEYS,
+            logical_data_types=data_range,
+            methods=methods,
+            column_aggregations={PRECIPITATION_COLUMN: 'sum'},
+            warn_on_aggregation=False,
+        ).reset_index()
+    return instantaneous, precipitation
+
+
+def _daily_from_dataset(dataset, data_range, methods):
+    """``_daily_from_hourly`` over one downloaded month, a day at a time.
+
+    Converting a whole month to a DataFrame first held every hourly value at
+    once: for a Europe-wide box that is tens of millions of rows per month,
+    with several months downloading together, and it ran out of memory.
+    """
+    time_name = "valid_time" if "valid_time" in dataset.dims else "time"
+    days = pd.to_datetime(np.asarray(dataset[time_name].values)).floor("D")
+    instantaneous, precipitation = [], []
+    for day in days.unique():
+        block = dataset.isel({time_name: np.flatnonzero(days == day)})
+        daily, accumulated = _daily_from_hourly(
+            block.to_dataframe().reset_index(), data_range, methods
+        )
+        if daily is not None:
+            instantaneous.append(daily)
+        if accumulated is not None:
+            precipitation.append(accumulated)
+    return instantaneous, precipitation
+
+
 async def read_data(spatial_range, time_range, data_range, level,
                     within_source_aggregation_methods=None) -> pd.DataFrame:
     """
@@ -93,6 +183,10 @@ async def read_data(spatial_range, time_range, data_range, level,
     # abandoned request stops instead of fetching into a deleted directory.
     cancelled = threading.Event()
     limit = asyncio.Semaphore(MAX_CONCURRENT_CDS_REQUESTS)
+    methods = (
+        within_source_aggregation_methods
+        or WITHIN_SOURCE_AGGREGATION_METHODS
+    )
 
     async def _fetch(retrieve):
         async with limit:
@@ -129,14 +223,16 @@ async def read_data(spatial_range, time_range, data_range, level,
                 the client keeps a per-instance HTTP session.
                 """
                 if cancelled.is_set():
-                    return pd.DataFrame()
+                    return [], []
                 result = cdsapi.Client().retrieve(dataset, request)
                 if cancelled.is_set():
-                    return pd.DataFrame()
+                    return [], []
                 result.download(str(temp_file_path))
                 downloaded_dataset = _open_downloaded_dataset(temp_file_path)
                 try:
-                    return downloaded_dataset.to_dataframe().reset_index()
+                    return _daily_from_dataset(
+                        downloaded_dataset, data_range, methods
+                    )
                 finally:
                     downloaded_dataset.close()
 
@@ -152,77 +248,25 @@ async def read_data(spatial_range, time_range, data_range, level,
             cancelled.set()
             raise
 
-    df = pd.concat(downloaded_frames, ignore_index=True)
+    instantaneous = [part for parts, _ in downloaded_frames for part in parts]
+    accumulated = [part for _, parts in downloaded_frames for part in parts]
 
-    # Cleaning
-    df = df[~df.isna()]
-    df = df.drop(['expver', 'number'], axis=1, errors='ignore')
-    df = df.drop_duplicates()
-
-    # Naming
-    df = df.rename(GLOBAL_MAPPING, axis=1)
-    df = df.rename({'latitude': 'lat', 'longitude': 'lon', 'valid_time': 'Timestamp'}, axis=1)
-
-    # Convert source units before temporal aggregation. ERA5 ``tp`` contains
-    # hourly accumulated metres; ``swvl1`` is a volumetric fraction.
-    if "Temperature [°C]" in df.columns:
-        df["Temperature [°C]"] = df["Temperature [°C]"] - 273.15
-    if "Precipitation total [mm]" in df.columns:
-        df["Precipitation total [mm]"] = (
-            df["Precipitation total [mm]"] * 1000
-        )
-    if "Soil moisture [%]" in df.columns:
-        df["Soil moisture [%]"] = df["Soil moisture [%]"] * 100
-
-    # Convert hourly data to daily values. Instantaneous variables use the
-    # configured method; accumulated precipitation must be summed and its
-    # timestamp shifted back to the hour represented by the accumulation.
-    methods = (
-        within_source_aggregation_methods
-        or WITHIN_SOURCE_AGGREGATION_METHODS
-    )
-    keys = ['lat', 'lon']
-    precipitation_column = "Precipitation total [mm]"
-    value_columns = [
-        column for column in df.columns
-        if column not in {*keys, 'Timestamp'}
-    ]
-    instantaneous_columns = [
-        column for column in value_columns
-        if column != precipitation_column
-    ]
     daily_frames = []
-    if instantaneous_columns:
-        instantaneous = df[keys + instantaneous_columns].copy()
-        instantaneous['day'] = pd.to_datetime(df['Timestamp']).dt.date
+    if instantaneous:
+        daily_frames.append(pd.concat(instantaneous, ignore_index=True))
+    if accumulated:
+        # Add up the two halves of each day's total (see _daily_from_hourly).
         daily_frames.append(
-            aggregate_to_s2(
-                instantaneous,
-                group_by=('day', 'lat', 'lon'),
-                logical_data_types=data_range,
-                methods=methods,
-            ).reset_index()
-        )
-    if precipitation_column in df.columns:
-        accumulated = df[keys + [precipitation_column]].copy()
-        accumulated['day'] = (
-            pd.to_datetime(df['Timestamp']) - pd.Timedelta(hours=1)
-        ).dt.date
-        daily_frames.append(
-            aggregate_to_s2(
-                accumulated,
-                group_by=('day', 'lat', 'lon'),
-                logical_data_types=data_range,
-                methods=methods,
-                column_aggregations={precipitation_column: 'sum'},
-            ).reset_index()
+            pd.concat(accumulated, ignore_index=True)
+            .groupby(_DAILY_KEYS, as_index=False)[PRECIPITATION_COLUMN]
+            .sum(min_count=1)
         )
 
     if not daily_frames:
         return pd.DataFrame()
     df = daily_frames[0]
     for daily_frame in daily_frames[1:]:
-        df = df.merge(daily_frame, on=['day', 'lat', 'lon'], how='outer')
+        df = df.merge(daily_frame, on=_DAILY_KEYS, how='outer')
     df['Timestamp'] = pd.to_datetime(df.pop('day')).dt.date
 
     # Temporal cut
@@ -236,8 +280,7 @@ async def read_data(spatial_range, time_range, data_range, level,
     df = aggregate_to_s2(
         df,
         logical_data_types=data_range,
-        methods=(within_source_aggregation_methods
-                 or WITHIN_SOURCE_AGGREGATION_METHODS),
+        methods=methods,
         column_aggregations={"lat": "mean", "lon": "mean"},
     )
 
