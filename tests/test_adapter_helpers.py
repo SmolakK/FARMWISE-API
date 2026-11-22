@@ -49,6 +49,77 @@ def test_eurocrop_extract_data_by_bbox_skips_truncated_rows(tmp_path):
     assert result["c2024"].tolist() == [4]
 
 
+def test_eurocrop_iter_cultivation_chunks_reads_only_requested_columns(tmp_path):
+    csv_path = tmp_path / "points.csv"
+    csv_path.write_text(
+        "id,lon,lat,cf2023,c2022,c2023,c2024\n"
+        "1,17.0,50.0,9,A,B,C\n"
+        "2,,17.0\n"
+        "3,17.5,50.5,9,D,E,F\n"
+        "4,30.0,60.0,9,G,H,I\n",
+        encoding="utf-8",
+    )
+
+    chunks = list(
+        euro_extractors.iter_cultivation_chunks(
+            str(csv_path), (51.0, 49.0, 18.0, 16.0), ("2023-01-01", "2024-12-31")
+        )
+    )
+    result = pd.concat(chunks)
+
+    assert result.columns.tolist() == ["lon", "lat", "c2023", "c2024"]
+    assert result["c2023"].tolist() == ["B", "E"]
+
+
+def _eurocrop_points():
+    rng = np.random.default_rng(3)
+    size = 3000
+    frame = pd.DataFrame(
+        {
+            "lon": rng.uniform(16.0, 18.0, size),
+            "lat": rng.uniform(49.0, 51.0, size),
+            # Few distinct codes so cells have ties, plus missing values.
+            "c2023": rng.choice(["11", "2", "PPH", None], size),
+            "c2024": rng.choice([1.0, 2.0, np.nan], size),
+        }
+    )
+    frame.loc[frame.index[:40], ["c2023", "c2024"]] = [None, np.nan]
+    return frame
+
+
+def test_eurocrop_chunked_mode_matches_whole_frame_aggregation():
+    from farmwise_api.adapters.mappings.data_source_mapping import (
+        WITHIN_SOURCE_AGGREGATION_METHODS,
+    )
+
+    points = _eurocrop_points()
+    bbox = (50.5, 49.5, 17.5, 16.5)
+    expected = euro_preparation.data_agregation(
+        euro_extractors.extract_years(points, ("2023-01-01", "2024-12-31")),
+        bbox, 8, ("land cover",), WITHIN_SOURCE_AGGREGATION_METHODS,
+    )
+
+    chunks = [points.iloc[start:start + 700] for start in range(0, len(points), 700)]
+    result = euro_preparation.aggregate_modes_by_cell(chunks, bbox, 8)
+
+    assert list(result.index) == list(expected.index)
+    for column in ("c2023", "c2024"):
+        pd.testing.assert_series_equal(
+            result[column], expected[column], check_dtype=False, check_names=False
+        )
+    assert np.allclose(result["lat"], expected["lat"], atol=1e-4)
+
+
+def test_eurocrop_chunked_mode_returns_empty_without_points_in_box():
+    points = _eurocrop_points()
+
+    result = euro_preparation.aggregate_modes_by_cell(
+        [points], (10.0, 9.0, 1.0, 0.0), 8
+    )
+
+    assert result.empty
+
+
 def test_eurocrop_extract_years_selects_requested_columns_and_nan():
     frame = pd.DataFrame(
         {
