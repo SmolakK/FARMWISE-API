@@ -251,3 +251,21 @@ def test_directory_settings_tolerate_stray_whitespace_and_quotes(monkeypatch, tm
 
     monkeypatch.delenv("FARMWISE_TEST_DIR")
     assert path_from_env("FARMWISE_TEST_DIR") is None
+
+
+def test_prefetch_all_can_continue_past_a_failed_entry(monkeypatch):
+    fetched = []
+
+    def fetch(rel):
+        if "eea" in rel:
+            raise OSError("host unreachable")
+        fetched.append(rel)
+
+    monkeypatch.setattr(paths, "fetch_remote", fetch)
+
+    failed = paths.prefetch_all(skip_failures=True)
+
+    assert failed and all("eea" in rel for rel in failed)
+    assert fetched == [rel for rel in paths.REMOTE_DATA if "eea" not in rel]
+    with pytest.raises(OSError):
+        paths.prefetch_all()

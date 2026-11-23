@@ -37,7 +37,7 @@ LOCK_NAME = "requirements-lock.txt"
 # Resolve for the lowest supported interpreter so the lock covers the whole
 # supported range. Left implicit, uv would target whichever interpreter
 # happens to be running and bake that assumption into the markers.
-TARGET_PYTHON = "3.11"
+TARGET_PYTHON = "3.11.5"
 
 # Extras included in the lock: what `pip install ".[server,dev]"` installs.
 LOCKED_EXTRAS = ("server", "dev")

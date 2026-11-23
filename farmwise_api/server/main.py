@@ -22,6 +22,17 @@ TEMP_DIR = (path_from_env("FARMWISE_TEMP_DIR") or CACHE_ROOT / "temp_files").res
 # Create the database tables
 Base.metadata.create_all(bind=engine)
 
+def prefetch_enabled() -> bool:
+    """Whether the server downloads the adapter datasets at startup.
+
+    On by default: without it the first request touching EuroCropV2 spent its
+    whole time budget downloading 7 GB and timed out. Set
+    ``FARMWISE_PREFETCH_DATA=0`` to switch it off.
+    """
+    value = os.getenv("FARMWISE_PREFETCH_DATA", "1").strip().lower()
+    return value not in {"0", "false", "no", "off"}
+
+
 # Define the lifespan context manager
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -29,11 +40,21 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         # Startup logic
         TEMP_DIR.mkdir(parents=True, exist_ok=True)
         app.state.temp_dir = str(TEMP_DIR)
-        if os.getenv("FARMWISE_PREFETCH_DATA", "").lower() in {"1", "true", "yes"}:
-            await asyncio.to_thread(prefetch_all)
+        prefetch_task = None
+        if prefetch_enabled():
+            # In the background: the first fetch is several GB (EuroCropV2
+            # alone is 7 GB) and awaiting it kept the server from answering
+            # anything for that long. A request that needs a dataset still
+            # being fetched waits for that download instead of starting a
+            # second one, rather than downloading it inside its own timeout.
+            prefetch_task = asyncio.create_task(
+                asyncio.to_thread(prefetch_all, skip_failures=True)
+            )
         start_scheduler(app.state.temp_dir)
         yield
     finally:
+        if prefetch_task is not None and not prefetch_task.done():
+            prefetch_task.cancel()
         # Shutdown logic
         shutdown_scheduler()
         shutil.rmtree(app.state.temp_dir, ignore_errors=True)

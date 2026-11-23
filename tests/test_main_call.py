@@ -802,3 +802,19 @@ async def test_avoided_requests_exclude_sources_without_the_requested_factor(mon
     assert precheck["dispatched_sources"] == 1
     assert precheck["requests_avoided_vs_factor_only"] == 1
     assert precheck["sources_not_dispatched"] == 2
+
+
+def test_default_source_timeout_scales_with_request_size():
+    from farmwise_api.core.main_call import (
+        BASE_SOURCE_TIMEOUT_SECONDS,
+        MAX_SOURCE_TIMEOUT_SECONDS,
+        default_source_timeout,
+    )
+
+    small = default_source_timeout((52, 51, 18, 17), "2017-01-01", "2017-03-31")
+    poland_year = default_source_timeout((55, 49, 24, 14), "2017-01-01", "2017-12-31")
+    europe = default_source_timeout((60, 36, 28, -10), "2017-01-01", "2017-03-30")
+
+    assert small == BASE_SOURCE_TIMEOUT_SECONDS
+    assert BASE_SOURCE_TIMEOUT_SECONDS < poland_year < MAX_SOURCE_TIMEOUT_SECONDS
+    assert europe == MAX_SOURCE_TIMEOUT_SECONDS
