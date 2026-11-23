@@ -1,5 +1,9 @@
+from collections.abc import Iterable
+
+import numpy as np
 import pandas as pd
-from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates
+import s2sphere
+from farmwise_api.core.utils.coordinates_to_cells import prepare_coordinates, s2_cell_ids
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
 from farmwise_api.core.within_source_aggregation import aggregate_to_s2
 
@@ -46,6 +50,88 @@ def data_agregation(
         methods=methods or WITHIN_SOURCE_AGGREGATION_METHODS,
         column_aggregations={"lat": "mean", "lon": "mean"},
     )
+
+
+def _add_counts(total, new):
+    if total is None:
+        return new
+    return pd.concat([total, new]).groupby(level=[0, 1]).sum()
+
+
+def aggregate_modes_by_cell(
+    chunks: Iterable[pd.DataFrame], spatial_range, level
+) -> pd.DataFrame:
+    """Per-S2-cell mode of each ``cYYYY`` column, read chunk by chunk.
+
+    Gives what ``data_agregation`` gives with the ``mode`` method (the
+    default for land cover) without holding every point in memory: each chunk
+    is reduced to a count per cell and value, and the counts are summed. A
+    tie goes to the smallest value, as ``pandas.Series.mode`` orders them.
+    Cells whose points have no value in a year get NaN for it.
+    """
+    north, south, east, west = spatial_range
+    positions = None
+    counts: dict[str, pd.Series | None] = {}
+
+    for chunk in chunks:
+        # float32 and the box check on it, as prepare_coordinates does.
+        lat = chunk["lat"].to_numpy(dtype=np.float32)
+        lon = chunk["lon"].to_numpy(dtype=np.float32)
+        inside = (lat <= north) & (lat >= south) & (lon <= east) & (lon >= west)
+        if not inside.any():
+            continue
+        chunk = chunk.loc[inside]
+        lat, lon = lat[inside], lon[inside]
+        cells = s2_cell_ids(lat, lon, level)
+
+        position = (
+            pd.DataFrame({"cell": cells, "lat": lat.astype(np.float64),
+                          "lon": lon.astype(np.float64), "n": 1})
+            .groupby("cell")[["lat", "lon", "n"]].sum()
+        )
+        positions = position if positions is None else (
+            pd.concat([positions, position]).groupby(level=0).sum()
+        )
+
+        for column in chunk.columns.drop(["lat", "lon"]):
+            values = chunk[column]
+            present = values.notna().to_numpy()
+            counts.setdefault(column, None)
+            if not present.any():
+                continue
+            chunk_counts = (
+                pd.DataFrame({"cell": cells[present],
+                              "value": values.to_numpy()[present]})
+                .groupby(["cell", "value"]).size()
+            )
+            counts[column] = _add_counts(counts[column], chunk_counts)
+
+    if positions is None:
+        return pd.DataFrame()
+
+    index = pd.Index(
+        [s2sphere.CellId(int(cell)) for cell in positions.index], name="S2CELL"
+    )
+    result = pd.DataFrame(
+        {
+            "lon": (positions["lon"] / positions["n"]).to_numpy(),
+            "lat": (positions["lat"] / positions["n"]).to_numpy(),
+        },
+        index=index,
+    )
+    for column, column_counts in counts.items():
+        if column_counts is None:
+            result[column] = np.nan
+            continue
+        ranked = (
+            column_counts.rename("count").reset_index()
+            .sort_values(["cell", "count", "value"],
+                         ascending=[True, False, True], kind="mergesort")
+            .drop_duplicates("cell")
+            .set_index("cell")["value"]
+        )
+        result[column] = ranked.reindex(positions.index).to_numpy()
+    return result
 
 
 def data_melting(df, time_range):

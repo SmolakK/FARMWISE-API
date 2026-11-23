@@ -13,7 +13,7 @@ from farmwise_api.adapters.API_readers.correctiv import correctiv_read
 async def test_eurocrop_read_data_returns_empty_when_bbox_has_no_points(monkeypatch):
     monkeypatch.setattr(EuroCropV2_read, "adapter_data", lambda *_args: "points.csv")
     monkeypatch.setattr(
-        EuroCropV2_read, "extract_data_by_bbox", lambda *_args: pd.DataFrame()
+        EuroCropV2_read, "iter_cultivation_chunks", lambda *_args: iter(())
     )
 
     result = await EuroCropV2_read.read_data(
@@ -41,11 +41,10 @@ async def test_eurocrop_read_data_runs_transformation_pipeline(monkeypatch):
     )
     monkeypatch.setattr(EuroCropV2_read, "adapter_data", lambda *_args: "points.csv")
     monkeypatch.setattr(
-        EuroCropV2_read, "extract_data_by_bbox", lambda *_args: extracted
+        EuroCropV2_read, "iter_cultivation_chunks", lambda *_args: iter([extracted])
     )
-    monkeypatch.setattr(EuroCropV2_read, "extract_years", lambda *_args: extracted)
     monkeypatch.setattr(
-        EuroCropV2_read, "data_agregation", lambda *_args: aggregated
+        EuroCropV2_read, "aggregate_modes_by_cell", lambda *_args: aggregated
     )
     melt = MagicMock(return_value=melted)
     monkeypatch.setattr(EuroCropV2_read, "data_melting", melt)
@@ -67,6 +66,43 @@ async def test_eurocrop_read_data_runs_transformation_pipeline(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_eurocrop_read_data_uses_whole_frame_path_for_other_methods(monkeypatch):
+    extracted = pd.DataFrame({"lat": [50.0], "lon": [17.0], "c2024": [2]})
+    aggregated = pd.DataFrame(
+        {"c2024": [2]}, index=pd.Index(["cell"], name="S2CELL")
+    )
+    melted = pd.DataFrame(
+        [[2]],
+        index=pd.to_datetime(["2024-01-01"]),
+        columns=pd.MultiIndex.from_tuples([("c", "cell")]),
+    )
+
+    def no_chunks(*_args):
+        raise AssertionError("the chunked mode path must not run for 'first'")
+
+    agregation = MagicMock(return_value=aggregated)
+    monkeypatch.setattr(EuroCropV2_read, "adapter_data", lambda *_args: "points.csv")
+    monkeypatch.setattr(EuroCropV2_read, "iter_cultivation_chunks", no_chunks)
+    monkeypatch.setattr(
+        EuroCropV2_read, "extract_data_by_bbox", lambda *_args: extracted
+    )
+    monkeypatch.setattr(EuroCropV2_read, "extract_years", lambda *_args: extracted)
+    monkeypatch.setattr(EuroCropV2_read, "data_agregation", agregation)
+    monkeypatch.setattr(EuroCropV2_read, "data_melting", lambda *_args: melted)
+
+    result = await EuroCropV2_read.read_data(
+        (51.0, 49.0, 18.0, 16.0),
+        ("2024-01-01", "2024-01-02"),
+        ["land cover"],
+        10,
+        within_source_aggregation_methods={"default": "mean", "land cover": "first"},
+    )
+
+    agregation.assert_called_once()
+    assert not result.empty
+
+
+@pytest.mark.asyncio
 async def test_eurocrop_read_data_returns_empty_when_selected_year_has_no_values(
     monkeypatch,
 ):
@@ -84,11 +120,10 @@ async def test_eurocrop_read_data_returns_empty_when_selected_year_has_no_values
     )
     monkeypatch.setattr(EuroCropV2_read, "adapter_data", lambda *_args: "points.csv")
     monkeypatch.setattr(
-        EuroCropV2_read, "extract_data_by_bbox", lambda *_args: extracted
+        EuroCropV2_read, "iter_cultivation_chunks", lambda *_args: iter([extracted])
     )
-    monkeypatch.setattr(EuroCropV2_read, "extract_years", lambda *_args: extracted)
     monkeypatch.setattr(
-        EuroCropV2_read, "data_agregation", lambda *_args: aggregated
+        EuroCropV2_read, "aggregate_modes_by_cell", lambda *_args: aggregated
     )
     monkeypatch.setattr(
         EuroCropV2_read, "data_melting", lambda *_args: all_missing
@@ -229,9 +264,8 @@ async def test_eurocrop_local_scan_does_not_block_the_event_loop(monkeypatch, tm
         return frame
 
     monkeypatch.setattr(EuroCropV2_read, "adapter_data", lambda *_args: str(tmp_path / "points.csv"))
-    monkeypatch.setattr(EuroCropV2_read, "extract_data_by_bbox", slow_scan)
-    monkeypatch.setattr(EuroCropV2_read, "extract_years", lambda f, _t: f)
-    monkeypatch.setattr(EuroCropV2_read, "data_agregation", lambda f, *_a, **_k: f)
+    monkeypatch.setattr(EuroCropV2_read, "iter_cultivation_chunks", lambda *_a: iter(()))
+    monkeypatch.setattr(EuroCropV2_read, "aggregate_modes_by_cell", slow_scan)
     monkeypatch.setattr(EuroCropV2_read, "data_melting", lambda _f, _t: pd.DataFrame())
 
     ticks = 0
