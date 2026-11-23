@@ -346,7 +346,7 @@ async def _read_data_for_request(request_body: ReadDataRequest):
 
 def _request_summary(request_body: ReadDataRequest) -> str:
     """The request parameters as listed in a notification email."""
-    if getattr(request_body, "country", None):
+    if request_body.country:
         location = "Country: " + ", ".join(request_body.country)
     else:
         location = "Bounding Box: " + str(request_body.bounding_box)
