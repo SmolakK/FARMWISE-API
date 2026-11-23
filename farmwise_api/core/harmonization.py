@@ -100,53 +100,336 @@ def harmonize_data(
     ``source_frames`` contains ``(source_name, dataframe, logical_data_types)``
     tuples. DataFrames are aligned by timestamp and full column key. Source
     weights are applied only where a source has a non-null observation.
+
+    The frames are reshaped to one long table of observations and reduced
+    with grouped operations, one pass per harmonization method. A
+    Europe-wide request has millions of (variable, cell) columns; handling
+    them one at a time took about a millisecond each, hours in total.
     """
     if not source_frames:
         return pd.DataFrame()
 
-    source_frames = [
-        (source, normalize_temporal_index(frame), logical_types)
-        for source, frame, logical_types in source_frames
-    ]
     weights = validate_source_weights(source_weights)
     methods = validate_harmonization_methods(data_type_methods)
     default_method = methods.get("default", "weighted_mean")
-    columns = _ordered_columns(source_frames)
-    output_series = []
 
-    for column in columns:
-        raw_series = []
-        column_weights = []
-        available_types: list[str] = []
+    frames = [
+        _merge_duplicate_columns(normalize_temporal_index(frame))
+        for _source, frame, _types in source_frames
+    ]
+    source_types = [list(types) for _source, _frame, types in source_frames]
+    source_weight = np.array(
+        [weights.get(source, DEFAULT_SOURCE_WEIGHT)
+         for source, _frame, _types in source_frames],
+        dtype=float,
+    )
 
-        for source, frame, logical_types in source_frames:
-            if column not in frame.columns:
-                continue
-            series = frame[column]
-            if isinstance(series, pd.DataFrame):
-                series = series.bfill(axis=1).iloc[:, 0]
-            raw_series.append((source, series))
-            column_weights.append(weights.get(source, DEFAULT_SOURCE_WEIGHT))
-            available_types.extend(logical_types)
+    columns = _union_columns(frames)
+    times = _union_times(frames)
+    column_positions = [columns.get_indexer(frame.columns) for frame in frames]
+    time_positions = [times.get_indexer(frame.index) for frame in frames]
+    column_methods = _column_methods(
+        columns, column_positions, source_types, methods, default_method
+    )
 
-        # Resolve the data type before collapsing repeated timestamps, so a
-        # categorical column is reduced by its mode. Collapsing first averaged
-        # every numeric column, turning CORINE classes 211 and 312 into 261.5.
-        data_type = resolve_data_type(column, available_types, methods)
-        method = methods.get(data_type, default_method)
-        categorical = "mode" in method
-        series_by_source = [
-            _collapse_duplicate_index(series, categorical=categorical).rename(source)
-            for source, series in raw_series
-        ]
-        values = pd.concat(series_by_source, axis=1)
-        output_series.append(
-            _aggregate(values, column_weights, method).rename(column)
+    blocks = []
+    block_columns = []
+    for method in pd.unique(column_methods):
+        in_method = column_methods == method
+        group_columns = np.flatnonzero(in_method)
+        observations = _observations(
+            frames, column_positions, time_positions, in_method,
+            n_columns=len(columns), categorical="mode" in method,
         )
+        keys, values = _reduce(observations, method, source_weight)
+        blocks.append(
+            _wide_block(keys, values, times, columns, group_columns,
+                        integer=observations.integer)
+        )
+        block_columns.append(group_columns)
 
-    result = pd.concat(output_series, axis=1).sort_index()
-    result.columns = _restore_column_index(source_frames, columns)
+    result = pd.concat(blocks, axis=1)
+    order = np.argsort(np.concatenate(block_columns), kind="stable")
+    result = result.iloc[:, order]
+    result.index = times
+    result.columns = _named_columns(columns, frames)
     return result
+
+
+class _Observations:
+    """Non-null values of one method's columns, one row per observation.
+
+    ``key`` is ``time_position * n_columns + column_position``; ``source`` is
+    the position of the source in the request, which the order-sensitive
+    methods (priority, weighted mode, weighted median ties) depend on.
+    """
+
+    def __init__(self, key, source, value, integer):
+        self.key = key
+        self.source = source
+        self.value = value
+        self.integer = integer
+
+
+def _merge_duplicate_columns(frame: pd.DataFrame) -> pd.DataFrame:
+    """Merge repeated column labels into one, first non-null value wins."""
+    if not frame.columns.has_duplicates:
+        return frame
+    merged = frame.loc[:, ~frame.columns.duplicated()].copy()
+    for label in frame.columns[frame.columns.duplicated()].unique():
+        merged[label] = frame[label].bfill(axis=1).iloc[:, 0]
+    return merged
+
+
+def _union_columns(frames: Sequence[pd.DataFrame]) -> pd.Index:
+    """The union of frame columns, in the order the sources list them."""
+    columns = frames[0].columns
+    for frame in frames[1:]:
+        new = frame.columns.difference(columns, sort=False)
+        if len(new):
+            columns = columns.append(new)
+    return columns
+
+
+def _union_times(frames: Sequence[pd.DataFrame]) -> pd.DatetimeIndex:
+    times = frames[0].index.unique()
+    for frame in frames[1:]:
+        times = times.union(frame.index.unique(), sort=True)
+    names = {frame.index.name for frame in frames}
+    return pd.DatetimeIndex(
+        times.sort_values(), name=names.pop() if len(names) == 1 else None
+    )
+
+
+def _named_columns(columns: pd.Index, frames: Sequence[pd.DataFrame]) -> pd.Index:
+    first = frames[0].columns
+    if isinstance(first, pd.MultiIndex):
+        if not isinstance(columns, pd.MultiIndex):
+            columns = pd.MultiIndex.from_tuples(list(columns))
+        return columns.set_names(first.names)
+    return pd.Index(columns, name=first.name)
+
+
+def _column_methods(columns, column_positions, source_types, methods, default_method):
+    """The harmonization method of every column, resolved once per kind.
+
+    A column's data type depends on its variable name and on the data types
+    of the sources that provide it, so it is resolved once per distinct
+    (variable, set of sources) pair rather than once per cell.
+    """
+    providers = np.zeros(len(columns), dtype=object)
+    for position, column_position in enumerate(column_positions):
+        providers[column_position] += 1 << position
+    factors = (
+        columns.get_level_values(0)
+        if isinstance(columns, pd.MultiIndex)
+        else columns
+    )
+    kinds, unique_kinds = pd.factorize(
+        pd.MultiIndex.from_arrays([factors, providers])
+    )
+    kind_methods = []
+    for factor, provider_bits in unique_kinds:
+        available = [
+            data_type
+            for position, types in enumerate(source_types)
+            if provider_bits >> position & 1
+            for data_type in types
+        ]
+        data_type = resolve_data_type(factor, available, methods)
+        kind_methods.append(methods.get(data_type, default_method))
+    return np.asarray(kind_methods, dtype=object)[kinds]
+
+
+def _observations(frames, column_positions, time_positions, in_method, *,
+                  n_columns, categorical):
+    keys, sources, values = [], [], []
+    integer = True
+    for position, frame in enumerate(frames):
+        selected = np.flatnonzero(in_method[column_positions[position]])
+        if not selected.size:
+            continue
+        sub = frame.iloc[:, selected]
+        array = sub.to_numpy()
+        rows, cols = np.nonzero(~pd.isna(array))
+        key = (
+            time_positions[position][rows].astype(np.int64) * n_columns
+            + column_positions[position][selected][cols]
+        )
+        value = array[rows, cols]
+        if frame.index.has_duplicates:
+            numeric = np.array([is_numeric_dtype(dtype) for dtype in sub.dtypes])
+            key, value = _collapse_repeated_timestamps(
+                key, value, numeric[cols], categorical
+            )
+        # Checked after collapsing: averaging repeated integers gives floats.
+        integer = integer and value.dtype.kind in "iu"
+        keys.append(key)
+        sources.append(np.full(len(key), position))
+        values.append(value)
+    if not keys:
+        return _Observations(np.empty(0, np.int64), np.empty(0, int),
+                             np.empty(0), integer=False)
+    return _Observations(np.concatenate(keys), np.concatenate(sources),
+                         _concatenate(values), integer)
+
+
+def _concatenate(arrays):
+    if all(array.dtype.kind in "iufb" for array in arrays):
+        return np.concatenate(arrays)
+    return np.concatenate([array.astype(object) for array in arrays])
+
+
+def _collapse_repeated_timestamps(key, value, numeric, categorical):
+    """Reduce one source's repeated timestamps to one value per cell.
+
+    Categorical columns take the most frequent value, numeric ones the mean
+    and anything else its first non-null value.
+    """
+    if categorical:
+        return _mode_by_key(key, value)
+    collapsed_keys, collapsed_values = [], []
+    if numeric.any():
+        means = (
+            pd.Series(value[numeric].astype(float))
+            .groupby(key[numeric], sort=False).mean()
+        )
+        collapsed_keys.append(means.index.to_numpy())
+        collapsed_values.append(means.to_numpy())
+    if (~numeric).any():
+        firsts = pd.Series(value[~numeric]).groupby(key[~numeric], sort=False).first()
+        collapsed_keys.append(firsts.index.to_numpy())
+        collapsed_values.append(firsts.to_numpy())
+    return np.concatenate(collapsed_keys), _concatenate(collapsed_values)
+
+
+def _mode_by_key(key, value, weight=None, first_source=None):
+    """Most frequent (or highest-scoring) value per key.
+
+    Ties go to the smallest value, as ``Series.mode`` sorts its result, or,
+    when ``first_source`` is given, to the value seen in the earliest source.
+    """
+    frame = pd.DataFrame({
+        "key": key,
+        "value": value,
+        "score": 1.0 if weight is None else weight,
+        "first": 0 if first_source is None else first_source,
+    })
+    scores = frame.groupby(["key", "value"], sort=False).agg(
+        score=("score", "sum"), first=("first", "min")
+    ).reset_index()
+    tie_break = "value" if first_source is None else "first"
+    scores = scores.sort_values(
+        ["key", "score", tie_break], ascending=[True, False, True],
+        kind="stable",
+    ).drop_duplicates("key")
+    return scores["key"].to_numpy(), scores["value"].to_numpy()
+
+
+def _numeric(values) -> np.ndarray:
+    if values.dtype.kind in "iufb":
+        return values.astype(float)
+    return pd.to_numeric(pd.Series(values), errors="coerce").to_numpy(dtype=float)
+
+
+def _reduce(observations, method, source_weight):
+    """One value per key from the observations of every source."""
+    key = observations.key
+    source = observations.source
+    value = observations.value
+    weight = source_weight[source] if len(source) else np.empty(0)
+
+    if method in {"mode", "weighted_mode", "priority"}:
+        if method == "mode":
+            return _mode_by_key(key, value)
+        eligible = weight > 0
+        key, source, value, weight = (
+            key[eligible], source[eligible], value[eligible], weight[eligible]
+        )
+        if method == "weighted_mode":
+            return _mode_by_key(key, value, weight=weight, first_source=source)
+        rank = np.empty(len(source_weight), dtype=int)
+        rank[np.argsort(-source_weight, kind="stable")] = np.arange(len(source_weight))
+        best = pd.DataFrame({"key": key, "rank": rank[source], "value": value})
+        best = best.sort_values(["key", "rank"], kind="stable").drop_duplicates("key")
+        return best["key"].to_numpy(), best["value"].to_numpy()
+
+    numbers = _numeric(value)
+    valid = ~np.isnan(numbers)
+    key, numbers, weight, source = (
+        key[valid], numbers[valid], weight[valid], source[valid]
+    )
+    if method == "weighted_mean":
+        totals = pd.DataFrame(
+            {"weighted": numbers * weight, "weight": weight}
+        ).groupby(key, sort=False).sum()
+        denominator = totals["weight"].to_numpy()
+        with np.errstate(divide="ignore", invalid="ignore"):
+            result = np.where(
+                denominator > 0, totals["weighted"].to_numpy() / denominator, np.nan
+            )
+        return totals.index.to_numpy(), result
+    if method == "weighted_median":
+        return _weighted_median(key, numbers, weight, source)
+    grouped = pd.Series(numbers).groupby(key, sort=False)
+    reduced = getattr(grouped, method)()
+    return reduced.index.to_numpy(), reduced.to_numpy(dtype=float)
+
+
+def _weighted_median(key, numbers, weight, source):
+    """Weighted median per key; an exact half-weight split averages the two."""
+    eligible = weight > 0
+    key, numbers, weight, source = (
+        key[eligible], numbers[eligible], weight[eligible], source[eligible]
+    )
+    if not len(key):
+        return key, numbers
+    order = np.lexsort((source, numbers, key))
+    key, numbers, weight = key[order], numbers[order], weight[order]
+    starts = np.flatnonzero(np.r_[True, key[1:] != key[:-1]])
+    ends = np.r_[starts[1:], len(key)]
+    group = np.repeat(np.arange(len(starts)), ends - starts)
+    cumulative = pd.Series(weight).groupby(group).cumsum().to_numpy()
+    half = cumulative[ends - 1][group] / 2
+    candidates = np.where(cumulative >= half, np.arange(len(key)), len(key))
+    position = np.minimum.reduceat(candidates, starts)
+    result = numbers[position].copy()
+    has_next = position + 1 < ends
+    at_position = cumulative[position]
+    half_weight = half[position]
+    exact = has_next & (
+        np.abs(at_position - half_weight)
+        <= 1e-9 * np.maximum(np.abs(at_position), np.abs(half_weight))
+    )
+    following = np.minimum(position + 1, len(key) - 1)
+    result[exact] = (numbers[position][exact] + numbers[following][exact]) / 2
+    return key[starts], result
+
+
+def _wide_block(keys, values, times, columns, group_columns, *, integer):
+    """The method's results as a time-by-column frame, NaN where none."""
+    n_columns = len(columns)
+    rows = keys // n_columns
+    local = np.searchsorted(group_columns, keys % n_columns)
+    shape = (len(times), len(group_columns))
+    values = np.asarray(values)
+
+    if values.dtype.kind in "iufb" or not len(values):
+        block = np.full(shape, np.nan)
+        block[rows, local] = values
+        frame = pd.DataFrame(block)
+        if integer and len(values):
+            complete = ~np.isnan(block).any(axis=0)
+            if complete.any():
+                frame = pd.concat(
+                    [frame.loc[:, complete].astype(np.int64),
+                     frame.loc[:, ~complete]],
+                    axis=1,
+                ).reindex(columns=frame.columns)
+        return frame
+    block = np.full(shape, np.nan, dtype=object)
+    block[rows, local] = values
+    return pd.DataFrame(block).infer_objects()
 
 
 def resolve_data_type(
@@ -175,141 +458,6 @@ def resolve_data_type(
     if len(normalized_available) == 1:
         return next(iter(normalized_available))
     return "default"
-
-
-def _ordered_columns(
-    source_frames: Sequence[tuple[str, pd.DataFrame, Sequence[str]]],
-) -> list[Any]:
-    """Return the union of frame columns while preserving source order."""
-    columns = []
-    seen = set()
-    for _source, frame, _logical_types in source_frames:
-        for column in frame.columns:
-            if column not in seen:
-                seen.add(column)
-                columns.append(column)
-    return columns
-
-
-def _restore_column_index(
-    source_frames: Sequence[tuple[str, pd.DataFrame, Sequence[str]]],
-    columns: Sequence[Any],
-) -> pd.Index:
-    first_columns = source_frames[0][1].columns
-    if isinstance(first_columns, pd.MultiIndex):
-        return pd.MultiIndex.from_tuples(columns, names=first_columns.names)
-    return pd.Index(columns, name=first_columns.name)
-
-
-def _collapse_duplicate_index(
-    series: pd.Series, *, categorical: bool = False
-) -> pd.Series:
-    if not series.index.has_duplicates:
-        return series
-    if categorical:
-        return series.groupby(level=0).agg(_series_mode)
-    if is_numeric_dtype(series.dtype):
-        return series.groupby(level=0).mean()
-    return series.groupby(level=0).agg(_first_non_null)
-
-
-def _series_mode(values: pd.Series) -> Any:
-    """Most frequent non-null value; the first on a tie, NaN if none."""
-    modes = values.dropna().mode()
-    return modes.iloc[0] if not modes.empty else np.nan
-
-
-def _first_non_null(values: pd.Series) -> Any:
-    values = values.dropna()
-    return values.iloc[0] if not values.empty else np.nan
-
-
-def _aggregate(
-    values: pd.DataFrame,
-    weights: Sequence[float],
-    method: str,
-) -> pd.Series:
-    weight_series = pd.Series(weights, index=values.columns, dtype=float)
-
-    if method == "weighted_mean":
-        numeric = values.apply(pd.to_numeric, errors="coerce")
-        numerator = numeric.mul(weight_series, axis=1).sum(axis=1, min_count=1)
-        denominator = numeric.notna().mul(weight_series, axis=1).sum(axis=1)
-        return numerator.div(denominator.replace(0, np.nan))
-    if method == "mean":
-        return values.apply(pd.to_numeric, errors="coerce").mean(axis=1)
-    if method == "weighted_median":
-        return values.apply(
-            lambda row: _weighted_median(row, weight_series),
-            axis=1,
-        )
-    if method == "median":
-        return values.apply(pd.to_numeric, errors="coerce").median(axis=1)
-    if method == "weighted_mode":
-        return values.apply(
-            lambda row: _weighted_mode(row, weight_series),
-            axis=1,
-        )
-    if method == "mode":
-        return values.apply(_mode, axis=1)
-    if method == "priority":
-        priority = sorted(
-            range(len(weights)),
-            key=lambda position: weights[position],
-            reverse=True,
-        )
-        eligible = [position for position in priority if weights[position] > 0]
-        if not eligible:
-            return pd.Series(np.nan, index=values.index)
-        return values.iloc[:, eligible].bfill(axis=1).iloc[:, 0]
-
-    numeric = values.apply(pd.to_numeric, errors="coerce")
-    if method == "min":
-        return numeric.min(axis=1)
-    if method == "max":
-        return numeric.max(axis=1)
-    if method == "sum":
-        return numeric.sum(axis=1, min_count=1)
-    raise ValueError(f"Unsupported harmonization method: {method}")
-
-
-def _weighted_median(row: pd.Series, weights: pd.Series) -> float:
-    numeric = pd.to_numeric(row, errors="coerce")
-    valid = numeric.notna() & weights.gt(0)
-    if not valid.any():
-        return np.nan
-
-    observations = pd.DataFrame(
-        {
-            "value": numeric[valid].astype(float),
-            "weight": weights[valid],
-        }
-    ).sort_values("value", kind="stable")
-    cumulative = observations["weight"].cumsum().to_numpy()
-    values = observations["value"].to_numpy()
-    half_weight = observations["weight"].sum() / 2
-    position = int(np.searchsorted(cumulative, half_weight, side="left"))
-
-    if (
-        position + 1 < len(values)
-        and math.isclose(cumulative[position], half_weight)
-    ):
-        return float((values[position] + values[position + 1]) / 2)
-    return float(values[position])
-
-
-def _weighted_mode(row: pd.Series, weights: pd.Series) -> Any:
-    scores: dict[Any, float] = {}
-    for value, weight in zip(row, weights):
-        if pd.isna(value) or weight <= 0:
-            continue
-        scores[value] = scores.get(value, 0.0) + weight
-    return max(scores, key=lambda value: scores[value]) if scores else np.nan
-
-
-def _mode(row: pd.Series) -> Any:
-    modes = row.dropna().mode()
-    return modes.iloc[0] if not modes.empty else np.nan
 
 
 def _normalize_label(value: Any) -> str:

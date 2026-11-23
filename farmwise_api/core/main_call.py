@@ -139,17 +139,24 @@ def _categorical_columns(frame, data_storage, harmonization_methods):
     available_types = sorted(
         {data_type for _source, _data, types in data_storage for data_type in types}
     )
+    # Resolved once per variable: a Europe-wide frame has millions of
+    # (variable, cell) columns but only a few dozen variables.
+    names = (
+        frame.columns.get_level_values(0)
+        if isinstance(frame.columns, pd.MultiIndex)
+        else frame.columns
+    )
     categorical = []
-    for column in frame.columns:
+    for name in dict.fromkeys(names):
         data_type = resolve_data_type(
-            column, available_types, harmonization_methods
+            name, available_types, harmonization_methods
         )
         method = harmonization_methods.get(
             data_type, harmonization_methods.get("default", "weighted_mean")
         )
         if "mode" in method:
-            categorical.append(column[0] if isinstance(column, tuple) else column)
-    return tuple(dict.fromkeys(categorical))
+            categorical.append(name)
+    return tuple(categorical)
 
 
 def plan_source_dispatch(
