@@ -62,36 +62,65 @@ def aggregate_to_s2(
     explicit_data_types = dict(column_data_types or {})
     overrides = dict(column_aggregations or {})
     aggregations: dict[str, str | Callable] = {}
+    # Columns pandas can aggregate natively, by method. Calling a Python
+    # function per group cost ~50 microseconds a group: a Europe-wide ERA5
+    # request has millions of (day, grid point) groups.
+    native: dict[str, list[str]] = {}
+    value_columns = [column for column in frame.columns if column not in group_by]
 
-    for column in frame.columns:
-        if column in group_by:
-            continue
+    for column in value_columns:
         if column in overrides:
             aggregation = overrides[column]
-            if isinstance(aggregation, str):
-                aggregation = _aggregator(normalize_method_name(aggregation))
-            aggregations[column] = aggregation
-            continue
+            if not isinstance(aggregation, str):
+                aggregations[column] = aggregation
+                continue
+            method = normalize_method_name(aggregation)
+        else:
+            data_type = _normalize_label(explicit_data_types[column]) if (
+                column in explicit_data_types
+            ) else resolve_data_type(
+                column,
+                logical_data_types,
+                validated_methods,
+            )
+            method = validated_methods.get(data_type, default_method)
 
-        data_type = _normalize_label(explicit_data_types[column]) if (
-            column in explicit_data_types
-        ) else resolve_data_type(
-            column,
-            logical_data_types,
-            validated_methods,
-        )
-        method = validated_methods.get(data_type, default_method)
-        aggregations[column] = _aggregator(method)
+        if method in _NATIVE_NUMERIC_METHODS and _is_plain_numeric(frame[column]):
+            native.setdefault(method, []).append(column)
+        else:
+            aggregations[column] = _aggregator(method)
 
     original_size = len(frame)
-    if aggregations:
-        result = frame.groupby(group_by).agg(aggregations)
+    if aggregations or native:
+        grouped = frame.groupby(group_by)
+        parts = []
+        if aggregations:
+            parts.append(grouped.agg(aggregations))
+        for method, columns in native.items():
+            if method == "sum":
+                # min_count=1: an all-missing group stays missing, not 0.
+                parts.append(grouped[columns].sum(min_count=1))
+            else:
+                parts.append(grouped[columns].agg(method))
+        result = parts[0] if len(parts) == 1 else pd.concat(parts, axis=1)
+        result = result[[column for column in value_columns if column in result]]
     else:
         result = frame[group_by].drop_duplicates().set_index(group_by)
 
     if warn_on_aggregation and original_size != len(result):
         warnings.warn("Some data were aggregated", stacklevel=2)
     return result
+
+
+# Same result as _numeric_aggregate on a numeric column, computed by pandas.
+_NATIVE_NUMERIC_METHODS = frozenset({"mean", "median", "min", "max", "sum"})
+
+
+def _is_plain_numeric(values: pd.Series) -> bool:
+    return (
+        pd.api.types.is_numeric_dtype(values)
+        and not pd.api.types.is_bool_dtype(values)
+    )
 
 
 def _aggregator(method: str) -> str | Callable[[pd.Series], Any]:

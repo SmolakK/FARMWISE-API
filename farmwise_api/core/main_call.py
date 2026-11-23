@@ -194,8 +194,35 @@ def plan_source_dispatch(
     return plan
 
 
+# Per-source time limit. A request of up to ~10 x 10 degrees over ~3 months
+# gets the base limit; bigger requests get proportionally more, up to the cap.
+# A flat 600 s was too short for a Europe-wide request: the CDS queue alone
+# took ~12 minutes for three months of ERA5, and per-point Hub'Eau queries over
+# France could not finish either. The cap keeps one stalled source from
+# holding a request for hours, as sources are queried one after another.
+BASE_SOURCE_TIMEOUT_SECONDS = 600
+MAX_SOURCE_TIMEOUT_SECONDS = 1800
+_BASE_AREA_SQUARE_DEGREES = 100
+_BASE_PERIOD_DAYS = 90
+
+
+def default_source_timeout(bounding_box, time_from, time_to) -> float:
+    """Return the per-source timeout for a request of this size, in seconds."""
+    north, south, east, west = bounding_box
+    area = max(north - south, 0) * max(east - west, 0)
+    if time_from is not None and time_to is not None:
+        days = (pd.Timestamp(time_to) - pd.Timestamp(time_from)).days + 1
+    else:
+        days = _BASE_PERIOD_DAYS
+    scale = (area / _BASE_AREA_SQUARE_DEGREES) * (days / _BASE_PERIOD_DAYS)
+    return float(min(
+        MAX_SOURCE_TIMEOUT_SECONDS,
+        max(BASE_SOURCE_TIMEOUT_SECONDS, BASE_SOURCE_TIMEOUT_SECONDS * scale),
+    ))
+
+
 async def read_data(bounding_box=None, country=None, level=None, time_from=None, time_to=None,
-                    factors=None, separate_api=False, timeout=600, interpolation=False,
+                    factors=None, separate_api=False, timeout=None, interpolation=False,
                     produce_map=False, source_weights=None, harmonization_methods=None,
                     within_source_aggregation_methods=None,
                     assess_quality=False, persist_quality_reports=False,
@@ -206,7 +233,9 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
     :param produce_map: If true, a map will be produced.
     :param interpolation: If true, interpolation is applied to the resulting data. Especially useful for maps and
     high data resolutions.
-    :param timeout: Timeout for each API after which the process will skip this API.
+    :param timeout: Timeout in seconds for each API after which the process will skip
+                    this API. None (the default) scales it with the request's area and
+                    period, from 600 s up to 1800 s (see ``default_source_timeout``).
     :param separate_api: If True APIs are stored in separate columns and not averaged
     :param source_weights: Optional mapping of full API module paths to relative
                            source weights. Values override DATA_SOURCE_WEIGHTS.
@@ -284,6 +313,10 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
             raise ValueError(
                 f"time_from ({time_from}) must not be after time_to ({time_to})."
             )
+
+    if timeout is None:
+        timeout = default_source_timeout(bounding_box, time_from, time_to)
+        logger.info("Per-source timeout for this request: %.0f s", timeout)
 
     precheck_started = perf_counter()
     effective_disabled_sources = _default_disabled_sources()
@@ -454,6 +487,7 @@ async def read_data(bounding_box=None, country=None, level=None, time_from=None,
             "precheck_seconds": precheck_seconds,
             "sources": dispatch_plan,
         },
+        "source_timeout_seconds": timeout,
         "dispatch": dispatch_metrics,
         "harmonization": {
             "enabled": not separate_api,

@@ -1,5 +1,72 @@
+from collections.abc import Iterator
+
 import pandas as pd
 import duckdb
+
+# DuckDB vectors are 2048 rows: 512 of them is about a million rows a chunk,
+# a few hundred MB of pandas objects at most.
+CHUNK_VECTORS = 512
+
+
+def _read_options() -> str:
+    # A small number of source rows can be truncated. Skipping only those
+    # malformed records keeps a multi-gigabyte import usable without padding
+    # corrupt values into the scientific columns.
+    return "strict_mode = false, ignore_errors = true"
+
+
+def requested_year_columns(columns, time_range: tuple) -> list[str]:
+    """The ``cYYYY`` cultivation columns of ``columns`` inside ``time_range``.
+
+    ``cfYYYY`` (the source parcel identifier) is never included.
+    """
+    year_from, year_to = (int(t[:4]) for t in time_range)
+    years = {str(year) for year in range(year_from, year_to + 1)}
+    return [
+        col for col in columns
+        if col.startswith("c") and col[1:] in years
+    ]
+
+
+def iter_cultivation_chunks(
+    path: str,
+    spatial_range: tuple,
+    time_range: tuple,
+    chunk_vectors: int = CHUNK_VECTORS,
+) -> Iterator[pd.DataFrame]:
+    """Yield the points inside the box in chunks: ``lon``, ``lat`` and the
+    requested ``cYYYY`` columns only.
+
+    ``extract_data_by_bbox`` loads every column at once. For a Europe-wide box
+    that is the whole 46-million-row file with 37 text columns, which ran out
+    of memory; this reads only the columns a request uses, a million rows at a
+    time.
+    """
+    north, south, east, west = spatial_range
+    with duckdb.connect() as con:
+        source = f"read_csv($path, {_read_options()})"
+        columns = [
+            row[0]
+            for row in con.execute(
+                f"DESCRIBE SELECT * FROM {source}", {"path": str(path)}
+            ).fetchall()
+        ]
+        selected = ["lon", "lat", *requested_year_columns(columns, time_range)]
+        select_list = ", ".join('"' + column + '"' for column in selected)
+        con.execute(
+            f"SELECT {select_list} FROM {source} "
+            "WHERE lat BETWEEN $south AND $north AND lon BETWEEN $west AND $east",
+            {
+                "path": str(path),
+                "south": float(south), "north": float(north),
+                "west": float(west), "east": float(east),
+            },
+        )
+        while True:
+            chunk = con.fetch_df_chunk(chunk_vectors)
+            if chunk.empty:
+                return
+            yield chunk
 
 
 def extract_data_by_bbox(path:str, spatial_range:tuple) -> pd.DataFrame:
@@ -34,9 +101,7 @@ def extract_data_by_bbox(path:str, spatial_range:tuple) -> pd.DataFrame:
     north, south, east, west = spatial_range
 
     with duckdb.connect() as con:
-        # A small number of source rows can be truncated. Skipping only those
-        # malformed records keeps a multi-gigabyte import usable without
-        # padding corrupt values into the scientific columns.
+        # See _read_options: truncated rows are skipped, not padded.
         source = con.read_csv(
             path,
             strict_mode=False,
@@ -82,16 +147,9 @@ def extract_years(df: pd.DataFrame, time_range:tuple) -> pd.DataFrame:
 
     base_cols = ["lon", "lat"]
 
-    year_from, year_to = (int(t[:4]) for t in time_range)
-    years = tuple(str(year) for year in range(year_from, year_to + 1))
-
     # ``cYYYY`` contains the cultivation class. ``cfYYYY`` is the source
     # parcel identifier and must not be exposed as an environmental factor.
-    year_cols = [
-        col
-        for col in df.columns
-        if col.startswith("c") and col[1:] in years
-    ]
+    year_cols = requested_year_columns(df.columns, time_range)
 
     result = df[base_cols + year_cols].copy()
 

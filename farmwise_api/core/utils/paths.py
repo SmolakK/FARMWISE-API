@@ -241,7 +241,9 @@ def fetch_remote(rel: str) -> Path:
         return target
 
 
-def prefetch_all(sources: list[str] | None = None) -> None:
+def prefetch_all(
+    sources: list[str] | None = None, *, skip_failures: bool = False
+) -> list[str]:
     """
     Eagerly fetch manifest entries. For deployment: run this in your Docker
     build or startup script so a server's first *request* never triggers a
@@ -249,11 +251,22 @@ def prefetch_all(sources: list[str] | None = None) -> None:
 
     ``sources``: optional list of substrings to filter which entries to
     fetch (e.g. ["eea", "EuroCropV2"]); None fetches everything.
+    ``skip_failures``: log a failed entry and continue with the rest instead
+    of raising - for the server, where one unreachable host must not leave
+    the other datasets unfetched. Returns the entries that failed.
     """
+    failed = []
     for rel in REMOTE_DATA:
         if sources and not any(s in rel for s in sources):
             continue
-        fetch_remote(rel)
+        try:
+            fetch_remote(rel)
+        except Exception:
+            if not skip_failures:
+                raise
+            logger.exception("Prefetch of %s failed; it will be fetched on first use", rel)
+            failed.append(rel)
+    return failed
 
 
 def adapter_cache(adapter: str) -> Path:

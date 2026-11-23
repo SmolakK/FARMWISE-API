@@ -3,11 +3,28 @@ import os
 import pandas as pd
 from typing import Tuple, List
 
-from farmwise_api.adapters.API_readers.EuroCropV2.utils.extractors import extract_data_by_bbox, extract_years
-from farmwise_api.adapters.API_readers.EuroCropV2.utils.preparation import data_agregation, data_melting
+from farmwise_api.adapters.API_readers.EuroCropV2.utils.extractors import (
+    extract_data_by_bbox,
+    extract_years,
+    iter_cultivation_chunks,
+)
+from farmwise_api.adapters.API_readers.EuroCropV2.utils.preparation import (
+    aggregate_modes_by_cell,
+    data_agregation,
+    data_melting,
+)
 from farmwise_api.adapters.API_readers.EuroCropV2.mappings.EuroCropV2_mappings import GLOBAL_MAPPING
 from farmwise_api.adapters.mappings.data_source_mapping import WITHIN_SOURCE_AGGREGATION_METHODS
+from farmwise_api.core.harmonization import resolve_data_type
 from farmwise_api.core.utils.paths import adapter_data
+from farmwise_api.core.within_source_aggregation import validate_within_source_methods
+
+
+def _cultivation_method(methods, data_range) -> str:
+    """The within-source method that applies to the ``cYYYY`` columns."""
+    validated = validate_within_source_methods(methods)
+    data_type = resolve_data_type("c", data_range, validated)
+    return validated.get(data_type, validated.get("default", "mean"))
 
 async def read_data(
     spatial_range: Tuple[float, float, float, float],
@@ -61,17 +78,28 @@ async def read_data(
         a server that stalls every other request, including job-status polls -
         so the whole local pipeline runs in a worker thread.
         """
-        extracted = extract_data_by_bbox(data_path, spatial_range)
-        if extracted.empty:
-            return pd.DataFrame()
-        extracted = extract_years(extracted, time_range)
-        aggregated = data_agregation(
-            extracted,
-            spatial_range,
-            level,
-            data_range,
-            within_source_aggregation_methods or WITHIN_SOURCE_AGGREGATION_METHODS,
-        )
+        methods = within_source_aggregation_methods or WITHIN_SOURCE_AGGREGATION_METHODS
+        if _cultivation_method(methods, data_range) == "mode":
+            # The default: counted chunk by chunk, so a Europe-wide box (the
+            # whole 46-million-row file) fits in memory.
+            aggregated = aggregate_modes_by_cell(
+                iter_cultivation_chunks(data_path, spatial_range, time_range),
+                spatial_range,
+                level,
+            )
+        else:
+            # Other methods need every value of a cell at once.
+            extracted = extract_data_by_bbox(data_path, spatial_range)
+            if extracted.empty:
+                return pd.DataFrame()
+            extracted = extract_years(extracted, time_range)
+            aggregated = data_agregation(
+                extracted,
+                spatial_range,
+                level,
+                data_range,
+                methods,
+            )
         if aggregated.empty:
             return pd.DataFrame()
         return data_melting(aggregated, time_range)
