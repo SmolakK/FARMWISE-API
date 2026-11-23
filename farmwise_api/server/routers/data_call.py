@@ -344,14 +344,61 @@ async def _read_data_for_request(request_body: ReadDataRequest):
     )
 
 
-async def run_direct_job(job_id: str, request_body: ReadDataRequest, temp_dir: str) -> None:
+def _request_summary(request_body: ReadDataRequest) -> str:
+    """The request parameters as listed in a notification email."""
+    if getattr(request_body, "country", None):
+        location = "Country: " + ", ".join(request_body.country)
+    else:
+        location = "Bounding Box: " + str(request_body.bounding_box)
+    return (
+        f"Your request details:\n"
+        f"- Time Range: {request_body.time_from} to {request_body.time_to}\n"
+        f"- Level: {request_body.level}\n"
+        f"- Factors: {', '.join(request_body.factors)}\n"
+        f"- Location Mode: {location}\n"
+    )
+
+
+def _notify(address: str | None, job_id: str, request_body: ReadDataRequest,
+            links: dict | None, message: str | None) -> None:
+    """Email the outcome of a job; a mail failure never fails the job."""
+    if not address:
+        return
+    if links:
+        subject = "Your Data is Ready"
+        body = (
+            f"Your data file is ready for download:\n\n"
+            f"Data File: {links['data_url']}\n"
+            f"Metadata File: {links['metadata_url']}\n"
+        )
+        if links.get("map_url"):
+            body += f"Map File: {links['map_url']}\n"
+    else:
+        subject = "Data Processing Failed"
+        body = f"{message}\n"
+    body += f"\n{_request_summary(request_body)}\nDO NOT RESPOND TO THIS EMAIL\n"
+    try:
+        send_email(address, subject, body)
+    except Exception as error:  # noqa: BLE001 - the job result is still readable
+        logger.error(f"Failed to send the email for job {job_id}: {error}")
+
+
+# Running jobs: the event loop holds tasks only weakly, so a fire-and-forget
+# task with no other reference can be garbage-collected before it finishes.
+_running_jobs: set[asyncio.Task] = set()
+
+
+async def run_direct_job(job_id: str, request_body: ReadDataRequest, temp_dir: str,
+                         notify_address: str | None = None) -> None:
     """Execute one accepted asynchronous request and record its outcome.
 
     Every failure is stored on the job rather than raised: nothing is waiting
-    on this task, so an exception here would otherwise be lost.
+    on this task, so an exception here would otherwise be lost. When
+    ``notify_address`` is given, the outcome is also emailed there.
     """
     jobs.registry.mark_running(job_id)
     started = perf_counter()
+    links = None
     try:
         result = await _read_data_for_request(request_body)
         if _has_no_data(result):
@@ -359,27 +406,29 @@ async def run_direct_job(job_id: str, request_body: ReadDataRequest, temp_dir: s
                 f"Asynchronous job {job_id} finished with no data "
                 f"after {perf_counter() - started:.1f} s"
             )
+            message = "No data available for the selected parameters."
             jobs.registry.finish(
-                job_id, jobs.NO_DATA, error_code="no_data",
-                message="No data available for the selected parameters.",
+                job_id, jobs.NO_DATA, error_code="no_data", message=message,
             )
-            return
-        links = _persist_result(result, request_body, temp_dir)
-        logger.info(
-            f"Asynchronous job {job_id} succeeded after "
-            f"{perf_counter() - started:.1f} s; data file "
-            f"{os.path.basename(links['data_url'])}"
-        )
-        jobs.registry.finish(job_id, jobs.SUCCESS, result=links)
+        else:
+            links = _persist_result(result, request_body, temp_dir)
+            logger.info(
+                f"Asynchronous job {job_id} succeeded after "
+                f"{perf_counter() - started:.1f} s; data file "
+                f"{os.path.basename(links['data_url'])}"
+            )
+            message = None
+            jobs.registry.finish(job_id, jobs.SUCCESS, result=links)
     except Exception as error:  # noqa: BLE001 - the client learns the outcome from the job
         logger.error(
             f"Asynchronous job {job_id} failed after "
             f"{perf_counter() - started:.1f} s: {error}"
         )
+        message = "An internal error occurred during data processing."
         jobs.registry.finish(
-            job_id, jobs.ERROR, error_code="internal_error",
-            message="An internal error occurred during data processing.",
+            job_id, jobs.ERROR, error_code="internal_error", message=message,
         )
+    _notify(notify_address, job_id, request_body, links, message)
 
 
 @api_router.post("/read-data-direct", response_model=None)
@@ -409,9 +458,13 @@ async def read_data_direct(
     if getattr(request_body, "mode", "sync") == "async":
         job = jobs.registry.create(owner=current_user.username)
         logger.info(f"Accepted asynchronous data request as job {job.job_id}")
-        # Fire and forget: the task keeps a reference through the registry and
-        # reports its outcome there.
-        asyncio.create_task(run_direct_job(job.job_id, request_body, temp_dir))
+        # Fire and forget: the task reports its outcome on the job.
+        notify_address = current_user.email if request_body.notify_email else None
+        task = asyncio.create_task(
+            run_direct_job(job.job_id, request_body, temp_dir, notify_address)
+        )
+        _running_jobs.add(task)
+        task.add_done_callback(_running_jobs.discard)
         payload = job.as_response()
         payload["status_url"] = f"{_public_base_url()}/jobs/{job.job_id}"
         payload["poll_after_seconds"] = 5

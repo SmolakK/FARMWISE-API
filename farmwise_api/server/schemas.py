@@ -96,6 +96,14 @@ class ReadDataRequest(BaseModel):
             "GET /jobs/{job_id} for the result."
         )
     )
+    notify_email: Optional[bool] = Field(
+        False,
+        description=(
+            "With mode 'async', also email the outcome (the download links, "
+            "or why there are none) to the account's address when the job "
+            "finishes. Useful for jobs that outlive a login session."
+        )
+    )
 
     @field_validator("time_from", "time_to")
     def validate_date(cls, value) -> str:

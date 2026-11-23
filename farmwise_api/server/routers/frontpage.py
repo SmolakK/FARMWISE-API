@@ -262,7 +262,12 @@ async def secured_frontend_page() -> HTMLResponse:
                     factors: factors,
                     separate_api: document.getElementById("separate_api").checked,
                     interpolation: !document.getElementById("no_interpolation").checked,
-                    produce_map: document.getElementById("produce_map").checked
+                    produce_map: document.getElementById("produce_map").checked,
+                    // A large request runs for tens of minutes: submit it as
+                    // a job and poll it, rather than holding one HTTP
+                    // request open for the whole run.
+                    mode: 'async',
+                    notify_email: true
                 };
 
                 if (useCountry) {
@@ -276,29 +281,120 @@ async def secured_frontend_page() -> HTMLResponse:
                     ];
                 }
 
-                const response = await fetch('/read-data', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    document.getElementById('result').innerText = 'Error: ' + response.statusText;
+                let accepted;
+                try {
+                    const response = await fetch('/read-data-direct', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) {
+                        showResult('Error: ' + await describeFailure(response));
+                        return;
+                    }
+                    accepted = await response.json();
+                } catch (error) {
+                    showResult('Error: could not reach the FARMWISE server (' + error.message + ').');
                     return;
                 }
 
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let resultText = '';
+                showResult('Request accepted. Processing...');
+                await followJob(accepted.job_id, token);
+            }
 
+            const POLL_SECONDS = 5;
+
+            function showResult(text) {
+                document.getElementById('result').innerText = text;
+            }
+
+            // The status and the server's own explanation. statusText alone
+            // is often empty, which left the page saying only "Error:".
+            async function describeFailure(response) {
+                let detail = '';
+                try {
+                    const body = await response.json();
+                    const raw = body.detail !== undefined ? body.detail
+                        : body.error !== undefined ? body.error : body;
+                    if (Array.isArray(raw)) {
+                        detail = raw.map(item => {
+                            const field = (item.loc || []).slice(1).join('.');
+                            return (field ? field + ': ' : '') + item.msg;
+                        }).join('; ');
+                    } else if (raw && typeof raw === 'object') {
+                        detail = raw.message || JSON.stringify(raw);
+                    } else {
+                        detail = String(raw);
+                    }
+                } catch (error) {
+                    detail = '';
+                }
+                const status = ('HTTP ' + response.status + ' ' + (response.statusText || '')).trim();
+                return detail ? status + ': ' + detail : status;
+            }
+
+            async function followJob(jobId, token) {
+                const started = Date.now();
                 while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    resultText += decoder.decode(value);
-                    document.getElementById('result').innerText = resultText;
+                    await new Promise(resolve => setTimeout(resolve, POLL_SECONDS * 1000));
+                    const minutes = Math.floor((Date.now() - started) / 60000);
+                    let response;
+                    try {
+                        response = await fetch('/jobs/' + jobId, {
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                    } catch (error) {
+                        showResult('Processing for ' + minutes + ' min. The last status check '
+                            + 'did not reach the server; retrying...');
+                        continue;
+                    }
+                    if (response.status === 429) {
+                        continue;
+                    }
+                    if (response.status === 401) {
+                        showResult('Your login session has expired, so this page can no longer '
+                            + 'follow the request. It keeps running on the server and the '
+                            + 'result will be emailed to you.');
+                        return;
+                    }
+                    if (!response.ok) {
+                        showResult('Error: ' + await describeFailure(response));
+                        return;
+                    }
+                    const job = await response.json();
+                    if (job.status === 'success') {
+                        showLinks(job);
+                        return;
+                    }
+                    if (job.status === 'no_data' || job.status === 'error') {
+                        showResult('Error: ' + job.message);
+                        return;
+                    }
+                    showResult((job.status === 'accepted' ? 'Queued' : 'Processing') + ' for '
+                        + minutes + ' min... You can close this page: the result will also '
+                        + 'be emailed to you.');
+                }
+            }
+
+            function showLinks(job) {
+                const result = document.getElementById('result');
+                result.textContent = 'Data processing completed. The links are also being emailed to you.';
+                const links = [
+                    ['Data file', job.data_url],
+                    ['Metadata file', job.metadata_url],
+                    ['Map', job.map_url]
+                ];
+                for (const [label, url] of links) {
+                    if (!url) continue;
+                    result.appendChild(document.createElement('br'));
+                    const anchor = document.createElement('a');
+                    anchor.href = url;
+                    anchor.textContent = label;
+                    anchor.target = '_blank';
+                    result.appendChild(anchor);
                 }
             }
 

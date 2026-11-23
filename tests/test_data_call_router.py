@@ -189,3 +189,76 @@ async def test_results_are_written_even_if_the_temp_directory_disappeared(monkey
 
     assert response["status"] == jobs.SUCCESS
     assert missing.is_dir()
+
+
+@pytest.mark.asyncio
+async def test_async_job_emails_the_links_when_asked(monkeypatch, tmp_path):
+    """The web page asks for an email: its session can expire before the job ends."""
+    sent = []
+    monkeypatch.setattr(data_call, "read_data", lambda **_kwargs: _future(_result()))
+    monkeypatch.setattr(data_call, "send_email", lambda *args: sent.append(args))
+
+    accepted = await data_call.read_data_direct.__wrapped__(
+        request_body=_request(mode="async", notify_email=True),
+        request=_http_request(tmp_path), current_user=USER,
+    )
+    job_id = json.loads(accepted.body.decode())["job_id"]
+    await asyncio.gather(*data_call._running_jobs)
+
+    state = jobs.registry.get(job_id, owner=USER.username).as_response()
+    assert state["status"] == jobs.SUCCESS
+    [(address, subject, body)] = sent
+    assert address == USER.email
+    assert subject == "Your Data is Ready"
+    assert state["data_url"] in body and state["metadata_url"] in body
+
+
+@pytest.mark.asyncio
+async def test_async_job_emails_a_failure_when_asked(monkeypatch, tmp_path):
+    sent = []
+
+    async def failing_read_data(**_kwargs):
+        raise MemoryError()
+
+    monkeypatch.setattr(data_call, "read_data", failing_read_data)
+    monkeypatch.setattr(data_call, "send_email", lambda *args: sent.append(args))
+    job = jobs.registry.create(owner=USER.username)
+
+    await data_call.run_direct_job(
+        job.job_id, _request(mode="async"), str(tmp_path), notify_address=USER.email
+    )
+
+    [(_, subject, body)] = sent
+    assert subject == "Data Processing Failed"
+    assert "internal error" in body
+
+
+@pytest.mark.asyncio
+async def test_a_mail_failure_does_not_fail_the_job(monkeypatch, tmp_path):
+    def broken_smtp(*_args):
+        raise OSError("SMTP down")
+
+    monkeypatch.setattr(data_call, "read_data", lambda **_kwargs: _future(_result()))
+    monkeypatch.setattr(data_call, "send_email", broken_smtp)
+    job = jobs.registry.create(owner=USER.username)
+
+    await data_call.run_direct_job(
+        job.job_id, _request(mode="async"), str(tmp_path), notify_address=USER.email
+    )
+
+    assert jobs.registry.get(job.job_id, owner=USER.username).status == jobs.SUCCESS
+
+
+@pytest.mark.asyncio
+async def test_async_job_sends_no_email_by_default(monkeypatch, tmp_path):
+    sent = []
+    monkeypatch.setattr(data_call, "read_data", lambda **_kwargs: _future(_result()))
+    monkeypatch.setattr(data_call, "send_email", lambda *args: sent.append(args))
+
+    await data_call.read_data_direct.__wrapped__(
+        request_body=_request(mode="async"),
+        request=_http_request(tmp_path), current_user=USER,
+    )
+    await asyncio.gather(*data_call._running_jobs)
+
+    assert sent == []
