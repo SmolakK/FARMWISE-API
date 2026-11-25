@@ -42,6 +42,15 @@ TARGET_PYTHON = "3.11.5"
 # Extras included in the lock: what `pip install ".[server,dev]"` installs.
 LOCKED_EXTRAS = ("server", "dev")
 
+# Resolve against PyPI as it stood at this instant, not as it is now. Without
+# a cutoff the lock depends on the minute it was generated: every new upstream
+# release failed the CI --check, and a release still being uploaded (fonttools
+# 4.69.0 had 4 of its files when the lock was generated) left a lock that
+# pip could not install on Linux. uv also ignores files added later to older
+# releases, so the result stays reproducible. Move this date forward on
+# purpose, e.g. to take a security fix, then regenerate the lock.
+EXCLUDE_NEWER = "2026-11-24T00:00:00Z"
+
 # Lines uv writes recording its own invocation. They embed the -o path, which
 # differs between a real run and a --check run, so they are excluded from the
 # comparison rather than being allowed to cause false drift.
@@ -62,6 +71,7 @@ def compile_lock(destination: Path) -> None:
         "--universal",                    # one lock for every platform
         "--generate-hashes",
         "--python-version", TARGET_PYTHON,
+        "--exclude-newer", EXCLUDE_NEWER,
         "-o", str(destination),
     ]
     for extra in LOCKED_EXTRAS:

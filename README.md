@@ -367,14 +367,16 @@ Dependencies are specified at two levels, for two different purposes.
 python -m pip install -e ".[server,dev]"
 ```
 
-[`requirements-lock.txt`](requirements-lock.txt) pins the *exact* transitive closure — 146 packages, each with SHA-256 hashes — of the environment the published results and the CI test runs were produced in. Install this way to reconstruct that environment:
+[`requirements-lock.txt`](requirements-lock.txt) pins the *exact* transitive closure — 148 packages, each with SHA-256 hashes — of the environment the published results and the CI test runs were produced in. Install this way to reconstruct that environment:
 
 ```powershell
 python -m pip install --require-hashes -r requirements-lock.txt
 python -m pip install -e . --no-deps
 ```
 
-Regenerate the lock after changing any dependency in `pyproject.toml`:
+The lock is resolved against PyPI as it stood at the cutoff date `EXCLUDE_NEWER` in [`tools/make_lock.py`](tools/make_lock.py), so new upstream releases do not change it. To take newer versions (for example a security fix), move that date forward and regenerate.
+
+Regenerate the lock after changing any dependency in `pyproject.toml` or the cutoff date:
 
 ```powershell
 python tools\make_lock.py
