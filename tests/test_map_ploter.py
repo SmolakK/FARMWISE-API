@@ -70,15 +70,6 @@ def test_create_folium_map_embeds_controls_and_overlay(monkeypatch):
     dataset = _dataset()
     monkeypatch.setattr(
         map_ploter,
-        "create_raster",
-        lambda *_args, **_kwargs: (
-            np.array([[1.0, 2.0]], dtype=float),
-            "temperature",
-            (16.0, 50.0, 18.0, 52.0),
-        ),
-    )
-    monkeypatch.setattr(
-        map_ploter,
         "raster_to_png_base64",
         lambda *_args, **_kwargs: "data:image/png;base64,ZmFrZQ==",
     )
@@ -150,3 +141,62 @@ def test_create_folium_map_does_not_warn_for_days_without_values(caplog):
     assert "overlay_0_0" in html
     assert "overlay_0_1" not in html
     assert not caplog.records
+
+
+def _grid_dataset(days=4, level=10, params=("temperature", "rain")):
+    rng = np.random.default_rng(3)
+    cells = list(dict.fromkeys(
+        CellId.from_lat_lng(LatLng.from_degrees(lat, lon)).parent(level)
+        for lat in np.arange(50.0, 51.0, 0.05)
+        for lon in np.arange(16.0, 17.5, 0.05)
+    ))
+    columns = pd.MultiIndex.from_product([list(params), cells])
+    values = rng.normal(size=(days, len(columns)))
+    values[rng.random(values.shape) < 0.2] = np.nan
+    return pd.DataFrame(
+        values, index=pd.date_range("2024-01-01", periods=days), columns=columns
+    ), cells, level
+
+
+def test_each_pixel_takes_the_value_of_the_cell_under_its_centre():
+    dataset, cells, level = _grid_dataset()
+    values = dataset["temperature"].to_numpy()
+    interior, touched, (minx, miny, maxx, maxy) = map_ploter._cell_layout(cells, {})
+    raster = map_ploter._fill_layout(values[0], interior, touched)
+
+    height, width = raster.shape
+    by_cell = dict(zip(cells, values[0]))
+    rng = np.random.default_rng(0)
+    checked = 0
+    for row, col in zip(rng.integers(0, height, 400), rng.integers(0, width, 400)):
+        lon = minx + (col + 0.5) * (maxx - minx) / width
+        lat = maxy - (row + 0.5) * (maxy - miny) / height
+        cell = CellId.from_lat_lng(LatLng.from_degrees(lat, lon)).parent(level)
+        if cell not in by_cell or np.isnan(by_cell[cell]):
+            continue
+        assert raster[row, col] == pytest.approx(by_cell[cell], rel=1e-6)
+        checked += 1
+    assert checked > 100
+
+
+def test_cells_are_rasterised_once_per_parameter_not_per_day(monkeypatch):
+    """Rasterising every cell for every day took ~12 min/day on Germany+Poland."""
+    dataset, _cells, _level = _grid_dataset(days=12)
+    calls = []
+    real = map_ploter.rasterize
+    monkeypatch.setattr(
+        map_ploter, "rasterize", lambda *a, **k: calls.append(1) or real(*a, **k)
+    )
+
+    html = map_ploter.create_folium_map(dataset, downsample_factor=1)
+
+    assert len(calls) == 2 * 2  # interior + touched layout, for each of 2 parameters
+    assert "overlay_1_11" in html
+
+
+def test_colour_table_matches_the_colormap():
+    from matplotlib import colormaps
+
+    index = np.arange(256, dtype=np.uint8)
+    expected = (colormaps.get_cmap("viridis")(index) * 255).astype(np.uint8)
+    np.testing.assert_array_equal(map_ploter._colour_table("viridis")[index], expected)

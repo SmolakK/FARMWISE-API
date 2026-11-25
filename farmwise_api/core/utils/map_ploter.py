@@ -3,6 +3,8 @@ import json
 from io import BytesIO
 
 import base64
+from functools import lru_cache
+
 import numpy as np
 import pandas as pd
 from PIL import Image
@@ -86,6 +88,67 @@ def create_raster(dataset, day, param, pixel_size=0.01):
     return raster, param, (minx, miny, maxx, maxy)
 
 
+def _cell_corners(cell_id, cache):
+    """The four (lon, lat) vertices of an S2 cell, computed once per cell."""
+    key = cell_id.id() if hasattr(cell_id, "id") else cell_id
+    corners = cache.get(key)
+    if corners is None:
+        cell = Cell(cell_id)
+        corners = []
+        for i in range(4):
+            latlng = LatLng.from_point(cell.get_vertex(i))
+            corners.append((latlng.lng().degrees, latlng.lat().degrees))
+        cache[key] = corners
+    return corners
+
+
+def _cell_layout(cells, cache, pixel_size=0.01):
+    """Rasters of cell positions (-1 outside every cell) and their bounds.
+
+    ``interior`` gives the cell containing each pixel centre; ``touched`` also
+    covers pixels a cell only grazes, so cells smaller than a pixel still show
+    (the ``all_touched`` behaviour of :func:`create_raster`).
+    """
+    corners = np.array([_cell_corners(cell, cache) for cell in cells], dtype=float)
+    minx, miny = corners[..., 0].min(), corners[..., 1].min()
+    maxx, maxy = corners[..., 0].max(), corners[..., 1].max()
+
+    width = max(int(np.ceil((maxx - minx) / pixel_size)), 1)
+    height = max(int(np.ceil((maxy - miny) / pixel_size)), 1)
+    transform_affine = from_bounds(minx, miny, maxx, maxy, width, height)
+    polygons = [Polygon(c) for c in corners]
+
+    def positions(all_touched):
+        return rasterize(
+            shapes=zip(polygons, range(len(polygons))),
+            out_shape=(height, width),
+            transform=transform_affine,
+            fill=-1,
+            dtype="int32",
+            all_touched=all_touched,
+        )
+
+    bounds = (float(minx), float(miny), float(maxx), float(maxy))
+    return positions(False), positions(True), bounds
+
+
+def _fill_layout(day_values, interior, touched):
+    """One day's raster: each pixel takes its cell's value, NaN where none."""
+    lookup = np.append(day_values, np.nan).astype(np.float32)  # -1 -> NaN
+    raster = lookup[interior]
+    gaps = np.isnan(raster)
+    raster[gaps] = lookup[touched[gaps]]
+    return raster
+
+
+@lru_cache(maxsize=None)
+def _colour_table(colormap):
+    """The 256 RGBA colours of a matplotlib colormap as uint8."""
+    from matplotlib import colormaps
+    cmap = colormaps.get_cmap(colormap)
+    return (cmap(np.arange(256)) * 255).astype(np.uint8)
+
+
 def raster_to_png_base64(raster, vmin, vmax, colormap='viridis', downsample=4):
     """
     Convert a raster to an RGBA PNG image and return as base64 data URL.
@@ -118,13 +181,12 @@ def raster_to_png_base64(raster, vmin, vmax, colormap='viridis', downsample=4):
         normalized = ((valid_values - vmin) / (vmax - vmin) * 255).clip(0, 255)
         raster_normalized[valid_mask] = normalized.astype(np.uint8)
 
-    # Map to RGBA using matplotlib
-    from matplotlib import colormaps
-    cmap = colormaps.get_cmap(colormap)
-    rgba_image = cmap(raster_normalized)
-    rgba_image[~valid_mask] = [0, 0, 0, 0]  # transparent where NaN
+    # Map to RGBA through the colormap's 256-entry table (the same colours as
+    # calling the colormap on every pixel, without a float RGBA array).
+    rgba_image = _colour_table(colormap)[raster_normalized]
+    rgba_image[~valid_mask] = 0  # transparent where NaN
 
-    img = Image.fromarray((rgba_image * 255).astype(np.uint8))
+    img = Image.fromarray(rgba_image)
 
     buffer = BytesIO()
     img.save(buffer, format='PNG')
@@ -203,47 +265,40 @@ def create_folium_map(
     if not parameters:
         raise ValueError("Dataset has no parameters in columns.")
 
-    # ---- 1st pass: compute global bounds & per-parameter min/max ----
-    logger.debug("Calculating parameter ranges...")
+    # ---- 1st pass: one cell layout per parameter, value range, bounds ----
+    # The cells of a parameter are the same on every day, so their polygons
+    # are rasterised once and each day's frame is filled by array lookup.
+    # Rebuilding and rasterising every polygon per day and parameter took
+    # about 12 minutes per day on a Germany + Poland request.
+    logger.debug("Rasterising cell layouts...")
 
-    param_ranges = {param: {'min': float('inf'), 'max': float('-inf')} for param in parameters}
+    param_ranges = {param: {'min': 0.0, 'max': 0.0} for param in parameters}
+    layouts = {}
     all_bounds = []
+    corner_cache: dict = {}
 
-    for day in tqdm(dates_index, total=len(dates_index)):
-        for param in parameters:
+    for param in tqdm(parameters, total=len(parameters)):
+        block = dataset[param]
+        try:
+            values = block.to_numpy(dtype=float)
+        except (TypeError, ValueError) as e:
+            logger.debug("Skipping non-numeric parameter %s: %s", param, e)
+            continue
+        if values.ndim == 1:
+            values = values[:, None]
+        has_data = ~np.isnan(values).all(axis=0)
+        if not has_data.any():
+            continue
+        values = values[:, has_data]
+        cells = block.columns[has_data]
 
-            # --- Fast skip: if no data, don't call rasterization ---
-            s = dataset.loc[day, param]
-            if s.isna().all():
-                continue
-
-            try:
-                raster, _, bounds = create_raster(dataset, day, param)
-            except Exception as e:
-                logger.debug("Skipping %s - %s: %s", day, param, e)
-                continue
-
-            all_bounds.append(bounds)
-
-            # --- Fast min/max using masked array ---
-            if np.isnan(raster).all():
-                continue
-
-            # Compute min/max from raster
-            vmin = float(np.nanmin(raster))
-            vmax = float(np.nanmax(raster))
-
-            # Inline update (faster than Python min/max)
-            if vmin < param_ranges[param]['min']:
-                param_ranges[param]['min'] = vmin
-            if vmax > param_ranges[param]['max']:
-                param_ranges[param]['max'] = vmax
-
-    # Handle params with no data at all
-    for param, rng in param_ranges.items():
-        if rng['min'] == float('inf') or rng['max'] == float('-inf'):
-            rng['min'] = 0.0
-            rng['max'] = 0.0
+        layout = _cell_layout(cells, corner_cache)
+        layouts[param] = (values, layout)
+        all_bounds.append(layout[2])
+        param_ranges[param] = {
+            'min': float(np.nanmin(values)),
+            'max': float(np.nanmax(values)),
+        }
 
     logger.debug("Parameter ranges:")
     for param, rng in param_ranges.items():
@@ -307,19 +362,23 @@ def create_folium_map(
     overlay_data = {}
 
     for param_idx, param in tqdm(enumerate(parameters),total=len(parameters)):
+        if param not in layouts:
+            continue
         rng = param_ranges[param]
         vmin, vmax = rng['min'], rng['max']
+        values, (interior, touched, bounds) = layouts[param]
         empty_days = 0
 
         for date_idx, day in enumerate(dates_index):
             # A day without values for this parameter is normal (sparse
             # station data) and has no overlay. Logging each one as a warning
             # wrote thousands of lines per Europe-wide request.
-            if dataset.loc[day, param].isna().all():
+            day_values = values[date_idx]
+            if np.isnan(day_values).all():
                 empty_days += 1
                 continue
             try:
-                raster, _, bounds = create_raster(dataset, day, param)
+                raster = _fill_layout(day_values, interior, touched)
 
                 img_base64 = raster_to_png_base64(
                     raster,
